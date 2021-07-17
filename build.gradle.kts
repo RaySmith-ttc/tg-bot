@@ -1,10 +1,11 @@
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.4.10"
     kotlin("jvm") version "1.5.10"
+    id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "0.0.1"
+version = "0.0.1-rc.1"
 
 repositories {
     mavenCentral()
@@ -15,6 +16,19 @@ repositories {
         credentials {
             username = System.getenv("git.username")
             password = System.getenv("git.read-token")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/raysmith-ttc/tg-bot")
+            credentials {
+                username = System.getenv("git.username")
+                password = System.getenv("git.publish-token")
+            }
         }
     }
 }
