@@ -1,0 +1,35 @@
+{
+  "update_id": 391845986,
+  "message": {
+    "message_id": 5,
+    "from": {
+      "id": 243562346,
+      "is_bot": false,
+      "first_name": "Ray",
+      "last_name": "Smith",
+      "username": "raysmithdev",
+      "language_code": "en"
+    },
+    "chat": {
+      "id": 243562346,
+      "first_name": "Ray",
+      "last_name": "Smith",
+      "username": "raysmithdev",
+      "type": "private"
+    },
+    "date": 1622588165,
+      "text": "Some utf-16 symbol: 潮\nlink: https://telegram.org\nphone: +1-212-555-0123",
+    "entities": [
+      {
+        "offset": 29,
+        "length": 20,
+        "type": "url"
+      },
+      {
+        "offset": 57,
+        "length": 15,
+        "type": "phone_number"
+      }
+    ]
+  }
+}
