@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.*
 import ru.raysmith.tgbot.model.bot.inlineKeyboard
+import ru.raysmith.tgbot.model.network.chat.ChatMember
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 
 class Runner {
@@ -56,6 +57,12 @@ class Runner {
         Bot()
             .onError { e -> logger.error(e.message) }
             .start {
+                handleMyChatMember {
+                    if (newChatMember is ChatMember.ChatMemberMember) {
+                        send("Я родился")
+                    }
+                }
+
                 handleMessage {
 
                     if (messageText == "/start") {

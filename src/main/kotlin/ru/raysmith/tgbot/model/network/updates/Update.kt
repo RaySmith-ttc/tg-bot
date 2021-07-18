@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.ChosenInlineResult
 import ru.raysmith.tgbot.model.network.InlineQuery
+import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
 import ru.raysmith.tgbot.model.network.message.Message
 
 /**
@@ -59,8 +60,18 @@ data class Update(
 //    /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
 //    @SerialName("poll_answer") val pollAnswer: PollAnswer? = null,
 
-    // TODO [chat member support] add my_chat_member field (https://core.telegram.org/bots/api#update)
-    // TODO [chat member support] add chat_member field (https://core.telegram.org/bots/api#update)
+
+    /**
+     * The bot's chat member status was updated in a chat. For private chats, this update is received only when the
+     * bot is blocked or unblocked by the user.
+     * */
+    @SerialName("my_chat_member") val myChatMember: ChatMemberUpdated? = null,
+
+    /**
+     * A chat member's status was updated in a chat. The bot must be an administrator in the chat and must
+     * explicitly specify “chat_member” in the list of allowed_updates to receive these updates.
+     * */
+    @SerialName("chat_member") val chatMember: ChatMemberUpdated? = null,
 
 )
 

@@ -5,6 +5,7 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
 import ru.raysmith.tgbot.model.network.BooleanResponse
+import ru.raysmith.tgbot.model.network.GetMeResponse
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.inputmedia.InputMedia
@@ -18,6 +19,13 @@ import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 
 interface TelegramService {
 
+    /**
+     * A simple method for testing your bot's auth token. Requires no parameters.
+     * Returns basic information about the bot in form of a User object.
+     * */
+    @GET("getMe")
+    fun getMe(): Call<GetMeResponse>
+
     @GET("getUpdates")
     fun getUpdates(
         @Query("offset") offset: Int? = null,
@@ -26,7 +34,6 @@ interface TelegramService {
         @Query("allowed_updates") allowedUpdates: String? = null
     ): Call<UpdatesResult>
 
-    @GET("sendMessage")
     /**
      *  Use this method to send text messages. On success, the sent [Message] is returned.
      *
@@ -40,6 +47,7 @@ interface TelegramService {
      *  @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
      *  @param keyboardMarkup Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
      *  */
+    @GET("sendMessage")
     fun sendMessage(
         @Query("chat_id") chatId: String,
         @Query("text") text: String,

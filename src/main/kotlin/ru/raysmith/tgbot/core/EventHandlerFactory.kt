@@ -13,6 +13,8 @@ object EventHandlerFactory {
     private lateinit var messageHandler: MessageHandler.() -> Unit
     private lateinit var commandHandler: CommandHandler.() -> Unit
     private lateinit var callbackQueryHandler: CallbackQueryHandler.() -> Unit
+    private lateinit var chatMemberHandler: ChatMemberHandler.() -> Unit
+
     private var alwaysAnswer: Boolean = false
 
     fun getHandler(update: Update): EventHandler {
@@ -24,6 +26,8 @@ object EventHandlerFactory {
                 alwaysAnswer,
                 callbackQueryHandler
             )
+            ::callbackQueryHandler.isInitialized && update.myChatMember != null -> ChatMemberHandler(update.myChatMember, chatMemberHandler)
+            ::callbackQueryHandler.isInitialized && update.chatMember != null -> ChatMemberHandler(update.chatMember, chatMemberHandler)
             else -> EmptyEventHandler()
         }
     }
@@ -44,6 +48,16 @@ object EventHandlerFactory {
     fun handleCommand(handler: CommandHandler.() -> Unit) {
         allowedUpdates.addIFNotContains(UpdateType.MESSAGE)
         commandHandler = handler
+    }
+
+    fun handleMyChatMember(handler: ChatMemberHandler.() -> Unit) {
+        allowedUpdates.addIFNotContains(UpdateType.MY_CHAT_MEMBER)
+        chatMemberHandler = handler
+    }
+
+    fun handleChatMember(handler: ChatMemberHandler.() -> Unit) {
+        allowedUpdates.addIFNotContains(UpdateType.CHAT_MEMBER)
+        chatMemberHandler = handler
     }
 
 }
