@@ -17,9 +17,9 @@ object EventHandlerFactory {
 
     fun getHandler(update: Update): EventHandler {
         return when {
-            update.message != null && update.message.type == MessageType.COMMAND -> CommandHandler(BotCommand(update.message.text!!), update.message.from!!, commandHandler)
-            update.message != null && update.message.type == MessageType.TEXT -> MessageHandler(update.message, update.message.from!!, messageHandler)
-            update.callbackQuery != null -> CallbackQueryHandler(
+            ::commandHandler.isInitialized && update.message != null && update.message.type == MessageType.COMMAND -> CommandHandler(BotCommand(update.message.text!!), update.message.from!!, commandHandler)
+            ::messageHandler.isInitialized && update.message != null && update.message.type == MessageType.TEXT -> MessageHandler(update.message, update.message.from!!, messageHandler)
+            ::callbackQueryHandler.isInitialized && update.callbackQuery != null -> CallbackQueryHandler(
                 update.callbackQuery,
                 alwaysAnswer,
                 callbackQueryHandler

@@ -1,11 +1,13 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.4.10"
-    kotlin("jvm") version "1.5.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.21"
+    kotlin("jvm") version "1.5.21"
     id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "0.0.1-rc.1"
+version = "0.0.1-rc.2"
 
 repositories {
     mavenCentral()
@@ -31,19 +33,22 @@ publishing {
             }
         }
     }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+    }
 }
 
 java {
-    withSourcesJar()
-    withJavadocJar()
+    @Suppress("UnstableApiUsage") withSourcesJar()
+    @Suppress("UnstableApiUsage") withJavadocJar()
 }
 
 dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
-    implementation("junit:junit:4.13.1")
-    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
 
     // Logging
     val slf4jVersion = "1.7.26"
@@ -52,7 +57,6 @@ dependencies {
     implementation("org.slf4j:slf4j-log4j12:$slf4jVersion")
 
     // Network
-
     val kotlinxSerializationVersion = "1.0.1"
     implementation("com.squareup.retrofit2:retrofit:2.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
@@ -65,12 +69,23 @@ dependencies {
     implementation("ru.raysmith:utils:1.0.0-rc.5")
 
     // Testing
+    implementation("junit:junit:4.13.1")
+    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     testImplementation("org.assertj:assertj-core:3.19.0")
     testImplementation("org.mockito:mockito-core:3.+")
-	testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+            targetCompatibility = JavaVersion.VERSION_1_8.toString()
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+    withType<Test> {
+        useJUnitPlatform()
+    }
 }
