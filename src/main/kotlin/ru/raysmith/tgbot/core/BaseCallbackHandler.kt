@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramApi
 
+/** Base implementation of query callback handler */
 open class BaseCallbackHandler(open val query: CallbackQuery) : ICallbackHandler {
     var isAnswered = false
 

@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.media.*
+import ru.raysmith.tgbot.network.TelegramApi
 
 @Serializable
 /** This object represents a message. */
@@ -239,4 +240,7 @@ data class Message(
         voice != null -> voice
         else -> null
     }
+
+    /** Delete a message, including service messages */
+    fun delete() = TelegramApi.service.deleteMessage(chat.id.toString(), messageId).execute()
 }

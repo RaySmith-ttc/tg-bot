@@ -7,6 +7,7 @@ import retrofit2.http.*
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.GetMeResponse
 import ru.raysmith.tgbot.model.network.chat.ChatAction
+import ru.raysmith.tgbot.model.network.chat.GetChatResponse
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.inputmedia.InputMedia
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -25,6 +26,14 @@ interface TelegramService {
      * */
     @GET("getMe")
     fun getMe(): Call<GetMeResponse>
+
+    /**
+     * Use this method to get up to date information about the chat (current name of the user for one-on-one
+     * conversations, current username of a user, group or channel, etc.).
+     * Returns a [Chat][ru.raysmith.tgbot.model.network.chat.Chat] object on success.
+     * */
+    @GET("getChat")
+    fun getChat(@Query("chat_id") chatId: String): Call<GetChatResponse>
 
     @GET("getUpdates")
     fun getUpdates(
@@ -135,7 +144,7 @@ interface TelegramService {
     @GET("deleteMessage")
     fun deleteMessage(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Int
+        @Query("message_id") messageId: Long
     ): Call<BooleanResponse>
 
     @GET("answerCallbackQuery")

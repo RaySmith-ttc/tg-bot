@@ -13,10 +13,10 @@ interface ChatID {
 interface ISender : ChatID {
     fun send(text: String): Response<MessageSendResponse> = send { this.text = text }
     fun send(message: TextMessage.() -> Unit): Response<MessageSendResponse> {
-        return TextMessage().apply(message).send(chatId!!)
+        return TextMessage().apply(message).send(chatId!!.toString())
     }
     fun sendPhoto(message: PhotoMessage.() -> Unit): Response<MessageSendResponse> {
-        return PhotoMessage().apply(message).send(chatId!!)
+        return PhotoMessage().apply(message).send(chatId!!.toString())
     }
 }
 
@@ -26,6 +26,6 @@ interface IEditor : ChatID {
 
     fun edit(text: String) = edit { this.text = text }
     fun edit(message: TextMessage.() -> Unit): Response<MessageEditResponse> {
-        return TextMessage().apply(message).edit(chatId, messageId, inlineMessageId)
+        return TextMessage().apply(message).edit(chatId.toString(), messageId, inlineMessageId)
     }
 }

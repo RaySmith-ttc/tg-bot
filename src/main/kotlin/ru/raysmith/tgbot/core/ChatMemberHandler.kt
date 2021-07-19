@@ -14,7 +14,7 @@ class ChatMemberHandler(
     val newChatMember: ChatMember,
     val inviteLink: ChatInviteLink? = null,
     private val handler: ChatMemberHandler.() -> Unit
-) : EventHandler {
+) :  EventHandler, ISender, IEditor {
 
     constructor(chatMember: ChatMemberUpdated, handler: ChatMemberHandler.() -> Unit) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,

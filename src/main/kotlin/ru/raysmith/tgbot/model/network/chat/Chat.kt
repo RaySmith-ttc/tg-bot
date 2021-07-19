@@ -13,7 +13,7 @@ data class Chat(
     @SerialName("id") val id: Long,
 
     /** Type of chat, can be either “private”, “group”, “supergroup” or “channel” */
-    @SerialName("type") val type: String,
+    @SerialName("type") val type: ChatType,
 
     /** Title, for supergroups, channels and group chats */
     @SerialName("title") val title: String? = null,

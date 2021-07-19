@@ -12,7 +12,7 @@ class Runner {
 
     val CALLBACK_PREFIX = "cb_"
 
-    fun EventHandler.sendMain() {
+    fun ISender.sendMain() {
         send {
             text = "main"
             replyKeyboard {
@@ -21,7 +21,7 @@ class Runner {
         }
     }
 
-    fun EventHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
+    fun CallbackQueryHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
 
         val keyboard = inlineKeyboard {
             row {
@@ -128,7 +128,6 @@ class Runner {
                     }
                     isUnknown {
                         logger.warn("Unknown query: $query")
-                        answer()
                     }
                 }
 

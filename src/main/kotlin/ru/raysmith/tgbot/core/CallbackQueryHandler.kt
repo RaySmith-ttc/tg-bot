@@ -1,18 +1,16 @@
 package ru.raysmith.tgbot.core
 
 import retrofit2.Response
-import ru.raysmith.tgbot.model.bot.TextMessage
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
-import ru.raysmith.tgbot.model.network.message.response.MessageSendResponse
 import ru.raysmith.tgbot.network.TelegramApi
 
 class CallbackQueryHandler(
     override val query: CallbackQuery,
     private val alwaysAnswer: Boolean,
     private val handler: CallbackQueryHandler.() -> Unit
-): EventHandler, ISender, BaseCallbackHandler(query) {
+):  EventHandler, ISender, IEditor, BaseCallbackHandler(query) {
 
     override var chatId: String? = query.from.id.toString()
     override var messageId: Long? = query.message?.messageId
@@ -41,7 +39,7 @@ class CallbackQueryHandler(
 
     fun isUnknown(unknownHandler: UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
         if (!isAnswered) {
-            UnknownQueryHandler(query).apply { unknownHandler(query) }
+            UnknownQueryHandler(query).apply { unknownHandler(query) }.apply { answer() }
         }
     }
 

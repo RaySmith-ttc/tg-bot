@@ -10,6 +10,7 @@ object EventHandlerFactory {
 
     private val allowedUpdates = mutableListOf<UpdateType>()
 
+    private lateinit var unknownHandler: UnknownEventHandler.() -> Unit
     private lateinit var messageHandler: MessageHandler.() -> Unit
     private lateinit var commandHandler: CommandHandler.() -> Unit
     private lateinit var callbackQueryHandler: CallbackQueryHandler.() -> Unit
@@ -19,20 +20,33 @@ object EventHandlerFactory {
 
     fun getHandler(update: Update): EventHandler {
         return when {
-            ::commandHandler.isInitialized && update.message != null && update.message.type == MessageType.COMMAND -> CommandHandler(BotCommand(update.message.text!!), update.message.from!!, commandHandler)
-            ::messageHandler.isInitialized && update.message != null && update.message.type == MessageType.TEXT -> MessageHandler(update.message, update.message.from!!, messageHandler)
+
+            // message
+            ::commandHandler.isInitialized && update.message != null && update.message.type == MessageType.COMMAND ->
+                CommandHandler(BotCommand(update.message.text!!), update.message.from!!, commandHandler)
+
+            ::messageHandler.isInitialized && update.message != null && update.message.type == MessageType.TEXT ->
+                MessageHandler(update.message, update.message.from!!, messageHandler)
+
             ::callbackQueryHandler.isInitialized && update.callbackQuery != null -> CallbackQueryHandler(
                 update.callbackQuery,
                 alwaysAnswer,
                 callbackQueryHandler
             )
+
             ::callbackQueryHandler.isInitialized && update.myChatMember != null -> ChatMemberHandler(update.myChatMember, chatMemberHandler)
+
             ::callbackQueryHandler.isInitialized && update.chatMember != null -> ChatMemberHandler(update.chatMember, chatMemberHandler)
-            else -> EmptyEventHandler()
+
+            else -> UnknownEventHandler(update, unknownHandler)
         }
     }
 
     fun getAllowedUpdateTypes(): List<UpdateType> = allowedUpdates
+
+    fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
+        unknownHandler = handler
+    }
 
     fun handleMessage(handler: MessageHandler.() -> Unit) {
         allowedUpdates.addIFNotContains(UpdateType.MESSAGE)
@@ -74,7 +88,7 @@ class BotCommand(commandText: String) : ICommand {
     }
 }
 
-class CommandHandler(val command: ICommand, val user: User, val handler: CommandHandler.() -> Unit) : ISender, EventHandler {
+class CommandHandler(val command: ICommand, val user: User, val handler: CommandHandler.() -> Unit) : EventHandler, ISender, IEditor {
     override suspend fun handle() = handler()
 
     override var chatId: String? = user.id.toString()

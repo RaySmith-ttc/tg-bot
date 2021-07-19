@@ -1,5 +1,5 @@
 package ru.raysmith.tgbot.core
 
-interface EventHandler : ISender, IEditor {
+interface EventHandler {
     suspend fun handle()
 }

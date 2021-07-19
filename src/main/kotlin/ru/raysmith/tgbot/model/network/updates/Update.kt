@@ -73,5 +73,24 @@ data class Update(
      * */
     @SerialName("chat_member") val chatMember: ChatMemberUpdated? = null,
 
-)
+) {
+    /** Type of update. Null if unknown */
+    val type: UpdateType? = when {
+        message != null -> UpdateType.MESSAGE
+        editedMessage != null -> UpdateType.EDITED_MESSAGE
+        channelPost != null -> UpdateType.CHANNEL_POST
+        editedChannelPost != null -> UpdateType.EDITED_CHANNEL_POST
+        inlineQuery != null -> UpdateType.INLINE_QUERY
+        chosenInlineResult != null -> UpdateType.CHOSEN_INLINE_RESULT
+        callbackQuery != null -> UpdateType.CALLBACK_QUERY
+
+        // TODO [poll support] uncomment
+//        poll != null -> UpdateType.POLL
+//        pollAnswer != null -> UpdateType.POLL_ANSWER
+
+        myChatMember != null -> UpdateType.MY_CHAT_MEMBER
+        chatMember != null -> UpdateType.CHAT_MEMBER
+        else -> null
+    }
+}
 

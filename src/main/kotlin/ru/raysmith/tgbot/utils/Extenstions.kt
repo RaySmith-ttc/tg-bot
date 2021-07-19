@@ -5,7 +5,6 @@ import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramApi
 
 fun List<UpdateType>.asParameter(): String {
-//    return joinToString(",", "[", "]") { "\"${it.name.lowercase()}\"" }
     return TelegramApi.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
 }
 
