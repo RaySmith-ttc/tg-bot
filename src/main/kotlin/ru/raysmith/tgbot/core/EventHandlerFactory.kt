@@ -1,5 +1,9 @@
 package ru.raysmith.tgbot.core
 
+import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.ChatMemberHandler
+import ru.raysmith.tgbot.core.handler.MessageHandler
+import ru.raysmith.tgbot.core.handler.UnknownEventHandler
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update

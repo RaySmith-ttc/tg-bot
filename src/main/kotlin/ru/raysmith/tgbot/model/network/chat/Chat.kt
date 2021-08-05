@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.chat
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.utils.notNull
 
 @Serializable
@@ -116,5 +117,51 @@ data class Chat(
             append(username)
             append(")")
         }
+    }
+
+    // TODO move ban methods to interface, impl update types. It guarantee a context in a group, supergroup or channel
+    /**
+     * Ban a user in the group
+     *
+     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
+     * (in the format @channelusername)
+     * @param userId Unique identifier of the target user
+     * @param untilDate Date when the user will be unbanned, unix time.
+     * If user is banned for more than 366 days or less than 30 seconds from the current time they are considered
+     * to be banned forever. Applied for supergroups and channels only.
+     * @param revokeMessages Pass True to delete all messages from the chat for the user that is being removed.
+     * If False, the user will be able to see messages in the group that were sent before the user was removed.
+     * Always True for supergroups and channels.
+     *
+     * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
+     * */
+    fun ban(userId: Long, untilDate: Int? = null, revokeMessages: Boolean? = null) {
+        require(type == ChatType.GROUP || type == ChatType.SUPERGROUP || type == ChatType.CHANNEL) {
+            "Chat must be a group, supergroup or channel"
+        }
+        val id = when(type) {
+            ChatType.GROUP -> id.toString()
+            else -> username!!
+        }
+        TelegramApi.service.banChatMember(id, userId, untilDate, revokeMessages)
+    }
+
+    /**
+     * Unban a user in the group
+     *
+     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
+     * (in the format @username)
+     * @param userId Unique identifier of the target user
+     * @param onlyIfBanned Do nothing if the user is not banned
+     * */
+    fun unban(userId: Long, onlyIfBanned: Boolean? = null) {
+        require(type == ChatType.GROUP || type == ChatType.SUPERGROUP || type == ChatType.CHANNEL) {
+            "Chat must be a group, supergroup or channel"
+        }
+        val id = when(type) {
+            ChatType.GROUP -> id.toString()
+            else -> username!!
+        }
+        TelegramApi.service.unbanChatMember(id, userId, onlyIfBanned)
     }
 }

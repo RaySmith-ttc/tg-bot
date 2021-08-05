@@ -11,6 +11,8 @@ class MessageInlineKeyboard : MessageKeyboard {
         return InlineKeyboardMarkup(rows.map { it.getRow() })
     }
 
+    fun row(text: String, callbackData: String) = row { button(text, callbackData) }
+
     fun row(setRow: MessageInlineKeyboardRow.() -> Unit) {
         rows.add(
             MessageInlineKeyboardRow()

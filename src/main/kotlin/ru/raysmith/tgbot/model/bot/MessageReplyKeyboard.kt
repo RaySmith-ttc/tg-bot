@@ -9,6 +9,8 @@ class MessageReplyKeyboard : MessageKeyboard {
     var selective: Boolean? = null
     private val rows: MutableList<MessageReplyKeyboardRow> = mutableListOf()
 
+    fun row(text: String) = row { button(text) }
+
     fun row(setRow: MessageReplyKeyboardRow.() -> Unit) {
         rows.add(
             MessageReplyKeyboardRow()

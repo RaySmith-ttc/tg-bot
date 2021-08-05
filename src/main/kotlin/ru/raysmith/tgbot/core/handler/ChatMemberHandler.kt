@@ -1,5 +1,8 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
+import ru.raysmith.tgbot.core.EventHandler
+import ru.raysmith.tgbot.core.IEditor
+import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatInviteLink

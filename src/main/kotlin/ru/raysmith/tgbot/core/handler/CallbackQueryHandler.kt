@@ -1,6 +1,7 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
 import retrofit2.Response
+import ru.raysmith.tgbot.core.*
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
