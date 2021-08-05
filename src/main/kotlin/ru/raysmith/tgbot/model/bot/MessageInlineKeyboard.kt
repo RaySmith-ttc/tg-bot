@@ -3,12 +3,25 @@ package ru.raysmith.tgbot.model.bot
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.utils.PaginationRows
 
 class MessageInlineKeyboard : MessageKeyboard {
     private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()
 
     override fun toMarkup(): KeyboardMarkup {
         return InlineKeyboardMarkup(rows.map { it.getRow() })
+    }
+
+    fun <T> pagination(
+        data: Iterable<T>,
+        page: Int,
+        pageFirstQuery: String,
+        pageQuery: String,
+        pageLastQuery: String,
+        createButtons: MessageInlineKeyboardRow.(item: T) -> Unit)
+    {
+        PaginationRows(this, pageFirstQuery, pageQuery, pageLastQuery)
+            .addRows(data, page, createButtons)
     }
 
     fun row(text: String, callbackData: String) = row { button(text, callbackData) }
