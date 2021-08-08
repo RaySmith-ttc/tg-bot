@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.utils
 
+import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import java.text.SimpleDateFormat
@@ -15,7 +16,7 @@ val shortDateFormat = SimpleDateFormat("dd.MM")
 /**
  * Class for creating calendar keyboard.
  *
- * TODO [docs]
+ * TODO docs
  *
  * */
 
@@ -70,7 +71,7 @@ class CalendarKeyboardCreator(
             year: Int,
             month: Int,
             prefixCallbackData: String,
-            emptyDaySymbol: String = InlineKeyboardButton.EMPTY_CALLBACK_DATA
+            emptyDaySymbol: String = CallbackQuery.EMPTY_CALLBACK_DATA
         ): MutableList<List<InlineKeyboardButton>> {
             val yearMonth = YearMonth.of(year, month)
             val prefixDays = yearMonth.atDay(1).dayOfWeek.value - 1

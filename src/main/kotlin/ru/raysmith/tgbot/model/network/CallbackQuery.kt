@@ -45,4 +45,8 @@ data class CallbackQuery(
      * @see <a href="https://core.telegram.org/bots/api#games">games</>
      * */
     @SerialName("game_short_name") val gameShortName: String? = null,
-)
+) {
+    companion object {
+        const val EMPTY_CALLBACK_DATA = " "
+    }
+}

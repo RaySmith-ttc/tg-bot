@@ -18,7 +18,7 @@ class CallbackQueryHandler(
     override var inlineMessageId: String? = query.inlineMessageId
 
     override suspend fun handle() = run {
-        if (query.data == InlineKeyboardButton.EMPTY_CALLBACK_DATA) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
         else handler().also {
             if (alwaysAnswer && !isAnswered) answer()
         }
@@ -40,7 +40,10 @@ class CallbackQueryHandler(
     ) {
         if (!isAnswered && query.data != null && query.data.startsWith(startWith)) {
             val value = query.data.substring(startWith.length, query.data.length)
-            if (value.isEmpty()) return
+            if (value.isEmpty()) {
+                answer()
+                this@CallbackQueryHandler.isAnswered = true
+            }
             ValueDataCallbackQueryHandler(query, query.data, value)
                 .apply { startWithHandler(query.data!!, value) }
                 .apply { answer() }

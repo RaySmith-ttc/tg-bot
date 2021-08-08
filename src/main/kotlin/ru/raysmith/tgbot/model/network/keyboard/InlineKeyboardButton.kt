@@ -45,8 +45,4 @@ data class InlineKeyboardButton(
      * @see <a href="https://core.telegram.org/bots/api#payments">https://core.telegram.org/bots/api#payments</a>
      * */
     @SerialName("pay") val pay: Boolean? = null
-) {
-    companion object {
-            const val EMPTY_CALLBACK_DATA = " "
-    }
-}
+)
