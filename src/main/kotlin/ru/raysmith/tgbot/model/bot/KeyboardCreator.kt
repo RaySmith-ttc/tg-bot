@@ -1,5 +1,8 @@
 package ru.raysmith.tgbot.model.bot
 
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
+
 abstract class KeyboardCreator {
 
     var keyboardMarkup: MessageKeyboard? = null
@@ -16,6 +19,14 @@ abstract class KeyboardCreator {
             .apply(init)
 
         return keyboardMarkup as MessageKeyboard
+    }
+
+    fun removeKeyboard(selective: Boolean? = null) {
+        keyboardMarkup = object : MessageKeyboard {
+            override fun toMarkup(): KeyboardMarkup {
+                return ReplyKeyboardRemove(selective = selective)
+            }
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 class MessageReplyKeyboard : MessageKeyboard {
     var resizeKeyboard: Boolean? = true
     var oneTimeKeyboard: Boolean? = null
+    var inputFieldPlaceholder: String? = null
     var selective: Boolean? = null
     private val rows: MutableList<MessageReplyKeyboardRow> = mutableListOf()
 
@@ -19,7 +20,7 @@ class MessageReplyKeyboard : MessageKeyboard {
     }
 
     override fun toMarkup(): ReplyKeyboardMarkup {
-        return ReplyKeyboardMarkup(rows.map { it.getRow() }, resizeKeyboard, oneTimeKeyboard, selective)
+        return ReplyKeyboardMarkup(rows.map { it.getRow() }, resizeKeyboard, oneTimeKeyboard, inputFieldPlaceholder, selective)
     }
 
     inner class MessageReplyKeyboardRow {

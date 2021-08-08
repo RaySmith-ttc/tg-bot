@@ -28,6 +28,9 @@ data class ReplyKeyboardMarkup(
      * */
     @SerialName("one_time_keyboard") val oneTimeKeyboard: Boolean? = null,
 
+    /** The placeholder to be shown in the input field when the keyboard is active; 1-64 characters */
+    @SerialName("input_field_placeholder") val inputFieldPlaceholder: String? = null,
+
     /**
      * Use this parameter if you want to show the keyboard to specific users only. Targets:
      * - users that are &#064;mentioned in the *text* of the [Message] object;
