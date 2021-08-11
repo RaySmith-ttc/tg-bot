@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.core.handler.ChatMemberHandler
 import ru.raysmith.tgbot.core.handler.MessageHandler
 import ru.raysmith.tgbot.core.handler.UnknownEventHandler
 import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
@@ -27,7 +28,7 @@ object EventHandlerFactory {
 
             // message
             ::commandHandler.isInitialized && update.message != null && update.message.type == MessageType.COMMAND ->
-                CommandHandler(BotCommand(update.message.text!!), update.message.from!!, commandHandler)
+                CommandHandler(BotCommand(update.message.text!!), update.message.from!!, update, commandHandler)
 
             ::messageHandler.isInitialized && update.message != null && update.message.type == MessageType.TEXT ->
                 MessageHandler(update.message, update.message.from!!, messageHandler)
@@ -92,7 +93,7 @@ class BotCommand(commandText: String) : ICommand {
     }
 }
 
-class CommandHandler(val command: ICommand, val user: User, val handler: CommandHandler.() -> Unit) : EventHandler, ISender, IEditor {
+class CommandHandler(val command: ICommand, val user: User, val update: Update, val handler: CommandHandler.() -> Unit) : EventHandler, ISender, IEditor {
     override suspend fun handle() = handler()
 
     override var chatId: String? = user.id.toString()

@@ -28,18 +28,18 @@ data class Sticker(
     @SerialName("is_animated") val isAnimated: Boolean,
 
     /** Sticker thumbnail in the .WEBP or .JPG format */
-    @SerialName("thumb") val thumb: PhotoSize,
+    @SerialName("thumb") val thumb: PhotoSize? = null,
 
     /** Emoji associated with the sticker */
-    @SerialName("emoji") val emoji: String,
+    @SerialName("emoji") val emoji: String? = null,
 
     /** Name of the sticker set to which the sticker belongs */
-    @SerialName("set_name") val setName: String,
+    @SerialName("set_name") val setName: String? = null,
 
     /** For mask stickers, the position where the mask should be placed */
-    @SerialName("mask_position") val maskPosition: MaskPosition,
+    @SerialName("mask_position") val maskPosition: MaskPosition? = null,
 
     /** File size */
-    @SerialName("file_size") val fileSize: Int
+    @SerialName("file_size") val fileSize: Int? = null
 
 )
