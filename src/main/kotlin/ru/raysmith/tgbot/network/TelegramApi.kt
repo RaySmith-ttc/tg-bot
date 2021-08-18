@@ -61,12 +61,12 @@ object TelegramApi {
         }
     }
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://api.telegram.org/bot$TOKEN/")
-        .client(client)
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .addConverterFactory(NetworkUtils.EnumConverterFactory())
-        .build()
+    private fun getRetrofit(token: String) = Retrofit.Builder()
+            .baseUrl("https://api.telegram.org/bot$token/")
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(NetworkUtils.EnumConverterFactory())
+            .build()
 
     private val fileRetrofit = Retrofit.Builder()
         .baseUrl("https://api.telegram.org/file/bot$TOKEN/")
@@ -75,7 +75,16 @@ object TelegramApi {
         .addConverterFactory(NetworkUtils.EnumConverterFactory())
         .build()
 
-    val service = retrofit.create(TelegramService::class.java)
+    private val services = mutableMapOf<String, TelegramService>()
+    val service = getRetrofit(TOKEN).create(TelegramService::class.java)
     val fileService = fileRetrofit.create(TelegramFileService::class.java)
+
+    fun serviceWithToken(token: String): TelegramService {
+        return services[token] ?: run {
+            val newService = getRetrofit(token).create(TelegramService::class.java)
+            services[token] = newService
+            newService
+        }
+    }
 }
 
