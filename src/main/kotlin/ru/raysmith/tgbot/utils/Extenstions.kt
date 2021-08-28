@@ -4,10 +4,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramApi
 
-fun List<UpdateType>.asParameter(): String {
+internal fun List<UpdateType>.asParameter(): String {
     return TelegramApi.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
 }
 
-fun <T> MutableList<T>.addIFNotContains(el: T) {
+internal fun <T> MutableList<T>.addIfNotContains(el: T) {
     if (!this.contains(el)) add(el)
 }

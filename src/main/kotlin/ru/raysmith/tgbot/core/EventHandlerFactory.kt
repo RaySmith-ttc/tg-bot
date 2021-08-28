@@ -5,11 +5,10 @@ import ru.raysmith.tgbot.core.handler.ChatMemberHandler
 import ru.raysmith.tgbot.core.handler.MessageHandler
 import ru.raysmith.tgbot.core.handler.UnknownEventHandler
 import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.addIFNotContains
+import ru.raysmith.tgbot.utils.addIfNotContains
 
 object EventHandlerFactory {
 
@@ -54,28 +53,28 @@ object EventHandlerFactory {
     }
 
     fun handleMessage(handler: MessageHandler.() -> Unit) {
-        allowedUpdates.addIFNotContains(UpdateType.MESSAGE)
+        allowedUpdates.addIfNotContains(UpdateType.MESSAGE)
         messageHandler = handler
     }
 
     fun handleCallbackQuery(alwaysAnswer: Boolean = false, handler: CallbackQueryHandler.() -> Unit) {
         this.alwaysAnswer = alwaysAnswer
-        allowedUpdates.addIFNotContains(UpdateType.CALLBACK_QUERY)
+        allowedUpdates.addIfNotContains(UpdateType.CALLBACK_QUERY)
         callbackQueryHandler = handler
     }
 
     fun handleCommand(handler: CommandHandler.() -> Unit) {
-        allowedUpdates.addIFNotContains(UpdateType.MESSAGE)
+        allowedUpdates.addIfNotContains(UpdateType.MESSAGE)
         commandHandler = handler
     }
 
     fun handleMyChatMember(handler: ChatMemberHandler.() -> Unit) {
-        allowedUpdates.addIFNotContains(UpdateType.MY_CHAT_MEMBER)
+        allowedUpdates.addIfNotContains(UpdateType.MY_CHAT_MEMBER)
         chatMemberHandler = handler
     }
 
     fun handleChatMember(handler: ChatMemberHandler.() -> Unit) {
-        allowedUpdates.addIFNotContains(UpdateType.CHAT_MEMBER)
+        allowedUpdates.addIfNotContains(UpdateType.CHAT_MEMBER)
         chatMemberHandler = handler
     }
 

@@ -84,16 +84,16 @@ interface TelegramService {
 
     @Multipart
     @POST("sendPhoto")
-    fun sendPhotoPost(
-        @Query("chat_id") chatId: String,
+    fun sendPhoto(
+        @Part("chat_id") chatId: RequestBody,
         @Part photo: MultipartBody.Part,
-        @Query("caption") caption: String? = null,
-        @Query("parse_mode") parseMode: ParseMode? = null,
-        @Query("caption_entities") captionEntities: String? = null,
-        @Query("disable_notification") disableNotification: Boolean? = null,
-        @Query("reply_to_message_id") replyToMessageId: Int? = null,
-        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
-        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageSendResponse>
 
     @GET("sendDocument")

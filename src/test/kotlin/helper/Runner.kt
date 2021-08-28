@@ -7,10 +7,12 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotCommand
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.bot.inlineKeyboard
 import ru.raysmith.tgbot.model.network.chat.ChatMember
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.utils.PaginationRows
+import java.io.File
 
 class Runner {
 
@@ -22,7 +24,9 @@ class Runner {
             replyKeyboard {
                 inputFieldPlaceholder = "test"
                 row { button("send image") }
+                row { button("send image2") }
                 row { button("pageable") }
+                row { button("send other id") }
             }
         }
     }
@@ -79,10 +83,24 @@ class Runner {
 
                     else if (messageText == "send image") {
                         sendPhoto {
-                            photo = "AgACAgIAAxkDAAPTYLzxe542hHekjNmlcA3vMMw7XVgAAlqyMRvfveFJJlmwc6u88jc3Bo-hLgADAQADAgADdwADuUkDAAEfBA"
+                            setPhoto("AgACAgIAAxkDAAPTYLzxe542hHekjNmlcA3vMMw7XVgAAlqyMRvfveFJJlmwc6u88jc3Bo-hLgADAQADAgADdwADuUkDAAEfBA")
                             caption = "Test image"
                         }
                         return@handleMessage
+                    }
+
+                    else if (messageText == "send image2") {
+                        sendPhoto {
+                            setPhoto(File("C:\\Users\\Ray\\Desktop\\Capture.PNG")/*.readBytes(), "test", "image/jpg"*/)
+                            caption = "Test image2"
+                        }
+                        return@handleMessage
+                    }
+
+                    else if (messageText == "send other id") {
+                        send("1") {
+                            text = "this is not sended"
+                        }
                     }
 
                     else if (messageText == "pageable") {
@@ -217,7 +235,7 @@ class Runner {
                 handleCommand {
                     when(command.text) {
                         BotCommand.START -> {
-                            send { sendMain() }
+                            sendMain()
                         }
                     }
                 }

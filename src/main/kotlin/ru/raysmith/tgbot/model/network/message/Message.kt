@@ -161,7 +161,7 @@ data class Message(
      * But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe
      * for storing this identifier.
      * */
-    @SerialName("migrate_to_chat_id") val migrateToChatId: Int? = null,
+    @SerialName("migrate_to_chat_id") val migrateToChatId: Long? = null,
 
     /**
      * The supergroup has been migrated from a group with the specified identifier. This number may have more than 32
@@ -169,7 +169,7 @@ data class Message(
      * But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe
      * for storing this identifier.
      * */
-    @SerialName("migrate_from_chat_id") val migrateFromChatId: Int? = null,
+    @SerialName("migrate_from_chat_id") val migrateFromChatId: Long? = null,
 
     /**
      * Specified message was pinned. Note that the Message object in this field will not contain further
@@ -216,7 +216,7 @@ data class Message(
     }
 
     /** Return true if entities has one or more link */
-    fun hasUrl() : Boolean = entities?.find { it.type == MessageEntityType.URL } != null
+    fun hasUrl() : Boolean = entities?.any { it.type == MessageEntityType.URL } ?: false
 
     /** Return all paths of a message that contains the requested type */
     fun getAllEntity(type: MessageEntityType): List<String> {
