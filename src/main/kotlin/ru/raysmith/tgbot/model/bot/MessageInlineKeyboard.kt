@@ -3,10 +3,12 @@ package ru.raysmith.tgbot.model.bot
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.utils.DatePicker
 import ru.raysmith.tgbot.utils.PaginationRows
 
 class MessageInlineKeyboard : MessageKeyboard {
     private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()
+    val rowsCount get() = rows.size
 
     override fun toMarkup(): KeyboardMarkup {
         return InlineKeyboardMarkup(rows.map { it.getRow() })
@@ -22,6 +24,10 @@ class MessageInlineKeyboard : MessageKeyboard {
     {
         PaginationRows(this, pageFirstQuery, pageQuery, pageLastQuery)
             .addRows(data, page, createButtons)
+    }
+
+    fun createDatePicker(datePicker: DatePicker) {
+        datePicker.setupMarkup(this)
     }
 
     fun row(text: String, callbackData: String) = row { button(text, callbackData) }
@@ -63,7 +69,7 @@ class MessageInlineKeyboard : MessageKeyboard {
 
             internal fun toKeyboardButton(): InlineKeyboardButton {
                 require(text.isNotEmpty()) { "Button text must be is not empty" }
-                return InlineKeyboardButton(text, url, loginUrl, callbackData, switchInlineQuery, pay)
+                return InlineKeyboardButton(text, callbackData, url, loginUrl, switchInlineQuery, pay)
             }
         }
     }

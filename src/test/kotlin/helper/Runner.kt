@@ -8,25 +8,54 @@ import ru.raysmith.tgbot.core.BotCommand
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.core.send
+import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.inlineKeyboard
 import ru.raysmith.tgbot.model.network.chat.ChatMember
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
+import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.utils.DatePicker
 import ru.raysmith.tgbot.utils.PaginationRows
 import java.io.File
+import java.util.*
+
+val datePicker = DatePicker("date_picker").apply {
+//    locale = Locale.forLanguageTag("ru")
+//    monthLimitBack = 5
+//    monthLimitForward = 3
+//    allowFutureDays = false
+//    allowPastDays = false
+    years = 2000..2022
+    yearsColumns = 4
+    yearsRows = 2
+}
+
 
 class Runner {
 
     val CALLBACK_PREFIX = "cb_"
 
     fun ISender.sendMain() {
+//        send {
+//            text = "main"
+//            replyKeyboard {
+//                inputFieldPlaceholder = "test"
+//                row { button("send image") }
+//                row { button("send image2") }
+//                row { button("pageable") }
+//                row { button("send other id") }
+//            }
+//        }
         send {
             text = "main"
-            replyKeyboard {
-                inputFieldPlaceholder = "test"
-                row { button("send image") }
-                row { button("send image2") }
-                row { button("pageable") }
-                row { button("send other id") }
+            inlineKeyboard {
+                row {
+                    button {
+                        text = "some pay"
+                        callbackData = "pay"
+                        pay = true
+                    }
+                }
+                row("dsvewdfa", "dsvewdfa")
             }
         }
     }
@@ -64,14 +93,19 @@ class Runner {
 
         val logger = LoggerFactory.getLogger("bot")
 
-        Bot()
+        Bot(token = System.getenv("tg.test"))
             .onError { e -> logger.error(e.message) }
-            .onUpdate { updates -> updates.forEach { println(it) } }
+            .onUpdate { updates -> updates.forEach { println(it.callbackQuery?.data) } }
+            .registerDatePicker(datePicker)
             .start {
                 handleMyChatMember {
                     if (newChatMember is ChatMember.ChatMemberMember) {
                         send("Я родился")
                     }
+                }
+
+                handlePreCheckoutQuery {
+                    answerPreCheckoutQuery(true)
                 }
 
                 handleMessage {
@@ -166,6 +200,47 @@ class Runner {
 
                 handleCallbackQuery {
 
+                    datePickerResult(datePicker) { date ->
+                        edit {
+                            text = "Date: $date"
+                        }
+                    }
+
+                    isDataEqual("dpinit") {
+                        edit {
+                            text = "test"
+                            inlineKeyboard {
+                                createDatePicker(datePicker)
+                            }
+                        }
+                    }
+
+                    isDataEqual("pay") {
+                        sendInvoice {
+                            title = "test"
+                            description = "Some desc"
+                            payload = "payload"
+                            currency = Currency.RUB
+                            prices = listOf(
+                                LabeledPrice("Item #1", 10000),
+                                LabeledPrice("Item #2", 15000),
+                                LabeledPrice("Item #3", 20000),
+                            )
+//                            needShippingAddress = true
+//                            needPhoneNumber = true
+//                            needEmail = true
+//                            needName = true
+//                            sendPhoneNumberToProvider = true
+//                            sendEmailToProvider = true
+//                            isFlexible = true
+//                            disableNotification = true
+//                            replyToMessageId = query.message?.messageId!!
+//                            allowSendingWithoutReply = true
+//                            maxTipAmount = 100000
+//                            suggestedTipAmounts = listOf(10000, 20000)
+//                            providerData = buildJsonObject { put("data", "some data") }
+                        }
+                    }
                     isDataEqual("pg_first") {
                         val data = (1..6).map(Int::toString)
 
@@ -228,7 +303,7 @@ class Runner {
                         sendHelloMessage("Data is $value")
                     }
                     isUnknown {
-                        logger.warn("Unknown query: $query")
+                        logger.warn("Unknown query (${query.data}): $query")
                     }
                 }
 
@@ -236,6 +311,12 @@ class Runner {
                     when(command.text) {
                         BotCommand.START -> {
                             sendMain()
+                        }
+                        "/dp" -> {
+                            send {
+                                text = "Date Picker"
+                                inlineKeyboard { createDatePicker(datePicker) }
+                            }
                         }
                     }
                 }

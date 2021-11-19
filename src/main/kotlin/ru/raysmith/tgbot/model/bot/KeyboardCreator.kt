@@ -3,22 +3,25 @@ package ru.raysmith.tgbot.model.bot
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 
-abstract class KeyboardCreator {
+interface InlineKeyboardCreator {
+    var keyboardMarkup: MessageKeyboard?
+    fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
+        keyboardMarkup = MessageInlineKeyboard()
+            .apply(init)
 
-    var keyboardMarkup: MessageKeyboard? = null
+        return keyboardMarkup as MessageKeyboard
+    }
+}
+
+abstract class KeyboardCreator : InlineKeyboardCreator {
+
+    override var keyboardMarkup: MessageKeyboard? = null
 
     fun replyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
         keyboardMarkup = MessageReplyKeyboard()
             .apply(init)
 
         return keyboardMarkup as MessageReplyKeyboard
-    }
-
-    fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
-        keyboardMarkup = MessageInlineKeyboard()
-            .apply(init)
-
-        return keyboardMarkup as MessageKeyboard
     }
 
     fun removeKeyboard(selective: Boolean? = null) {

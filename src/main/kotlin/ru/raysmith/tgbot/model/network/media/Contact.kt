@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Contact(
-    @SerialName("file_id") override val fileId: String,
-    @SerialName("file_unique_id") override val fileUniqueId: String,
-    @SerialName("file_name") override val fileName: String? = null,
-    @SerialName("file_size") override val fileSize: Int? = null,
-    @SerialName("duration") val duration: Int,
-) : Media
+    @SerialName("phone_number") val phoneNumber: String,
+    @SerialName("first_name") val firstName: String,
+    @SerialName("last_name") val lastName: String? = null,
+    @SerialName("user_id") val userId: Int? = null,
+    @SerialName("vcard") val vcard: String? = null,
+)

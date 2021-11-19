@@ -10,12 +10,11 @@ import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.chat.GetChatResponse
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.inputmedia.InputMedia
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.response.MediaSendResponse
-import ru.raysmith.tgbot.model.network.message.response.MessageEditResponse
-import ru.raysmith.tgbot.model.network.message.response.MessageSendResponse
+import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 
 interface TelegramService {
@@ -48,7 +47,7 @@ interface TelegramService {
      *
      *  @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      *  @param text Text of the message to be sent, 1-4096 characters after entities parsing
-     *  @param parseMode [Mode][ParseMode] for parsing entities in the message text.
+     *  @param parseMode [ParseMode] for parsing entities in the message text.
      *  @param entities List of special entities that appear in message text, which can be specified instead of *parse_mode*
      *  @param disableWebPagePreview Disables link previews for links in this message
      *  @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
@@ -67,7 +66,7 @@ interface TelegramService {
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-    ): Call<MessageSendResponse>
+    ): Call<MessageResponse>
 
     @GET("sendPhoto")
     fun sendPhoto(
@@ -80,7 +79,7 @@ interface TelegramService {
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-    ): Call<MessageSendResponse>
+    ): Call<MessageResponse>
 
     @Multipart
     @POST("sendPhoto")
@@ -94,13 +93,13 @@ interface TelegramService {
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
         @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
-    ): Call<MessageSendResponse>
+    ): Call<MessageResponse>
 
     @GET("sendDocument")
     fun sendDocument(
         @Query("chat_id") chatId: String,
         @Query("document") document: String,
-    ): Call<MediaSendResponse>
+    ): Call<MessageResponse>
 
     @GET("editMessageText")
     fun editMessageText(
@@ -112,7 +111,7 @@ interface TelegramService {
         @Query("entities") entities: String? = null,
         @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
-    ): Call<MessageEditResponse>
+    ): Call<MessageResponse>
 
     @GET("editMessageCaption")
     fun editMessageCaption(
@@ -122,7 +121,7 @@ interface TelegramService {
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null
-    ): Call<MessageEditResponse>
+    ): Call<MessageResponse>
 
     @GET("editMessageMedia")
     fun editMessageMedia(
@@ -131,15 +130,15 @@ interface TelegramService {
         @Query("media") media: InputMedia,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null
-    ): Call<MessageEditResponse>
+    ): Call<MessageResponse>
 
     @GET("editMessageReplyMarkup")
     fun editMessageReplyMarkup(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: String? = null,
         @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
-    ): Call<MessageEditResponse>
+    ): Call<MessageResponse>
 
     @GET("deleteMessage")
     fun deleteMessage(
@@ -174,7 +173,7 @@ interface TelegramService {
      * Returns True on success.
      *
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
-     * (in the format @channelusername)
+     * (in the format `@channelusername`)
      * @param userId Unique identifier of the target user
      * @param untilDate Date when the user will be unbanned, unix time.
      * If user is banned for more than 366 days or less than 30 seconds from the current time they are considered
@@ -210,5 +209,127 @@ interface TelegramService {
         @Query("only_if_banned") onlyIfBanned: Boolean? = null,
     ): Call<BooleanResponse>
 
+    /**
+     * Use this method to send invoices. On success, the sent Message is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param title Product name, 1-32 characters
+     * @param description Product description, 1-255 characters
+     * @param payload Bot-defined invoice payload, 1-128 bytes.
+     * This will not be displayed to the user, use for your internal processes.
+     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
+     * @param currency Three-letter ISO 4217 currency code, see
+     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
+     * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
+     * delivery cost, delivery tax, bonus, etc.)
+     * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
+     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
+     * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
+     * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+     * Defaults to 0
+     * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
+     * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
+     * The suggested tip amounts must be positive, passed in a strictly increased order and must
+     * not exceed *max_tip_amount*.
+     * @param startParameter Unique deep-linking parameter. If left empty, *forwarded copies* of the sent message will
+     * have a *Pay* button, allowing multiple users to pay directly from the forwarded message, using the same invoice.
+     * If non-empty, forwarded copies of the sent message will have a URL button with a deep link to the bot
+     * (instead of a *Pay* button), with the value used as the start parameter
+     * @param providerData A JSON-serialized data about the invoice, which will be shared with the payment provider.
+     * A detailed description of required fields should be provided by the payment provider.
+     * @param photoUrl URL of the product photo for the invoice. Can be a photo of the goods or a marketing
+     * image for a service. People like it better when they see what they are paying for.
+     * @param photoSize Photo size
+     * @param photoWidth Photo width
+     * @param photoHeight Photo height
+     * @param needName Pass *True*, if you require the user's full name to complete the order
+     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
+     * @param needEmail Pass *True*, if you require the user's email address to complete the order
+     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
+     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
+     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
+     * @param isFlexible Pass *True*, if the final price depends on the shipping method
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to
+     * message is not found
+     * @param replyMarkup A JSON-serialized object for an
+     * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating).
+     * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
+     * */
+    @GET("sendInvoice")
+    fun sendInvoice(
+        @Query("chat_id") chatId: String,
+        @Query("title") title: String,
+        @Query("description") description: String,
+        @Query("payload") payload: String,
+        @Query("provider_token") providerToken: String,
+        @Query("currency") currency: String,
+        @Query("prices") prices: String,
+        @Query("max_tip_amount") maxTipAmount: Int? = null,
+        @Query("suggested_tip_amounts") suggestedTipAmounts: String? = null,
+        @Query("start_parameter") startParameter: String? = null,
+        @Query("provider_data") providerData: String? = null,
+        @Query("photo_url") photoUrl: String? = null,
+        @Query("photo_size") photoSize: Int? = null,
+        @Query("photo_width") photoWidth: Int? = null,
+        @Query("photo_height") photoHeight: Int? = null,
+        @Query("need_name") needName: Boolean? = null,
+        @Query("need_phone_number") needPhoneNumber: Boolean? = null,
+        @Query("need_email") needEmail: Boolean? = null,
+        @Query("need_shipping_address") needShippingAddress: Boolean? = null,
+        @Query("send_phone_number_to_provider") sendPhoneNumberToProvider: Boolean? = null,
+        @Query("send_email_to_provider") sendEmailToProvider: Boolean? = null,
+        @Query("is_flexible") isFlexible: Boolean? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Long? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") replyMarkup: InlineKeyboardMarkup? = null,
+    ): Call<MessageResponse>
+
+    /**
+     * Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation
+     * in the form of an [Update][ru.raysmith.tgbot.model.network.updates.Update] with the field *pre_checkout_query*.
+     * Use this method to respond to such pre-checkout queries.
+     * On success, True is returned. **Note:** The Bot API must receive an answer within 10 seconds after
+     * the pre-checkout query was sent.
+     *
+     * @param preCheckoutQueryId Unique identifier for the query to be answered
+     * @param ok Specify *True* if everything is alright (goods are available, etc.) and the bot is ready to proceed
+     * with the order. Use *False* if there are any problems.
+     * @param errorMessage Required if *ok* is *False*. Error message in human readable form that explains the reason
+     * for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black
+     * T-shirts while you were busy filling out your payment details. Please choose a different color or garment!").
+     * Telegram will display this message to the user.
+     * */
+    @GET("answerPreCheckoutQuery")
+    fun answerPreCheckoutQuery(
+        @Query("pre_checkout_query_id") preCheckoutQueryId: String,
+        @Query("ok") ok: Boolean,
+        @Query("error_message") errorMessage: String? = null,
+    ): Call<BooleanResponse>
+
+    /**
+     * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
+     * will send an [Update][ru.raysmith.tgbot.model.network.updates.Update] with a *shipping_query* field to the bot.
+     * Use this method to reply to shipping queries. On success, True is returned.
+     *
+     * @param shippingQueryId Unique identifier for the query to be answered
+     * @param ok Specify True if delivery to the specified address is possible and False if there are any problems
+     * (for example, if delivery to the specified address is not possible)
+     * @param shippingOptions Required if *ok* is True. A JSON-serialized array of available shipping options.
+     * @param errorMessage Required if *ok* is False. Error message in human readable form that explains why it is
+     * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
+     * Telegram will display this message to the user.
+     * */
+    @GET("answerShippingQuery")
+    fun answerShippingQuery(
+        @Query("shipping_query_id") shippingQueryId: String,
+        @Query("ok") ok: Boolean,
+        @Query("shipping_options") shippingOptions: String? = null,
+        @Query("error_message") errorMessage: String? = null,
+    ): Call<BooleanResponse>
 }
 

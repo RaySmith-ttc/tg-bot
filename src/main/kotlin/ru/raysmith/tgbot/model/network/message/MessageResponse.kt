@@ -1,11 +1,11 @@
-package ru.raysmith.tgbot.model.network.message.response
+package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
 
 @Serializable
-data class MessageSendResponse(
+data class MessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("result") val result: Message
 )

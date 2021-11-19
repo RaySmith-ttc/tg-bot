@@ -1,15 +1,15 @@
 package ru.raysmith.tgbot.core
 
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.core.handler.ChatMemberHandler
-import ru.raysmith.tgbot.core.handler.MessageHandler
-import ru.raysmith.tgbot.core.handler.UnknownEventHandler
+import ru.raysmith.tgbot.core.handler.*
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.utils.DatePicker
 import ru.raysmith.tgbot.utils.addIfNotContains
+import java.util.*
 
+data class CallbackQueryHandlerData(val handler: (CallbackQueryHandler.() -> Unit)? = null, val datePicker: DatePicker? = null)
 object EventHandlerFactory {
 
     private val allowedUpdates = mutableListOf<UpdateType>()
@@ -17,8 +17,10 @@ object EventHandlerFactory {
     private lateinit var unknownHandler: UnknownEventHandler.() -> Unit
     private lateinit var messageHandler: MessageHandler.() -> Unit
     private lateinit var commandHandler: CommandHandler.() -> Unit
-    private lateinit var callbackQueryHandler: CallbackQueryHandler.() -> Unit
+    private val callbackQueryHandler: MutableMap<String, CallbackQueryHandlerData> = mutableMapOf()
     private lateinit var chatMemberHandler: ChatMemberHandler.() -> Unit
+    private lateinit var preCheckoutQueryHandler: PreCheckoutQueryHandler.() -> Unit
+    private lateinit var shippingQueryHandler: ShippingQueryHandler.() -> Unit
 
     private var alwaysAnswer: Boolean = false
 
@@ -32,15 +34,19 @@ object EventHandlerFactory {
             ::messageHandler.isInitialized && update.message != null && update.message.type == MessageType.TEXT ->
                 MessageHandler(update.message, update.message.from!!, messageHandler)
 
-            ::callbackQueryHandler.isInitialized && update.callbackQuery != null -> CallbackQueryHandler(
+            update.callbackQuery != null -> CallbackQueryHandler(
                 update.callbackQuery,
                 alwaysAnswer,
                 callbackQueryHandler
             )
 
-            ::callbackQueryHandler.isInitialized && update.myChatMember != null -> ChatMemberHandler(update.myChatMember, chatMemberHandler)
+            update.myChatMember != null -> ChatMemberHandler(update.myChatMember, chatMemberHandler)
 
-            ::callbackQueryHandler.isInitialized && update.chatMember != null -> ChatMemberHandler(update.chatMember, chatMemberHandler)
+            update.chatMember != null -> ChatMemberHandler(update.chatMember, chatMemberHandler)
+
+            ::preCheckoutQueryHandler.isInitialized && update.preCheckoutQuery != null -> PreCheckoutQueryHandler(update.preCheckoutQuery, preCheckoutQueryHandler)
+
+            ::shippingQueryHandler.isInitialized && update.shippingQuery != null -> ShippingQueryHandler(update.shippingQuery, shippingQueryHandler)
 
             else -> UnknownEventHandler(update, unknownHandler)
         }
@@ -57,10 +63,13 @@ object EventHandlerFactory {
         messageHandler = handler
     }
 
-    fun handleCallbackQuery(alwaysAnswer: Boolean = false, handler: CallbackQueryHandler.() -> Unit) {
+    fun handleCallbackQuery(alwaysAnswer: Boolean = false, handlerId: String = CallbackQueryHandler.HANDLER_ID, datePicker: DatePicker? = null, handler: (CallbackQueryHandler.() -> Unit)? = null) {
         this.alwaysAnswer = alwaysAnswer
         allowedUpdates.addIfNotContains(UpdateType.CALLBACK_QUERY)
-        callbackQueryHandler = handler
+        callbackQueryHandler[
+                if (callbackQueryHandler.containsKey(handlerId)) UUID.randomUUID().toString()
+                else CallbackQueryHandler.HANDLER_ID
+        ] = CallbackQueryHandlerData(handler, datePicker)
     }
 
     fun handleCommand(handler: CommandHandler.() -> Unit) {
@@ -76,6 +85,16 @@ object EventHandlerFactory {
     fun handleChatMember(handler: ChatMemberHandler.() -> Unit) {
         allowedUpdates.addIfNotContains(UpdateType.CHAT_MEMBER)
         chatMemberHandler = handler
+    }
+
+    fun handlePreCheckoutQuery(handler: PreCheckoutQueryHandler.() -> Unit) {
+        allowedUpdates.addIfNotContains(UpdateType.PRE_CHECKOUT_QUERY)
+        preCheckoutQueryHandler = handler
+    }
+
+    fun handleShippingQuery(handler: ShippingQueryHandler.() -> Unit) {
+        allowedUpdates.addIfNotContains(UpdateType.SHIPPING_QUERY)
+        shippingQueryHandler = handler
     }
 
 }

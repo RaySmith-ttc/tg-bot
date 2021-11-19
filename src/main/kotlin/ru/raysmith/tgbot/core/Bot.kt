@@ -4,9 +4,12 @@ import kotlinx.coroutines.*
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.utils.DatePicker
 import ru.raysmith.tgbot.utils.asParameter
+import ru.raysmith.utils.PropertiesFactory
 
 class Bot(
+    val token: String? = null,
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     var lastUpdateId: Int = 0,
@@ -16,10 +19,19 @@ class Bot(
     private var onUpdate: (updates: List<Update>) -> Unit = { }
     private var onMessageSend: (message: Message) -> Unit = { }
 
+    companion object {
+        val ME by lazy { TelegramApi.service.getMe().execute().body()!!.result }
+    }
+
+    init {
+        if (token != null) {
+            TelegramApi.setToken(token)
+        }
+    }
+
     private suspend fun startBot() {
         while (scope.isActive) {
             try {
-
                 @Suppress("BlockingMethodInNonBlockingContext")
                 val updates = TelegramApi.service.getUpdates(
                     offset = lastUpdateId + 1,
@@ -54,22 +66,27 @@ class Bot(
         startBot()
     }
 
-    suspend fun onError(onError: (e: Exception) -> Unit): Bot {
+    fun onError(onError: (e: Exception) -> Unit): Bot {
         this.onError = onError
         return this
     }
 
-    suspend fun onUpdate(onUpdate: (updates: List<Update>) -> Unit): Bot {
+    fun onUpdate(onUpdate: (updates: List<Update>) -> Unit): Bot {
         this.onUpdate = onUpdate
         return this
     }
 
-    suspend fun onMessageSend(onMessageSend: (message: Message) -> Unit): Bot {
+    fun registerDatePicker(datePicker: DatePicker): Bot {
+        EventHandlerFactory.handleCallbackQuery(handlerId = DatePicker.HANDLER_ID, datePicker = datePicker)
+        return this
+    }
+
+    fun onMessageSend(onMessageSend: (message: Message) -> Unit): Bot {
         this.onMessageSend = onMessageSend
         return this
     }
 
-    suspend fun stop(cause: CancellationException? = null) {
+    fun stop(cause: CancellationException? = null) {
         scope.cancel(cause)
     }
 }

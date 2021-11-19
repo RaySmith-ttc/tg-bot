@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.media.*
+import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.network.TelegramApi
 
 @Serializable
@@ -179,13 +180,21 @@ data class Message(
 
     /**
      * Message is an invoice for a payment, information about the invoice.
-     *
      * @see <a href="https://core.telegram.org/bots/api#payments">More about payments »</a>
      * */
     @SerialName("invoice") val invoice: Invoice? = null,
 
-    // TODO [payment support] add successful_payment field (https://core.telegram.org/bots/api#message)
-    // TODO [payment support] add connected_website field (https://core.telegram.org/bots/api#message)
+    /**
+     * Message is a service message about a successful payment, information about the payment.
+     * @see <a href="https://core.telegram.org/bots/api#payments">More about payments »</a>
+     * */
+    @SerialName("successful_payment") val successfulPayment: SuccessfulPayment? = null,
+
+    /**
+     * The domain name of the website on which the user has logged in.
+     * @see <a href="https://core.telegram.org/widgets/login">More about Telegram Login »</a>
+     * */
+    @SerialName("connected_website") val connectedWebsite: String? = null,
     // TODO [passport support] add passport_data field (https://core.telegram.org/bots/api#message)
 
     /** Service message. A user in the chat triggered another user's proximity alert while sharing Live Location. */

@@ -7,6 +7,8 @@ import ru.raysmith.tgbot.model.network.ChosenInlineResult
 import ru.raysmith.tgbot.model.network.InlineQuery
 import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
+import ru.raysmith.tgbot.model.network.payment.ShippingQuery
 
 /**
  * This object represents an incoming update.
@@ -49,8 +51,11 @@ data class Update(
     /** New incoming callback query */
     @SerialName("callback_query") val callbackQuery: CallbackQuery? = null,
 
-    // TODO [payment support] add shipping_query field (https://core.telegram.org/bots/api#update)
-    // TODO [payment support] add pre_checkout_query field (https://core.telegram.org/bots/api#update)
+    /** New incoming shipping query. Only for invoices with flexible price */
+    @SerialName("shipping_query") val shippingQuery: ShippingQuery? = null,
+
+    /** New incoming pre-checkout query. Contains full information about checkout */
+    @SerialName("pre_checkout_query") val preCheckoutQuery: PreCheckoutQuery? = null,
 
     // TODO [poll support]
 //    /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot */
@@ -59,7 +64,6 @@ data class Update(
     // TODO [poll support]
 //    /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
 //    @SerialName("poll_answer") val pollAnswer: PollAnswer? = null,
-
 
     /**
      * The bot's chat member status was updated in a chat. For private chats, this update is received only when the
@@ -73,7 +77,7 @@ data class Update(
      * */
     @SerialName("chat_member") val chatMember: ChatMemberUpdated? = null,
 
-) {
+    ) {
     /** Type of update. Null if unknown */
     val type: UpdateType? = when {
         message != null -> UpdateType.MESSAGE

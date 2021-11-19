@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.8"
+version = "0.0.1-alpha.21"
 
 repositories {
     mavenCentral()
@@ -66,7 +66,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    implementation("ru.raysmith:utils:1.0.0-rc.5")
+    implementation("ru.raysmith:utils:1.0.0-rc.6")
 
     // Testing
     implementation("junit:junit:4.13.1")

@@ -10,6 +10,9 @@ data class InlineKeyboardButton(
     /** Label text on the button */
     @SerialName("text") val text: String,
 
+    /** Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes */
+    @SerialName("callback_data") val callbackData: String? = null,
+
     /** HTTP or tg:// url to be opened when button is pressed */
     @SerialName("url") val url: String? = null,
 
@@ -18,9 +21,6 @@ data class InlineKeyboardButton(
      * @see <a href="https://core.telegram.org/widgets/login">Telegram Login Widget</a>
      * */
     @SerialName("login_url") val loginUrl: String? = null,
-
-    /** Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes */
-    @SerialName("callback_data") val callbackData: String? = null,
 
     /**
      * If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the

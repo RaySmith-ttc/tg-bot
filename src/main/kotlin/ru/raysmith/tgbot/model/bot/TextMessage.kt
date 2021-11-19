@@ -4,13 +4,14 @@ import org.slf4j.LoggerFactory
 import retrofit2.Response
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.response.MessageEditResponse
-import ru.raysmith.tgbot.model.network.message.response.MessageSendResponse
+import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.network.TelegramApi
 
-private val logger = LoggerFactory.getLogger("text-message")
-
 class TextMessage : EditableMessage, KeyboardCreator() {
+    companion object {
+        private val logger = LoggerFactory.getLogger("text-message")
+    }
+
     private var _text: MessageText? = null
     var text: String? = null
         set(value) {
@@ -31,7 +32,7 @@ class TextMessage : EditableMessage, KeyboardCreator() {
     }
     private fun getMessageText() = _text?.getTextString() ?: text ?: ""
 
-    override fun send(chatId: String): Response<MessageSendResponse> {
+    override fun send(chatId: String): Response<MessageResponse> {
         return TelegramApi.service.sendMessage(
             chatId = chatId,
             text = getMessageText(),
@@ -45,7 +46,7 @@ class TextMessage : EditableMessage, KeyboardCreator() {
         ).execute()
     }
 
-    override fun edit(chatId: String?, messageId: Long?, inlineMessageId: String?) : Response<MessageEditResponse> {
+    override fun edit(chatId: String?, messageId: Long?, inlineMessageId: String?) : Response<MessageResponse> {
         return TelegramApi.service.editMessageText(
             chatId = chatId,
             messageId = messageId,

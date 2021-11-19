@@ -14,12 +14,14 @@ class PaginationRows(
         const val PAGE_FIRST = -1
         const val PAGE_LAST = -2
 
-        val defaultRows: Int = PropertiesFactory.from("bot.properties").getOrDefault("pagination.rows", "5")
+        private val propertiesManager = PropertiesFactory.from("bot.properties")
+
+        val defaultRows: Int = propertiesManager.getOrDefault("pagination.rows", "5")
             .toIntOrNull() ?: throw IllegalArgumentException("Property pagination.rows is not Int")
-        val defaultColumns: Int = PropertiesFactory.from("bot.properties").getOrDefault("pagination.columns", "1")
+        val defaultColumns: Int = propertiesManager.getOrDefault("pagination.columns", "1")
             .toIntOrNull() ?: throw IllegalArgumentException("Property pagination.columns is not Int")
-        val firstPageSymbol = PropertiesFactory.from("bot.properties").getOrDefault("pagination.firstpagesymbol", "«")
-        val lastPageSymbol = PropertiesFactory.from("bot.properties").getOrDefault("pagination.lastpagesymbol", "»")
+        val firstPageSymbol = propertiesManager.getOrDefault("pagination.firstpagesymbol", "«")
+        val lastPageSymbol = propertiesManager.getOrDefault("pagination.lastpagesymbol", "»")
     }
 
     var rows = defaultRows
@@ -92,7 +94,7 @@ class PaginationRows(
                                     if (totalPages > 1) {
                                         IntRange(firstPage, lastPage).forEach {
                                             button(
-                                                if (it == page) "[$it]" else it.toString(),
+                                                if (it == page) "·$it·" else it.toString(),
                                                 if (it == page) pageQuery else "$pageQuery$it"
                                             )
                                         }

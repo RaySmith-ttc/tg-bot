@@ -3,12 +3,11 @@ package ru.raysmith.tgbot.model.bot
 import kotlinx.serialization.encodeToString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.response.MessageSendResponse
+import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.network.TelegramApi
 import java.io.File
 import java.nio.file.Files
@@ -72,7 +71,7 @@ class PhotoMessage : IMessage {
 
     private fun getCaptionText(): String? = _caption?.getTextString() ?: caption
 
-    override fun send(chatId: String): Response<MessageSendResponse> {
+    override fun send(chatId: String): Response<MessageResponse> {
         return when {
             photo != null -> {
                 TelegramApi.service.sendPhoto(

@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.network.TelegramApi
 
@@ -14,6 +15,6 @@ data class InlineKeyboardMarkup(
     @SerialName("inline_keyboard") @Required val keyboard: List<List<InlineKeyboardButton>>
 ) : KeyboardMarkup() {
     override fun toString(): String {
-        return TelegramApi.json.encodeToJsonElement(this).toString()
+        return TelegramApi.json.encodeToString(this)
     }
 }

@@ -23,7 +23,11 @@ import java.util.concurrent.TimeUnit
 object TelegramApi {
 
     val logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = PropertiesFactory.from("bot.properties").get("token")
+    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault("token", "")
+
+    fun setToken(newToken: String) {
+        TOKEN = newToken
+    }
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
@@ -48,7 +52,6 @@ object TelegramApi {
     val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        prettyPrint = true
         classDiscriminator = "clazz" // resolve `type` field naming conflict
         serializersModule = SerializersModule {
 //            contextual(NetworkUtils.AnySerializer)
@@ -61,23 +64,31 @@ object TelegramApi {
         }
     }
 
-    private fun getRetrofit(token: String) = Retrofit.Builder()
+    private fun getRetrofit(token: String): Retrofit {
+        if (token.isEmpty()) throw IllegalArgumentException("Token is empty")
+
+        return Retrofit.Builder()
             .baseUrl("https://api.telegram.org/bot$token/")
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .addConverterFactory(NetworkUtils.EnumConverterFactory())
             .build()
+    }
 
-    private val fileRetrofit = Retrofit.Builder()
-        .baseUrl("https://api.telegram.org/file/bot$TOKEN/")
-        .client(client)
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-        .addConverterFactory(NetworkUtils.EnumConverterFactory())
-        .build()
+    private val fileRetrofit by lazy {
+        if (TOKEN.isEmpty()) throw IllegalArgumentException("Token is empty")
+
+        Retrofit.Builder()
+            .baseUrl("https://api.telegram.org/file/bot$TOKEN/")
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(NetworkUtils.EnumConverterFactory())
+            .build()
+    }
 
     private val services = mutableMapOf<String, TelegramService>()
-    val service = getRetrofit(TOKEN).create(TelegramService::class.java)
-    val fileService = fileRetrofit.create(TelegramFileService::class.java)
+    val service by lazy { getRetrofit(TOKEN).create(TelegramService::class.java) }
+    val fileService by lazy { fileRetrofit.create(TelegramFileService::class.java) }
 
     fun serviceWithToken(token: String): TelegramService {
         return services[token] ?: run {
