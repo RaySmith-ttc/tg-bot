@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.utils
+package ru.raysmith.tgbot.utils.datepicker
 
 data class DatePickerData(val y: Int?, val m: Int?, val d: Int?, val yearPage: Int? = null) {
     companion object {

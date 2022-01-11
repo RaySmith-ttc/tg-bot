@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.network.TelegramApi
 import java.io.File
 import java.nio.file.Files
 
-class PhotoMessage : IMessage {
+class PhotoMessage : IMessage<MessageResponse> {
     private var photo: String? = null
     private var file: File? = null
     private var fileName: String? = null

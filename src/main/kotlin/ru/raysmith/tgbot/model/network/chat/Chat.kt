@@ -102,9 +102,8 @@ data class Chat(
 ) {
 
     /**
-     * Возвращает полное имя чата
-     *
-     * @param includeUsername Если true и есть имя или фамилия, будет добавлен никнейм в скобках
+     * Return full name of the chat
+     * @param includeUsername If true and there is a first or last name, a nickname will be added in brackets
      * */
     fun getFullName(includeUsername: Boolean = false): String = buildString {
         append(firstName ?: "")

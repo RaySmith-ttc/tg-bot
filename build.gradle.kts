@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.21"
+version = "0.0.1-alpha.48"
 
 repositories {
     mavenCentral()
@@ -61,12 +61,16 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    implementation("ru.raysmith:utils:1.0.0-rc.6")
+    implementation("ru.raysmith:utils:1.2.0")
+
+    // Extensions for
+    implementation("org.jetbrains.exposed:exposed-core:0.36.2")
 
     // Testing
     implementation("junit:junit:4.13.1")

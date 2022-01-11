@@ -9,12 +9,13 @@ import ru.raysmith.tgbot.model.network.GetMeResponse
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.chat.GetChatResponse
 import ru.raysmith.tgbot.model.network.file.FileResponse
-import ru.raysmith.tgbot.model.network.inputmedia.InputMedia
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.message.MessageResponseArray
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 
 interface TelegramService {
@@ -100,6 +101,57 @@ interface TelegramService {
         @Query("chat_id") chatId: String,
         @Query("document") document: String,
     ): Call<MessageResponse>
+
+    /**
+     * Use this method to send a group of photos, videos, documents or audios as an album.
+     * Documents and audio filescan be only grouped in an album with messages of the same type.
+     * On success, an array of Messages that were sent is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
+     * */
+    @GET("sendMediaGroup")
+    fun sendMediaGroup(
+        @Query("chat_id") chatId: String,
+        @Query("media") media: String,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null
+    ): Call<MessageResponseArray>
+
+    /**
+     * Use this method to send a group of photos, videos, documents or audios as an album.
+     * Documents and audio filescan be only grouped in an album with messages of the same type.
+     * On success, an array of Messages that were sent is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
+     * */
+    @Multipart
+    @POST("sendMediaGroup")
+    fun sendMediaGroup(
+        @Query("chat_id") chatId: String,
+        @Query("media") media: String,
+        @Part mediaPart1: MultipartBody.Part,
+        @Part mediaPart2: MultipartBody.Part,
+        @Part mediaPart3: MultipartBody.Part? = null,
+        @Part mediaPart4: MultipartBody.Part? = null,
+        @Part mediaPart5: MultipartBody.Part? = null,
+        @Part mediaPart6: MultipartBody.Part? = null,
+        @Part mediaPart7: MultipartBody.Part? = null,
+        @Part mediaPart8: MultipartBody.Part? = null,
+        @Part mediaPart9: MultipartBody.Part? = null,
+        @Part mediaPart10: MultipartBody.Part? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null
+    ): Call<MessageResponseArray>
 
     @GET("editMessageText")
     fun editMessageText(

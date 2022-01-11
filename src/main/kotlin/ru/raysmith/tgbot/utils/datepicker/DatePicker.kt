@@ -1,18 +1,19 @@
-package ru.raysmith.tgbot.utils
+package ru.raysmith.tgbot.utils.datepicker
 
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.utils.AdditionalRowsPosition
 import ru.raysmith.utils.PropertiesFactory
+import ru.raysmith.utils.properties.getOrNull
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class DatePicker(
-    val callbackQueryPrefix: String,
-) {
+class DatePicker(val callbackQueryPrefix: String) {
 
+    // TODO replace to days
     // how many months back user can browse
     var monthLimitBack = -1
         set(value) {
@@ -47,6 +48,10 @@ class DatePicker(
     var monthPickMessageText: (year: Int) -> String = { _ -> defaultMessageText }
     var dayPickMessageText: (year: Int, month: Int) -> String = { _, _ -> defaultMessageText }
 
+    var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
+    var additionalRows: MessageInlineKeyboard.() -> Unit = { }
+    var additionalRowsVisibleOnStates = DatePickerState.values().toSet()
+
     var timeZone = ZoneId.systemDefault()
     var locale = PropertiesFactory.from("bot.properties").getOrNull("calendar_locale")?.let {
         Locale.forLanguageTag(it)
@@ -60,10 +65,7 @@ class DatePicker(
 
     private val now = LocalDate.now(timeZone)
 
-    companion object {
-        const val HANDLER_ID = "date_picker"
-        private const val YEAR_PICK_POSTFIX = "pick"
-    }
+    val handlerId = "date_picker_$callbackQueryPrefix"
 
     init {
         // 1 symbol for result prefix,
@@ -72,19 +74,30 @@ class DatePicker(
     }
 
     fun setupMarkup(messageInlineKeyboard: MessageInlineKeyboard) {
-        messageInlineKeyboard.setupDaysMarkup(now.year, now.monthValue)
+        messageInlineKeyboard.setupMarkup(DatePickerState.DAY) { setupDaysMarkup(now.year, now.monthValue) }
+    }
+
+    private fun MessageInlineKeyboard.setupMarkup(state: DatePickerState, setup: MessageInlineKeyboard.() -> Unit) {
+        val isAllowedState = state in additionalRowsVisibleOnStates
+        if (isAllowedState && additionalRowsPosition == AdditionalRowsPosition.TOP) {
+            additionalRows()
+        }
+        setup()
+        if (isAllowedState && additionalRowsPosition == AdditionalRowsPosition.BOTTOM) {
+            additionalRows()
+        }
     }
 
     fun handle(handler: CallbackQueryHandler) {
         handler.apply {
-            isDataStartWith(callbackQueryPrefix) { _, data ->
+            isDataStartWith(callbackQueryPrefix) { data ->
                 val datePickerData = DatePickerData.from(data)
                 when {
                     datePickerData.yearPage != null -> {
                         edit {
                             text = yearsPickMessageText()
                             inlineKeyboard {
-                                setupYearsMarkup(datePickerData.yearPage)
+                                setupMarkup(DatePickerState.YEAR) { setupYearsMarkup(datePickerData.yearPage) }
                             }
                         }
                     }
@@ -92,7 +105,7 @@ class DatePicker(
                         edit {
                             text = dayPickMessageText(datePickerData.y, datePickerData.m)
                             inlineKeyboard {
-                                setupDaysMarkup(datePickerData.y, datePickerData.m)
+                                setupMarkup(DatePickerState.DAY) { setupDaysMarkup(datePickerData.y, datePickerData.m) }
                             }
                         }
                     }
@@ -100,7 +113,7 @@ class DatePicker(
                         edit {
                             text = monthPickMessageText(datePickerData.y)
                             inlineKeyboard {
-                                setupMonthsMarkup(datePickerData.y)
+                                setupMarkup(DatePickerState.MONTH) { setupMonthsMarkup(datePickerData.y) }
                             }
                         }
                     }

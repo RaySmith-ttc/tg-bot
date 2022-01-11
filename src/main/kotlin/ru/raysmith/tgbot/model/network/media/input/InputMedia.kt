@@ -1,4 +1,6 @@
-package ru.raysmith.tgbot.model.network.inputmedia
+package ru.raysmith.tgbot.model.network.media.input
+
+import kotlinx.serialization.Serializable
 
 /**
  * This object represents the content of a media message to be sent. It should be one of
@@ -9,4 +11,7 @@ package ru.raysmith.tgbot.model.network.inputmedia
  * - [InputMediaPhoto]
  * - InputMediaVideo
  * */
-sealed class InputMedia
+@Serializable
+sealed class InputMedia {
+    abstract val type: String
+}

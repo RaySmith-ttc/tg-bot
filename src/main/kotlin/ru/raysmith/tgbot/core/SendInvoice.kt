@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.utils.PropertiesFactory
+import ru.raysmith.utils.properties.getOrNull
 
 class SendInvoice : InlineKeyboardCreator {
     companion object {

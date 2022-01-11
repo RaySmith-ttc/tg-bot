@@ -5,16 +5,14 @@ import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.DatePicker
 import ru.raysmith.tgbot.utils.addIfNotContains
-import java.util.*
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
-data class CallbackQueryHandlerData(val handler: (CallbackQueryHandler.() -> Unit)? = null, val datePicker: DatePicker? = null)
 object EventHandlerFactory {
 
     private val allowedUpdates = mutableListOf<UpdateType>()
 
-    private lateinit var unknownHandler: UnknownEventHandler.() -> Unit
+    private var unknownHandler: UnknownEventHandler.() -> Unit = { }
     private lateinit var messageHandler: MessageHandler.() -> Unit
     private lateinit var commandHandler: CommandHandler.() -> Unit
     private val callbackQueryHandler: MutableMap<String, CallbackQueryHandlerData> = mutableMapOf()
@@ -63,13 +61,19 @@ object EventHandlerFactory {
         messageHandler = handler
     }
 
-    fun handleCallbackQuery(alwaysAnswer: Boolean = false, handlerId: String = CallbackQueryHandler.HANDLER_ID, datePicker: DatePicker? = null, handler: (CallbackQueryHandler.() -> Unit)? = null) {
+    fun handleCallbackQuery(
+        alwaysAnswer: Boolean = false,
+        handlerId: String = CallbackQueryHandler.HANDLER_ID,
+        datePicker: DatePicker? = null,
+        handler: (CallbackQueryHandler.() -> Unit)? = null
+    ) {
+        if (callbackQueryHandler.containsKey(handlerId)) {
+            throw IllegalArgumentException("Callback handler with id '$handlerId' already registered")
+        }
+
         this.alwaysAnswer = alwaysAnswer
         allowedUpdates.addIfNotContains(UpdateType.CALLBACK_QUERY)
-        callbackQueryHandler[
-                if (callbackQueryHandler.containsKey(handlerId)) UUID.randomUUID().toString()
-                else CallbackQueryHandler.HANDLER_ID
-        ] = CallbackQueryHandlerData(handler, datePicker)
+        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, datePicker)
     }
 
     fun handleCommand(handler: CommandHandler.() -> Unit) {

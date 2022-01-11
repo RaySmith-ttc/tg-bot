@@ -96,5 +96,11 @@ data class Update(
         chatMember != null -> UpdateType.CHAT_MEMBER
         else -> null
     }
+
+    /**
+     * Indicates whether an update handler was found and processing was started.
+     *
+     * If you are handling updates using the dsl [handleUnknown][ru.raysmith.tgbot.core.EventHandlerFactory.handleUnknown] method, explicitly set the value yourself.  */
+    var isHandled: Boolean = false
 }
 

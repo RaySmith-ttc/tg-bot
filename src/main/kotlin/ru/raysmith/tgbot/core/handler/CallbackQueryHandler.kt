@@ -1,11 +1,12 @@
 package ru.raysmith.tgbot.core.handler
 
+import org.slf4j.LoggerFactory
 import retrofit2.Response
 import ru.raysmith.tgbot.core.*
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.utils.DatePicker
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.handleAll
 import java.time.LocalDate
 
@@ -21,6 +22,7 @@ class CallbackQueryHandler(
 
     companion object {
         const val HANDLER_ID = "default"
+        val logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
     override suspend fun handle() = run {
@@ -37,8 +39,6 @@ class CallbackQueryHandler(
             val value = query.data.substring(callbackQueryPrefix.length + 1)
             DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix)
                 .apply { datePickerHandler(getDate()) }
-                .apply { answer() }
-                .also { this@CallbackQueryHandler.isAnswered = true }
         }
     }
 
@@ -46,35 +46,37 @@ class CallbackQueryHandler(
         if (!isAnswered && query.data == value) {
             DataCallbackQueryHandler(query, query.data)
                 .apply { equalHandler(query.data!!) }
-                .apply { answer() }
-                .also { this@CallbackQueryHandler.isAnswered = true }
+        }
+    }
+
+    fun isPage(paginationCallbackQueryPrefix: String, handler: PaginationCallbackQueryHandler.(page: Long) -> Unit) {
+        if (!isAnswered && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
+            query.data.substring(paginationCallbackQueryPrefix.length).let {
+                if (it.isEmpty()) null
+                else it.substring(1).toLongOrNull()?.let { page ->
+                    PaginationCallbackQueryHandler(query, page).apply { handler(page) }
+                }
+            } ?: logger.warn("Pagination data incorrect. Are you sure '$paginationCallbackQueryPrefix' prefix should use isPage handler?")
         }
     }
 
     fun isDataStartWith(
         startWith: String,
-        startWithHandler: ValueDataCallbackQueryHandler.(data: String, value: String) -> Unit
+        startWithHandler: ValueDataCallbackQueryHandler.(value: String) -> Unit
     ) {
         if (!isAnswered && query.data != null && query.data.startsWith(startWith)) {
             val value = query.data.substring(startWith.length)
-            if (value.isEmpty()) {
-                answer()
-                this@CallbackQueryHandler.isAnswered = true
-            } else {
-                ValueDataCallbackQueryHandler(query, query.data, value)
-                    .apply { startWithHandler(query.data!!, value) }
-                    .apply { answer() }
-                    .also { this@CallbackQueryHandler.isAnswered = true }
+            if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
+                ValueDataCallbackQueryHandler(query, value)
+                    .apply { startWithHandler(value) }
             }
         }
     }
 
-    fun isUnknown(unknownHandler: UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
+    fun isUnhandled(unknownHandler: UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
         if (!isAnswered) {
             UnknownQueryHandler(query)
                 .apply { unknownHandler(query) }
-                .apply { answer() }
-                .also { this@CallbackQueryHandler.isAnswered = true }
         }
     }
 

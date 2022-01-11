@@ -28,15 +28,16 @@ class Endpoints {
     fun sendPhoto() {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
-                val response = chain.proceed(chain.request())
+                val request = chain.request()
+                val response = chain.proceed(request)
                 if (!response.isSuccessful && response.body != null) {
                     val error = TelegramApi.json.decodeFromString<Error>(response.body!!.string())
-                    throw TelegramApiException(error)
+                    throw TelegramApiException(error, request)
                 }
                 response
             }
             .build()
-        val file = File("C:\\Users\\Ray\\Desktop\\Capture.PNG")
+        val file = File("C:\\Users\\Ray\\Desktop\\image1.png")
         val multipartBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("chat_id", "243562346")

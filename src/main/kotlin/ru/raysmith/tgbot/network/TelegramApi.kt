@@ -11,19 +11,21 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
+import ru.raysmith.tgbot.core.BotException
 import ru.raysmith.tgbot.model.network.Error
-import ru.raysmith.tgbot.model.network.inputmedia.InputMedia
-import ru.raysmith.tgbot.model.network.inputmedia.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
+import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.utils.PropertiesFactory
+import ru.raysmith.utils.properties.getOrDefault
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
 object TelegramApi {
 
     val logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault("token", "")
+    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault<String>("token", "")!!
 
     fun setToken(newToken: String) {
         TOKEN = newToken
@@ -38,11 +40,14 @@ object TelegramApi {
             }
         )
         .addInterceptor { chain ->
-            val response = chain.proceed(chain.request())
+            val request = chain.request()
+            val response = chain.proceed(request)
 
             if (!response.isSuccessful && response.body != null) {
                 val error = json.decodeFromString<Error>(response.body!!.string())
-                throw TelegramApiException(error)
+                if (error.errorCode == 401) {
+                    throw BotException("Bot is unauthorized with token")
+                } else throw TelegramApiException(error, request)
             }
 
             response
@@ -52,9 +57,9 @@ object TelegramApi {
     val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
+        encodeDefaults = false
         classDiscriminator = "clazz" // resolve `type` field naming conflict
         serializersModule = SerializersModule {
-//            contextual(NetworkUtils.AnySerializer)
             polymorphic(KeyboardMarkup::class) {
                 subclass(ReplyKeyboardMarkup::class, ReplyKeyboardMarkup.serializer())
             }
@@ -65,7 +70,7 @@ object TelegramApi {
     }
 
     private fun getRetrofit(token: String): Retrofit {
-        if (token.isEmpty()) throw IllegalArgumentException("Token is empty")
+        if (token.isEmpty()) throw BotException("Token is empty")
 
         return Retrofit.Builder()
             .baseUrl("https://api.telegram.org/bot$token/")
@@ -76,7 +81,7 @@ object TelegramApi {
     }
 
     private val fileRetrofit by lazy {
-        if (TOKEN.isEmpty()) throw IllegalArgumentException("Token is empty")
+        if (TOKEN.isEmpty()) throw BotException("Token is empty")
 
         Retrofit.Builder()
             .baseUrl("https://api.telegram.org/file/bot$TOKEN/")
