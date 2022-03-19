@@ -7,7 +7,7 @@ object FileLoader {
     @Throws(IOException::class)
     fun read(filePath: String): String {
         return javaClass.classLoader.getResourceAsStream(filePath)?.use {
-            String(it.readAllBytes())
+            String(it.readBytes())
         } ?: throw IOException("file $filePath not found")
     }
 }

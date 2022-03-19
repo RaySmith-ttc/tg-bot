@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatIdHolder
 
 /**
  * Represents a result of an inline query that was chosen by the user and sent to their chat partner.
@@ -28,4 +29,6 @@ data class ChosenInlineResult(
 
     /** The query that was used to obtain the result */
     @SerialName("query") val query: String,
-)
+) : ChatIdHolder {
+    override fun getChatId() = from.id.toString()
+}

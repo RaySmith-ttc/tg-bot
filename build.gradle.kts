@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.5.21"
-    kotlin("jvm") version "1.5.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.0"
+    kotlin("jvm") version "1.6.0"
     id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.48"
+version = "0.0.1-alpha.84"
 
 repositories {
     mavenCentral()
@@ -47,44 +47,44 @@ java {
 
 dependencies {
     // Kotlin
-    implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
 
     // Logging
-    val slf4jVersion = "1.7.26"
-    implementation("log4j:log4j:1.2.17")
-    implementation("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("org.slf4j:slf4j-log4j12:$slf4jVersion")
+    implementation("org.apache.logging.log4j:log4j:2.17.0")
 
     // Network
-    val kotlinxSerializationVersion = "1.0.1"
-    implementation("com.squareup.retrofit2:retrofit:2.7.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+    val kotlinxSerializationVersion = "1.3.2"
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    implementation("ru.raysmith:utils:1.2.0")
+    implementation("ru.raysmith:utils:1.2.2-rc.3")
 
     // Extensions for
-    implementation("org.jetbrains.exposed:exposed-core:0.36.2")
+    implementation("org.jetbrains.exposed:exposed-core:0.37.3")
 
     // Testing
-    implementation("junit:junit:4.13.1")
-    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
-    testImplementation("org.assertj:assertj-core:3.19.0")
-    testImplementation("org.mockito:mockito-core:3.+")
+    testImplementation("org.assertj:assertj-core:3.22.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation("org.mockito:mockito-core:4.3.1")
+
+    val slf4jVersion = "1.7.36"
+    testImplementation("org.slf4j:slf4j-api:$slf4jVersion")
+    testImplementation("org.slf4j:slf4j-log4j12:$slf4jVersion")
 }
 
 tasks {
     withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
             targetCompatibility = JavaVersion.VERSION_1_8.toString()
             jvmTarget = JavaVersion.VERSION_1_8.toString()
         }

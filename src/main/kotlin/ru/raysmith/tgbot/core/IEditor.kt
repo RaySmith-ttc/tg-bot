@@ -4,26 +4,31 @@ import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.TextMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.Pagination
 import java.lang.IllegalStateException
 
-interface IEditor : ChatID {
+/** Represent an object that can edit messages */
+interface IEditor : ChatIdHolder, ApiCaller {
+
+    /** Identifier of the message to be edited */
     var messageId: Long?
+
+    /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
+    override val service: TelegramService
+
     fun edit(
-        chatId: String = this.chatId!!,
+        chatId: String = getChatIdOrThrow(),
         messageId: Long? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
         message: TextMessage.() -> Unit
     ): Message {
-        return (TextMessage().apply(message).edit(chatId, messageId, inlineMessageId)
-            .body()?.result ?: throw NullPointerException("Edit message has no response body"))
-            .also {
-                if (this is CallbackQueryHandler) {
-                    isAnswered = true
-                }
-            }
+        return TextMessage(service).apply(message)
+            .edit(chatId, messageId, inlineMessageId)
+            .body()?.result
+            ?: throw NullPointerException("Edit message has no response body")
     }
 
     /**
@@ -33,10 +38,9 @@ interface IEditor : ChatID {
      * @throws IllegalStateException if this isn't a CallbackQueryHandler
      * */
     fun IEditor.getPreviousPageCallback(pagePrefix: String): String {
-        if (this !is CallbackQueryHandler)
-            throw IllegalStateException("Previous page can be obtained from CallbackQueryHandler only")
+        if (this !is CallbackQueryHandler) return "${pagePrefix}p1"
 
-        return  getPreviousPageButton(pagePrefix)?.callbackData ?: "${pagePrefix}p${Pagination.PAGE_FIRST}"
+        return "${pagePrefix}p${getPreviousPage(pagePrefix)}"
     }
 
     private fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
@@ -44,8 +48,9 @@ interface IEditor : ChatID {
         if (query.message?.replyMarkup?.keyboard != null) {
             keyboard@ for (row in query.message.replyMarkup.keyboard) {
                 row@ for (button in row) {
-                    if (pagePrefix != null && button.callbackData != null && !button.callbackData.startsWith(pagePrefix)) break@row
-                    if (button.text.startsWith("·") && button.text.endsWith("·")) {
+//                    if (pagePrefix != null && button.callbackData != null && !button.callbackData.startsWith(pagePrefix)) break@row
+                    if (pagePrefix != null && row.none { it.callbackData?.startsWith(pagePrefix) == true }) break@row
+                    if (button.text.startsWith(Pagination.SYMBOL_CURRENT_PAGE) && button.text.endsWith(Pagination.SYMBOL_CURRENT_PAGE)) {
                         res = button
                         break@keyboard
                     }
@@ -70,5 +75,5 @@ interface IEditor : ChatID {
     }
 
     private fun InlineKeyboardButton?.getPage(): Long =
-        this?.text?.replace("·", "")?.toLongOrNull() ?: Pagination.PAGE_FIRST
+        this?.text?.filterNot { it == Pagination.SYMBOL_CURRENT_PAGE }?.toLongOrNull() ?: Pagination.PAGE_FIRST
 }

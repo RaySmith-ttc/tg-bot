@@ -1,17 +1,21 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
 import retrofit2.Response
+import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramService
 
 /** Base implementation of query callback handler */
-open class BaseCallbackHandler(open val query: CallbackQuery) : ICallbackHandler {
+open class BaseCallbackHandler(open val query: CallbackQuery, open val service: TelegramService) : ICallbackHandler {
     var isAnswered = false
+
+    fun answer(text: String) = answer { this.text = text }
+    fun alert(text: String) = answer { this.text = text; showAlert = true }
 
     override fun answer(init: AnswerCallbackQuery.() -> Unit): Response<BooleanResponse> {
         return AnswerCallbackQuery().apply(init).let {
-            TelegramApi.service.answerCallbackQuery(
+            service.answerCallbackQuery(
                 callbackQueryId = query.id,
                 text = it.text,
                 showAlert = it.showAlert,

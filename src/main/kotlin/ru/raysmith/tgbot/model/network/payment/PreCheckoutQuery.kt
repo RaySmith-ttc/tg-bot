@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.payment
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.network.User
 
@@ -33,4 +34,6 @@ data class PreCheckoutQuery(
 
     /** Order info provided by the user */
     @SerialName("order_info") val orderInfo: OrderInfo? = null,
-)
+) : ChatIdHolder {
+    override fun getChatId() = from.id.toString()
+}

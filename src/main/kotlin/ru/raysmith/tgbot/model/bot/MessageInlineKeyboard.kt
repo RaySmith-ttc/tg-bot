@@ -1,17 +1,30 @@
 package ru.raysmith.tgbot.model.bot
 
+import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.HandlerDsl
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.IKeyboardButton
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.Pagination
 
-class MessageInlineKeyboard : MessageKeyboard {
-    private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()
-    val rowsCount get() = rows.size
+interface MessageKeyboardRow <T : MessageKeyboardButton> : Iterable<T> {
+    fun getRow(): List<T>
+    fun button(button: T)
+}
+interface MessageKeyboardButton {
+    fun toKeyboardButton(): IKeyboardButton
+}
+
+// TODO [kodoctor] remove serializable & row & button; move inner classes
+@Serializable
+@KeyboardDsl
+class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()) : MessageKeyboard, Iterable<MessageInlineKeyboard.MessageInlineKeyboardRow> {
+    fun getRows(): List<MessageInlineKeyboardRow> = rows
 
     override fun toMarkup(): KeyboardMarkup {
-        return InlineKeyboardMarkup(rows.map { it.getRow() })
+        return InlineKeyboardMarkup(rows.map { it.getRow().map { b -> b.toKeyboardButton() } })
     }
 
     fun <T> pagination(
@@ -27,12 +40,12 @@ class MessageInlineKeyboard : MessageKeyboard {
             .setupMarkup(this)
     }
 
-    fun createDatePicker(datePicker: DatePicker) {
-        datePicker.setupMarkup(this)
+    fun createDatePicker(datePicker: DatePicker, data: String? = null) {
+        datePicker.setupMarkup(this, data)
     }
 
+    fun row(row: MessageInlineKeyboardRow) = rows.add(row)
     fun row(text: String, callbackData: String) = row { button(text, callbackData) }
-
     fun row(setRow: MessageInlineKeyboardRow.() -> Unit) {
         rows.add(
             MessageInlineKeyboardRow()
@@ -40,27 +53,31 @@ class MessageInlineKeyboard : MessageKeyboard {
         )
     }
 
-    inner class MessageInlineKeyboardRow {
-        private val row: MutableList<InlineKeyboardButton> = mutableListOf()
+    @Serializable
+    class MessageInlineKeyboardRow : MessageKeyboardRow<MessageInlineKeyboardRow.MessageInlineKeyboardButton> {
+        private val row: MutableList<MessageInlineKeyboardButton> = mutableListOf()
 
-        internal fun getRow(): List<InlineKeyboardButton> = row
+        override fun getRow(): List<MessageInlineKeyboardButton> = row
 
+        override fun button(button: MessageInlineKeyboardButton) {
+            row.add(button)
+        }
         fun button(text: String, callbackData: String) {
             row.add(
-                MessageInlineKeyboardButton()
-                    .apply { this.text = text; this.callbackData = callbackData }
-                    .toKeyboardButton()
+                MessageInlineKeyboardButton().apply {
+                    this.text = text;
+                    this.callbackData = callbackData
+                }
             )
         }
         fun button(setButton: MessageInlineKeyboardButton.() -> Unit) {
-            row.add(
-                MessageInlineKeyboardButton()
-                    .apply(setButton)
-                    .toKeyboardButton()
-            )
+            row.add(MessageInlineKeyboardButton().apply(setButton))
         }
 
-        inner class MessageInlineKeyboardButton {
+        override fun iterator(): Iterator<MessageInlineKeyboardButton> = row.iterator()
+
+        @Serializable
+        class MessageInlineKeyboardButton : MessageKeyboardButton {
             var text: String = ""
             var url: String? = null
             var loginUrl: String? = null
@@ -68,10 +85,12 @@ class MessageInlineKeyboard : MessageKeyboard {
             var switchInlineQuery: String? = null
             var pay: Boolean? = null
 
-            internal fun toKeyboardButton(): InlineKeyboardButton {
+            override fun toKeyboardButton(): InlineKeyboardButton {
                 require(text.isNotEmpty()) { "Button text must be is not empty" }
                 return InlineKeyboardButton(text, callbackData, url, loginUrl, switchInlineQuery, pay)
             }
         }
     }
+
+    override fun iterator(): Iterator<MessageInlineKeyboardRow> = rows.iterator()
 }

@@ -5,9 +5,14 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
 import ru.raysmith.tgbot.model.network.BooleanResponse
+import ru.raysmith.tgbot.model.network.BotCommandsResponse
 import ru.raysmith.tgbot.model.network.GetMeResponse
+import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.chat.GetChatResponse
+import ru.raysmith.tgbot.model.network.command.BotCommand
+import ru.raysmith.tgbot.model.network.command.BotCommandScope
+import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
@@ -22,20 +27,21 @@ interface TelegramService {
 
     /**
      * A simple method for testing your bot's auth token. Requires no parameters.
-     * Returns basic information about the bot in form of a User object.
+     *
+     * Returns basic information about the bot in form of a [User] object.
      * */
-    @GET("getMe")
+    @POST("getMe")
     fun getMe(): Call<GetMeResponse>
 
     /**
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
-     * Returns a [Chat][ru.raysmith.tgbot.model.network.chat.Chat] object on success.
+     * Returns a [Chat][User] object on success.
      * */
-    @GET("getChat")
+    @POST("getChat")
     fun getChat(@Query("chat_id") chatId: String): Call<GetChatResponse>
 
-    @GET("getUpdates")
+    @POST("getUpdates")
     fun getUpdates(
         @Query("offset") offset: Int? = null,
         @Query("limit") limit: Int? = null,
@@ -56,7 +62,7 @@ interface TelegramService {
      *  @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
      *  @param keyboardMarkup Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
      *  */
-    @GET("sendMessage")
+    @POST("sendMessage")
     fun sendMessage(
         @Query("chat_id") chatId: String,
         @Query("text") text: String,
@@ -69,7 +75,7 @@ interface TelegramService {
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
 
-    @GET("sendPhoto")
+    @POST("sendPhoto")
     fun sendPhoto(
         @Query("chat_id") chatId: String,
         @Query("photo") photo: String,
@@ -96,7 +102,7 @@ interface TelegramService {
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
-    @GET("sendDocument")
+    @POST("sendDocument")
     fun sendDocument(
         @Query("chat_id") chatId: String,
         @Query("document") document: String,
@@ -113,7 +119,7 @@ interface TelegramService {
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
      * */
-    @GET("sendMediaGroup")
+    @POST("sendMediaGroup")
     fun sendMediaGroup(
         @Query("chat_id") chatId: String,
         @Query("media") media: String,
@@ -153,7 +159,7 @@ interface TelegramService {
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null
     ): Call<MessageResponseArray>
 
-    @GET("editMessageText")
+    @POST("editMessageText")
     fun editMessageText(
         @Query("chat_id") chatId: String? = null,
         @Query("message_id") messageId: Long? = null,
@@ -165,57 +171,57 @@ interface TelegramService {
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
 
-    @GET("editMessageCaption")
+    @POST("editMessageCaption")
     fun editMessageCaption(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Int? = null,
+        @Query("message_id") messageId: Long? = null,
         @Query("caption") caption: String,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null
     ): Call<MessageResponse>
 
-    @GET("editMessageMedia")
+    @POST("editMessageMedia")
     fun editMessageMedia(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Int? = null,
+        @Query("message_id") messageId: Long? = null,
         @Query("media") media: InputMedia,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null
     ): Call<MessageResponse>
 
-    @GET("editMessageReplyMarkup")
+    @POST("editMessageReplyMarkup")
     fun editMessageReplyMarkup(
         @Query("chat_id") chatId: String? = null,
-        @Query("message_id") messageId: Int? = null,
+        @Query("message_id") messageId: Long? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
 
-    @GET("deleteMessage")
+    @POST("deleteMessage")
     fun deleteMessage(
         @Query("chat_id") chatId: String,
         @Query("message_id") messageId: Long
     ): Call<BooleanResponse>
 
-    @GET("answerCallbackQuery")
+    @POST("answerCallbackQuery")
     fun answerCallbackQuery(
         @Query("callback_query_id") callbackQueryId: String,
         @Query("text") text: String? = null,
         @Query("show_alert") showAlert: Boolean? = null,
         @Query("url") url: String? = null,
-        @Query("cache_time") cacheTime: Int? = null,
+        @Query("cache_time") cacheTime: Int? = null
     ): Call<BooleanResponse>
 
-    @GET("sendChatAction")
+    @POST("sendChatAction")
     fun sendChatAction(
         @Query("chat_id") chatId: String,
         @Query("action") action: ChatAction
     ): Call<BooleanResponse>
 
-    @GET("getFile")
+    @POST("getFile")
     fun getFile(
-        @Query("file_id") fileId: String,
+        @Query("file_id") fileId: String
     ): Call<FileResponse>
 
     /**
@@ -234,12 +240,12 @@ interface TelegramService {
      * If False, the user will be able to see messages in the group that were sent before the user was removed.
      * Always True for supergroups and channels.
      * */
-    @GET("banChatMember")
+    @POST("banChatMember")
     fun banChatMember(
         @Query("chat_id") chatId: String,
         @Query("user_id") userId: Long,
         @Query("until_date") untilDate: Int? = null,
-        @Query("revoke_messages") revokeMessages: Boolean? = null,
+        @Query("revoke_messages") revokeMessages: Boolean? = null
     ): Call<BooleanResponse>
 
     /**
@@ -254,11 +260,11 @@ interface TelegramService {
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
      * */
-    @GET("unbanChatMember")
+    @POST("unbanChatMember")
     fun unbanChatMember(
         @Query("chat_id") chatId: String,
         @Query("user_id") userId: Long,
-        @Query("only_if_banned") onlyIfBanned: Boolean? = null,
+        @Query("only_if_banned") onlyIfBanned: Boolean? = null
     ): Call<BooleanResponse>
 
     /**
@@ -311,7 +317,7 @@ interface TelegramService {
      * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
-    @GET("sendInvoice")
+    @POST("sendInvoice")
     fun sendInvoice(
         @Query("chat_id") chatId: String,
         @Query("title") title: String,
@@ -338,7 +344,7 @@ interface TelegramService {
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Long? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
-        @Query("reply_markup") replyMarkup: InlineKeyboardMarkup? = null,
+        @Query("reply_markup") replyMarkup: InlineKeyboardMarkup? = null
     ): Call<MessageResponse>
 
     /**
@@ -356,11 +362,11 @@ interface TelegramService {
      * T-shirts while you were busy filling out your payment details. Please choose a different color or garment!").
      * Telegram will display this message to the user.
      * */
-    @GET("answerPreCheckoutQuery")
+    @POST("answerPreCheckoutQuery")
     fun answerPreCheckoutQuery(
         @Query("pre_checkout_query_id") preCheckoutQueryId: String,
         @Query("ok") ok: Boolean,
-        @Query("error_message") errorMessage: String? = null,
+        @Query("error_message") errorMessage: String? = null
     ): Call<BooleanResponse>
 
     /**
@@ -376,12 +382,57 @@ interface TelegramService {
      * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
      * Telegram will display this message to the user.
      * */
-    @GET("answerShippingQuery")
+    @POST("answerShippingQuery")
     fun answerShippingQuery(
         @Query("shipping_query_id") shippingQueryId: String,
         @Query("ok") ok: Boolean,
         @Query("shipping_options") shippingOptions: String? = null,
-        @Query("error_message") errorMessage: String? = null,
+        @Query("error_message") errorMessage: String? = null
     ): Call<BooleanResponse>
+
+    /**
+     * Use this method to change the list of the bot's commands.
+     *
+     * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands. Returns True on success
+     * */
+    @POST("setMyCommands")
+    fun setMyCommands(
+        /** A JSON-serialized list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified. */
+        @Query("commands") commandsJson: String,
+
+        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
+        @Query("scope") scope: BotCommandScope? = null,
+
+        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
+        @Query("language_code") languageCode: String? = null
+    ): Call<BooleanResponse>
+
+    /**
+     * Use this method to delete the list of the bot's commands for the given scope and user language.
+     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns True on success.
+     * */
+    @POST("deleteMyCommands")
+    fun deleteMyCommands(
+
+        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
+        @Query("scope") scope: BotCommandScope? = null,
+
+        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
+        @Query("language_code") languageCode: String? = null
+    ): Call<BooleanResponse>
+
+    /**
+     * Use this method to get the current list of the bot's commands for the given scope and user language.
+     * Returns Array of [BotCommand] on success. If commands aren't set, an empty list is returned.
+     * */
+    @POST("getMyCommands")
+    fun getMyCommands(
+
+        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
+        @Query("scope") scope: BotCommandScope? = null,
+
+        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
+        @Query("language_code") languageCode: String? = null
+    ): Call<BotCommandsResponse>
 }
 

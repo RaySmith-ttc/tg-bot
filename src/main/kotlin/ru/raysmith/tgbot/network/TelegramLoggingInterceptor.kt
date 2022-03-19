@@ -1,10 +1,12 @@
 package ru.raysmith.tgbot.network
 
 import okhttp3.logging.HttpLoggingInterceptor
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 object TelegramLoggingInterceptor : HttpLoggingInterceptor.Logger {
     override fun log(message: String) {
-        TelegramApi.logger.debug(message)
+        TelegramApi.logger.debug(URLDecoder.decode(message, StandardCharsets.UTF_8.toString()).replace("\n", "\\n"))
     }
 
 }

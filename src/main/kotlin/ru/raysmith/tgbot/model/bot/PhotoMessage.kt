@@ -9,10 +9,13 @@ import retrofit2.Response
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.withSafeLength
 import java.io.File
 import java.nio.file.Files
 
-class PhotoMessage : IMessage<MessageResponse> {
+class PhotoMessage(override val service: TelegramService = TelegramApi.service) : IMessage<MessageResponse> {
+
     private var photo: String? = null
     private var file: File? = null
     private var fileName: String? = null
@@ -26,16 +29,20 @@ class PhotoMessage : IMessage<MessageResponse> {
     override var allowSendingWithoutReply: Boolean? = null
     private var keyboardMarkup: MessageKeyboard? = null
 
-    /** Sets a caption as [MessageText] object */
-    fun captionWithEntities(setText: MessageText.() -> Unit) {
-        _caption = MessageText().apply(setText)
+    /**
+     * Sets a caption as [MessageText] object
+     *
+     * @param printNulls Set true for apply null strings to message text
+     * */
+    fun captionWithEntities(printNulls: Boolean = false, setText: MessageText.() -> Unit) {
+        _caption = MessageText(printNulls).apply(setText)
     }
 
     /**
      * Set a photo to send.
      * @param fileId identifier of telegram [file][ru.raysmith.tgbot.model.network.file.File]
      * */
-    fun setPhoto(fileId: String) {
+    fun photo(fileId: String) {
         this.photo = fileId
         this.file = null
         this.byteArray = null
@@ -47,7 +54,7 @@ class PhotoMessage : IMessage<MessageResponse> {
      * Set a photo to send.
      * @param file The image file that will be sent
      * */
-    fun setPhoto(file: File) {
+    fun photo(file: File) {
         this.photo = null
         this.file = file
         this.fileName = file.nameWithoutExtension
@@ -61,7 +68,7 @@ class PhotoMessage : IMessage<MessageResponse> {
      * @param fileName the name of the file that be created
      * @param mimeType content type
      * */
-    fun setPhoto(byteArray: ByteArray, fileName: String, mimeType: String) {
+    fun photo(byteArray: ByteArray, fileName: String, mimeType: String) {
         this.photo = null
         this.file = null
         this.fileName = fileName
@@ -69,17 +76,17 @@ class PhotoMessage : IMessage<MessageResponse> {
         this.byteArray = byteArray
     }
 
-    private fun getCaptionText(): String? = _caption?.getTextString() ?: caption
+    private fun getCaptionText(): String? = _caption?.getSafeTextString() ?: caption?.withSafeLength()
 
     override fun send(chatId: String): Response<MessageResponse> {
         return when {
             photo != null -> {
-                TelegramApi.service.sendPhoto(
+                service.sendPhoto(
                     chatId = chatId,
                     photo = photo!!,
                     caption = getCaptionText(),
                     parseMode = parseMode,
-                    captionEntities = _caption?.getEntitiesString(),
+                    captionEntities = _caption?.getSafeEntitiesString(),
                     disableNotification = disableNotification,
                     replyToMessageId = replyToMessageId,
                     allowSendingWithoutReply = allowSendingWithoutReply,
@@ -89,7 +96,7 @@ class PhotoMessage : IMessage<MessageResponse> {
             file != null -> {
                 val requestBody = file!!.asRequestBody(mimeType!!.toMediaType())
                 val photo = MultipartBody.Part.createFormData("photo", fileName!!, requestBody)
-                TelegramApi.service.sendPhoto(
+                service.sendPhoto(
                     chatId = chatId.toRequestBody(),
                     photo = photo,
                     caption = getCaptionText()?.toRequestBody(),
@@ -103,7 +110,7 @@ class PhotoMessage : IMessage<MessageResponse> {
             byteArray != null -> {
                 val requestBody = byteArray!!.toRequestBody(mimeType!!.toMediaType())
                 val photo = MultipartBody.Part.createFormData("photo", fileName!!, requestBody)
-                TelegramApi.service.sendPhoto(
+                service.sendPhoto(
                     chatId = chatId.toRequestBody(),
                     photo = photo,
                     caption = getCaptionText()?.toRequestBody(),
@@ -118,21 +125,3 @@ class PhotoMessage : IMessage<MessageResponse> {
         }
     }
 }
-
-//TelegramApi.service.sendPhotoMultipart(
-//MultipartBody.Builder()
-//.setType(MultipartBody.FORM)
-//.addFormDataPart("chat_id", chatId)
-//.addPart(
-//MultipartBody.Part.createFormData("photo", fileName, file!!.asRequestBody("image/*".toMediaType()))
-//)
-//.apply {
-//    getCaptionText()?.also { caption -> addFormDataPart("caption", caption) }
-//    parseMode?.also { addFormDataPart("parse_mode", TelegramApi.json.encodeToString(it)) }
-//    disableNotification?.also { addFormDataPart("disable_notification", it.toString()) }
-//    replyToMessageId?.also { addFormDataPart("reply_to_message_id", it.toString()) }
-//    allowSendingWithoutReply?.also { addFormDataPart("allow_sending_without_reply", it.toString()) }
-//    keyboardMarkup?.also { addFormDataPart("reply_markup", TelegramApi.json.encodeToString(it)) }
-//}
-//.build()
-//).execute()

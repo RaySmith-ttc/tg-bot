@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.User
 
 @Serializable
@@ -25,4 +26,6 @@ data class ChatMemberUpdated(
 
     /** Chat invite link, which was used by the user to join the chat; for joining by invite link events only. */
     @SerialName("invite_link") val inviteLink: ChatInviteLink? = null,
-)
+) : ChatIdHolder {
+    override fun getChatId() = chat.id.toString()
+}

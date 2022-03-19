@@ -20,4 +20,4 @@ data class KeyboardButton(
     /** If True, the user's current location will be sent when the button is pressed. Available in private chats only */
     @SerialName("request_location") val requestLocation: Boolean? = null,
     // TODO [poll support] add request_poll field (https://core.telegram.org/bots/api#keyboardbutton)
-)
+) : IKeyboardButton

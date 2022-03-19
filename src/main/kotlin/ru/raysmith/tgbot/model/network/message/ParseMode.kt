@@ -115,5 +115,12 @@ import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
  * for italic `snake_case` and `*2*\**2=4*` for bold `2*2=4`.
  * */
 enum class ParseMode {
-    HTML, MARKDOWN, MARKDOWNV2
+    HTML,
+
+    @Deprecated(
+        "This is a legacy mode, retained for backward compatibility",
+        ReplaceWith("MARKDOWNV2", "ru.raysmith.tgbot.model.network.message.ParseMode")
+    )
+    MARKDOWN,
+    MARKDOWNV2
 }

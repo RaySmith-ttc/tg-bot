@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.utils.asParameter
 class UpdateResponseTests {
 
     @Test
-    fun `entities UTF-16`() {
+    fun `update with entities`() {
         val actualUpdate = TelegramApi.json.decodeFromString<Update>(FileLoader.read("updateWithEntities.json"))
 
         assertThat(actualUpdate.message!!.getAllEntity(MessageEntityType.URL))
@@ -26,8 +26,7 @@ class UpdateResponseTests {
     fun updateTypesAsParameter() {
         val param = listOf(UpdateType.MESSAGE, UpdateType.CALLBACK_QUERY).asParameter()
 
-        assertThat(param)
-            .isEqualTo("[\"message\",\"callback_query\"]")
+        assertThat(param).isEqualTo("[\"message\",\"callback_query\"]")
     }
 
     @Test

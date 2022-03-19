@@ -12,11 +12,12 @@ import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.message.MessageResponseArray
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramService
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
 
-class MediaGroupMessage : IMessage<MessageResponseArray> {
+class MediaGroupMessage(override val service: TelegramService = TelegramApi.service) : IMessage<MessageResponseArray> {
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -39,7 +40,7 @@ class MediaGroupMessage : IMessage<MessageResponseArray> {
     }
     fun photo(inputStream: InputStream, filename: String, mimeType: String, caption: String? = null, parseMode: ParseMode? = null) {
         inputMedia.add(InputMediaPhoto(media = "attach://$filename", caption = caption, parseMode = parseMode))
-        val requestBody = inputStream.readAllBytes().toRequestBody(mimeType.toMediaType())
+        val requestBody = inputStream.readBytes().toRequestBody(mimeType.toMediaType())
         multipartBodyParts.add(MultipartBody.Part.createFormData(filename, filename, requestBody))
     }
 
@@ -47,9 +48,9 @@ class MediaGroupMessage : IMessage<MessageResponseArray> {
         return when(inputMedia.firstOrNull()) {
             is InputMediaPhoto -> {
                 if (multipartBodyParts.isEmpty()) {
-                    TelegramApi.service.sendMediaGroup(
+                    service.sendMediaGroup(
                         chatId = chatId,
-                        media = TelegramApi.json.encodeToString(inputMedia),
+                        media = TelegramApi.json.encodeToString(inputMedia.toList()),
                         disableNotification = disableNotification,
                         replyToMessageId = replyToMessageId,
                         allowSendingWithoutReply = allowSendingWithoutReply,
@@ -60,12 +61,12 @@ class MediaGroupMessage : IMessage<MessageResponseArray> {
                     }
 
                     if (sendAction) {
-                        TelegramApi.service.sendChatAction(chatId, ChatAction.UPLOAD_PHOTO).execute()
+                        service.sendChatAction(chatId, ChatAction.UPLOAD_PHOTO).execute()
                     }
 
-                    TelegramApi.service.sendMediaGroup(
+                    service.sendMediaGroup(
                         chatId = chatId,
-                        media = TelegramApi.json.encodeToString(inputMedia),
+                        media = TelegramApi.json.encodeToString(inputMedia.toList()),
                         mediaPart1 = multipartBodyParts[0],
                         mediaPart2 = multipartBodyParts[1],
                         mediaPart3 = multipartBodyParts.getOrNull(2),

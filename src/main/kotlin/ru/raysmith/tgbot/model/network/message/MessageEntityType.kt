@@ -12,7 +12,6 @@ import kotlinx.serialization.Serializable
  * “text_link” (for clickable text URLs), “text_mention” (for users without usernames)
  *
  * @see <a href="https://telegram.org/blog/edit#new-mentions">New Mentions</a>
- *
  * */
 enum class MessageEntityType {
     @SerialName("mention") MENTION,
@@ -26,8 +25,9 @@ enum class MessageEntityType {
     @SerialName("italic") ITALIC,
     @SerialName("underline") UNDERLINE,
     @SerialName("strikethrough") STRIKETHROUGH,
+    @SerialName("spoiler") SPOILER,
     @SerialName("code") CODE,
     @SerialName("pre") PRE,
     @SerialName("text_link") TEXT_LINK,
-    @SerialName("text_mention") TEXT_MENTION
+    @SerialName("text_mention") TEXT_MENTION;
 }

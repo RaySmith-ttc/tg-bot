@@ -3,12 +3,14 @@ package ru.raysmith.tgbot.model.network.message
 import ru.raysmith.tgbot.model.network.Location
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.chat.Chat
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApiException
 
 @Serializable
 /** This object represents a message. */
@@ -215,14 +217,16 @@ data class Message(
     /** Inline keyboard attached to the message. `login_url` buttons are represented as ordinary `url` buttons. */
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null
 
-) {
+)  : ChatIdHolder {
 
     /** [Type][MessageType] of the message. It can be text, command or inline data */
     val type = when {
         replyMarkup != null -> MessageType.INLINE_DATA
-        entities != null && entities.size > 1 && entities.first().type == MessageEntityType.BOT_COMMAND -> MessageType.COMMAND
+        entities != null && entities.isNotEmpty() && entities.first().type == MessageEntityType.BOT_COMMAND -> MessageType.COMMAND
         else -> MessageType.TEXT
     }
+
+    override fun getChatId() = from?.id.toString()
 
     /** Return true if entities has one or more link */
     fun hasUrl() : Boolean = entities?.any { it.type == MessageEntityType.URL } ?: false
@@ -250,6 +254,20 @@ data class Message(
         else -> null
     }
 
-    /** Delete a message, including service messages */
-    fun delete() = TelegramApi.service.deleteMessage(chat.id.toString(), messageId).execute()
+    /**
+     * Use this method to delete a message, including service messages, with the following limitations:
+     * - A message can only be deleted if it was sent less than 48 hours ago.
+     * - A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+     * - Bots can delete outgoing messages in private chats, groups, and supergroups.
+     * - Bots can delete incoming messages in private chats.
+     * - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+     * - If the bot is an administrator of a group, it can delete any message there.
+     * - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+     *
+     * Returns True on success.
+     * */
+    fun delete() = TelegramApi.service.deleteMessage(chat.id.toString(), messageId).execute().body()?.result ?: false
+
+    /** A safe version of the [delete] method that does not throw a [TelegramApiException]. Return true if message success deleted */
+    fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }
 }

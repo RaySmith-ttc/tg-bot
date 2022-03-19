@@ -3,8 +3,7 @@ package ru.raysmith.tgbot.utils
 import org.jetbrains.exposed.sql.SizedIterable
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.utils.PropertiesFactory
-import ru.raysmith.utils.properties.getOrDefault
+import ru.raysmith.utils.properties.PropertiesFactory
 
 class Pagination<T>(
     private val data: Iterable<T>,
@@ -16,14 +15,17 @@ class Pagination<T>(
         const val PAGE_FIRST = -1L
         const val PAGE_LAST = -2L
 
+        const val SYMBOL_PAGE_PREFIX = 'p'
+        const val SYMBOL_CURRENT_PAGE = '·'
+
         private val propertiesManager = PropertiesFactory.from("bot.properties")
 
-        val defaultRows: Int = propertiesManager.getOrDefault<String>("pagination.rows", "5")
+        val defaultRows: Int = propertiesManager.getOrDefault("pagination.rows", "5")?.toString()
             ?.toIntOrNull() ?: throw IllegalArgumentException("Property pagination.rows is not Int")
-        val defaultColumns: Int = propertiesManager.getOrDefault<String>("pagination.columns", "1")
+        val defaultColumns: Int = propertiesManager.getOrDefault("pagination.columns", "1")?.toString()
             ?.toIntOrNull() ?: throw IllegalArgumentException("Property pagination.columns is not Int")
-        val firstPageSymbol = propertiesManager.getOrDefault<String>("pagination.firstpagesymbol", "«")!!
-        val lastPageSymbol = propertiesManager.getOrDefault<String>("pagination.lastpagesymbol", "»")!!
+        val firstPageSymbol = propertiesManager.getOrDefault("pagination.firstpagesymbol", "«")!!.toString()
+        val lastPageSymbol = propertiesManager.getOrDefault("pagination.lastpagesymbol", "»")!!.toString()
     }
 
     var rows = defaultRows
@@ -74,51 +76,62 @@ class Pagination<T>(
 
         val lastIndex = (offset + rows * columns) - 1
         val isLastPage = lastIndex > dataCount - 1
-        val range = if (data is SizedIterable) LongRange(0, (rows * columns).toLong()) else LongRange(offset, if (isLastPage) dataCount - 1L else lastIndex)
-        dataList.filterIndexed { index, _ -> index in range }
-            .let { items ->
-                items.chunked(columns)
-                    .map { row ->
+        val range = if (data is SizedIterable) {
+            LongRange(0, (rows * columns).toLong())
+        } else {
+            LongRange(offset, if (isLastPage) dataCount - 1L else lastIndex)
+        }
+
+        dataList.filterIndexed { index, _ -> index in range }.let { items ->
+            items.chunked(columns)
+                .map { row ->
+                    row {
+                        row.forEach {
+                            createButtons(it)
+                        }
+                    }
+                }
+                .apply {
+
+                    // add a pages row if needed and it is enabled
+                    if (addPagesRow && !(page == 1L && isLastPage)) {
                         row {
-                            row.forEach {
-                                createButtons(it)
+
+                            // [«] button
+                            if (page > pages_paddings + 1 && totalPages > max_displayed_pages) {
+                                button(firstPageSymbol, "$callbackQueryPrefix${SYMBOL_PAGE_PREFIX}1")
                             }
+
+                            // first page in a row for current state
+                            var firstPage = when {
+                                totalPages <= max_displayed_pages -> 1
+                                page < pages_paddings + 1 -> 1
+                                page == totalPages -> (page - pages_paddings) - 1
+                                else -> page - pages_paddings
+                            }
+
+                            // last page in a row for current state // TODO replace with coerceMethod
+                            val lastPage =
+                                if ((firstPage + max_displayed_pages) - 1 > totalPages) totalPages
+                                else (firstPage + max_displayed_pages) - 1
+
+                            (((lastPage - firstPage) - max_displayed_pages) + 1).let {
+                                if (totalPages > max_displayed_pages && it != 0L) firstPage += it
+                            }
+
+                            // page buttons
+                            if (totalPages > 1) {
+                                LongRange(firstPage, lastPage).forEach {
+                                    if (it == page) button("$SYMBOL_CURRENT_PAGE$it$SYMBOL_CURRENT_PAGE", CallbackQuery.EMPTY_CALLBACK_DATA)
+                                    else button(it.toString(), "$callbackQueryPrefix$SYMBOL_PAGE_PREFIX$it")
+                                }
+                            }
+
+                            // [»] button
+                            if (lastPage < totalPages) button(lastPageSymbol, "$callbackQueryPrefix$SYMBOL_PAGE_PREFIX$totalPages")
                         }
                     }
-                    .apply {
-                        if (addPagesRow && !(page == 1L && isLastPage)) {
-                            row {
-                                if (page > pages_paddings + 1 && totalPages > max_displayed_pages) {
-                                    button(firstPageSymbol, callbackQueryPrefix + "p1")
-                                }
-
-                                var firstPage = when {
-                                    totalPages <= max_displayed_pages -> 1
-                                    page < pages_paddings + 1 -> 1
-                                    page == totalPages -> (page - pages_paddings) - 1
-                                    else -> page - pages_paddings
-                                }
-
-                                val lastPage =
-                                    if ((firstPage + max_displayed_pages) - 1 > totalPages) totalPages
-                                    else (firstPage + max_displayed_pages) - 1
-
-                                (((lastPage - firstPage) - max_displayed_pages) + 1).let {
-                                    if (totalPages > max_displayed_pages && it != 0L) firstPage += it
-                                }
-
-                                if (totalPages > 1) {
-                                    LongRange(firstPage, lastPage).forEach {
-                                        if (it == page) button("·$it·", CallbackQuery.EMPTY_CALLBACK_DATA)
-                                        else button(it.toString(), callbackQueryPrefix + "p$it")
-                                    }
-                                }
-
-                                if (lastPage < totalPages) button(lastPageSymbol, callbackQueryPrefix + "p${totalPages}")
-
-                            }
-                        }
-                    }
-            }
+                }
+        }
     }
 }

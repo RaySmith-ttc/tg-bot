@@ -8,14 +8,18 @@ import ru.raysmith.tgbot.network.serializer.ChatMemberSerializer
 @Serializable(with = ChatMemberSerializer::class)
 sealed class ChatMember {
 
+    /** The member's status in the chat */
+    @SerialName("status") abstract val status: String
+
+    /** Information about the user */
+    @SerialName("user") abstract val user: User
+
     @Serializable
     /** Represents a chat member that owns the chat and has all administrator privileges. */
     data class ChatMemberOwner(
         /** The member's status in the chat, always “creator” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
 
         /** True, if the user's presence in the chat is hidden */
         @SerialName("is_anonymous") val isAnonymous: Boolean,
@@ -28,10 +32,8 @@ sealed class ChatMember {
     /** Represents a chat member that has some additional privileges. */
     data class ChatMemberAdministrator(
         /** The member's status in the chat, always “administrator” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
 
         /** True, if the bot is allowed to edit administrator privileges of that user */
         @SerialName("can_be_edited") val canBeEdited: Boolean,
@@ -85,20 +87,16 @@ sealed class ChatMember {
     /** Represents a chat member that has no additional privileges or restrictions. */
     data class ChatMemberMember(
         /** The member's status in the chat, always “member” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
     ) : ChatMember()
 
     @Serializable
     /** Represents a chat member that is under certain restrictions in the chat. Supergroups only. */
     data class ChatMemberRestricted(
         /** The member's status in the chat, always “restricted” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
 
         /** True, if the user is allowed to change the chat title, photo and other settings */
         @SerialName("is_member") val isMember: Boolean,
@@ -135,20 +133,16 @@ sealed class ChatMember {
     /** Represents a chat member that isn't currently a member of the chat, but may join it themselves. */
     data class ChatMemberLeft(
         /** The member's status in the chat, always “left” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
     ) : ChatMember()
 
     @Serializable
     /** Represents a chat member that was banned in the chat and can't return to the chat or view chat messages. */
     data class ChatMemberBanned(
         /** The member's status in the chat, always “kicked” */
-        @SerialName("status") val status: String,
-
-        /** Information about the user */
-        @SerialName("user") val user: User,
+        override val status: String,
+        override val user: User,
 
         /** Date when restrictions will be lifted for this user; unix time. If 0, then the user is banned forever */
         @SerialName("until_date") val untilDate: Int,

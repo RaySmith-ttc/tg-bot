@@ -37,5 +37,51 @@ data class MessageEntity(
 
     /** For “pre” only, the programming language of the entity text */
     @SerialName("language") val language: String? = null,
-)
+) {
 
+    @Suppress("Deprecation")
+    fun formatString(string: String, parseMode: ParseMode): String {
+        fun getForParseMode(html: String, md: String, md2: String): String {
+            return when(parseMode) {
+                ParseMode.HTML -> html
+                ParseMode.MARKDOWN -> md
+                ParseMode.MARKDOWNV2 -> md2
+            }
+        }
+
+        fun String.linkEsc() = this.replace(")", "\\)").replace("\\", "\\\\")
+
+        return when(type) {
+            MessageEntityType.BOLD -> getForParseMode("<b>$string</b>", "*$string*", "*$string*")
+            MessageEntityType.ITALIC -> getForParseMode("<i>$string</i>", "_${string}_", "_${string}_")
+            MessageEntityType.UNDERLINE -> getForParseMode("<u>$string</u>", string, "__${string}__")
+            MessageEntityType.STRIKETHROUGH -> getForParseMode("<s>$string</s>", string, "~${string}~")
+            MessageEntityType.SPOILER -> getForParseMode(
+                "<span class=\"tg-spoiler\">$string</span>", string, "||$string||"
+            )
+            MessageEntityType.URL ->  getForParseMode(
+                "<a href=\"${string}\">$string</a>", "[$string](${string.linkEsc()})", "[$string](${string.linkEsc()})"
+            )
+            MessageEntityType.TEXT_LINK -> getForParseMode(
+                "<a href=\"${url}\">$string</a>", "[$string](${url?.linkEsc()})", "[$string](${url?.linkEsc()})"
+            )
+            MessageEntityType.MENTION -> getForParseMode(
+                "<a href=\"mention:$string\">$string</a>", string, "[$string](mention:$string)"
+            )
+            MessageEntityType.TEXT_MENTION -> {
+                getForParseMode(
+                    "<a href=\"mention:${user?.username ?: user?.id}\">$string</a>",
+                    string,
+                    "[$string](mention:${user?.username ?: user?.id})"
+                )
+            }
+            MessageEntityType.CODE -> getForParseMode("<code>$string</code>", "`$string`", "`$string`")
+            MessageEntityType.PRE -> getForParseMode(
+                "<pre>${language?.let { "<code class=\"language-$it\">" } ?: ""}$string${language?.let { "</code>" } ?: ""}</pre>",
+                "```${language ?: ""}\n$string\n```",
+                "```${language ?: ""}\n$string\n```",
+            )
+            else -> string
+        }
+    }
+}

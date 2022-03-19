@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.ChosenInlineResult
 import ru.raysmith.tgbot.model.network.InlineQuery
+import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
@@ -78,6 +80,7 @@ data class Update(
     @SerialName("chat_member") val chatMember: ChatMemberUpdated? = null,
 
     ) {
+
     /** Type of update. Null if unknown */
     val type: UpdateType? = when {
         message != null -> UpdateType.MESSAGE
@@ -94,8 +97,47 @@ data class Update(
 
         myChatMember != null -> UpdateType.MY_CHAT_MEMBER
         chatMember != null -> UpdateType.CHAT_MEMBER
+        shippingQuery != null -> UpdateType.SHIPPING_QUERY
+        preCheckoutQuery != null -> UpdateType.PRE_CHECKOUT_QUERY
         else -> null
     }
+
+    /** Find [from][User] by current update.  */
+    fun findFrom(): User? = when(type) {
+        UpdateType.MESSAGE -> message!!.from
+        UpdateType.EDITED_MESSAGE -> editedMessage!!.from
+        UpdateType.CHANNEL_POST -> channelPost!!.from
+        UpdateType.EDITED_CHANNEL_POST -> editedChannelPost!!.from
+        UpdateType.INLINE_QUERY -> inlineQuery!!.from
+        UpdateType.CHOSEN_INLINE_RESULT -> chatMember!!.from
+        UpdateType.CALLBACK_QUERY -> callbackQuery!!.from
+        UpdateType.POLL -> null // TODO [poll support]
+        UpdateType.POLL_ANSWER -> null // TODO [poll support]
+        UpdateType.MY_CHAT_MEMBER -> myChatMember!!.from
+        UpdateType.CHAT_MEMBER -> chatMember!!.from
+        UpdateType.SHIPPING_QUERY -> shippingQuery!!.from
+        UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.from
+        null -> null
+    }
+
+    /** Find [chat][Chat] id by current update. */
+    fun findChatId(): String? = when(type) {
+        UpdateType.MESSAGE -> message!!.getChatId()
+        UpdateType.EDITED_MESSAGE -> editedMessage!!.getChatId()
+        UpdateType.CHANNEL_POST -> channelPost!!.getChatId()
+        UpdateType.EDITED_CHANNEL_POST -> editedChannelPost!!.getChatId()
+        UpdateType.INLINE_QUERY -> inlineQuery!!.getChatId()
+        UpdateType.CHOSEN_INLINE_RESULT -> chatMember!!.getChatId()
+        UpdateType.CALLBACK_QUERY -> callbackQuery!!.getChatId()
+        UpdateType.POLL -> null // TODO [poll support]
+        UpdateType.POLL_ANSWER -> null // TODO [poll support]
+        UpdateType.MY_CHAT_MEMBER -> myChatMember!!.getChatId()
+        UpdateType.CHAT_MEMBER -> chatMember!!.getChatId()
+        UpdateType.SHIPPING_QUERY -> shippingQuery!!.getChatId()
+        UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.getChatId()
+        null -> null
+    }
+
 
     /**
      * Indicates whether an update handler was found and processing was started.

@@ -40,8 +40,4 @@ data class User(
 
     /** True, if the bot supports inline queries. Returned only in getMe. */
     @SerialName("supports_inline_queries") val supportsInlineQueries: Boolean? = null,
-) {
-
-
-
-}
+)

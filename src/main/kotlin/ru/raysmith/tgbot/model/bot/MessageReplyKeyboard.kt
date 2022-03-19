@@ -1,8 +1,24 @@
 package ru.raysmith.tgbot.model.bot
 
+import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardButton
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 
+@Serializable
+@KeyboardDsl
+class RemoveKeyboard : MessageKeyboard {
+    var selective: Boolean? = null
+
+    override fun toMarkup(): KeyboardMarkup {
+        return ReplyKeyboardRemove(selective = selective)
+    }
+
+}
+
+@Serializable
+@KeyboardDsl
 class MessageReplyKeyboard : MessageKeyboard {
     var resizeKeyboard: Boolean? = true
     var oneTimeKeyboard: Boolean? = null
@@ -23,7 +39,8 @@ class MessageReplyKeyboard : MessageKeyboard {
         return ReplyKeyboardMarkup(rows.map { it.getRow() }, resizeKeyboard, oneTimeKeyboard, inputFieldPlaceholder, selective)
     }
 
-    inner class MessageReplyKeyboardRow {
+    @Serializable
+    class MessageReplyKeyboardRow {
         private val row: MutableList<KeyboardButton> = mutableListOf()
 
         fun button(text: String) {

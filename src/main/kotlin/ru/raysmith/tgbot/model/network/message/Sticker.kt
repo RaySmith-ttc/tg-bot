@@ -20,12 +20,11 @@ data class Sticker(
     /** Sticker height */
     @SerialName("height") val height: Int,
 
-    /**
-     * True, if the sticker is animated
-     *
-     * @see <a href="https://telegram.org/blog/animated-stickers">Animated Stickers</a>
-     * */
+    /** True, if the sticker is [animated](https://telegram.org/blog/animated-stickers) */
     @SerialName("is_animated") val isAnimated: Boolean,
+
+    /** True, if the sticker is a video sticker */
+    @SerialName("is_video") val isVideo: Boolean,
 
     /** Sticker thumbnail in the .WEBP or .JPG format */
     @SerialName("thumb") val thumb: PhotoSize? = null,

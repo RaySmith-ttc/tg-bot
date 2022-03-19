@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+interface IKeyboardButton
 @Serializable
 /** This object represents one button of an inline keyboard. You **must** use exactly one of the optional fields. */
 data class InlineKeyboardButton(
@@ -45,4 +46,4 @@ data class InlineKeyboardButton(
      * @see <a href="https://core.telegram.org/bots/api#payments">https://core.telegram.org/bots/api#payments</a>
      * */
     @SerialName("pay") val pay: Boolean? = null
-)
+) : IKeyboardButton

@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.chat.ChatType
 
 /**
@@ -31,4 +32,6 @@ data class InlineQuery(
 
     /** Sender location, only for bots that request user location */
     @SerialName("location") val location: Location? = null,
-)
+) : ChatIdHolder {
+    override fun getChatId() = from.id.toString()
+}

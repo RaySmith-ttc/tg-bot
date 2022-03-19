@@ -1,43 +1,51 @@
 package ru.raysmith.tgbot.model.bot
 
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
+@DslMarker
+annotation class KeyboardDsl
 
+@KeyboardDsl
 interface InlineKeyboardCreator {
     var keyboardMarkup: MessageKeyboard?
-    fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
-        keyboardMarkup = MessageInlineKeyboard()
-            .apply(init)
 
+    @KeyboardDsl
+    fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
+        keyboardMarkup = MessageInlineKeyboard().apply(init)
         return keyboardMarkup as MessageKeyboard
     }
 }
 
-abstract class KeyboardCreator : InlineKeyboardCreator {
+@KeyboardDsl
+interface ReplyKeyboardCreator {
+    var keyboardMarkup: MessageKeyboard?
 
-    override var keyboardMarkup: MessageKeyboard? = null
-
+    @KeyboardDsl
     fun replyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
-        keyboardMarkup = MessageReplyKeyboard()
-            .apply(init)
-
+        keyboardMarkup = MessageReplyKeyboard().apply(init)
         return keyboardMarkup as MessageReplyKeyboard
     }
-
-    fun removeKeyboard(selective: Boolean? = null) {
-        keyboardMarkup = object : MessageKeyboard {
-            override fun toMarkup(): KeyboardMarkup {
-                return ReplyKeyboardRemove(selective = selective)
-            }
-        }
-    }
-
 }
 
-fun replyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
+
+@KeyboardDsl
+interface RemoveKeyboardCreator {
+    var keyboardMarkup: MessageKeyboard?
+
+    @KeyboardDsl
+    fun removeKeyboard(init: RemoveKeyboard.() -> Unit): RemoveKeyboard {
+        keyboardMarkup = RemoveKeyboard().apply(init)
+        return keyboardMarkup as RemoveKeyboard
+    }
+}
+
+@KeyboardDsl
+interface KeyboardCreator : InlineKeyboardCreator, ReplyKeyboardCreator, RemoveKeyboardCreator {
+    override var keyboardMarkup: MessageKeyboard?
+}
+
+inline fun buildReplyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
     return MessageReplyKeyboard().apply(init)
 }
 
-fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
+inline fun buildInlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageInlineKeyboard {
     return MessageInlineKeyboard().apply(init)
 }

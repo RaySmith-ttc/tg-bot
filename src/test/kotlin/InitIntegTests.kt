@@ -1,10 +1,10 @@
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatType
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.updates.Update
 import java.time.Instant
 
 open class BotTests {
@@ -21,17 +21,26 @@ class InitIntegTests : BotTests() {
     fun errorWhileOnError() = runBlocking {
         val bot = Bot(token = "bot123").apply {
             onError {
-//                throw Exception("from onError")
+                Assertions.assertThat(it.message).isEqualTo("Not Found")
             }
-            start {
-                handleMessage {
-//                    throw Exception("from handleMessage")
-                }
-            }
+
+//            launch {
+//                start {
+//                    handleMessage {
+//                        throw Exception("Shouldn't reach")
+//                    }
+//                }
+//            }
         }
 
-        bot.newUpdate(Update(1, message = Message(1, chat = getPrivateChat(), date = getDate())))
+//            bot.newUpdate(Update(1, message = Message(1, chat = getPrivateChat(), date = getDate())))
+
+        println("asdasd")
+        delay(100)
         bot.stop()
+//        runBlocking {
+//            delay(1000)
+//        }
     }
 
 }

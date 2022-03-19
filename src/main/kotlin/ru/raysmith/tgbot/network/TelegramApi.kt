@@ -9,50 +9,66 @@ import kotlinx.serialization.modules.polymorphic
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
-import ru.raysmith.tgbot.core.BotException
+import ru.raysmith.tgbot.exceptions.BotException
+import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.MessageKeyboard
+import ru.raysmith.tgbot.model.bot.MessageReplyKeyboard
 import ru.raysmith.tgbot.model.network.Error
+import ru.raysmith.tgbot.model.network.command.*
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
-import ru.raysmith.utils.PropertiesFactory
-import ru.raysmith.utils.properties.getOrDefault
+import ru.raysmith.utils.properties.PropertiesFactory
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
 object TelegramApi {
 
-    val logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault<String>("token", "")!!
+    val logger: Logger = LoggerFactory.getLogger("tg-api")
+    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault("token", null) as? String
+    const val BASE_URL = "https://api.telegram.org"
 
     fun setToken(newToken: String) {
         TOKEN = newToken
     }
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .addInterceptor(
-            HttpLoggingInterceptor(TelegramLoggingInterceptor).apply {
-                level = HttpLoggingInterceptor.Level.BASIC
-            }
-        )
-        .addInterceptor { chain ->
-            val request = chain.request()
-            val response = chain.proceed(request)
+    private fun getClient() = client ?: defaultClient
+    private var client: OkHttpClient? = null
+    val defaultClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .addInterceptor(
+                HttpLoggingInterceptor(TelegramLoggingInterceptor).apply {
+                    level = HttpLoggingInterceptor.Level.BASIC
+                }
+            )
+            .addInterceptor { chain ->
+                val request = chain.request()
+                val response = chain.proceed(request)
 
-            if (!response.isSuccessful && response.body != null) {
-                val error = json.decodeFromString<Error>(response.body!!.string())
-                if (error.errorCode == 401) {
-                    throw BotException("Bot is unauthorized with token")
-                } else throw TelegramApiException(error, request)
-            }
+                if (!response.isSuccessful && response.body != null) {
+                    val error = json.decodeFromString<Error>(response.body!!.string())
+                    if (error.errorCode == 401) {
+                        throw BotException("Bot is unauthorized with token")
+                    } else throw TelegramApiException(error, request)
+                }
 
-            response
-        }
-        .build()
+                response
+            }
+            .build()
+    }
+
+    fun setClient(client: OkHttpClient) {
+        this.client = client
+    }
 
     val json = Json {
         isLenient = true
@@ -62,43 +78,48 @@ object TelegramApi {
         serializersModule = SerializersModule {
             polymorphic(KeyboardMarkup::class) {
                 subclass(ReplyKeyboardMarkup::class, ReplyKeyboardMarkup.serializer())
+                subclass(ReplyKeyboardRemove::class, ReplyKeyboardRemove.serializer())
+                subclass(InlineKeyboardMarkup::class, InlineKeyboardMarkup.serializer())
             }
             polymorphic(InputMedia::class) {
                 subclass(InputMediaPhoto::class, InputMediaPhoto.serializer())
             }
+            polymorphic(MessageKeyboard::class) {
+                subclass(MessageInlineKeyboard::class, MessageInlineKeyboard.serializer())
+                subclass(MessageReplyKeyboard::class, MessageReplyKeyboard.serializer())
+            }
         }
     }
 
-    private fun getRetrofit(token: String): Retrofit {
-        if (token.isEmpty()) throw BotException("Token is empty")
+    private fun buildService(token: String?, type: ServiceType): Retrofit {
+        if (token == null) throw BotException("Token is not set")
 
         return Retrofit.Builder()
-            .baseUrl("https://api.telegram.org/bot$token/")
-            .client(client)
+            .baseUrl(type.getBaseUrl(token))
+            .client(getClient())
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .addConverterFactory(NetworkUtils.EnumConverterFactory())
-            .build()
-    }
-
-    private val fileRetrofit by lazy {
-        if (TOKEN.isEmpty()) throw BotException("Token is empty")
-
-        Retrofit.Builder()
-            .baseUrl("https://api.telegram.org/file/bot$TOKEN/")
-            .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .addConverterFactory(NetworkUtils.EnumConverterFactory())
+            .addConverterFactory(NetworkUtils.ConverterFactory())
             .build()
     }
 
     private val services = mutableMapOf<String, TelegramService>()
-    val service by lazy { getRetrofit(TOKEN).create(TelegramService::class.java) }
-    val fileService by lazy { fileRetrofit.create(TelegramFileService::class.java) }
+    private val filesServices = mutableMapOf<String, TelegramFileService>()
+
+    val service: TelegramService by lazy { buildService(TOKEN, ServiceType.DEFAULT).create(TelegramService::class.java) }
+    val fileService: TelegramFileService by lazy { buildService(TOKEN, ServiceType.FILE).create(TelegramFileService::class.java) }
 
     fun serviceWithToken(token: String): TelegramService {
         return services[token] ?: run {
-            val newService = getRetrofit(token).create(TelegramService::class.java)
+            val newService = buildService(token, ServiceType.DEFAULT).create(TelegramService::class.java)
             services[token] = newService
+            newService
+        }
+    }
+
+    fun fileServiceWithToken(token: String): TelegramFileService {
+        return filesServices[token] ?: run {
+            val newService = buildService(token, ServiceType.FILE).create(TelegramFileService::class.java)
+            filesServices[token] = newService
             newService
         }
     }
