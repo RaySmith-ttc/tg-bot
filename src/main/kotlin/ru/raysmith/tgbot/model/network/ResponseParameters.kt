@@ -11,5 +11,5 @@ data class ResponseParameters(
     @SerialName("migrate_to_chat_id") val migrateToChatId: Long?,
 
     /** In case of exceeding flood control, the number of seconds left to wait before the request can be repeated*/
-    @SerialName("retry_after") val retryAfter: Long
+    @SerialName("retry_after") val retryAfter: Long?
 )

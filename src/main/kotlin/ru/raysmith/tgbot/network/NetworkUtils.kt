@@ -8,7 +8,6 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import java.lang.reflect.Type
 
-
 object NetworkUtils {
     class ConverterFactory : Converter.Factory() {
         override fun stringConverter(type: Type, annotations: Array<Annotation>, retrofit: Retrofit): Converter<*, String>? {

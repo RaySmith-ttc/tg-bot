@@ -1,13 +1,13 @@
 package ru.raysmith.tgbot.core.handler
 
 import org.slf4j.LoggerFactory
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.EventHandler
 import ru.raysmith.tgbot.core.HandlerDsl
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.Pagination
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.handleAll
 import java.time.LocalDate
@@ -18,10 +18,10 @@ class CallbackQueryHandler(
     private val alwaysAnswer: Boolean,
     private val handlerData: Map<String, CallbackQueryHandlerData>,
     override var service: TelegramService = TelegramApi.service
-) : EventHandler, BaseCallbackHandler(query, service) {
+) : EventHandler, BaseCallbackHandler(query, service), BotContext<CallbackQueryHandler> {
 
     override fun getChatId() = query.message?.chat?.id?.toString()
-    override var messageId: Long? = query.message?.messageId
+    override var messageId: Int? = query.message?.messageId
     override var inlineMessageId: String? = query.inlineMessageId
 
     companion object {
@@ -97,6 +97,13 @@ class CallbackQueryHandler(
         if (!isAnswered) {
             UnknownQueryHandler(query)
                 .apply { unknownHandler(query) }
+        }
+    }
+
+    override fun withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> Any) {
+        CallbackQueryHandler(query, alwaysAnswer, handlerData, service).apply {
+            this.service = bot.service
+            block()
         }
     }
 }

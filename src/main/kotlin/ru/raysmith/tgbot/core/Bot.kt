@@ -13,6 +13,8 @@ import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
+import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.utils.properties.PropertiesFactory
 import kotlin.system.measureTimeMillis
 
 private var stoppingJob: Job? = null
@@ -31,6 +33,7 @@ class Bot(
     private var onShutdown: suspend () -> Unit = { }
     private var onUpdate: (updates: List<Update>) -> Unit = { }
     private var onMessageSend: (message: Message) -> Unit = { }
+    private var onStart: () -> Unit = { }
     private var onStop: () -> Unit = { }
 
     // options
@@ -45,8 +48,14 @@ class Bot(
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
 
         /** Api call result of [getMe][TelegramService.getMe] method */
-        val ME by lazy { TelegramApi.service.getMe().execute().body()!!.result }
+        @Deprecated("This constant returns the bot for a default service instance. Use a property from a bot instance instead", ReplaceWith("me"))
+        val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
+
+        val properties = PropertiesFactory.fromOrNull("bot.properties")
     }
+
+    /** Api call result of [getMe][TelegramService.getMe] method */
+    val me by lazy { service.getMe().execute().body()?.result ?: errorBody() }
 
     init {
         if (token != null) {
@@ -147,6 +156,8 @@ class Bot(
         isActive = true
 
         try {
+            onStart()
+
             while (isActive) {
                 safeNetwork {
                     updateRequest = TelegramApi.service.getUpdates(
@@ -184,8 +195,8 @@ class Bot(
 
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
-    suspend fun start(updateHandler: EventHandlerFactory.() -> Unit) {
-        EventHandlerFactory.updateHandler() // setup handlers
+    suspend fun start(updateHandler: EventHandlerFactory.(bot: Bot) -> Unit) {
+        EventHandlerFactory.updateHandler(this) // setup handlers
         startBot()
     }
 
@@ -202,6 +213,12 @@ class Bot(
 
     fun onStop(onStop: () -> Unit): Bot {
         this.onStop = onStop
+        return this
+    }
+
+
+    fun onStart(onStart: () -> Unit): Bot {
+        this.onStart = onStart
         return this
     }
 

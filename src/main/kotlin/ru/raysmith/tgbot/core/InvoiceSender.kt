@@ -12,6 +12,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.utils.properties.PropertiesFactory
 import ru.raysmith.utils.properties.getOrNull
 
@@ -19,7 +20,7 @@ class InvoiceSender(override var service: TelegramService) : InlineKeyboardCreat
 
     companion object {
         private val logger = LoggerFactory.getLogger("invoice")
-        private val defaultProviderToken = PropertiesFactory.from("bot.properties").getOrNull("providerToken")
+        private val defaultProviderToken = Bot.properties?.getOrNull("providerToken")
     }
 
     var title: String? = null
@@ -48,7 +49,7 @@ class InvoiceSender(override var service: TelegramService) : InlineKeyboardCreat
     var allowSendingWithoutReply: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    fun send(chatId: String): Response<MessageResponse> {
+    fun send(chatId: String): MessageResponse {
         return service.sendInvoice(
             chatId = chatId,
             title = title ?: "",
@@ -76,7 +77,7 @@ class InvoiceSender(override var service: TelegramService) : InlineKeyboardCreat
             replyToMessageId = replyToMessageId,
             allowSendingWithoutReply = allowSendingWithoutReply,
             replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
-        ).execute()
+        ).execute().body() ?: errorBody()
     }
 
 }

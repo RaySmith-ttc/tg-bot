@@ -1,10 +1,10 @@
 package ru.raysmith.tgbot.core.handler
 
-import retrofit2.Response
 import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.errorBody
 
 /** Base implementation of query callback handler */
 open class BaseCallbackHandler(open val query: CallbackQuery, open val service: TelegramService) : ICallbackHandler {
@@ -13,7 +13,7 @@ open class BaseCallbackHandler(open val query: CallbackQuery, open val service: 
     fun answer(text: String) = answer { this.text = text }
     fun alert(text: String) = answer { this.text = text; showAlert = true }
 
-    override fun answer(init: AnswerCallbackQuery.() -> Unit): Response<BooleanResponse> {
+    override fun answer(init: AnswerCallbackQuery.() -> Unit): BooleanResponse {
         return AnswerCallbackQuery().apply(init).let {
             service.answerCallbackQuery(
                 callbackQueryId = query.id,
@@ -26,7 +26,7 @@ open class BaseCallbackHandler(open val query: CallbackQuery, open val service: 
                     isAnswered = true
                 }
             }
-        }
+        }.body() ?: errorBody()
 
     }
 }

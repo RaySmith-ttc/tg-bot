@@ -17,10 +17,7 @@ import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.MessageResponse
-import ru.raysmith.tgbot.model.network.message.MessageResponseArray
+import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 
 interface TelegramService {
@@ -34,34 +31,39 @@ interface TelegramService {
     fun getMe(): Call<GetMeResponse>
 
     /**
-     * Use this method to get up to date information about the chat (current name of the user for one-on-one
-     * conversations, current username of a user, group or channel, etc.).
-     * Returns a [Chat][User] object on success.
+     * Use this method to log out from the cloud Bot API server before launching the bot locally.
+     * You **must** log out the bot before running it locally, otherwise there is no guarantee that the bot will
+     * receive updates. After a successful call, you can immediately log in on a local server, but will not be able
+     * to log in back to the cloud Bot API server for 10 minutes. Returns *True* on success. Requires no parameters.
      * */
-    @POST("getChat")
-    fun getChat(@Query("chat_id") chatId: String): Call<GetChatResponse>
-
-    @POST("getUpdates")
-    fun getUpdates(
-        @Query("offset") offset: Int? = null,
-        @Query("limit") limit: Int? = null,
-        @Query("timeout") timeout: Int? = null,
-        @Query("allowed_updates") allowedUpdates: String? = null
-    ): Call<UpdatesResult>
+    @POST("logOut")
+    fun logOut(): Call<BooleanResponse>
 
     /**
-     *  Use this method to send text messages. On success, the sent [Message] is returned.
+     * Use this method to close the bot instance before moving it from one local server to another.
+     * You need to delete the webhook before calling this method to ensure that the bot isn't launched again after
+     * server restart. The method will return error 429 in the first 10 minutes after the bot is launched.
+     * Returns *True* on success. Requires no parameters.
+     * */
+    @POST("close")
+    fun close(): Call<BooleanResponse>
+
+    /**
+     * Use this method to send text messages. On success, the sent [Message] is returned.
      *
-     *  @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-     *  @param text Text of the message to be sent, 1-4096 characters after entities parsing
-     *  @param parseMode [ParseMode] for parsing entities in the message text.
-     *  @param entities List of special entities that appear in message text, which can be specified instead of *parse_mode*
-     *  @param disableWebPagePreview Disables link previews for links in this message
-     *  @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
-     *  @param replyToMessageId If the message is a reply, ID of the original message
-     *  @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
-     *  @param keyboardMarkup Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
-     *  */
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param text Text of the message to be sent, 1-4096 characters after entities parsing
+     * @param parseMode [ParseMode] for parsing entities in the message text.
+     * @param entities List of special entities that appear in message text, which can be specified instead of *parse_mode*
+     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
+     * @param keyboardMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
+     * */
     @POST("sendMessage")
     fun sendMessage(
         @Query("chat_id") chatId: String,
@@ -70,10 +72,63 @@ interface TelegramService {
         @Query("entities") entities: String? = null,
         @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
         @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
+
+    /**
+     * Use this method to forward messages of any kind. Service messages can't be forwarded. On success, the sent [Message] is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param fromChatId Unique identifier for the chat where the original message was sent (or channel username in the format `@channelusername`)
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the forwarded message from forwarding and saving
+     * @param messageId Message identifier in the chat specified in [fromChatId]
+     * */
+    @POST("forwardMessage")
+    fun forwardMessage(
+        @Query("chat_id") chatId: String,
+        @Query("from_chat_id") fromChatId: String,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("message_id") messageId: Int
+    ): Call<MessageResponse>
+
+    /**
+     * Use this method to copy messages of any kind. Service messages and invoice messages can't be copied.
+     * The method is analogous to the method forwardMessage, but the copied message doesn't have a link to the
+     * original message. Returns the MessageId of the sent message on success.
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param fromChatId Unique identifier for the chat where the original message was sent (or channel username in the format `@channelusername`)
+     * @param messageId Message identifier in the chat specified in [fromChatId]
+     * @param caption New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
+     * @param parseMode [ParseMode] for parsing entities in the message caption.
+     * @param captionEntities List of special entities that appear in message text, which can be specified instead of *parse_mode*
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
+     * @param replyMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
+     * */
+    @POST("copyMessage")
+    fun copyMessage(
+        @Query("chat_id") chatId: String,
+        @Query("from_chat_id") fromChatId: String,
+        @Query("message_id") messageId: Int,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageIdResponse>
 
     @POST("sendPhoto")
     fun sendPhoto(
@@ -101,6 +156,22 @@ interface TelegramService {
         @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
+
+    /**
+     * Use this method to get up to date information about the chat (current name of the user for one-on-one
+     * conversations, current username of a user, group or channel, etc.).
+     * Returns a [Chat][User] object on success.
+     * */
+    @POST("getChat")
+    fun getChat(@Query("chat_id") chatId: String): Call<GetChatResponse>
+
+    @POST("getUpdates")
+    fun getUpdates(
+        @Query("offset") offset: Int? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("timeout") timeout: Int? = null,
+        @Query("allowed_updates") allowedUpdates: String? = null
+    ): Call<UpdatesResult>
 
     @POST("sendDocument")
     fun sendDocument(
@@ -162,7 +233,7 @@ interface TelegramService {
     @POST("editMessageText")
     fun editMessageText(
         @Query("chat_id") chatId: String? = null,
-        @Query("message_id") messageId: Long? = null,
+        @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("text") text: String,
         @Query("parse_mode") parseMode: ParseMode? = null,
@@ -174,7 +245,7 @@ interface TelegramService {
     @POST("editMessageCaption")
     fun editMessageCaption(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Long? = null,
+        @Query("message_id") messageId: Int? = null,
         @Query("caption") caption: String,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
@@ -184,7 +255,7 @@ interface TelegramService {
     @POST("editMessageMedia")
     fun editMessageMedia(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Long? = null,
+        @Query("message_id") messageId: Int? = null,
         @Query("media") media: InputMedia,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
         @Query("inline_message_id") inlineMessageId: String? = null
@@ -193,7 +264,7 @@ interface TelegramService {
     @POST("editMessageReplyMarkup")
     fun editMessageReplyMarkup(
         @Query("chat_id") chatId: String? = null,
-        @Query("message_id") messageId: Long? = null,
+        @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
@@ -201,7 +272,7 @@ interface TelegramService {
     @POST("deleteMessage")
     fun deleteMessage(
         @Query("chat_id") chatId: String,
-        @Query("message_id") messageId: Long
+        @Query("message_id") messageId: Int
     ): Call<BooleanResponse>
 
     @POST("answerCallbackQuery")
@@ -434,5 +505,88 @@ interface TelegramService {
         /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
         @Query("language_code") languageCode: String? = null
     ): Call<BotCommandsResponse>
+
+    /**
+     * Use this method to send answers to an inline query. On success, True is returned.
+     * No more than 50 results per query are allowed.
+     *
+     * @param inlineQueryId Unique identifier for the answered query
+     * @param results A JSON-serialized array of results for the inline query
+     * @param cacheTime The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
+     * @param isPersonal Pass True, if results may be cached on the server side only for the user that sent the query.
+     * By default, results may be returned to any user who sends the same query
+     * @param isPersonal Pass the offset that a client should send in the next query with the same text to receive
+     * more results. Pass an empty string if there are no more results or if you don't support pagination.
+     * Offset length can't exceed 64 bytes.
+     * @param switchPmParameter [Deep-linking](https://core.telegram.org/bots#deep-linking) parameter
+     * for the /start message sent to the bot when user presses the switch button.
+     * 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
+     *
+     * Example: An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account
+     * to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the
+     * results, or even before showing any. The user presses the button, switches to a private chat with the bot and,
+     * in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can
+     * offer a switch_inline button so that the user can easily return to the chat where they wanted to use the bot's
+     * inline capabilities.
+     * */
+    @POST("answerInlineQuery")
+    fun answerInlineQuery(
+        @Query("inline_query_id") inlineQueryId: String,
+        @Query("results") results: String,
+        @Query("cache_time") cacheTime: Int? = null,
+        @Query("is_personal") isPersonal: Boolean? = null,
+        @Query("next_offset") nextOffset: String? = null,
+        @Query("switch_pm_text") switchPmText: String? = null,
+        @Query("switch_pm_parameter") switchPmParameter: String? = null,
+    ): Call<BooleanResponse>
+
+    /**
+     * Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat,
+     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator
+     * right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of a message to pin
+     * @param disableNotification Pass True, if it is not necessary to send a notification to all chat members
+     * about the new pinned message. Notifications are always disabled in channels and private chats.
+     * */
+    @POST("pinChatMessage")
+    fun pinChatMessage(
+        @Query("chat_id") chatId: String,
+        @Query("message_id") messageId: Int,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+    ): Call<BooleanResponse>
+
+    /**
+     * Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a
+     * private chat, the bot must be an administrator in the chat for this to work and must have the
+     * 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
+     * Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of a message to unpin.
+     * If not specified, the most recent pinned message (by sending date) will be unpinned.
+     * */
+    @POST("unpinChatMessage")
+    fun unpinChatMessage(
+        @Query("chat_id") chatId: String,
+        @Query("message_id") messageId: Int? = null
+    ): Call<BooleanResponse>
+
+    /**
+     * Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat,
+     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages'
+     * administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
+     * Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * */
+    @POST("unpinAllChatMessages")
+    fun unpinAllChatMessages(
+        @Query("chat_id") chatId: String
+    ): Call<BooleanResponse>
 }
 

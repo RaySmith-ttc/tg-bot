@@ -2,8 +2,10 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.utils.properties.PropertiesFactory
 
 @Serializable
@@ -49,9 +51,8 @@ data class CallbackQuery(
     @SerialName("game_short_name") val gameShortName: String? = null,
 )  : ChatIdHolder {
     companion object {
-        val EMPTY_CALLBACK_DATA = PropertiesFactory.from("bot.properties")
-            .getOrDefault("empty_callback_query", " ")!!
-            .toString()
+        val EMPTY_CALLBACK_DATA = Bot.properties
+            .getOrDefault("empty_callback_query", " ")
     }
 
     override fun getChatId() = message?.chat?.id?.toString()

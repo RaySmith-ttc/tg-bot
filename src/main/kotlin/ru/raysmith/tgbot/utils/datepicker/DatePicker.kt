@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.utils.datepicker
 
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
@@ -54,7 +55,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var additionalRowsVisibleOnStates = DatePickerState.values().toSet()
 
     var timeZone = ZoneId.systemDefault()
-    var locale = PropertiesFactory.from("bot.properties").getOrNull("calendar_locale")?.let {
+    var locale = Bot.properties?.getOrNull("calendar_locale")?.let {
         Locale.forLanguageTag(it)
     } ?: Locale.getDefault()
 

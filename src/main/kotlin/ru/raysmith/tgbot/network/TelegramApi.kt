@@ -12,11 +12,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.MessageKeyboard
 import ru.raysmith.tgbot.model.bot.MessageReplyKeyboard
-import ru.raysmith.tgbot.model.network.Error
+import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.command.*
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -24,14 +26,13 @@ import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
-import ru.raysmith.utils.properties.PropertiesFactory
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
 object TelegramApi {
 
     val logger: Logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = PropertiesFactory.from("bot.properties").getOrDefault("token", null) as? String
+    private var TOKEN = Bot.properties?.getOrDefault("token", null) as? String
     const val BASE_URL = "https://api.telegram.org"
 
     fun setToken(newToken: String) {
@@ -84,9 +85,28 @@ object TelegramApi {
             polymorphic(InputMedia::class) {
                 subclass(InputMediaPhoto::class, InputMediaPhoto.serializer())
             }
+            polymorphic(InlineQueryResult::class) {
+                subclass(InlineQueryResultArticle::class, InlineQueryResultArticle.serializer())
+            }
+            polymorphic(InputMessageContent::class) {
+                subclass(InputTextMessageContent::class, InputTextMessageContent.serializer())
+            }
             polymorphic(MessageKeyboard::class) {
                 subclass(MessageInlineKeyboard::class, MessageInlineKeyboard.serializer())
                 subclass(MessageReplyKeyboard::class, MessageReplyKeyboard.serializer())
+            }
+            polymorphic(ChatId::class) {
+                subclass(ChatId.ID::class, ChatId.ID.serializer())
+                subclass(ChatId.Username::class, ChatId.Username.serializer())
+            }
+            polymorphic(BotCommandScope::class) {
+                subclass(BotCommandScopeAllChatAdministrators::class, BotCommandScopeAllChatAdministrators.serializer())
+                subclass(BotCommandScopeAllGroupChats::class, BotCommandScopeAllGroupChats.serializer())
+                subclass(BotCommandScopeAllPrivateChats::class, BotCommandScopeAllPrivateChats.serializer())
+                subclass(BotCommandScopeChat::class, BotCommandScopeChat.serializer())
+                subclass(BotCommandScopeChatAdministrators::class, BotCommandScopeChatAdministrators.serializer())
+                subclass(BotCommandScopeChatMember::class, BotCommandScopeChatMember.serializer())
+                subclass(BotCommandScopeDefault::class, BotCommandScopeDefault.serializer())
             }
         }
     }

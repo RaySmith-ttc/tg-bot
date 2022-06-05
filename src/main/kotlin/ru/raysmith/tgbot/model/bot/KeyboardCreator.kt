@@ -19,7 +19,7 @@ interface ReplyKeyboardCreator {
     var keyboardMarkup: MessageKeyboard?
 
     @KeyboardDsl
-    fun replyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
+    fun replyKeyboard(init: MessageReplyKeyboard.() -> Unit = {}): MessageKeyboard {
         keyboardMarkup = MessageReplyKeyboard().apply(init)
         return keyboardMarkup as MessageReplyKeyboard
     }
@@ -39,6 +39,8 @@ interface RemoveKeyboardCreator {
 
 @KeyboardDsl
 interface KeyboardCreator : InlineKeyboardCreator, ReplyKeyboardCreator, RemoveKeyboardCreator {
+
+    /** Keyboard markup of a message */
     override var keyboardMarkup: MessageKeyboard?
 }
 

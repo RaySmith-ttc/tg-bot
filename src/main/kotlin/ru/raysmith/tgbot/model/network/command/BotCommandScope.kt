@@ -7,13 +7,13 @@ import ru.raysmith.tgbot.network.TelegramApi
 
 /**
  * This object represents the scope to which bot commands are applied. Currently, the following 7 scopes are supported:
- * - BotCommandScopeDefault
- * - BotCommandScopeAllPrivateChats
- * - BotCommandScopeAllGroupChats
- * - BotCommandScopeAllChatAdministrators
- * - BotCommandScopeChat
- * - BotCommandScopeChatAdministrators
- * - BotCommandScopeChatMember
+ * - [BotCommandScopeDefault]
+ * - [BotCommandScopeAllPrivateChats]
+ * - [BotCommandScopeAllGroupChats]
+ * - [BotCommandScopeAllChatAdministrators]
+ * - [BotCommandScopeChat]
+ * - [BotCommandScopeChatAdministrators]
+ * - [BotCommandScopeChatMember]
  *
  * ## Determining list of commands
  * The following algorithm is used to determine the list of commands for a particular user viewing the bot menu.

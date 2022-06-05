@@ -12,5 +12,5 @@ interface ICallbackHandler {
     fun answer() = answer {  }
 
     /** Call [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) with build parameters */
-    fun answer(init: AnswerCallbackQuery.() -> Unit): Response<BooleanResponse>
+    fun answer(init: AnswerCallbackQuery.() -> Unit): BooleanResponse
 }

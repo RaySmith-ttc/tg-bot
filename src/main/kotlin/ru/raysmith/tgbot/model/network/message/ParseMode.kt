@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
 
-@Serializable(with = ParseModeSerializer::class)
 /**
  * # Formatting options
  * The Bot API supports basic formatting for messages. You can use bold, italic, underlined and strikethrough text,
@@ -114,6 +113,7 @@ import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
  * - Escaping inside entities is not allowed, so entity must be closed first and reopened again: use `_snake_\__case_`
  * for italic `snake_case` and `*2*\**2=4*` for bold `2*2=4`.
  * */
+@Serializable(with = ParseModeSerializer::class)
 enum class ParseMode {
     HTML,
 

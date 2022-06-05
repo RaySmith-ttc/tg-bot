@@ -1,10 +1,12 @@
 package ru.raysmith.tgbot.model.bot
 
-import retrofit2.Response
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.withSafeLength
 
 @DslMarker
@@ -13,8 +15,6 @@ annotation class TextMessageDsl
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
 @TextMessageDsl
 class TextMessage(override val service: TelegramService = TelegramApi.service) : EditableMessage, KeyboardCreator {
-
-    override var keyboardMarkup: MessageKeyboard? = null
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -31,17 +31,13 @@ class TextMessage(override val service: TelegramService = TelegramApi.service) :
     /** Disables link previews for links in this message */
     var disableWebPagePreview: Boolean? = null
 
-    /**
-     * Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
-     * Users will receive a notification with no sound.
-     * */
+    /** Whether test should be truncated if text length is greater than 4096 */
+    var safeTextLength: Boolean = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
+
     override var disableNotification: Boolean? = null
-
-    /** If the message is a reply, ID of the original message */
     override var replyToMessageId: Int? = null
-
-    /** Pass True, if the message should be sent even if the specified replied-to message is not found */
     override var allowSendingWithoutReply: Boolean? = null
+    override var keyboardMarkup: MessageKeyboard? = null
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
@@ -51,45 +47,38 @@ class TextMessage(override val service: TelegramService = TelegramApi.service) :
     }
 
     /** Returns the raw text with safe length for sending the message, empty string if not set */
-    private fun getMessageText() = messageText?.getSafeTextString() ?: text?.withSafeLength() ?: ""
+    private fun getMessageText() =
+        messageText?.let { if (safeTextLength) it.getSafeTextString() else it.getTextString() }
+            ?: text?.let { if (safeTextLength) it.withSafeLength() else it }
+            ?: ""
 
     /** Returns the [parseMode] if entities were not used, null otherwise */
-    private fun getParseModeIdNeed() = if (messageText != null) null else parseMode
+    private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override fun send(chatId: String): Response<MessageResponse> {
+    override fun send(chatId: String): MessageResponse {
         return service.sendMessage(
             chatId = chatId,
             text = getMessageText(),
-            parseMode = getParseModeIdNeed(),
-            entities = messageText?.getSafeEntitiesString(),
+            parseMode = getParseModeIfNeed(),
+            entities = messageText?.getEntitiesString(safeTextLength),
             disableWebPagePreview = disableWebPagePreview,
             disableNotification = disableNotification,
             replyToMessageId = replyToMessageId,
             allowSendingWithoutReply = allowSendingWithoutReply,
             keyboardMarkup = keyboardMarkup?.toMarkup()
-        ).execute()
+        ).execute().body() ?: errorBody()
     }
 
-    override fun edit(chatId: String?, messageId: Long?, inlineMessageId: String?) : Response<MessageResponse> {
-        val msg = getMessageText()
-        if (msg.isEmpty()) {
-            return service.editMessageReplyMarkup(
-                chatId = chatId,
-                messageId = messageId,
-                inlineMessageId = inlineMessageId,
-                replyMarkup = keyboardMarkup?.toMarkup()
-            ).execute()
-        } else {
-            return service.editMessageText(
-                chatId = chatId,
-                messageId = messageId,
-                inlineMessageId = inlineMessageId,
-                text = getMessageText(),
-                parseMode = getParseModeIdNeed(),
-                entities = messageText?.getSafeEntitiesString(),
-                replyMarkup = keyboardMarkup?.toMarkup(),
-                disableWebPagePreview = disableWebPagePreview
-            ).execute()
-        }
+    override fun edit(chatId: String?, messageId: Int?, inlineMessageId: String?) : MessageResponse {
+        return service.editMessageText(
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            text = getMessageText(),
+            parseMode = getParseModeIfNeed(),
+            entities = messageText?.getEntitiesString(safeTextLength),
+            replyMarkup = keyboardMarkup?.toMarkup(),
+            disableWebPagePreview = disableWebPagePreview
+        ).execute().body() ?: errorBody()
     }
 }

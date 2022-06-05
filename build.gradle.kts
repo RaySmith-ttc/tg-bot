@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.84"
+version = "0.0.1-alpha.102"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/raysmith-ttc/utils")
         credentials {
             username = System.getenv("git.username")
-            password = System.getenv("git.read-token")
+            password = System.getenv("GIT_TOKEN_READ")
         }
     }
 }
@@ -28,8 +28,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/raysmith-ttc/tg-bot")
             credentials {
-                username = System.getenv("git.username")
-                password = System.getenv("git.publish-token")
+                username = System.getenv("GIT_USERNAME")
+                password = System.getenv("GIT_TOKEN_PUBLISH")
             }
         }
     }
@@ -48,13 +48,13 @@ java {
 dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
 
     // Logging
-    implementation("org.apache.logging.log4j:log4j:2.17.0")
+    implementation("org.apache.logging.log4j:log4j:2.17.2")
 
     // Network
-    val kotlinxSerializationVersion = "1.3.2"
+    val kotlinxSerializationVersion = "1.3.3"
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
@@ -63,17 +63,17 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    implementation("ru.raysmith:utils:1.2.2-rc.3")
+    implementation("ru.raysmith:utils:1.2.4")
 
     // Extensions for
-    implementation("org.jetbrains.exposed:exposed-core:0.37.3")
+    implementation("org.jetbrains.exposed:exposed-core:0.38.2")
 
     // Testing
     testImplementation("org.assertj:assertj-core:3.22.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-    testImplementation("org.mockito:mockito-core:4.3.1")
+    testImplementation("org.mockito:mockito-core:4.5.1")
 
     val slf4jVersion = "1.7.36"
     testImplementation("org.slf4j:slf4j-api:$slf4jVersion")

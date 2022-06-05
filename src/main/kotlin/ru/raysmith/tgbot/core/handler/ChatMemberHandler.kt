@@ -1,5 +1,7 @@
 package ru.raysmith.tgbot.core.handler
 
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.EventHandler
 import ru.raysmith.tgbot.core.HandlerDsl
 import ru.raysmith.tgbot.model.network.User
@@ -19,10 +21,10 @@ class ChatMemberHandler(
     val newChatMember: ChatMember,
     val inviteLink: ChatInviteLink? = null,
     private val handler: ChatMemberHandler.() -> Unit
-) : EventHandler {
+) : EventHandler, BotContext<ChatMemberHandler> {
 
     override fun getChatId() = chat.id.toString()
-    override var messageId: Long? = null
+    override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
     constructor(chatMember: ChatMemberUpdated, handler: ChatMemberHandler.() -> Unit) : this(
@@ -33,9 +35,9 @@ class ChatMemberHandler(
     override suspend fun handle() = handler()
 
     override var service: TelegramService = TelegramApi.service
-    fun withService(service: TelegramService, block: () -> Any) {
+    override fun withBot(bot: Bot, block: BotContext<ChatMemberHandler>.() -> Any) {
         ChatMemberHandler(chat, from, date, oldChatMember, newChatMember, inviteLink, handler).apply {
-            this.service = service
+            this.service = bot.service
             block()
         }
     }

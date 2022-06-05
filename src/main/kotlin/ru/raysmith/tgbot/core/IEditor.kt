@@ -12,7 +12,7 @@ import java.lang.IllegalStateException
 interface IEditor : ChatIdHolder, ApiCaller {
 
     /** Identifier of the message to be edited */
-    var messageId: Long?
+    var messageId: Int?
 
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
@@ -21,14 +21,13 @@ interface IEditor : ChatIdHolder, ApiCaller {
 
     fun edit(
         chatId: String = getChatIdOrThrow(),
-        messageId: Long? = this.messageId,
+        messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
         message: TextMessage.() -> Unit
     ): Message {
         return TextMessage(service).apply(message)
             .edit(chatId, messageId, inlineMessageId)
-            .body()?.result
-            ?: throw NullPointerException("Edit message has no response body")
+            .result
     }
 
     /**
@@ -43,7 +42,7 @@ interface IEditor : ChatIdHolder, ApiCaller {
         return "${pagePrefix}p${getPreviousPage(pagePrefix)}"
     }
 
-    private fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
+    fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
         var res: InlineKeyboardButton? = null
         if (query.message?.replyMarkup?.keyboard != null) {
             keyboard@ for (row in query.message.replyMarkup.keyboard) {

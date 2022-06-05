@@ -13,6 +13,12 @@ data class MessageResponse(
 ) : MessageRes
 
 @Serializable
+data class MessageIdResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("result") val result: MessageId
+) : MessageRes
+
+@Serializable
 data class MessageResponseArray(
     @SerialName("ok") val ok: Boolean,
     @SerialName("result") val results: List<Message>

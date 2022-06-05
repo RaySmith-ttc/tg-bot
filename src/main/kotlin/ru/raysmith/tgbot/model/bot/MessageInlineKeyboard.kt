@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.IKeyboardButton
+import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.Pagination
 
@@ -82,12 +83,13 @@ class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardR
             var url: String? = null
             var loginUrl: String? = null
             var callbackData: String? = null
+            var webApp: WebAppInfo? = null
             var switchInlineQuery: String? = null
             var pay: Boolean? = null
 
             override fun toKeyboardButton(): InlineKeyboardButton {
                 require(text.isNotEmpty()) { "Button text must be is not empty" }
-                return InlineKeyboardButton(text, callbackData, url, loginUrl, switchInlineQuery, pay)
+                return InlineKeyboardButton(text, callbackData, webApp, url, loginUrl, switchInlineQuery, pay)
             }
         }
     }

@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.bot.IMessage
 import ru.raysmith.tgbot.model.bot.MessageText
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramApi
+import java.util.*
 
 internal fun List<UpdateType>.asParameter(): String {
     return TelegramApi.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
@@ -30,3 +31,5 @@ fun MessageText.n() = text("\n")
 fun String.withSafeLength() = this.let {
     if (it.length > IMessage.MAX_TEXT_LENGTH) it.take(IMessage.MAX_TEXT_LENGTH) else it
 }
+
+internal fun Properties?.getOrDefault(key: String, default: String) = this?.getOrDefault(key, default)?.toString() ?: default

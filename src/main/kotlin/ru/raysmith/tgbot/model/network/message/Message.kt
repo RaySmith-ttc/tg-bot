@@ -1,9 +1,9 @@
 package ru.raysmith.tgbot.model.network.message
 
-import ru.raysmith.tgbot.model.network.Location
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.ChatIdHolder
+import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
@@ -17,7 +17,7 @@ import ru.raysmith.tgbot.network.TelegramApiException
 data class Message(
 
     /** Unique message identifier inside this chat */
-    @SerialName("message_id") val messageId: Long,
+    @SerialName("message_id") val messageId: Int,
 
     /** Sender, empty for messages sent to channels */
     @SerialName("from") val from: User? = null,

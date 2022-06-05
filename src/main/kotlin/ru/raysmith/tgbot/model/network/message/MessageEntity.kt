@@ -70,9 +70,9 @@ data class MessageEntity(
             )
             MessageEntityType.TEXT_MENTION -> {
                 getForParseMode(
-                    "<a href=\"mention:${user?.username ?: user?.id}\">$string</a>",
+                    "<a href=\"tg://user?id=${user?.id}\">$string</a>",
                     string,
-                    "[$string](mention:${user?.username ?: user?.id})"
+                    "[$string](tg://user?id=${user?.id})"
                 )
             }
             MessageEntityType.CODE -> getForParseMode("<code>$string</code>", "`$string`", "`$string`")

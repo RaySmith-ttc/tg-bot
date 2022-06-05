@@ -1,9 +1,9 @@
 package ru.raysmith.tgbot.utils
 
 import org.jetbrains.exposed.sql.SizedIterable
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.utils.properties.PropertiesFactory
 
 class Pagination<T>(
     private val data: Iterable<T>,
@@ -18,14 +18,12 @@ class Pagination<T>(
         const val SYMBOL_PAGE_PREFIX = 'p'
         const val SYMBOL_CURRENT_PAGE = '·'
 
-        private val propertiesManager = PropertiesFactory.from("bot.properties")
-
-        val defaultRows: Int = propertiesManager.getOrDefault("pagination.rows", "5")?.toString()
-            ?.toIntOrNull() ?: throw IllegalArgumentException("Property pagination.rows is not Int")
-        val defaultColumns: Int = propertiesManager.getOrDefault("pagination.columns", "1")?.toString()
-            ?.toIntOrNull() ?: throw IllegalArgumentException("Property pagination.columns is not Int")
-        val firstPageSymbol = propertiesManager.getOrDefault("pagination.firstpagesymbol", "«")!!.toString()
-        val lastPageSymbol = propertiesManager.getOrDefault("pagination.lastpagesymbol", "»")!!.toString()
+        val defaultRows: Int = Bot.properties.getOrDefault("pagination.rows", "5").toIntOrNull()
+            ?: throw IllegalArgumentException("Property pagination.rows is not Int")
+        val defaultColumns: Int = Bot.properties.getOrDefault("pagination.columns", "1").toIntOrNull()
+            ?: throw IllegalArgumentException("Property pagination.columns is not Int")
+        val firstPageSymbol = Bot.properties.getOrDefault("pagination.firstpagesymbol", "«")
+        val lastPageSymbol = Bot.properties.getOrDefault("pagination.lastpagesymbol", "»")
     }
 
     var rows = defaultRows

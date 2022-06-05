@@ -19,7 +19,8 @@ class BotCommand(val commandText: String) {
         if (it.contains("@")) it.substring(it.indexOf("@") + 1, getArgsStartIndex()) else null
     }
 
-    fun mentionIsNotCurrentBot(bot: User = Bot.ME) = botMention != null && botMention != bot.username
+    fun mentionIsNotCurrentBot(bot: Bot) = mentionIsNotCurrentBot(bot.me)
+    fun mentionIsNotCurrentBot(botUser: User) = botMention != null && botMention != botUser.username
 
     /**
      * The rest of the text in message after the command.

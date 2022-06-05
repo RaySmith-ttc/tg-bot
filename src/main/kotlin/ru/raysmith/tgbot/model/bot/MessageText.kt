@@ -9,7 +9,26 @@ import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.utils.letIf
 import java.lang.StringBuilder
 
-/** Represents message text or caption as string with entities */
+/**
+ * Represents message text or caption as string with entities
+ *
+ * @param printNulls
+ * Set true for apply null strings to message text
+ *
+ * `printNulls = true`:
+ * ```
+ * textWithEntities {
+ *     text("Some text: ").text(null) // Output: 'Some text: null'
+ * }
+ * ```
+ *
+ * `printNulls = false`:
+ * ```
+ * textWithEntities {
+ *     text("Some text: ").text(null) // Output: 'Some text: '
+ * }
+ * ```
+ * */
 @TextMessageDsl
 class MessageText(private val printNulls: Boolean) {
     private val text: StringBuilder = StringBuilder()
@@ -18,28 +37,9 @@ class MessageText(private val printNulls: Boolean) {
 
     private var entities: MutableList<MessageEntity> = mutableListOf()
 
-    /**
-     * Set true for apply null strings to message text
-     *
-     * ```
-     * textWithEntities {
-     *     printNulls = true
-     *     text("Some text: ").text(null) // Output: 'Some text: null'
-     * }
-     *
-     * textWithEntities {
-     *     printNulls = false
-     *     text("Some text: ").text(null) // Output: 'Some text: '
-     * }
-     * ```
-     * */
-//    // TODO tests
-//    var printNulls: Boolean = false
-
-    fun getEntitiesString() = TelegramApi.json.encodeToJsonElement(entities.toList()).toString()
-
-    // TODO tests
-    fun getSafeEntitiesString() = TelegramApi.json.encodeToJsonElement(getSafeEntities()).toString()
+    fun getEntitiesString(safeLength: Boolean) = TelegramApi.json.encodeToJsonElement(
+        if (safeLength) getSafeEntities() else entities.toList()
+    ).toString()
 
     fun getSafeEntities() = entities.filter { it.offset < IMessage.MAX_TEXT_LENGTH }.toMutableList().also { filtered ->
         filtered.lastOrNull()?.let { last ->
@@ -80,10 +80,10 @@ class MessageText(private val printNulls: Boolean) {
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
 
     // TODO test
-    fun mix(text: Any?, url: String? = null, language: String? = null, vararg types: MessageEntityType): MessageText {
+    fun mix(text: Any?, url: String? = null, language: String? = null, user: User? = null, vararg types: MessageEntityType): MessageText {
         text.toString().also { t ->
             types.forEach {
-                entities.add(MessageEntity(it, offset = this.text.length, t.length, url = url, language = language))
+                entities.add(MessageEntity(it, offset = this.text.length, t.length, url = url, user = user, language = language))
             }
             this.text.append(t)
         }
@@ -122,11 +122,53 @@ class MessageText(private val printNulls: Boolean) {
         }
     }
 
+    // fix bad mix entities in MessageText builders after adding raw entity with
+    //
+    // bold("some text")
+    // entity(MessageEntityType.ITALIC) {
+    //     offset = 2
+    //     length = 5
+    // }
+    //
+    // BOLD 0 -> 8
+    // ITALIC 2 -> 6
+    // --->
+    // BOLD 0 -> 1, MIX(BOLD, ITALIC) 2 -> 6, BOLD 7 -> 8
+    // TODO not work with recursive
+    private fun fixed(entities: List<MessageEntity>): List<MessageEntity> {
+        val blacklist = mutableListOf<MessageEntity>()
+
+        val res = buildList {
+            entities.forEach { entity ->
+                val badMix = entities.find { it.offset > entity.offset && it.offset + it.length < entity.offset + entity.length }
+                if (badMix != null) {
+                    add(MessageEntity(entity.type, entity.offset, badMix.offset - entity.offset))
+                    add(MessageEntity(entity.type, badMix.offset, badMix.offset + badMix.length - badMix.offset))
+                    add(MessageEntity(badMix.type, badMix.offset, badMix.offset + badMix.length - badMix.offset))
+                    val offset = badMix.offset + badMix.length
+                    add(MessageEntity(entity.type, offset, entity.offset + entity.length - offset))
+
+                    blacklist.add(badMix)
+                } else if (!blacklist.contains(entity)) {
+                    add(entity)
+                }
+            }
+        }
+
+        return if (blacklist.isNotEmpty()) fixed(res).also { println("REQ") }
+        else res.also {
+            val textString = getSafeTextString()
+            it.forEach {
+//                println("$it --> ${textString.substring(it.offset, it.offset + it.length)}")
+            }
+        }
+    }
+
     fun format(parseMode: ParseMode, safeLength: Boolean = true): String {
         val textString = if (safeLength) getSafeTextString() else getTextString()
         if (entities.isEmpty()) return textString.escape(parseMode)
 
-        val entities = if (safeLength) getSafeEntities() else entities
+        val entities = (if (safeLength) getSafeEntities() else entities).let { fixed(it) }.sortedBy { it.offset }
         fun MessageEntity.isSameLengthAndOffset(other: MessageEntity): Boolean {
             return this.length == other.length && this.offset == other.offset
         }
@@ -153,7 +195,11 @@ class MessageText(private val printNulls: Boolean) {
                 val mix = entities.filterIndexed { j, e -> j != i && e.length == entity.length && e.offset == entity.offset && pathsOfEntities.add(j) }.let {
                     if (it.isNotEmpty()) it.toMutableList().apply { add(entity) } else it
                 }
+//                val mix = entities.filterIndexed { j, e -> j != i && ((e.length == entity.length && e.offset == entity.offset) || (e.offset >= entity.offset && e.offset + e.length <= entity.offset + entity.length)) && pathsOfEntities.add(j) }.let {
+//                    if (it.isNotEmpty()) it.toMutableList().apply { add(entity) } else it
+//                }
                 val usedPartOfMix = pathsOfEntities.contains(i)
+
                 if (mix.isEmpty()) {
                     append(
                         entity.formatString(

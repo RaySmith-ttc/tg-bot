@@ -11,16 +11,16 @@ class CommandHandler(
     val command: BotCommand,
     val message: Message,
     val handler: CommandHandler.() -> Unit
-) : EventHandler, BotChanger<CommandHandler> {
+) : EventHandler, BotContext<CommandHandler> {
 
     override fun getChatId() = message.chat.id.toString()
-    override var messageId: Long? = null
+    override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
     override var service: TelegramService = TelegramApi.service
     override suspend fun handle() = handler()
 
-    override fun withBot(bot: Bot, block: CommandHandler.() -> Any) {
+    override fun withBot(bot: Bot, block: BotContext<CommandHandler>.() -> Any) {
         CommandHandler(command, message, handler).apply {
             this.service = bot.service
             this.block()

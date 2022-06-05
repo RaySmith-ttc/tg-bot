@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.network.message.MessageResponseArray
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.errorBody
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
@@ -44,7 +45,7 @@ class MediaGroupMessage(override val service: TelegramService = TelegramApi.serv
         multipartBodyParts.add(MultipartBody.Part.createFormData(filename, filename, requestBody))
     }
 
-    override fun send(chatId: String): Response<MessageResponseArray> {
+    override fun send(chatId: String): MessageResponseArray {
         return when(inputMedia.firstOrNull()) {
             is InputMediaPhoto -> {
                 if (multipartBodyParts.isEmpty()) {
@@ -54,7 +55,7 @@ class MediaGroupMessage(override val service: TelegramService = TelegramApi.serv
                         disableNotification = disableNotification,
                         replyToMessageId = replyToMessageId,
                         allowSendingWithoutReply = allowSendingWithoutReply,
-                    ).execute()
+                    ).execute().body() ?: errorBody()
                 } else {
                     require(multipartBodyParts.size >= 2) {
                         "Input media collection contains less than 2 items"
@@ -80,9 +81,10 @@ class MediaGroupMessage(override val service: TelegramService = TelegramApi.serv
                         disableNotification = disableNotification,
                         replyToMessageId = replyToMessageId,
                         allowSendingWithoutReply = allowSendingWithoutReply,
-                    ).execute()
+                    ).execute().body() ?: errorBody()
                 }
             }
+            // TODO message unknown input or files is not set
             else -> { throw NotImplementedError() }
         }
     }

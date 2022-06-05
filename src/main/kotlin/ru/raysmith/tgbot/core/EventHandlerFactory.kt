@@ -8,8 +8,9 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.utils.addIfNotContains
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
+
+@DslMarker
+annotation class HandlerDsl
 
 @HandlerDsl
 object EventHandlerFactory {
@@ -24,6 +25,7 @@ object EventHandlerFactory {
     private var chatMemberHandler: (ChatMemberHandler.() -> Unit)? = null
     private var preCheckoutQueryHandler: (PreCheckoutQueryHandler.() -> Unit)? = null
     private var shippingQueryHandler: (ShippingQueryHandler.() -> Unit)? = null
+    private var inlineQueryHandler: (InlineQueryHandler.() -> Unit)? = null
 
     private var alwaysAnswer: Boolean = false
 
@@ -47,6 +49,9 @@ object EventHandlerFactory {
 
             shippingQueryHandler != null && update.shippingQuery != null ->
                 ShippingQueryHandler(update.shippingQuery, shippingQueryHandler!!)
+
+            inlineQueryHandler != null && update.inlineQuery != null ->
+                InlineQueryHandler(update.inlineQuery, inlineQueryHandler!!)
 
             else -> UnknownEventHandler(update, unknownHandler)
         }
@@ -112,7 +117,10 @@ object EventHandlerFactory {
         shippingQueryHandler = handler
     }
 
-}
+    @HandlerDsl
+    fun handleInlineQuery(handler: InlineQueryHandler.() -> Unit) {
+        allowedUpdates.addIfNotContains(UpdateType.INLINE_QUERY)
+        inlineQueryHandler = handler
+    }
 
-@DslMarker
-annotation class HandlerDsl
+}

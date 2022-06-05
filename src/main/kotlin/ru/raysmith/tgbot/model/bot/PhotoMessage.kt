@@ -5,16 +5,19 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Response
-import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.withSafeLength
 import java.io.File
 import java.nio.file.Files
 
-class PhotoMessage(override val service: TelegramService = TelegramApi.service) : IMessage<MessageResponse> {
+class PhotoMessage(override val service: TelegramService = TelegramApi.service
+) : IMessage<MessageResponse>, KeyboardCreator {
 
     private var photo: String? = null
     private var file: File? = null
@@ -22,12 +25,20 @@ class PhotoMessage(override val service: TelegramService = TelegramApi.service) 
     private var mimeType: String? = null
     private var byteArray: ByteArray? = null
     private var _caption: MessageText? = null
+
+    /** Simple caption text to send the message, optionally with [parseMode] */
     var caption: String? = null
+
+    /** [Parse mode][ParseMode] for a simple caption text */
     var parseMode: ParseMode? = null
+
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
-    private var keyboardMarkup: MessageKeyboard? = null
+    override var keyboardMarkup: MessageKeyboard? = null
+
+    /** Whether test should be truncated if caption length is greater than 4096 */
+    var safeTextLength: Boolean = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
 
     /**
      * Sets a caption as [MessageText] object
@@ -76,9 +87,11 @@ class PhotoMessage(override val service: TelegramService = TelegramApi.service) 
         this.byteArray = byteArray
     }
 
-    private fun getCaptionText(): String? = _caption?.getSafeTextString() ?: caption?.withSafeLength()
+    private fun getCaptionText(): String? =
+        _caption?.let { if (safeTextLength) it.getSafeTextString() else it.getTextString() }
+            ?: caption?.let { if (safeTextLength) it.withSafeLength() else it }
 
-    override fun send(chatId: String): Response<MessageResponse> {
+    override fun send(chatId: String): MessageResponse {
         return when {
             photo != null -> {
                 service.sendPhoto(
@@ -86,12 +99,12 @@ class PhotoMessage(override val service: TelegramService = TelegramApi.service) 
                     photo = photo!!,
                     caption = getCaptionText(),
                     parseMode = parseMode,
-                    captionEntities = _caption?.getSafeEntitiesString(),
+                    captionEntities = _caption?.getEntitiesString(safeTextLength),
                     disableNotification = disableNotification,
                     replyToMessageId = replyToMessageId,
                     allowSendingWithoutReply = allowSendingWithoutReply,
                     keyboardMarkup = keyboardMarkup?.toMarkup()
-                ).execute()
+                ).execute().body() ?: errorBody()
             }
             file != null -> {
                 val requestBody = file!!.asRequestBody(mimeType!!.toMediaType())
@@ -101,11 +114,12 @@ class PhotoMessage(override val service: TelegramService = TelegramApi.service) 
                     photo = photo,
                     caption = getCaptionText()?.toRequestBody(),
                     parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
+                    captionEntities = _caption?.getEntitiesString(safeTextLength)?.toRequestBody(),
                     disableNotification = disableNotification?.toString()?.toRequestBody(),
                     replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
                     allowSendingWithoutReply = allowSendingWithoutReply?.toString()?.toRequestBody(),
-                    keyboardMarkup = keyboardMarkup?.let { TelegramApi.json.encodeToString(it.toMarkup()) }?.toRequestBody()
-                ).execute()
+                    keyboardMarkup = keyboardMarkup?.toJson()?.toRequestBody()
+                ).execute().body() ?: errorBody()
             }
             byteArray != null -> {
                 val requestBody = byteArray!!.toRequestBody(mimeType!!.toMediaType())
@@ -115,11 +129,12 @@ class PhotoMessage(override val service: TelegramService = TelegramApi.service) 
                     photo = photo,
                     caption = getCaptionText()?.toRequestBody(),
                     parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
+                    captionEntities = _caption?.getEntitiesString(safeTextLength)?.toRequestBody(),
                     disableNotification = disableNotification?.toString()?.toRequestBody(),
                     replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
                     allowSendingWithoutReply = allowSendingWithoutReply?.toString()?.toRequestBody(),
-                    keyboardMarkup = keyboardMarkup?.let { TelegramApi.json.encodeToString(it.toMarkup()) }?.toRequestBody()
-                ).execute()
+                    keyboardMarkup = keyboardMarkup?.toJson()?.toRequestBody()
+                ).execute().body() ?: errorBody()
             }
             else -> throw IllegalArgumentException("Photo or file is required")
         }
