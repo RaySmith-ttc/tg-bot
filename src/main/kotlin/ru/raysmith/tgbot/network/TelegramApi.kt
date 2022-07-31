@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.ChatIdConverterFactory
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.MessageKeyboard
 import ru.raysmith.tgbot.model.bot.MessageReplyKeyboard
@@ -24,8 +24,6 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
-import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -82,9 +80,6 @@ object TelegramApi {
                 subclass(ReplyKeyboardRemove::class, ReplyKeyboardRemove.serializer())
                 subclass(InlineKeyboardMarkup::class, InlineKeyboardMarkup.serializer())
             }
-            polymorphic(InputMedia::class) {
-                subclass(InputMediaPhoto::class, InputMediaPhoto.serializer())
-            }
             polymorphic(InlineQueryResult::class) {
                 subclass(InlineQueryResultArticle::class, InlineQueryResultArticle.serializer())
             }
@@ -94,10 +89,6 @@ object TelegramApi {
             polymorphic(MessageKeyboard::class) {
                 subclass(MessageInlineKeyboard::class, MessageInlineKeyboard.serializer())
                 subclass(MessageReplyKeyboard::class, MessageReplyKeyboard.serializer())
-            }
-            polymorphic(ChatId::class) {
-                subclass(ChatId.ID::class, ChatId.ID.serializer())
-                subclass(ChatId.Username::class, ChatId.Username.serializer())
             }
             polymorphic(BotCommandScope::class) {
                 subclass(BotCommandScopeAllChatAdministrators::class, BotCommandScopeAllChatAdministrators.serializer())
@@ -111,7 +102,7 @@ object TelegramApi {
         }
     }
 
-    private fun buildService(token: String?, type: ServiceType): Retrofit {
+    fun buildService(token: String?, type: ServiceType): Retrofit {
         if (token == null) throw BotException("Token is not set")
 
         return Retrofit.Builder()
@@ -119,6 +110,7 @@ object TelegramApi {
             .client(getClient())
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .addConverterFactory(NetworkUtils.ConverterFactory())
+            .addConverterFactory(ChatIdConverterFactory())
             .build()
     }
 

@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Test
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatType
+import ru.raysmith.tgbot.utils.toChatId
 import java.time.Instant
 
 open class BotTests {
     fun getPrivateChat(id: Long = 1) = Chat(
-        id, ChatType.PRIVATE
+        id.toChatId(), ChatType.PRIVATE
     )
 
     fun getDate() = Instant.now().epochSecond.toInt()

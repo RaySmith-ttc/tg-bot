@@ -6,7 +6,6 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.utils.getOrDefault
-import ru.raysmith.utils.properties.PropertiesFactory
 
 @Serializable
 /**
@@ -55,5 +54,5 @@ data class CallbackQuery(
             .getOrDefault("empty_callback_query", " ")
     }
 
-    override fun getChatId() = message?.chat?.id?.toString()
+    override fun getChatId() = message?.chat?.id
 }

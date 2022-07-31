@@ -226,7 +226,7 @@ data class Message(
         else -> MessageType.TEXT
     }
 
-    override fun getChatId() = from?.id.toString()
+    override fun getChatId() = chat.id
 
     /** Return true if entities has one or more link */
     fun hasUrl() : Boolean = entities?.any { it.type == MessageEntityType.URL } ?: false
@@ -266,7 +266,7 @@ data class Message(
      *
      * Returns True on success.
      * */
-    fun delete() = TelegramApi.service.deleteMessage(chat.id.toString(), messageId).execute().body()?.result ?: false
+    fun delete() = TelegramApi.service.deleteMessage(chat.id, messageId).execute().body()?.result ?: false
 
     /** A safe version of the [delete] method that does not throw a [TelegramApiException]. Return true if message success deleted */
     fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }

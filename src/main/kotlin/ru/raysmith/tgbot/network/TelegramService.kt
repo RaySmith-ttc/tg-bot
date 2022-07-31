@@ -3,7 +3,11 @@ package ru.raysmith.tgbot.network
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.Query
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.BotCommandsResponse
 import ru.raysmith.tgbot.model.network.GetMeResponse
@@ -14,9 +18,9 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.FileResponse
-import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 
@@ -66,7 +70,7 @@ interface TelegramService {
      * */
     @POST("sendMessage")
     fun sendMessage(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("text") text: String,
         @Query("parse_mode") parseMode: ParseMode? = null,
         @Query("entities") entities: String? = null,
@@ -90,8 +94,8 @@ interface TelegramService {
      * */
     @POST("forwardMessage")
     fun forwardMessage(
-        @Query("chat_id") chatId: String,
-        @Query("from_chat_id") fromChatId: String,
+        @Query("chat_id") chatId: ChatId,
+        @Query("from_chat_id") fromChatId: ChatId,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
         @Query("message_id") messageId: Int
@@ -117,8 +121,8 @@ interface TelegramService {
      * */
     @POST("copyMessage")
     fun copyMessage(
-        @Query("chat_id") chatId: String,
-        @Query("from_chat_id") fromChatId: String,
+        @Query("chat_id") chatId: ChatId,
+        @Query("from_chat_id") fromChatId: ChatId,
         @Query("message_id") messageId: Int,
         @Query("caption") caption: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
@@ -132,12 +136,13 @@ interface TelegramService {
 
     @POST("sendPhoto")
     fun sendPhoto(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("photo") photo: String,
         @Query("caption") caption: String? = null,
         @Query("caption_entities") captionEntities: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
         @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
@@ -152,6 +157,75 @@ interface TelegramService {
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("sendAudio")
+    fun sendAudio(
+        @Query("chat_id") chatId: ChatId,
+        @Query("audio") audio: String,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("duration") duration: Int? = null,
+        @Query("performer") performer: String? = null,
+        @Query("title") title: String? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendAudio")
+    fun sendAudio(
+        @Part("chat_id") chatId: RequestBody,
+        @Part audio: MultipartBody.Part,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("performer") performer: RequestBody? = null,
+        @Part("title") title: RequestBody? = null,
+        @Part thumb: MultipartBody.Part? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("sendDocument")
+    fun sendDocument(
+        @Query("chat_id") chatId: ChatId,
+        @Query("document") document: String,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("disable_content_type_detection") disableContentTypeDetection: Boolean? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendDocument")
+    fun sendDocument(
+        @Part("chat_id") chatId: RequestBody,
+        @Part document: MultipartBody.Part,
+        @Part thumb: MultipartBody.Part? = null,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("disable_content_type_detection") disableContentType_Detection: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
         @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
@@ -163,7 +237,7 @@ interface TelegramService {
      * Returns a [Chat][User] object on success.
      * */
     @POST("getChat")
-    fun getChat(@Query("chat_id") chatId: String): Call<GetChatResponse>
+    fun getChat(@Query("chat_id") chatId: ChatId): Call<GetChatResponse>
 
     @POST("getUpdates")
     fun getUpdates(
@@ -172,12 +246,6 @@ interface TelegramService {
         @Query("timeout") timeout: Int? = null,
         @Query("allowed_updates") allowedUpdates: String? = null
     ): Call<UpdatesResult>
-
-    @POST("sendDocument")
-    fun sendDocument(
-        @Query("chat_id") chatId: String,
-        @Query("document") document: String,
-    ): Call<MessageResponse>
 
     /**
      * Use this method to send a group of photos, videos, documents or audios as an album.
@@ -192,7 +260,7 @@ interface TelegramService {
      * */
     @POST("sendMediaGroup")
     fun sendMediaGroup(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("media") media: String,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
@@ -213,7 +281,7 @@ interface TelegramService {
     @Multipart
     @POST("sendMediaGroup")
     fun sendMediaGroup(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("media") media: String,
         @Part mediaPart1: MultipartBody.Part,
         @Part mediaPart2: MultipartBody.Part,
@@ -232,7 +300,7 @@ interface TelegramService {
 
     @POST("editMessageText")
     fun editMessageText(
-        @Query("chat_id") chatId: String? = null,
+        @Query("chat_id") chatId: ChatId? = null,
         @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("text") text: String,
@@ -244,7 +312,7 @@ interface TelegramService {
 
     @POST("editMessageCaption")
     fun editMessageCaption(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int? = null,
         @Query("caption") caption: String,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
@@ -254,7 +322,7 @@ interface TelegramService {
 
     @POST("editMessageMedia")
     fun editMessageMedia(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int? = null,
         @Query("media") media: InputMedia,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
@@ -263,7 +331,7 @@ interface TelegramService {
 
     @POST("editMessageReplyMarkup")
     fun editMessageReplyMarkup(
-        @Query("chat_id") chatId: String? = null,
+        @Query("chat_id") chatId: ChatId? = null,
         @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
@@ -271,7 +339,7 @@ interface TelegramService {
 
     @POST("deleteMessage")
     fun deleteMessage(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int
     ): Call<BooleanResponse>
 
@@ -286,7 +354,7 @@ interface TelegramService {
 
     @POST("sendChatAction")
     fun sendChatAction(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("action") action: ChatAction
     ): Call<BooleanResponse>
 
@@ -313,7 +381,7 @@ interface TelegramService {
      * */
     @POST("banChatMember")
     fun banChatMember(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("user_id") userId: Long,
         @Query("until_date") untilDate: Int? = null,
         @Query("revoke_messages") revokeMessages: Boolean? = null
@@ -333,7 +401,7 @@ interface TelegramService {
      * */
     @POST("unbanChatMember")
     fun unbanChatMember(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("user_id") userId: Long,
         @Query("only_if_banned") onlyIfBanned: Boolean? = null
     ): Call<BooleanResponse>
@@ -390,7 +458,7 @@ interface TelegramService {
      * */
     @POST("sendInvoice")
     fun sendInvoice(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("title") title: String,
         @Query("description") description: String,
         @Query("payload") payload: String,
@@ -553,7 +621,7 @@ interface TelegramService {
      * */
     @POST("pinChatMessage")
     fun pinChatMessage(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int,
         @Query("disable_notification") disableNotification: Boolean? = null,
     ): Call<BooleanResponse>
@@ -571,7 +639,7 @@ interface TelegramService {
      * */
     @POST("unpinChatMessage")
     fun unpinChatMessage(
-        @Query("chat_id") chatId: String,
+        @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int? = null
     ): Call<BooleanResponse>
 
@@ -586,7 +654,7 @@ interface TelegramService {
      * */
     @POST("unpinAllChatMessages")
     fun unpinAllChatMessages(
-        @Query("chat_id") chatId: String
+        @Query("chat_id") chatId: ChatId
     ): Call<BooleanResponse>
 }
 

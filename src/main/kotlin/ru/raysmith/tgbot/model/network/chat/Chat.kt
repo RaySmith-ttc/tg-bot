@@ -2,16 +2,22 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.utils.toChatId
 import ru.raysmith.utils.notNull
 
 @Serializable
 /** This object represents a chat. */
 data class Chat(
 
-    /** Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier. */
-    @SerialName("id") val id: Long,
+    /**
+     * Unique identifier for this chat. This number may have more than 32 significant bits and some programming
+     * languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits,
+     * so a signed 64-bit integer or double-precision float type are safe for storing this identifier.
+     * */
+    @SerialName("id") val id: ChatId.ID,
 
     /** Type of chat, can be either “private”, “group”, “supergroup” or “channel” */
     @SerialName("type") val type: ChatType,
@@ -89,7 +95,11 @@ data class Chat(
     @SerialName("can_set_sticker_set") val canSetStickerSet: Boolean? = null,
 
     /**
-     * Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa; for supergroups and channel chats. This identifier may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier. Returned only in getChat.
+     * Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa;
+     * for supergroups and channel chats. This identifier may be greater than 32 bits and some programming
+     * languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits,
+     * so a signed 64 bit integer or double-precision float type are safe for storing this identifier.
+     * Returned only in getChat.
      * @see <a href='https://core.telegram.org/bots/api#getchat'>getChat</a>
      * */
     @SerialName("linked_chat_id") val linkedChatId: Int? = null,
@@ -139,8 +149,8 @@ data class Chat(
             "Chat must be a group, supergroup or channel"
         }
         val id = when(type) {
-            ChatType.GROUP -> id.toString()
-            else -> username!!
+            ChatType.GROUP -> id
+            else -> username!!.toChatId()
         }
         TelegramApi.service.banChatMember(id, userId, untilDate, revokeMessages)
     }
@@ -158,8 +168,8 @@ data class Chat(
             "Chat must be a group, supergroup or channel"
         }
         val id = when(type) {
-            ChatType.GROUP -> id.toString()
-            else -> username!!
+            ChatType.GROUP -> id
+            else -> username!!.toChatId()
         }
         TelegramApi.service.unbanChatMember(id, userId, onlyIfBanned)
     }

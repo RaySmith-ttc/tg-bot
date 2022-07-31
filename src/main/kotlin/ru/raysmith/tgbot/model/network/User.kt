@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.bot.ChatId
 
 @Serializable
 /** This object represents a Telegram user or bot. */
@@ -11,7 +12,7 @@ data class User(
      * programming languages may have difficulty/silent defects in interpreting it. But it has at most 52
      * significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier.
      * */
-    @SerialName("id") val id: Long,
+    @SerialName("id") val id: ChatId.ID,
 
     /** True, if this user is a bot */
     @SerialName("is_bot") val isBot: Boolean,

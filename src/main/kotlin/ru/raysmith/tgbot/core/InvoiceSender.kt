@@ -4,19 +4,19 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import org.slf4j.LoggerFactory
-import retrofit2.Response
 import ru.raysmith.tgbot.model.Currency
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
-import ru.raysmith.utils.properties.PropertiesFactory
 import ru.raysmith.utils.properties.getOrNull
 
-class InvoiceSender(override var service: TelegramService) : InlineKeyboardCreator, ApiCaller {
+class InvoiceSender(override var service: TelegramService, override val fileService: TelegramFileService) : InlineKeyboardCreator, ApiCaller {
 
     companion object {
         private val logger = LoggerFactory.getLogger("invoice")
@@ -49,7 +49,7 @@ class InvoiceSender(override var service: TelegramService) : InlineKeyboardCreat
     var allowSendingWithoutReply: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    fun send(chatId: String): MessageResponse {
+    fun send(chatId: ChatId): MessageResponse {
         return service.sendInvoice(
             chatId = chatId,
             title = title ?: "",

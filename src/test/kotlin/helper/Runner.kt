@@ -1,18 +1,19 @@
 package helper
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
-import ru.raysmith.tgbot.core.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.EventHandler
+import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.core.handler.UnknownEventHandler
 import ru.raysmith.tgbot.core.handler.isCommand
+import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.MessageText
 import ru.raysmith.tgbot.model.bot.buildInlineKeyboard
@@ -23,14 +24,15 @@ import ru.raysmith.tgbot.model.network.chat.ChatMember
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeChat
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
+import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.asTgFile
+import ru.raysmith.tgbot.model.network.media.inputStream
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
-import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
 import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
@@ -38,8 +40,13 @@ import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import java.io.File
+import java.io.IOException
 import java.util.*
 import kotlin.properties.Delegates
+
+val ME = botContext {
+    getMe()
+}
 
 val datePicker = DatePicker("sys").apply {
     locale = Locale.forLanguageTag("us")
@@ -141,19 +148,14 @@ class Runner {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Test
     fun run() {
-        GlobalScope.launch {
-            delay(5000)
-            botContext {
-                println(getMe())
-            }
-        }
-
         runBlocking {
             val logger = LoggerFactory.getLogger("bot")
             val notifierBot = Bot(token = "5031990924:AAG-7F1QzGqybvYW1CJdhvFlFUR0s5Icw6Y")
-            Bot(token = System.getenv("BOT_TOKEN"), lastUpdateId = 391851722)
+
+            Bot(token = System.getenv("BOT_TOKEN")/*, lastUpdateId = 391851722*/, timeout = 5)
                 .onError { e -> logger.error(e.message, e) }
                 .onUpdate { updates ->
 //                    updates.forEach { println(it.callbackQuery?.data ?: it.message?.text) }
@@ -161,7 +163,8 @@ class Runner {
                 }
                 .registerDatePicker(datePicker)
     //            .registerPagination(pagination)
-                .enableBlocking { u -> u.findFrom() }
+//                .enableBlocking { u -> u.findFrom() }
+                .enableBlocking { u -> u.findChatId() }
                 .shutdownCommand("/shutdown")
                 .start { bot ->
                     handleInlineQuery {
@@ -194,25 +197,25 @@ class Runner {
                     handleMessage {
                         Delegates.notNull<Int>()
                         if (message.photo != null) {
-                            TelegramApi.service.getFile(message.photo!!.last().fileId).execute().body()?.let { fr ->
-                                TelegramApi.fileService.downLoad(fr.file.path!!).execute().body()?.byteStream()!!.also {
-                                    println(it.readBytes().size)
-                                }
+                            message.photo!!.last().inputStream(this).readAllBytes().size.let {
+                                send("Bytes: $it")
                             }
+                        } else if (message.audio != null) {
+                          println(message.audio!!.fileId)
                         } else if (message.text == "send image") {
                             sendPhoto {
-                                photo("AgACAgIAAxkDAAPTYLzxe542hHekjNmlcA3vMMw7XVgAAlqyMRvfveFJJlmwc6u88jc3Bo-hLgADAQADAgADdwADuUkDAAEfBA")
+                                photo = "AgACAgIAAxkDAAPTYLzxe542hHekjNmlcA3vMMw7XVgAAlqyMRvfveFJJlmwc6u88jc3Bo-hLgADAQADAgADdwADuUkDAAEfBA".asTgFile()
                                 caption = "Test image"
                             }
                             return@handleMessage
                         } else if (message.text == "send image2") {
                             sendPhoto {
-                                photo(File("C:\\Users\\Ray\\Desktop\\image1.png")/*.readBytes(), "test", "image/jpg"*/)
+                                photo = File("C:\\Users\\Ray\\Desktop\\image1.png").asTgFile()
                                 caption = "Test image2"
                             }
                             return@handleMessage
                         } else if (message.text == "send other id") {
-                            send("1") {
+                            send(1) {
                                 text = "this is not sent"
                             }
                         } else if (message.text == "text") {
@@ -248,20 +251,30 @@ class Runner {
 
                     handleCallbackQuery(alwaysAnswer = true) {
                         isDataEqual("media_group_file") {
-                            sendMediaGroup {
-                                photo("files/image1.png".asResources())
-                                photo("files/image2.jpg".asResources())
-                            }.also {
-                                it.forEach {
-                                    println(it.photo)
+                            sendPhotoMediaGroup {
+                                val caption = generateSequence("") { "123456780".random().toString() }
+
+                                photo("files/image1.png".asResources().asTgFile()) {
+                                    bold("Test").n()
+                                    italic("Message")
+                                }
+                                photo("files/image1.png".asResources().asTgFile(), caption.take(1024).joinToString(""))
+                                photo("files/image1.png".asResources().asTgFile(), caption.take(2000).joinToString(""))
+                                photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(1024).joinToString("")}</b>", parseMode = ParseMode.HTML)
+//                                photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(2000).joinToString("")}</b>", parseMode = ParseMode.HTML) // error
+                                photo("files/image2.jpg".asResources().asTgFile()) {
+                                    text(caption.take(2000).joinToString(""))
                                 }
                             }
                         }
 
                         isDataEqual("media_group_id") {
-                            sendMediaGroup {
-                                photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ")
-                                photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ")
+                            sendPhotoMediaGroup {
+                                photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
+
+                                    text("test")
+                                }
+                                photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile())
                             }
                         }
 
@@ -321,10 +334,10 @@ class Runner {
                     }
 
                     handleCommand {
-                        if (command.mentionIsNotCurrentBot(bot.me)) return@handleCommand
+                        if (!command.mentionIsCurrentBot(getMe())) return@handleCommand
 
                         fun getChatIdFromCommandsCommand(args: String?) =
-                            args?.split("\n")?.find { it.startsWith("chat_id") }?.split("=")?.last() ?: message.chat.id.toString()
+                            (args?.split("\n")?.find { it.startsWith("chat_id") }?.split("=")?.last()?.toLongOrNull() ?: message.chat.id.value).toChatId()
 
                         fun collectCommandsFromArgs(args: String) = args
                             .split("\n")
@@ -333,7 +346,7 @@ class Runner {
                             .associate { arg -> arg.split(" - ").let { it.first() to it.last() } }
                             .map { BotCommand(it.key, it.value) }
 
-                        fun updateCommands(commands: List<BotCommand>, chatId: String?) {
+                        fun updateCommands(commands: List<BotCommand>, chatId: ChatId?) {
                             setMyCommands(commands, chatId?.let { BotCommandScopeChat(it) } ?: BotCommandScopeDefault())
                             send(buildString {
                                 if (chatId != null) {
@@ -347,8 +360,12 @@ class Runner {
                             })
                         }
 
-                        isCommand("provide_commands_control") { args ->
-                            val chatId = message.chat.id.toString()
+                        isCommand("exception") {
+                            throw IOException("test")
+                        }
+
+                        isCommand("provide_commands_control") {
+                            val chatId = message.chat.id
                             val commands = getMyCommands(BotCommandScopeChat(chatId)).toMutableList().apply {
                                 addAll(listOf(
                                     BotCommand("set_commands", "Установить новый список команд"),
@@ -359,6 +376,12 @@ class Runner {
                             }
 
                             updateCommands(commands, chatId)
+                        }
+
+                        isCommand("send_username") {
+                            send(ChatId.of("@dskfijfwndnslllaa1")) {
+                                text = "send_username"
+                            }
                         }
 
                         isCommand("set_commands") { args ->
@@ -462,6 +485,7 @@ class Runner {
 
                         isCommand("get_commands") { args ->
                             val chatId = getChatIdFromCommandsCommand(args)
+                            println(chatId)
                             getMyCommands(BotCommandScopeChat(chatId)).also { commands ->
                                 send(buildString {
                                     append("Команды для чата #${chatId}:\n")
@@ -520,7 +544,7 @@ class Runner {
                             else sendMain()
                         }
 
-                        isCommand("keybloard") { args ->
+                        isCommand("keybloard") {
                             send {
                                 text = "test"
                                 keyboardMarkup = MessageInlineKeyboard(buildInlineKeyboard {
@@ -610,11 +634,50 @@ class Runner {
 
                         isCommand("photo") {
                             sendPhoto {
-                                photo("files/image1.png".asResources())
+                                photo = "files/image1.png".asResources().asTgFile()
                                 captionWithEntities {
                                     bold("Title").n()
                                     n()
                                     text("Description")
+                                }
+                            }
+                        }
+
+                        isCommand("document") {
+                            sendDocument {
+                                document = "files/image1.png".asResources().asTgFile()
+                                thumb = "files/image1.png".asResources().asTgFile()
+                                captionWithEntities {
+                                    bold("Title").n()
+                                    n()
+                                    text("Description")
+                                }
+                            }
+                        }
+
+                        isCommand("document_group") {
+                            sendDocumentMediaGroup {
+                                document("files/image1.png".asResources().asTgFile(), "files/image1.png".asResources().asTgFile()) {
+                                    text("1")
+                                }
+                                document("files/image2.jpg".asResources().asTgFile(), "files/image2.jpg".asResources().asTgFile()) {
+                                    text("2")
+                                }
+                            }
+                        }
+
+                        isCommand("send_audio") {
+                            sendAudioMediaGroup {
+                                audio("audio2.mp3".asResources().asTgFile(), "files/size.small.jpg".asResources().asTgFile()) {
+                                    bold("Test ").n().italic("message")
+                                }
+                                audio(
+                                    InputFile.ByteArray("audio1.mp3".asResources().readBytes(), "audio1", "audio/mp3"),
+                                    "files/size.small.jpg".asResources().asTgFile()
+                                )
+
+                                audio("audio2.mp3".asResources().asTgFile(), "files/size.small.jpg".asResources().asTgFile()) {
+                                    bold("Test ").n().italic("message 2")
                                 }
                             }
                         }
@@ -627,10 +690,8 @@ class Runner {
                             )
                         }
 
-                        isCommand("copyMe") { args ->
-    //                        copyMessage(
-    //                            getChatIdOrThrow()
-    //                        )
+                        isCommand("copyMe") {
+//                            copyMessage(getChatIdOrThrow())
                         }
 
                         isCommand("answertest") {

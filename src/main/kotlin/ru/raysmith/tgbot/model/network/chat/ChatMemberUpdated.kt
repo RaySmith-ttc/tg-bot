@@ -27,5 +27,5 @@ data class ChatMemberUpdated(
     /** Chat invite link, which was used by the user to join the chat; for joining by invite link events only. */
     @SerialName("invite_link") val inviteLink: ChatInviteLink? = null,
 ) : ChatIdHolder {
-    override fun getChatId() = chat.id.toString()
+    override fun getChatId() = chat.id
 }

@@ -1,5 +1,9 @@
 package ru.raysmith.tgbot.model.network.media
 
+import ru.raysmith.tgbot.core.ApiCaller
+import ru.raysmith.tgbot.utils.errorBody
+import java.io.InputStream
+
 /** This interface represents media attachment */
 interface Media {
 
@@ -14,4 +18,11 @@ interface Media {
 
     /** Original animation filename as defined by sender */
     val fileName: String?
+}
+
+fun Media.inputStream(apiCaller: ApiCaller): InputStream {
+    val fileResponse = apiCaller.service.getFile(fileId).execute().body() ?: errorBody()
+    return apiCaller.fileService.downLoad(fileResponse.file.path!!).execute().let {
+        (it.body() ?: errorBody()).byteStream()
+    }
 }

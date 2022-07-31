@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.utils.botContext
 
 /**
  * Represent a bot command
@@ -19,8 +20,11 @@ class BotCommand(val commandText: String) {
         if (it.contains("@")) it.substring(it.indexOf("@") + 1, getArgsStartIndex()) else null
     }
 
-    fun mentionIsNotCurrentBot(bot: Bot) = mentionIsNotCurrentBot(bot.me)
-    fun mentionIsNotCurrentBot(botUser: User) = botMention != null && botMention != botUser.username
+    /** Returns true if the command mentions a bot or is missing */
+    fun mentionIsCurrentBot(bot: Bot) = botMention == null || botMention == botContext(bot) { getMe() }.username
+
+    /** Returns true if mention in command is null or [bot user][botUser] */
+    fun mentionIsCurrentBot(botUser: User) = botMention == null || botMention == botUser.username
 
     /**
      * The rest of the text in message after the command.

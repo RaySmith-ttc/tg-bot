@@ -30,5 +30,5 @@ data class ChosenInlineResult(
     /** The query that was used to obtain the result */
     @SerialName("query") val query: String,
 ) : ChatIdHolder {
-    override fun getChatId() = from.id.toString()
+    override fun getChatId() = from.id
 }

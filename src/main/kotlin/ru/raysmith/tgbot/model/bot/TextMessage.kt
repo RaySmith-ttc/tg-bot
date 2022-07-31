@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.model.bot
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.getOrDefault
@@ -14,7 +14,7 @@ annotation class TextMessageDsl
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
 @TextMessageDsl
-class TextMessage(override val service: TelegramService = TelegramApi.service) : EditableMessage, KeyboardCreator {
+class TextMessage(override val service: TelegramService, override val fileService: TelegramFileService) : EditableMessage, KeyboardCreator {
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -38,24 +38,25 @@ class TextMessage(override val service: TelegramService = TelegramApi.service) :
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
+    override var protectContent: Boolean? = null
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
     fun textWithEntities(setText: MessageText.() -> Unit) {
-        messageText = MessageText(printNulls)
+        messageText = MessageText(printNulls, MessageTextType.TEXT)
         messageText!!.apply(setText)
     }
 
     /** Returns the raw text with safe length for sending the message, empty string if not set */
     private fun getMessageText() =
         messageText?.let { if (safeTextLength) it.getSafeTextString() else it.getTextString() }
-            ?: text?.let { if (safeTextLength) it.withSafeLength() else it }
+            ?: text?.let { if (safeTextLength) it.withSafeLength(MessageTextType.TEXT) else it }
             ?: ""
 
     /** Returns the [parseMode] if entities were not used, null otherwise */
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override fun send(chatId: String): MessageResponse {
+    override fun send(chatId: ChatId): MessageResponse {
         return service.sendMessage(
             chatId = chatId,
             text = getMessageText(),
@@ -63,13 +64,14 @@ class TextMessage(override val service: TelegramService = TelegramApi.service) :
             entities = messageText?.getEntitiesString(safeTextLength),
             disableWebPagePreview = disableWebPagePreview,
             disableNotification = disableNotification,
+            protectContent = protectContent,
             replyToMessageId = replyToMessageId,
             allowSendingWithoutReply = allowSendingWithoutReply,
             keyboardMarkup = keyboardMarkup?.toMarkup()
         ).execute().body() ?: errorBody()
     }
 
-    override fun edit(chatId: String?, messageId: Int?, inlineMessageId: String?) : MessageResponse {
+    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) : MessageResponse {
         return service.editMessageText(
             chatId = chatId,
             messageId = messageId,

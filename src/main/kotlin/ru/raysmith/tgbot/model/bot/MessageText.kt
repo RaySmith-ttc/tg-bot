@@ -6,8 +6,13 @@ import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
-import java.lang.StringBuilder
+
+enum class MessageTextType(val maxLength: Int) {
+    TEXT(IMessage.MAX_TEXT_LENGTH),
+    CAPTION(IMessage.MAX_CAPTION_LENGTH)
+}
 
 /**
  * Represents message text or caption as string with entities
@@ -30,7 +35,8 @@ import java.lang.StringBuilder
  * ```
  * */
 @TextMessageDsl
-class MessageText(private val printNulls: Boolean) {
+// TODO move printNulls, safeLength into class as var
+class MessageText(private val printNulls: Boolean, private val type: MessageTextType) {
     private val text: StringBuilder = StringBuilder()
     val currentTextLength: Int
         get() = text.length
@@ -41,19 +47,23 @@ class MessageText(private val printNulls: Boolean) {
         if (safeLength) getSafeEntities() else entities.toList()
     ).toString()
 
-    fun getSafeEntities() = entities.filter { it.offset < IMessage.MAX_TEXT_LENGTH }.toMutableList().also { filtered ->
-        filtered.lastOrNull()?.let { last ->
-            if (last.length + last.offset > IMessage.MAX_TEXT_LENGTH) {
-                filtered[filtered.lastIndex] = last.copy(length = IMessage.MAX_TEXT_LENGTH - last.offset)
-            }
-        }
-    }.toList()
+    fun getEntities(safeLength: Boolean): List<MessageEntity> = if (safeLength) getSafeEntities() else entities
+
+    fun getSafeEntities(): List<MessageEntity> {
+        return entities
+            .filter { it.offset < type.maxLength }
+            .toMutableList().also { filtered ->
+                filtered.lastOrNull()?.let { last ->
+                    if (last.length + last.offset > type.maxLength) {
+                        filtered[filtered.lastIndex] = last.copy(length = type.maxLength - last.offset)
+                    }
+                }
+            }.toList()
+    }
 
     fun getTextString() = text.toString()
 
-    fun getSafeTextString() = getTextString().let {
-        if (it.length > IMessage.MAX_TEXT_LENGTH) it.take(IMessage.MAX_TEXT_LENGTH) else it
-    }
+    fun getSafeTextString() = getTextString().withSafeLength(type)
 
     fun text(text: Any?): MessageText {
         if (!printNulls && text == null) return this

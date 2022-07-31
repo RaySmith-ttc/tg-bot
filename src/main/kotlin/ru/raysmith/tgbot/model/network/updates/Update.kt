@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.updates
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.ChosenInlineResult
 import ru.raysmith.tgbot.model.network.InlineQuery
@@ -121,7 +122,7 @@ data class Update(
     }
 
     /** Find [chat][Chat] id by current update. */
-    fun findChatId(): String? = when(type) {
+    fun findChatId(): ChatId? = when(type) {
         UpdateType.MESSAGE -> message!!.getChatId()
         UpdateType.EDITED_MESSAGE -> editedMessage!!.getChatId()
         UpdateType.CHANNEL_POST -> channelPost!!.getChatId()

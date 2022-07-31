@@ -1,12 +1,13 @@
 package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.TextMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.Pagination
-import java.lang.IllegalStateException
 
 /** Represent an object that can edit messages */
 interface IEditor : ChatIdHolder, ApiCaller {
@@ -18,14 +19,15 @@ interface IEditor : ChatIdHolder, ApiCaller {
     var inlineMessageId: String?
 
     override val service: TelegramService
+    override val fileService: TelegramFileService
 
     fun edit(
-        chatId: String = getChatIdOrThrow(),
+        chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
         message: TextMessage.() -> Unit
     ): Message {
-        return TextMessage(service).apply(message)
+        return TextMessage(service, fileService).apply(message)
             .edit(chatId, messageId, inlineMessageId)
             .result
     }

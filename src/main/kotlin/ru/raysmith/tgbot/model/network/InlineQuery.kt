@@ -38,7 +38,7 @@ data class InlineQuery(
     /** Sender location, only for bots that request user location */
     @SerialName("location") val location: Location? = null,
 ) : ChatIdHolder {
-    override fun getChatId() = from.id.toString()
+    override fun getChatId() = from.id
 }
 
 @Polymorphic

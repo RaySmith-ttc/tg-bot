@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.model.network.message.MessageResponse
 interface IMessage<T : MessageRes> : ApiCaller {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
+        const val MAX_CAPTION_LENGTH = 1024
     }
 
     /**
@@ -22,19 +23,22 @@ interface IMessage<T : MessageRes> : ApiCaller {
     /** Pass True, if the message should be sent even if the specified replied-to message is not found */
     var allowSendingWithoutReply: Boolean?
 
+    /** Protects the contents of the sent message from forwarding and saving */
+    var protectContent: Boolean?
+
     /** Send message to [chat] */
-    fun send(chat: Chat): T = send(chat.id.toString())
+    fun send(chat: Chat): T = send(chat.id)
 
     /** Send message to chat with [chatId] */
-    fun send(chatId: String): T
+    fun send(chatId: ChatId): T
 }
 
 interface EditableMessage : IMessage<MessageResponse> {
 
     /** Edit message from [chat] with [messageId] or [inlineMessageId] */
     fun edit(chat: Chat?, messageId: Int?, inlineMessageId: String?): MessageResponse =
-        edit(chat?.id?.toString(), messageId, inlineMessageId)
+        edit(chat?.id, messageId, inlineMessageId)
 
     /** Edit message from chat with [chatId] and [messageId] or [inlineMessageId] */
-    fun edit(chatId: String?, messageId: Int?, inlineMessageId: String?): MessageResponse
+    fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse
 }

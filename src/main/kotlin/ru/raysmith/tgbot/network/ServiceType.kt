@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.network
 
-internal enum class ServiceType {
+// TODO set internal
+enum class ServiceType {
     DEFAULT, FILE;
 
     fun getBaseUrl(token: String) = when(this) {

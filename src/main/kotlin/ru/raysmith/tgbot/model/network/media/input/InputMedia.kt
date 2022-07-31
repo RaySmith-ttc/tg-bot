@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.media.input
 
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 /**
@@ -11,6 +12,7 @@ import kotlinx.serialization.Serializable
  * - [InputMediaPhoto]
  * - InputMediaVideo
  * */
+@Polymorphic
 @Serializable
 sealed class InputMedia {
     abstract val type: String

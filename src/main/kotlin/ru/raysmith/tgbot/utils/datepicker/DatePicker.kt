@@ -4,7 +4,6 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.utils.properties.PropertiesFactory
 import ru.raysmith.utils.properties.getOrNull
 import java.time.*
 import java.time.format.TextStyle
@@ -51,7 +50,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var dayPickMessageText: (year: Int, month: Int) -> String = { _, _ -> defaultMessageText }
 
     var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
-    var additionalRows: MessageInlineKeyboard.() -> Unit = { }
+    var additionalRows: MessageInlineKeyboard.(data: String?) -> Unit = { }
     var additionalRowsVisibleOnStates = DatePickerState.values().toSet()
 
     var timeZone = ZoneId.systemDefault()
@@ -89,7 +88,7 @@ class DatePicker(val callbackQueryPrefix: String) {
                 else -> now
             }
         }
-        messageInlineKeyboard.setupMarkup(startWithState) {
+        messageInlineKeyboard.setupMarkup(startWithState, data) {
             when(startWithState) {
                 DatePickerState.DAY -> setupDaysMarkup(date.year, date.monthValue, data)
                 DatePickerState.MONTH -> setupMonthsMarkup(date.year, data)
@@ -98,14 +97,14 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    private fun MessageInlineKeyboard.setupMarkup(state: DatePickerState, setup: MessageInlineKeyboard.() -> Unit) {
+    private fun MessageInlineKeyboard.setupMarkup(state: DatePickerState, data: String?, setup: MessageInlineKeyboard.() -> Unit) {
         val isAllowedState = state in additionalRowsVisibleOnStates
         if (isAllowedState && additionalRowsPosition == AdditionalRowsPosition.TOP) {
-            additionalRows()
+            additionalRows(data)
         }
         setup()
         if (isAllowedState && additionalRowsPosition == AdditionalRowsPosition.BOTTOM) {
-            additionalRows()
+            additionalRows(data)
         }
     }
 
@@ -118,7 +117,9 @@ class DatePicker(val callbackQueryPrefix: String) {
                         edit {
                             text = yearsPickMessageText()
                             inlineKeyboard {
-                                setupMarkup(DatePickerState.YEAR) { setupYearsMarkup(datePickerData.yearPage, datePickerData.additionalData) }
+                                setupMarkup(DatePickerState.YEAR, datePickerData.additionalData) {
+                                    setupYearsMarkup(datePickerData.yearPage, datePickerData.additionalData)
+                                }
                             }
                         }
                     }
@@ -126,7 +127,9 @@ class DatePicker(val callbackQueryPrefix: String) {
                         edit {
                             text = dayPickMessageText(datePickerData.y, datePickerData.m)
                             inlineKeyboard {
-                                setupMarkup(DatePickerState.DAY) { setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData) }
+                                setupMarkup(DatePickerState.DAY, datePickerData.additionalData) {
+                                    setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData)
+                                }
                             }
                         }
                     }
@@ -134,7 +137,9 @@ class DatePicker(val callbackQueryPrefix: String) {
                         edit {
                             text = monthPickMessageText(datePickerData.y)
                             inlineKeyboard {
-                                setupMarkup(DatePickerState.MONTH) { setupMonthsMarkup(datePickerData.y, datePickerData.additionalData) }
+                                setupMarkup(DatePickerState.MONTH, datePickerData.additionalData) {
+                                    setupMonthsMarkup(datePickerData.y, datePickerData.additionalData)
+                                }
                             }
                         }
                     }
@@ -147,8 +152,8 @@ class DatePicker(val callbackQueryPrefix: String) {
     private fun Number.toIso() = if (this.toInt() < 10) "0$this" else this.toString()
     private fun Number.toIso(isYear: Boolean = false) = this.toString().padStart(if (isYear) 4 else 2, '0')
     private fun getMonthsDiff(year: Int, month: Int, date: LocalDate = now): Long {
-        // TODO tests
-        val day = Month.of(month).maxLength().let { if (it < now.dayOfMonth) it else now.dayOfMonth }
+        val maxLength = Month.of(month).length(Year.of(year).isLeap)
+        val day = if (maxLength < now.dayOfMonth) maxLength else now.dayOfMonth
         return ChronoUnit.MONTHS.between(LocalDate.of(year, month, day), date)
     }
 
@@ -282,8 +287,8 @@ class DatePicker(val callbackQueryPrefix: String) {
 
             val allowByFutureDaysDeny = !(!allowFutureDays && isCurrentMonth)
             if ((monthLimitForward == -1 || diff > -monthLimitForward) && allowByFutureDaysDeny && allowFutureByDates) {
-                val updatedYear = (if (month == 12) year + 1 else year).let { if (it > datesRange.endInclusive.year) datesRange.endInclusive.year else it  }
-                val updatedMonth = (if (month == 12) 1 else month + 1).let { if (it > datesRange.endInclusive.monthValue) datesRange.endInclusive.monthValue else it  }
+                val updatedYear = (if (month == 12) year + 1 else year)
+                val updatedMonth = (if (month == 12) 1 else month + 1)
                 button("»", "${callbackQueryPrefix}{${data ?: ""}}y${updatedYear.toIso(true)}m${updatedMonth.toIso()}")
             }
             else button(" ", CallbackQuery.EMPTY_CALLBACK_DATA)

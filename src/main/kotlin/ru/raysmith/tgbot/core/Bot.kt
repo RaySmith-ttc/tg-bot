@@ -10,11 +10,14 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.utils.properties.PropertiesFactory
+import java.io.IOException
+import java.util.*
 import kotlin.system.measureTimeMillis
 
 private var stoppingJob: Job? = null
@@ -26,7 +29,7 @@ class Bot(
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + job),
     var lastUpdateId: Int? = null,
-) {
+) : ApiCaller {
 
     // callbacks
     private var onError: (e: Exception) -> Unit = { }
@@ -38,7 +41,8 @@ class Bot(
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
-    val service = token?.let { TelegramApi.serviceWithToken(it) } ?: TelegramApi.service
+    override val service = token?.let { TelegramApi.serviceWithToken(it) } ?: TelegramApi.service
+    override val fileService = token?.let { TelegramApi.fileServiceWithToken(it) } ?: TelegramApi.fileService
 
     // states
     var isActive = false
@@ -48,14 +52,11 @@ class Bot(
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
 
         /** Api call result of [getMe][TelegramService.getMe] method */
-        @Deprecated("This constant returns the bot for a default service instance. Use a property from a bot instance instead", ReplaceWith("me"))
+        @Deprecated("This constant returns the bot for a default service instance. Use the getMe() method from bot context", ReplaceWith("botContext { getMe() }"))
         val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
 
         val properties = PropertiesFactory.fromOrNull("bot.properties")
     }
-
-    /** Api call result of [getMe][TelegramService.getMe] method */
-    val me by lazy { service.getMe().execute().body()?.result ?: errorBody() }
 
     init {
         if (token != null) {
@@ -80,7 +81,11 @@ class Bot(
         blockingSelector?.invoke(this)?.apply(action)
     }
 
-    fun newUpdate(update: Update) = safeNetwork {
+    private val eventHandlerFactory = EventHandlerFactory()
+
+    fun Map<Any, Pair<UUID, Job>>?.data(key: Any) = this?.get(key).let { it?.first to it?.second }
+
+    fun newUpdate(update: Update, service: TelegramService) = safeNetwork {
         val start = System.currentTimeMillis()
 
         var blockingTime = 0L
@@ -89,43 +94,56 @@ class Bot(
                 val job = queue[it]
                 if (job != null) {
                     blockingTime = measureTimeMillis {
+                        logger.debug("Wait end blocking for $it...")
                         job.join()
                     }
                 }
             }
         }
 
-        scope.launch {
-            try {
-                EventHandlerFactory.getHandler(update).run {
-                    if (this is CommandHandler && command.body == shutdownCommand) {
-                        val chatId = update.message?.chat?.id
-                        val userId = update.message?.from?.id
-                        logger.info("Shutdown command was called from chat #${chatId} by user #${userId}")
-                        onShutdown()
-                        logger.info("Shutting down bot...")
-                        stop()
-                        return@run
+        try {
+            scope.launch {
+                try {
+                    eventHandlerFactory.getHandler(update, service, fileService).run {
+                        if (this is CommandHandler && command.body == shutdownCommand) {
+                            val chatId = update.message?.chat?.id
+                            val userId = update.message?.from?.id
+                            logger.info("Shutdown command was called from chat #${chatId} by user #${userId}")
+                            onShutdown()
+                            logger.info("Shutting down bot...")
+                            stop()
+                            return@run
+                        }
+
+                        handle()
+                    }
+                } catch (e: Exception) {
+                    safeOnError(e)
+                } finally {
+                    update.withBlockingObject {
+                        queue.remove(it)
                     }
 
-                    handle()
+                    logger.debug(
+                        "Update #${update.updateId} handled in ${System.currentTimeMillis() - start} ms${
+                            if (blockingTime > 0) " (wait $blockingTime ms)" else ""
+                        }."
+                    )
                 }
-            } catch (e: Exception) {
-                safeOnError(e)
-            } finally {
-                update.withBlockingObject {
-                    queue.remove(it)
+            }.also { job ->
+                if (blockingSelector != null) {
+                    update.withBlockingObject {
+                        val uuid = UUID.randomUUID()
+                        logger.debug("Add blocking for $it ($uuid)")
+                        queue[it] = job
+                    }
                 }
-
-                logger.debug("Update #${update.updateId} handled in ${System.currentTimeMillis() - start} ms${
-                    if (blockingTime > 0) " (wait $blockingTime ms)" else ""
-                }.")
             }
-        }.also { job ->
-            if (blockingSelector != null) {
-                update.withBlockingObject {
-                    queue[it] = job
-                }
+        } catch (e: Exception) {
+            logger.error(e.message, e)
+            update.withBlockingObject {
+                logger.debug("Release blocking for $it after $blockingTime ms.")
+                queue.remove(it)
             }
         }
     }
@@ -137,6 +155,10 @@ class Bot(
             lastUpdateId = (lastUpdateId ?: 0) + 1
             safeOnError(e)
             throw e
+        } catch (e: IOException) {
+            safeOnError(e)
+        } catch (e: TelegramApiException) {
+            safeOnError(e)
         } catch (e: Exception) {
             lastUpdateId = (lastUpdateId ?: 0) + 1
             safeOnError(e)
@@ -160,10 +182,10 @@ class Bot(
 
             while (isActive) {
                 safeNetwork {
-                    updateRequest = TelegramApi.service.getUpdates(
+                    updateRequest = service.getUpdates(
                         offset = lastUpdateId?.plus(1),
                         timeout = timeout,
-                        allowedUpdates = EventHandlerFactory.getAllowedUpdateTypes().asParameter()
+                        allowedUpdates = eventHandlerFactory.getAllowedUpdateTypes().asParameter()
                     )
 
                     val updates = updateRequest!!.execute()
@@ -171,7 +193,7 @@ class Bot(
                     if (updates.isSuccessful && updates.body()?.result?.isNotEmpty() == true) {
                         onUpdate(updates.body()!!.result)
                         updates.body()!!.result.forEach { update ->
-                            newUpdate(update)
+                            newUpdate(update, service)
                         }
 
                         lastUpdateId = updates.body()!!.result.last().updateId
@@ -196,7 +218,7 @@ class Bot(
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
     suspend fun start(updateHandler: EventHandlerFactory.(bot: Bot) -> Unit) {
-        EventHandlerFactory.updateHandler(this) // setup handlers
+        eventHandlerFactory.updateHandler(this) // setup handlers
         startBot()
     }
 
@@ -228,7 +250,7 @@ class Bot(
     }
 
     fun registerDatePicker(datePicker: DatePicker): Bot {
-        EventHandlerFactory.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker)
+        eventHandlerFactory.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker)
         return this
     }
 

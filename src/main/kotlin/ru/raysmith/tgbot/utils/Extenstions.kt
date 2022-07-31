@@ -1,10 +1,11 @@
 package ru.raysmith.tgbot.utils
 
 import kotlinx.serialization.builtins.ListSerializer
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandlerData
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.model.bot.IMessage
+import ru.raysmith.tgbot.core.handler.CallbackQueryHandlerData
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.MessageText
+import ru.raysmith.tgbot.model.bot.MessageTextType
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramApi
 import java.util.*
@@ -28,8 +29,9 @@ internal fun Map<*, CallbackQueryHandlerData>.handleAll(handler: CallbackQueryHa
 /** Append line break */
 fun MessageText.n() = text("\n")
 
-fun String.withSafeLength() = this.let {
-    if (it.length > IMessage.MAX_TEXT_LENGTH) it.take(IMessage.MAX_TEXT_LENGTH) else it
-}
+fun String.withSafeLength(type: MessageTextType) = if (this.length > type.maxLength) this.take(type.maxLength) else this
 
 internal fun Properties?.getOrDefault(key: String, default: String) = this?.getOrDefault(key, default)?.toString() ?: default
+
+fun Long.toChatId(): ChatId.ID = ChatId.of(this) as ChatId.ID
+fun String.toChatId(): ChatId.Username = ChatId.of(this) as ChatId.Username

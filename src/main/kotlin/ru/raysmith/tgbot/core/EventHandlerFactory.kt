@@ -6,6 +6,8 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.network.TelegramFileService
+import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.addIfNotContains
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
@@ -13,7 +15,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 annotation class HandlerDsl
 
 @HandlerDsl
-object EventHandlerFactory {
+class EventHandlerFactory {
 
     private val logger = LoggerFactory.getLogger("event-handler-factory")
     val allowedUpdates = mutableListOf<UpdateType>() // TODO change to set
@@ -29,31 +31,31 @@ object EventHandlerFactory {
 
     private var alwaysAnswer: Boolean = false
 
-    fun getHandler(update: Update): EventHandler {
+    fun getHandler(update: Update, service: TelegramService, fileService: TelegramFileService): EventHandler {
         return when {
 
             commandHandler != null && update.message?.type == MessageType.COMMAND ->
-                CommandHandler(BotCommand(update.message.text!!), update.message, commandHandler!!)
+                CommandHandler(BotCommand(update.message.text!!), update.message, service, fileService, commandHandler!!)
 
             messageHandler != null && update.message?.type == MessageType.TEXT ->
-                MessageHandler(update.message, messageHandler!!)
+                MessageHandler(update.message, service, fileService, messageHandler!!)
 
-            update.callbackQuery != null -> CallbackQueryHandler(update.callbackQuery, alwaysAnswer, callbackQueryHandler)
+            update.callbackQuery != null -> CallbackQueryHandler(update.callbackQuery, alwaysAnswer, callbackQueryHandler, service, fileService)
 
-            update.myChatMember != null -> ChatMemberHandler(update.myChatMember, chatMemberHandler!!)
+            update.myChatMember != null -> ChatMemberHandler(update.myChatMember, service, fileService, chatMemberHandler!!)
 
-            update.chatMember != null -> ChatMemberHandler(update.chatMember, chatMemberHandler!!)
+            update.chatMember != null -> ChatMemberHandler(update.chatMember, service, fileService, chatMemberHandler!!)
 
             preCheckoutQueryHandler != null && update.preCheckoutQuery != null ->
-                PreCheckoutQueryHandler(update.preCheckoutQuery, preCheckoutQueryHandler!!)
+                PreCheckoutQueryHandler(update.preCheckoutQuery, service, fileService, preCheckoutQueryHandler!!)
 
             shippingQueryHandler != null && update.shippingQuery != null ->
-                ShippingQueryHandler(update.shippingQuery, shippingQueryHandler!!)
+                ShippingQueryHandler(update.shippingQuery, service, fileService, shippingQueryHandler!!)
 
             inlineQueryHandler != null && update.inlineQuery != null ->
-                InlineQueryHandler(update.inlineQuery, inlineQueryHandler!!)
+                InlineQueryHandler(update.inlineQuery, service, fileService, inlineQueryHandler!!)
 
-            else -> UnknownEventHandler(update, unknownHandler)
+            else -> UnknownEventHandler(update, service, fileService, unknownHandler)
         }
     }
 
