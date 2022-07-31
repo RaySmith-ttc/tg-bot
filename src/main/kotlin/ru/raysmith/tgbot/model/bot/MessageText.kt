@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.model.bot
 
 import kotlinx.serialization.json.encodeToJsonElement
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
@@ -35,19 +36,24 @@ enum class MessageTextType(val maxLength: Int) {
  * ```
  * */
 @TextMessageDsl
-// TODO move printNulls, safeLength into class as var
-class MessageText(private val printNulls: Boolean, private val type: MessageTextType) {
+class MessageText(private val type: MessageTextType) {
+
+    var printNulls: Boolean = Bot.Config.printNulls
+
+    /** Whether test should be truncated if text length is greater than 4096 */
+    var safeTextLength: Boolean = Bot.Config.safeTextLength
+
     private val text: StringBuilder = StringBuilder()
     val currentTextLength: Int
         get() = text.length
 
     private var entities: MutableList<MessageEntity> = mutableListOf()
 
-    fun getEntitiesString(safeLength: Boolean) = TelegramApi.json.encodeToJsonElement(
-        if (safeLength) getSafeEntities() else entities.toList()
+    fun getEntitiesString() = TelegramApi.json.encodeToJsonElement(
+        if (safeTextLength) getSafeEntities() else entities.toList()
     ).toString()
 
-    fun getEntities(safeLength: Boolean): List<MessageEntity> = if (safeLength) getSafeEntities() else entities
+    fun getEntities(): List<MessageEntity> = if (safeTextLength) getSafeEntities() else entities
 
     fun getSafeEntities(): List<MessageEntity> {
         return entities
@@ -61,9 +67,7 @@ class MessageText(private val printNulls: Boolean, private val type: MessageText
             }.toList()
     }
 
-    fun getTextString() = text.toString()
-
-    fun getSafeTextString() = getTextString().withSafeLength(type)
+    fun getTextString() = if (safeTextLength) text.toString().withSafeLength(type) else text.toString()
 
     fun text(text: Any?): MessageText {
         if (!printNulls && text == null) return this
@@ -167,18 +171,18 @@ class MessageText(private val printNulls: Boolean, private val type: MessageText
 
         return if (blacklist.isNotEmpty()) fixed(res).also { println("REQ") }
         else res.also {
-            val textString = getSafeTextString()
+            val textString = getTextString()
             it.forEach {
 //                println("$it --> ${textString.substring(it.offset, it.offset + it.length)}")
             }
         }
     }
 
-    fun format(parseMode: ParseMode, safeLength: Boolean = true): String {
-        val textString = if (safeLength) getSafeTextString() else getTextString()
+    fun format(parseMode: ParseMode): String {
+        val textString = getTextString()
         if (entities.isEmpty()) return textString.escape(parseMode)
 
-        val entities = (if (safeLength) getSafeEntities() else entities).let { fixed(it) }.sortedBy { it.offset }
+        val entities = fixed(getEntities()).sortedBy { it.offset }
         fun MessageEntity.isSameLengthAndOffset(other: MessageEntity): Boolean {
             return this.length == other.length && this.offset == other.offset
         }

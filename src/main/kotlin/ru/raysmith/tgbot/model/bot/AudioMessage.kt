@@ -21,14 +21,14 @@ class AudioMessage(override val service: TelegramService, override val fileServi
 
     override val mediaName: String = "audio"
 
-    override fun send(chatId: ChatId): MessageResponse = when(media) {
+    override fun send(chatId: ChatId): MessageResponse = when(audio) {
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendAudio(
                 chatId = chatId.toRequestBody(),
                 audio = getMediaMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
-                captionEntities = _caption?.getEntitiesString(safeTextLength)?.toRequestBody(),
+                captionEntities = _caption?.getEntitiesString()?.toRequestBody(),
                 duration = duration?.toString()?.toRequestBody(),
                 performer = performer?.toRequestBody(),
                 title = title?.toRequestBody(),
@@ -46,7 +46,7 @@ class AudioMessage(override val service: TelegramService, override val fileServi
                 audio = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,
-                captionEntities = _caption?.getEntitiesString(safeTextLength),
+                captionEntities = _caption?.getEntitiesString(),
                 duration = duration,
                 performer = performer,
                 title = title,

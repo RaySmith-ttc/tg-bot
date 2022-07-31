@@ -4,6 +4,7 @@ import kotlinx.serialization.encodeToString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.message.MessageEntity
@@ -19,7 +20,8 @@ import java.nio.file.Files
 class DocumentMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaGroupMessage(service, fileService) {
     fun document(
         document: InputFile, thumb: NotReusableInputFile, disableContentTypeDetection: Boolean? = null,
-        printNulls: Boolean = false, safeTextLength: Boolean = true, caption: MessageText.() -> Unit
+        printNulls: Boolean = Bot.Config.printNulls, safeTextLength: Boolean = Bot.Config.safeTextLength,
+        caption: MessageText.() -> Unit
     ) {
         inputMedia.add(InputMediaDocument(
             getMedia(document), getMedia(thumb), getCaption(printNulls, caption), null,
@@ -33,7 +35,7 @@ class DocumentMediaGroupMessage(override val service: TelegramService, override 
     ) {
         inputMedia.add(InputMediaDocument(
             getMedia(document), getMedia(thumb), getCaption(caption, false, parseMode), parseMode,
-            getCaptionEntities(captionEntities), disableContentTypeDetection
+            captionEntities, disableContentTypeDetection
         ))
     }
 }
@@ -46,13 +48,14 @@ class AudioMediaGroupMessage(override val service: TelegramService, override val
     ) {
         inputMedia.add(InputMediaAudio(
             getMedia(audio), getMedia(thumb), getCaption(caption, false, parseMode),
-            parseMode, getCaptionEntities(captionEntities), duration, performer, title
+            parseMode, captionEntities, duration, performer, title
         ))
     }
 
     fun audio(
         audio: InputFile, thumb: NotReusableInputFile, duration: Int? = null, performer: String? = null,
-        title: String? = null, printNulls: Boolean = false, safeTextLength: Boolean = true, caption: MessageText.() -> Unit
+        title: String? = null, printNulls: Boolean = Bot.Config.printNulls,
+        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
     ) {
         inputMedia.add(InputMediaAudio(
             getMedia(audio), getMedia(thumb), getCaption(printNulls, caption), null,
@@ -64,15 +67,16 @@ class AudioMediaGroupMessage(override val service: TelegramService, override val
 class PhotoMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaGroupMessage(service, fileService) {
     // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
     fun photo(
-        photo: InputFile, caption: String? = null, parseMode: ParseMode? = null, safeTextLength: Boolean = true,
-        captionEntities: List<MessageEntity>? = null
+        photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,
+        safeTextLength: Boolean = Bot.Config.safeTextLength, captionEntities: List<MessageEntity>? = null
     ) {
         inputMedia.add(InputMediaPhoto(
-            getMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, getCaptionEntities(captionEntities)
+            getMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, captionEntities
         ))
     }
     fun photo(
-        photo: InputFile, printNulls: Boolean = false, safeTextLength: Boolean = true, caption: MessageText.() -> Unit
+        photo: InputFile, printNulls: Boolean = Bot.Config.printNulls,
+        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
     ) {
         inputMedia.add(InputMediaPhoto(
             getMedia(photo), getCaption(printNulls, caption), null, getCaptionEntities(printNulls, safeTextLength, caption)
@@ -80,7 +84,7 @@ class PhotoMediaGroupMessage(override val service: TelegramService, override val
     }
 }
 
-abstract class MediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : /*CaptionableMessage(),*/ IMessage<MessageResponseArray> {
+abstract class MediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : IMessage<MessageResponseArray> {
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
     override var replyToMessageId: Int? = null
@@ -121,27 +125,23 @@ abstract class MediaGroupMessage(override val service: TelegramService, override
 
 
     protected fun getCaption(caption: String?, safeTextLength: Boolean, parseMode: ParseMode?) = when {
-//        inputMedia.isEmpty() && hasCaption() -> {
-//            getCaptionText()
-//        }
         safeTextLength && parseMode == null -> caption?.withSafeLength(MessageTextType.CAPTION)
         safeTextLength -> caption
         else -> caption
     }
 
-    protected fun getCaption(printNulls: Boolean, caption: MessageText.() -> Unit) = when {
-//        inputMedia.isEmpty() && hasCaption() -> getCaptionText()
-        else -> MessageText(printNulls, MessageTextType.CAPTION).apply(caption).getSafeTextString()
-    }
-
-    protected fun getCaptionEntities(captionEntities: List<MessageEntity>?) = captionEntities/*if (inputMedia.isEmpty() && hasCaption())
-        _caption?.getSafeEntities() else captionEntities*/
+    protected fun getCaption(printNulls: Boolean, caption: MessageText.() -> Unit) =
+        MessageText(MessageTextType.CAPTION)
+            .apply { this.printNulls = printNulls }
+            .apply(caption).getTextString()
 
     protected fun getCaptionEntities(printNulls: Boolean, safeTextLength: Boolean, caption: MessageText.() -> Unit) =
-        when {
-//        inputMedia.isEmpty() && hasCaption() -> _caption?.getEntities(safeTextLength)
-            else -> MessageText(printNulls, MessageTextType.CAPTION).apply(caption).getEntities(safeTextLength)
-        }
+        MessageText(MessageTextType.CAPTION)
+            .apply {
+                this.printNulls = printNulls
+                this.safeTextLength = safeTextLength
+            }
+            .apply(caption).getEntities()
 
     override fun send(chatId: ChatId): MessageResponseArray {
         return if (multipartBodyParts.isEmpty()) {

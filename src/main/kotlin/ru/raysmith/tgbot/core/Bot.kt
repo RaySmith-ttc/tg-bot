@@ -15,6 +15,7 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.utils.properties.PropertiesFactory
 import java.io.IOException
 import java.util.*
@@ -56,6 +57,11 @@ class Bot(
         val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
 
         val properties = PropertiesFactory.fromOrNull("bot.properties")
+    }
+
+    object Config {
+        val safeTextLength = properties.getOrDefault("safeTextLength", "true").toBoolean()
+        val printNulls = properties.getOrDefault("printNulls", "false").toBoolean()
     }
 
     init {

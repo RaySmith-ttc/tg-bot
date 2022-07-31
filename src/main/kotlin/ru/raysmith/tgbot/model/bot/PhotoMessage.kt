@@ -16,14 +16,14 @@ class PhotoMessage(override val service: TelegramService, override val fileServi
 
     override val mediaName: String = "photo"
 
-    override fun send(chatId: ChatId) = when(media) {
+    override fun send(chatId: ChatId) = when(photo) {
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendPhoto(
                 chatId = chatId.toRequestBody(),
                 photo = getMediaMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
-                captionEntities = _caption?.getEntitiesString(safeTextLength)?.toRequestBody(),
+                captionEntities = _caption?.getEntitiesString()?.toRequestBody(),
                 disableNotification = disableNotification?.toString()?.toRequestBody(),
                 protectContent = protectContent?.toString()?.toRequestBody(),
                 replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
@@ -37,7 +37,7 @@ class PhotoMessage(override val service: TelegramService, override val fileServi
                 photo = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,
-                captionEntities = _caption?.getEntitiesString(safeTextLength),
+                captionEntities = _caption?.getEntitiesString(),
                 disableNotification = disableNotification,
                 protectContent = protectContent,
                 replyToMessageId = replyToMessageId,

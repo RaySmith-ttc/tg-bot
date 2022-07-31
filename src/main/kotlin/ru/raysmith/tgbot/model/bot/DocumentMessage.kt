@@ -43,7 +43,7 @@ class DocumentMessage(override val service: TelegramService, override val fileSe
 
     override val mediaName: String = "document"
 
-    override fun send(chatId: ChatId): MessageResponse = when(media) {
+    override fun send(chatId: ChatId): MessageResponse = when(document) {
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendDocument(
                 chatId = chatId.toRequestBody(),
@@ -51,7 +51,7 @@ class DocumentMessage(override val service: TelegramService, override val fileSe
                 thumb = getThumbMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
-                captionEntities = _caption?.getEntitiesString(safeTextLength)?.toRequestBody(),
+                captionEntities = _caption?.getEntitiesString()?.toRequestBody(),
                 disableNotification = disableNotification?.toString()?.toRequestBody(),
                 protectContent = protectContent?.toString()?.toRequestBody(),
                 replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
@@ -65,7 +65,7 @@ class DocumentMessage(override val service: TelegramService, override val fileSe
                 document = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,
-                captionEntities = _caption?.getEntitiesString(safeTextLength),
+                captionEntities = _caption?.getEntitiesString(),
                 disableNotification = disableNotification,
                 protectContent = protectContent,
                 replyToMessageId = replyToMessageId,

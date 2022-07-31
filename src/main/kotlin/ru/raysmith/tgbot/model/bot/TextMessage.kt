@@ -6,7 +6,6 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
-import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.withSafeLength
 
 @DslMarker
@@ -19,9 +18,6 @@ class TextMessage(override val service: TelegramService, override val fileServic
     /** Full text of message with entities */
     private var messageText: MessageText? = null
 
-    /** Set true for apply null strings to message text */
-    var printNulls: Boolean = false
-
     /** Simple text to send the message, optionally with [parseMode] */
     var text: String? = null
 
@@ -32,7 +28,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
     var disableWebPagePreview: Boolean? = null
 
     /** Whether test should be truncated if text length is greater than 4096 */
-    var safeTextLength: Boolean = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
+    var safeTextLength: Boolean = Bot.Config.safeTextLength
 
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
@@ -43,13 +39,13 @@ class TextMessage(override val service: TelegramService, override val fileServic
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
     fun textWithEntities(setText: MessageText.() -> Unit) {
-        messageText = MessageText(printNulls, MessageTextType.TEXT)
+        messageText = MessageText(MessageTextType.TEXT)
         messageText!!.apply(setText)
     }
 
     /** Returns the raw text with safe length for sending the message, empty string if not set */
     private fun getMessageText() =
-        messageText?.let { if (safeTextLength) it.getSafeTextString() else it.getTextString() }
+        messageText?.getTextString()
             ?: text?.let { if (safeTextLength) it.withSafeLength(MessageTextType.TEXT) else it }
             ?: ""
 
@@ -61,7 +57,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
             chatId = chatId,
             text = getMessageText(),
             parseMode = getParseModeIfNeed(),
-            entities = messageText?.getEntitiesString(safeTextLength),
+            entities = messageText?.getEntitiesString(),
             disableWebPagePreview = disableWebPagePreview,
             disableNotification = disableNotification,
             protectContent = protectContent,
@@ -78,7 +74,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
             inlineMessageId = inlineMessageId,
             text = getMessageText(),
             parseMode = getParseModeIfNeed(),
-            entities = messageText?.getEntitiesString(safeTextLength),
+            entities = messageText?.getEntitiesString(),
             replyMarkup = keyboardMarkup?.toMarkup(),
             disableWebPagePreview = disableWebPagePreview
         ).execute().body() ?: errorBody()

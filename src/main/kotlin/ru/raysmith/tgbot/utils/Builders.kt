@@ -6,20 +6,16 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 
 inline fun buildHTMLString(
     type: MessageTextType = MessageTextType.TEXT,
-    printNulls: Boolean = false,
-    safeLength: Boolean = true,
     block: MessageText.() -> Unit
 ): String {
-    return MessageText(printNulls, type).apply(block).format(ParseMode.HTML, safeLength)
+    return MessageText(type).apply(block).format(ParseMode.HTML)
 }
 
 inline fun buildMarkdownV2String(
     type: MessageTextType = MessageTextType.TEXT,
-    printNulls: Boolean = false,
-    safeLength: Boolean = true,
     block: MessageText.() -> Unit
 ): String {
-    return MessageText(printNulls, type).apply(block).format(ParseMode.MARKDOWNV2, safeLength)
+    return MessageText(type).apply(block).format(ParseMode.MARKDOWNV2)
 }
 
 @Deprecated(
@@ -28,9 +24,7 @@ inline fun buildMarkdownV2String(
 )
 inline fun buildMarkdownString(
     type: MessageTextType = MessageTextType.TEXT,
-    printNulls: Boolean = false,
-    safeLength: Boolean = true,
     block: MessageText.() -> Unit
 ): String {
-    return MessageText(printNulls, type).apply(block).format(ParseMode.MARKDOWN, safeLength)
+    return MessageText(type).apply(block).format(@Suppress("DEPRECATION") ParseMode.MARKDOWN)
 }

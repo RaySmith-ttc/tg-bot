@@ -729,12 +729,84 @@ class Runner {
 
                            send("main")
                         }
+
+                        isCommand("safe2") {
+                            send {
+                                textWithEntities {
+                                    text("test")
+                                }
+                            }
+
+                            send {
+                                textWithEntities {
+                                    safeTextLength = true
+                                    text(generateString(5000))
+                                }
+                            }
+
+                            try {
+                                send {
+                                    textWithEntities {
+                                        safeTextLength = false
+                                        text("test")
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+
+                            send {
+                                textWithEntities {
+                                    safeTextLength = true
+                                    repeat(50) {
+                                        when((1..5).random()) {
+                                            1 -> text(generateString(100))
+                                            2 -> bold(generateString(100))
+                                            3 -> italic(generateString(100))
+                                            4 -> strikethrough(generateString(100))
+                                            5 -> code(generateString(100))
+                                        }
+                                    }
+                                }
+                            }
+
+                            try {
+                                send {
+                                    textWithEntities {
+                                        safeTextLength = false
+                                        repeat(50) {
+                                            when((1..5).random()) {
+                                                1 -> text(generateString(100))
+                                                2 -> bold(generateString(100))
+                                                3 -> italic(generateString(100))
+                                                4 -> strikethrough(generateString(100))
+                                                5 -> code(generateString(100))
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
+                        isCommand("safe3") {
+                            send {
+                                text = generateString(5000)
+                                safeTextLength = true
+                            }
+                        }
                     }
                 }
-
-    //        Thread.sleep(100000000)
         }
     }
+}
+
+fun generateString(length: Int): String {
+    val symbols = listOf('a'..'z', 'A'..'Z', '0'..'9').flatten().toMutableList().apply {
+        add(' ')
+    }
+    return generateSequence("") { symbols.random().toString() }.take(length).joinToString("")
 }
 
 fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
