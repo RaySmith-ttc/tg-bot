@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 object TelegramApi {
 
     val logger: Logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = Bot.properties?.getOrDefault("token", null) as? String
+    private var TOKEN = Bot.Config.token
     const val BASE_URL = "https://api.telegram.org"
 
     fun setToken(newToken: String) {

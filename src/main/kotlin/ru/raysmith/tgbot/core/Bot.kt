@@ -17,6 +17,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.utils.properties.PropertiesFactory
+import ru.raysmith.utils.properties.getOrNull
 import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
@@ -62,9 +63,27 @@ class Bot(
     object Config {
         val safeTextLength = properties.getOrDefault("safeTextLength", "true").toBoolean()
         val printNulls = properties.getOrDefault("printNulls", "false").toBoolean()
+        val defaultProviderToken = properties?.getOrNull("providerToken")
+        val emptyCallbackQuery = properties.getOrDefault("emptyCallbackQuery", " ")
+        val token = properties?.getOrNull("token")
+
+        val defaultRows: Int = properties.getOrDefault("pagination.rows", "5").toIntOrNull()
+            ?: throw IllegalArgumentException("Property pagination.rows is not Int")
+        val defaultColumns: Int = properties.getOrDefault("pagination.columns", "1").toIntOrNull()
+            ?: throw IllegalArgumentException("Property pagination.columns is not Int")
+        val firstPageSymbol = properties.getOrDefault("pagination.firstPageSymbol", "«")
+        val lastPageSymbol = properties.getOrDefault("pagination.lastPageSymbol", "»")
+        val locale = properties?.getOrNull("calendar_locale")?.let {
+            Locale.forLanguageTag(it)
+        } ?: Locale.getDefault()
+
+        fun init() {
+
+        }
     }
 
     init {
+        Config.init()
         if (token != null) {
             TelegramApi.setToken(token)
         }

@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.core
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.InlineKeyboardCreator
@@ -14,19 +13,13 @@ import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
-import ru.raysmith.utils.properties.getOrNull
 
 class InvoiceSender(override var service: TelegramService, override val fileService: TelegramFileService) : InlineKeyboardCreator, ApiCaller {
-
-    companion object {
-        private val logger = LoggerFactory.getLogger("invoice")
-        private val defaultProviderToken = Bot.properties?.getOrNull("providerToken")
-    }
 
     var title: String? = null
     var description: String? = null
     var payload: String? = null
-    var providerToken: String? = defaultProviderToken
+    var providerToken: String? = Bot.Config.defaultProviderToken
     var currency: Currency? = null
     var prices: List<LabeledPrice>? = null
     var maxTipAmount: Int? = null

@@ -4,11 +4,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.utils.properties.getOrNull
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
-import java.util.*
 
 class DatePicker(val callbackQueryPrefix: String) {
 
@@ -54,9 +52,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var additionalRowsVisibleOnStates = DatePickerState.values().toSet()
 
     var timeZone = ZoneId.systemDefault()
-    var locale = Bot.properties?.getOrNull("calendar_locale")?.let {
-        Locale.forLanguageTag(it)
-    } ?: Locale.getDefault()
+    var locale = Bot.Config.locale
 
     private val now = LocalDate.now(timeZone)
 
