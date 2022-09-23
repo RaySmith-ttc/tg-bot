@@ -9,7 +9,13 @@ import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 
+// should never be called
 internal fun errorBody(): Nothing = throw NullPointerException("The method did not return a body")
+
+fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.service, bot.fileService, withChatId)
+fun botContext(token: String, withChatId: ChatId? = null) = createBotContext(
+    TelegramApi.serviceWithToken(token), TelegramApi.fileServiceWithToken(token), withChatId
+)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -17,6 +23,7 @@ internal fun errorBody(): Nothing = throw NullPointerException("The method did n
  * @param bot Telegram service with a bot token
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
+@BotContextDsl
 inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
     botContext(bot.service, bot.fileService, withChatId, block)
 
@@ -26,6 +33,7 @@ inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContex
  * @param token Telegram bot token
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
+@BotContextDsl
 inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
     botContext(TelegramApi.serviceWithToken(token), TelegramApi.fileServiceWithToken(token), withChatId, block)
 
@@ -40,6 +48,11 @@ inline fun <T> botContext(
     service: TelegramService = TelegramApi.service, fileService: TelegramFileService = TelegramApi.fileService,
     withChatId: ChatId? = null,
     block: BotContext<UnknownEventHandler>.() -> T
+) = createBotContext(service, fileService, withChatId).let(block)
+
+fun createBotContext(
+    service: TelegramService = TelegramApi.service, fileService: TelegramFileService = TelegramApi.fileService,
+    withChatId: ChatId? = null,
 ) = object : BotContext<UnknownEventHandler> {
     override val service: TelegramService = service
     override val fileService: TelegramFileService = fileService
@@ -50,7 +63,7 @@ inline fun <T> botContext(
             block()
         }
     }
-}.let(block)
+}
 
 @DslMarker
 annotation class BotContextDsl

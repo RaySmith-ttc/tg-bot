@@ -1,13 +1,17 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message.group
 
 import kotlinx.serialization.encodeToString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.IMessage
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.network.chat.ChatAction
-import ru.raysmith.tgbot.model.network.media.input.*
-import ru.raysmith.tgbot.model.network.message.MessageEntity
+import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
+import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.message.MessageResponseArray
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
@@ -17,74 +21,8 @@ import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.withSafeLength
 import java.nio.file.Files
 
-class DocumentMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaGroupMessage(service, fileService) {
-    fun document(
-        document: InputFile, thumb: NotReusableInputFile, disableContentTypeDetection: Boolean? = null,
-        printNulls: Boolean = Bot.Config.printNulls, safeTextLength: Boolean = Bot.Config.safeTextLength,
-        caption: MessageText.() -> Unit
-    ) {
-        inputMedia.add(InputMediaDocument(
-            getMedia(document), getMedia(thumb), getCaption(printNulls, caption), null,
-            getCaptionEntities(printNulls, safeTextLength, caption), disableContentTypeDetection
-        ))
-    }
-
-    fun document(
-        document: InputFile, thumb: NotReusableInputFile, caption: String? = null, parseMode: ParseMode? = null,
-        captionEntities: List<MessageEntity>? = null, disableContentTypeDetection: Boolean? = null
-    ) {
-        inputMedia.add(InputMediaDocument(
-            getMedia(document), getMedia(thumb), getCaption(caption, false, parseMode), parseMode,
-            captionEntities, disableContentTypeDetection
-        ))
-    }
-}
-
-class AudioMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaGroupMessage(service, fileService) {
-    fun audio(
-        audio: InputFile, thumb: NotReusableInputFile, caption: String? = null, parseMode: ParseMode? = null,
-        captionEntities: List<MessageEntity>? = null, duration: Int? = null, performer: String? = null,
-        title: String? = null
-    ) {
-        inputMedia.add(InputMediaAudio(
-            getMedia(audio), getMedia(thumb), getCaption(caption, false, parseMode),
-            parseMode, captionEntities, duration, performer, title
-        ))
-    }
-
-    fun audio(
-        audio: InputFile, thumb: NotReusableInputFile, duration: Int? = null, performer: String? = null,
-        title: String? = null, printNulls: Boolean = Bot.Config.printNulls,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
-    ) {
-        inputMedia.add(InputMediaAudio(
-            getMedia(audio), getMedia(thumb), getCaption(printNulls, caption), null,
-            getCaptionEntities(printNulls, safeTextLength, caption), duration, performer, title
-        ))
-    }
-}
-
-class PhotoMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaGroupMessage(service, fileService) {
-    // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
-    fun photo(
-        photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, captionEntities: List<MessageEntity>? = null
-    ) {
-        inputMedia.add(InputMediaPhoto(
-            getMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, captionEntities
-        ))
-    }
-    fun photo(
-        photo: InputFile, printNulls: Boolean = Bot.Config.printNulls,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
-    ) {
-        inputMedia.add(InputMediaPhoto(
-            getMedia(photo), getCaption(printNulls, caption), null, getCaptionEntities(printNulls, safeTextLength, caption)
-        ))
-    }
-}
-
-abstract class MediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : IMessage<MessageResponseArray> {
+abstract class MediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) :
+    IMessage<MessageResponseArray> {
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
     override var replyToMessageId: Int? = null

@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.TextMessage
+import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.TelegramFileService

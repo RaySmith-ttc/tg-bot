@@ -4,8 +4,12 @@ data class DatePickerData(val additionalData: String?, val y: Int?, val m: Int?,
     companion object {
         private fun getValueFor(rawData: String, prefix: Char): Int? {
             return rawData.lastIndexOf(prefix)
-                .let { if (it == -1) null else "[-\\d]+".toRegex().find(rawData.substring(it + 1))!!.value }
-                ?.toInt()
+                .let { if (it == -1) null else {
+                        val substr = rawData.substring(it + 1)
+                        if (substr.contains("[^\\\\]}".toRegex())) return null
+                        else "[-\\d]+".toRegex().find(substr)?.value
+                    }
+                }?.toInt()
         }
 
         fun from(rawData: String): DatePickerData {

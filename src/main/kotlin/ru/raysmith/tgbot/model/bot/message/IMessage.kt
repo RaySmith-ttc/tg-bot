@@ -1,14 +1,15 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.ApiCaller
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.message.MessageRes
-import ru.raysmith.tgbot.model.network.message.MessageResponse
 
 interface IMessage<T : MessageRes> : ApiCaller {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
         const val MAX_CAPTION_LENGTH = 1024
+        const val MAX_POLL_EXPLANATION_LENGTH = 200
     }
 
     /**
@@ -33,12 +34,3 @@ interface IMessage<T : MessageRes> : ApiCaller {
     fun send(chatId: ChatId): T
 }
 
-interface EditableMessage : IMessage<MessageResponse> {
-
-    /** Edit message from [chat] with [messageId] or [inlineMessageId] */
-    fun edit(chat: Chat?, messageId: Int?, inlineMessageId: String?): MessageResponse =
-        edit(chat?.id, messageId, inlineMessageId)
-
-    /** Edit message from chat with [chatId] and [messageId] or [inlineMessageId] */
-    fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse
-}

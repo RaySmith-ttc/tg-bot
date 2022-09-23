@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.BotContextDsl
 
 @HandlerDsl
 class CommandHandler(
@@ -23,6 +24,7 @@ class CommandHandler(
 
     override suspend fun handle() = handler()
 
+    @BotContextDsl
     override fun withBot(bot: Bot, block: BotContext<CommandHandler>.() -> Any) {
         CommandHandler(command, message, bot.service, bot.fileService, handler).apply {
             this.block()

@@ -5,7 +5,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.ChatIdSerializer
+import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
 /** Represents the [scope][BotCommandScope] of bot commands, covering a specific member of a group or supergroup chat. */
 @Serializable

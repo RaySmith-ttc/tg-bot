@@ -231,6 +231,138 @@ interface TelegramService {
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
+    @POST("sendVideo")
+    fun sendVideo(
+        @Query("chat_id") chatId: ChatId,
+        @Query("video") video: String,
+        @Query("duration") duration: Int? = null,
+        @Query("width") width: Int? = null,
+        @Query("height") height: Int? = null,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("supports_streaming") supportsStreaming: Boolean? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendVideo")
+    fun sendVideo(
+        @Part("chat_id") chatId: RequestBody,
+        @Part video: MultipartBody.Part,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("width") width: RequestBody? = null,
+        @Part("height") height: RequestBody? = null,
+        @Part thumb: MultipartBody.Part? = null,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("supports_streaming") supportsStreaming: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+//    @POST("sendAnimation")
+//    fun sendAnimation(
+//        @Query("chat_id") chatId: ChatId,
+//        @Query("animation") animation: String,
+//        @Query("duration") duration: Int? = null,
+//        @Query("width") width: Int? = null,
+//        @Query("height") height: Int? = null,
+//        @Query("caption") caption: String? = null,
+//        @Query("parse_mode") parseMode: ParseMode? = null,
+//        @Query("caption_entities") captionEntities: String? = null,
+//        @Query("disable_notification") disableNotification: Boolean? = null,
+//        @Query("protect_content") protectContent: Boolean? = null,
+//        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+//        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+//        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+//    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendAnimation")
+    fun sendAnimation(
+        @Part("chat_id") chatId: RequestBody,
+        @Part animation: MultipartBody.Part,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("width") width: RequestBody? = null,
+        @Part("height") height: RequestBody? = null,
+        @Part thumb: MultipartBody.Part? = null,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("sendVoice")
+    fun sendVoice(
+        @Query("chat_id") chatId: ChatId,
+        @Query("voice") voice: String,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("duration") duration: Int? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendVoice")
+    fun sendVoice(
+        @Part("chat_id") chatId: RequestBody,
+        @Part voice: MultipartBody.Part,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("sendVideoNote")
+    fun sendVideoNote(
+        @Query("chat_id") chatId: ChatId,
+        @Query("video_note") videoNote: String,
+        @Query("duration") duration: Int? = null,
+        @Query("length") length: Int? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendVideoNote")
+    fun sendVideoNote(
+        @Part("chat_id") chatId: RequestBody,
+        @Part videoNote: MultipartBody.Part,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("length") length: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
     /**
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
@@ -297,6 +429,97 @@ interface TelegramService {
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null
     ): Call<MessageResponseArray>
+
+    @POST("sendLocation")
+    fun sendLocation(
+        @Query("chat_id") chatId: ChatId,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("horizontal_accuracy") horizontalAccuracy: Double? = null,
+        @Query("live_period") livePeriod: Int? = null,
+        @Query("heading") heading: Int? = null,
+        @Query("proximity_alert_radius") proximityAlertRadius: Int? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("editMessageLiveLocation")
+    fun editMessageLiveLocation(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("horizontal_accuracy") horizontalAccuracy: Double? = null,
+        @Query("heading") heading: Int? = null,
+        @Query("proximity_alert_radius") proximityAlertRadius: Int? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse> // TODO On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+
+    @POST("stopMessageLiveLocation")
+    fun stopMessageLiveLocation(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse> // TODO On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+
+    @POST("sendVenue")
+    fun sendVenue(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("title") title: String,
+        @Query("address") address: String,
+        @Query("foursquare_id") foursquareId: String? = null,
+        @Query("foursquare_type") foursquareType: String? = null,
+        @Query("google_place_id") googlePlaceId: String? = null,
+        @Query("google_place_type") googlePlaceType: String? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("sendContact")
+    fun sendContact(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("phone_number") phoneNumber: String,
+        @Query("first_name") firstName: String,
+        @Query("last_name") lastName: String? = null,
+        @Query("vcard") vcard: String? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("sendPoll")
+    fun sendPoll(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("question") question: String,
+        @Query("options") options: String,
+        @Query("is_anonymous") isAnonymous: Boolean? = null,
+        @Query("type") type: PollType? = null,
+        @Query("allows_multiple_answers") allowsMultipleAnswers: Boolean? = null,
+        @Query("correct_option_id") correctOptionId: Int? = null,
+        @Query("explanation") explanation: String? = null,
+        @Query("explanation_parse_mode") explanationParseMode: String? = null,
+        @Query("explanation_entities") explanationEntities: String? = null,
+        @Query("open_period") openPeriod: Int? = null,
+        @Query("close_date") closeDate: Int? = null,
+        @Query("is_closed") isClosed: Boolean? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
 
     @POST("editMessageText")
     fun editMessageText(
@@ -608,17 +831,6 @@ interface TelegramService {
         @Query("switch_pm_parameter") switchPmParameter: String? = null,
     ): Call<BooleanResponse>
 
-    /**
-     * Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat,
-     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator
-     * right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns True on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     * (in the format `@channelusername`)
-     * @param messageId Identifier of a message to pin
-     * @param disableNotification Pass True, if it is not necessary to send a notification to all chat members
-     * about the new pinned message. Notifications are always disabled in channels and private chats.
-     * */
     @POST("pinChatMessage")
     fun pinChatMessage(
         @Query("chat_id") chatId: ChatId,
@@ -626,32 +838,13 @@ interface TelegramService {
         @Query("disable_notification") disableNotification: Boolean? = null,
     ): Call<BooleanResponse>
 
-    /**
-     * Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a
-     * private chat, the bot must be an administrator in the chat for this to work and must have the
-     * 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
-     * Returns True on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     * (in the format `@channelusername`)
-     * @param messageId Identifier of a message to unpin.
-     * If not specified, the most recent pinned message (by sending date) will be unpinned.
-     * */
+
     @POST("unpinChatMessage")
     fun unpinChatMessage(
         @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int? = null
     ): Call<BooleanResponse>
 
-    /**
-     * Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat,
-     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages'
-     * administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
-     * Returns True on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     * (in the format `@channelusername`)
-     * */
     @POST("unpinAllChatMessages")
     fun unpinAllChatMessages(
         @Query("chat_id") chatId: ChatId

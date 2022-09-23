@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.utils
 
-import ru.raysmith.tgbot.model.bot.MessageText
-import ru.raysmith.tgbot.model.bot.MessageTextType
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 
 inline fun buildHTMLString(

@@ -17,12 +17,6 @@ import ru.raysmith.tgbot.network.TelegramApi
 data class ReplyKeyboardRemove(
 
     /**
-     * Requests clients to remove the custom keyboard (user will not be able to summon this keyboard; if you want
-     * to hide the keyboard from sight but keep it accessible, use *[one_time_keyboard][ReplyKeyboardMarkup.oneTimeKeyboard]* in [ReplyKeyboardMarkup])
-     * */
-    @SerialName("remove_keyboard") @Required val removeKeyboard: Boolean = true,
-
-    /**
      * Use this parameter if you want to show the keyboard to specific users only. Targets:
      * - users that are &#064;mentioned in the *text* of the [Message] object;
      * - if the bot's message is a reply (has *reply_to_message_id*), sender of the original message.
@@ -32,6 +26,15 @@ data class ReplyKeyboardRemove(
      * */
     @SerialName("selective") @Contextual val selective: Boolean? = null
 ) : KeyboardMarkup() {
+
+    /**
+     * Requests clients to remove the custom keyboard (user will not be able to summon this keyboard; if you want
+     * to hide the keyboard from sight but keep it accessible, use *[one_time_keyboard][ReplyKeyboardMarkup.oneTimeKeyboard]* in [ReplyKeyboardMarkup])
+     * */
+    @Required
+    @SerialName("remove_keyboard")
+    val removeKeyboard: Boolean = true
+
     override fun toString(): String {
         return TelegramApi.json.encodeToJsonElement(this).toString()
     }

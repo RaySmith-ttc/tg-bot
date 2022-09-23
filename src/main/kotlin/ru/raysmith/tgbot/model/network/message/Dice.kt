@@ -14,3 +14,4 @@ data class Dice(
     @SerialName("value") val value: Int
 
 )
+

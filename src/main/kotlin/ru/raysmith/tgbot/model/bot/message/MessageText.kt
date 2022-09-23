@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message
 
 import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.core.Bot
@@ -7,13 +7,9 @@ import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
-
-enum class MessageTextType(val maxLength: Int) {
-    TEXT(IMessage.MAX_TEXT_LENGTH),
-    CAPTION(IMessage.MAX_CAPTION_LENGTH)
-}
 
 /**
  * Represents message text or caption as string with entities
@@ -92,6 +88,7 @@ class MessageText(private val type: MessageTextType) {
     fun textMention(text: String?, user: User) = appendEntity(MessageEntityType.TEXT_MENTION, text, user = user)
 
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
+    fun datePickerMessageText(datePicker: DatePicker, data: String? = null) = datePicker.messageText(this, data, datePicker.startWithState)
 
     // TODO test
     fun mix(text: Any?, url: String? = null, language: String? = null, user: User? = null, vararg types: MessageEntityType): MessageText {
@@ -190,10 +187,11 @@ class MessageText(private val type: MessageTextType) {
             entities.forEachIndexed { i, entity ->
                 if (i != 0 && i != entities.size - 1 &&
                     (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (
-                            ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
-                            ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
+                        ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
+                        ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
                     )
                 ) {
+                    // TODO show text with problem
                     throw IllegalStateException("MarkdownV2 not allowed to append italic and underline entities. Use the mix method or create an HTML string instead")
                 }
             }
@@ -263,6 +261,7 @@ class MessageText(private val type: MessageTextType) {
     }
 
     fun appendEntity(type: MessageEntityType, text: Any?, url: String? = null, language: String? = null, user: User? = null): MessageText {
+        if (!printNulls && text == null) return this
         text.toString().also { t ->
             entities.add(MessageEntity(type, offset = this.text.length, t.length, url = url, language = language, user = user))
             this.text.append(t)

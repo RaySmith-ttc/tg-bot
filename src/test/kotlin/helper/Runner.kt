@@ -14,9 +14,9 @@ import ru.raysmith.tgbot.core.handler.isCommand
 import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.MessageText
-import ru.raysmith.tgbot.model.bot.buildInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.InlineQueryResultArticle
 import ru.raysmith.tgbot.model.network.InputTextMessageContent
@@ -30,6 +30,7 @@ import ru.raysmith.tgbot.model.network.media.inputStream
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
 import ru.raysmith.tgbot.network.TelegramApi
@@ -41,8 +42,10 @@ import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import java.io.File
 import java.io.IOException
+import java.time.LocalDate
 import java.util.*
 import kotlin.properties.Delegates
+import kotlin.time.Duration.Companion.minutes
 
 val ME = botContext {
     getMe()
@@ -50,6 +53,15 @@ val ME = botContext {
 
 val datePicker = DatePicker("sys").apply {
     locale = Locale.forLanguageTag("us")
+    messageText = { data, state ->
+        bold("Title").n()
+        n()
+        text("Data: $data").n()
+        text("State: $state").n()
+    }
+    dates = {
+        LocalDate.of(2022, 9, 1)..LocalDate.of(2022, 9, 21)
+    }
 //    monthLimitBack = 5
 //    monthLimitForward = 3
 //    allowFutureDays = false
@@ -65,7 +77,7 @@ val datePicker = DatePicker("sys").apply {
     yearsColumns = 6
     yearsRows = 4
 
-    startWithState = DatePickerState.YEAR
+    startWithState = DatePickerState.DAY
 
     additionalRowsPosition = AdditionalRowsPosition.TOP
     additionalRows = {
@@ -234,6 +246,7 @@ class Runner {
                                     row {
                                         button("hello", "hello")
                                         button("world", "${CALLBACK_PREFIX}world")
+                                        row {  }
                                     }
                                     row {
                                         button {
@@ -616,10 +629,7 @@ class Runner {
 
                         isCommand("dp") {
                             send {
-                                text = "Date Picker"
-                                inlineKeyboard {
-                                    createDatePicker(datePicker)
-                                }
+                                datePicker(datePicker, "somedata")
                             }
                         }
 
@@ -794,6 +804,102 @@ class Runner {
                             send {
                                 text = generateString(5000)
                                 safeTextLength = true
+                            }
+                        }
+
+                        isCommand("video") {
+                            sendVideo {
+                                captionWithEntities {
+                                    bold("Title").n()
+                                    n()
+                                    text("Body")
+                                }
+                                video = "files/video1.mp4".asResources().asTgFile()
+                                duration = 30
+                                width = 640
+                                height = 360
+                                supportsStreaming = false
+                            }
+                        }
+
+                        isCommand("video_group") {
+                            sendVideoMediaGroup {
+                                video("files/video1.mp4".asResources().asTgFile()) {
+                                    bold("Title").n()
+                                    n()
+                                    text("Body")
+                                }
+                                video("files/video2.webm".asResources().asTgFile())
+                            }
+                        }
+
+                        isCommand("animation") {
+                            sendAnimation {
+                                captionWithEntities {
+                                    bold("Title").n()
+                                    n()
+                                    text("Body")
+                                }
+                                animation = "files/anim1.gif".asResources().asTgFile()
+                            }
+                        }
+
+                        isCommand("location") {
+                            sendLocation(56.843139, 60.596065) {
+                                inlineKeyboard {
+                                    row("Test", " ")
+                                }
+                            }
+                        }
+
+                        isCommand("editMessageLiveLocation") {
+                            var lat = 56.843139
+                            var heading = 0
+                            val message = sendLocation(lat, 60.596065) {
+                                this.heading = heading
+                                this.livePeriod = 1.minutes
+                                inlineKeyboard {
+                                    row("Test", " ")
+                                }
+                            }
+
+                            repeat(25) {
+                                lat += 0.001
+                                heading += 5
+                                editMessageLiveLocation(lat, 60.596065, messageId = message.messageId) {
+                                    this.heading = heading
+                                    inlineKeyboard {
+                                        row("Test", " ")
+                                    }
+                                }
+                                Thread.sleep(2000)
+                            }
+                        }
+
+                        isCommand("venue") {
+                            sendVenue(-33.8670522,151.1957362, "Test", "ул. Пушкина, д. Колотушкина") {
+                                googlePlaceId = "ChIJrTLr-GyuEmsRBfy61i59si0"
+                                googlePlaceType = "restaurant"
+                            }
+                        }
+
+                        isCommand("contact") {
+                            sendContact("=79827304599", "Ray") {
+                                lastName = "Smith"
+                                inlineKeyboard {
+                                    row("Test", " ")
+                                }
+                            }
+                        }
+
+                        isCommand("poll") {
+                            sendPoll("Question", listOf("1", "2", "3")) {
+                                type = PollType.QUIZ
+                                correctOptionId = 0
+                                explanationWithEntities {
+                                    bold("Expl: ").text("Wrong answer")
+                                }
+                                openPeriod = 5
                             }
                         }
                     }

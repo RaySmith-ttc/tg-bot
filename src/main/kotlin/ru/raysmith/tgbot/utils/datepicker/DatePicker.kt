@@ -2,7 +2,8 @@ package ru.raysmith.tgbot.utils.datepicker
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import java.time.*
 import java.time.format.TextStyle
@@ -42,10 +43,12 @@ class DatePicker(val callbackQueryPrefix: String) {
             field = value
         }
 
-    var defaultMessageText = "Pick the date"
-    var yearsPickMessageText = { defaultMessageText }
-    var monthPickMessageText: (year: Int) -> String = { _ -> defaultMessageText }
-    var dayPickMessageText: (year: Int, month: Int) -> String = { _, _ -> defaultMessageText }
+    var messageText: MessageText.(data: String?, state: DatePickerState) -> Unit = { _, _ -> text("Pick the date") }
+
+//    var defaultMessageText = "Pick the date"
+//    var yearsPickMessageText = { defaultMessageText }
+//    var monthPickMessageText: (year: Int) -> String = { _ -> defaultMessageText }
+//    var dayPickMessageText: (year: Int, month: Int) -> String = { _, _ -> defaultMessageText }
 
     var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
     var additionalRows: MessageInlineKeyboard.(data: String?) -> Unit = { }
@@ -54,7 +57,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var timeZone = ZoneId.systemDefault()
     var locale = Bot.Config.locale
 
-    private val now = LocalDate.now(timeZone)
+    private val now get() = LocalDate.now(timeZone)
 
     var initDate: LocalDate = now
     var startWithState = DatePickerState.DAY
@@ -111,7 +114,7 @@ class DatePicker(val callbackQueryPrefix: String) {
                 when {
                     datePickerData.yearPage != null -> {
                         edit {
-                            text = yearsPickMessageText()
+                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.YEAR) }
                             inlineKeyboard {
                                 setupMarkup(DatePickerState.YEAR, datePickerData.additionalData) {
                                     setupYearsMarkup(datePickerData.yearPage, datePickerData.additionalData)
@@ -121,7 +124,7 @@ class DatePicker(val callbackQueryPrefix: String) {
                     }
                     datePickerData.y != null && datePickerData.m != null -> {
                         edit {
-                            text = dayPickMessageText(datePickerData.y, datePickerData.m)
+                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.DAY) }
                             inlineKeyboard {
                                 setupMarkup(DatePickerState.DAY, datePickerData.additionalData) {
                                     setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData)
@@ -131,7 +134,7 @@ class DatePicker(val callbackQueryPrefix: String) {
                     }
                     datePickerData.y != null && datePickerData.m == null -> {
                         edit {
-                            text = monthPickMessageText(datePickerData.y)
+                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.MONTH) }
                             inlineKeyboard {
                                 setupMarkup(DatePickerState.MONTH, datePickerData.additionalData) {
                                     setupMonthsMarkup(datePickerData.y, datePickerData.additionalData)
@@ -304,6 +307,11 @@ class DatePicker(val callbackQueryPrefix: String) {
             }
 
             when {
+                !allowPastByDates && !allowFutureByDates -> {
+                    repeat(datesRange.start.dayOfMonth - 1) { add(-1) }
+                    addAll(datesRange.start.dayOfMonth..datesRange.endInclusive.dayOfMonth)
+                    repeat(yearMonth.lengthOfMonth() - datesRange.endInclusive.dayOfMonth) { add(-1) }
+                }
                 !allowPastByDates -> {
                     repeat(datesRange.start.dayOfMonth - 1) { add(-1) }
                     addAll(datesRange.start.dayOfMonth..yearMonth.lengthOfMonth())

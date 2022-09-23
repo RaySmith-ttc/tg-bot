@@ -1,29 +1,39 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message.media
 
 import kotlinx.serialization.encodeToString
 import okhttp3.RequestBody.Companion.toRequestBody
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
-class PhotoMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaMessage() {
+class AudioMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaMessageWithThumb() {
 
-    var photo: InputFile?
+    var audio: InputFile?
         get() = media
         set(value) { media = value }
 
-    override val mediaName: String = "photo"
+    var title: String? = null
+    var duration: Int? = null
+    var performer: String? = null
 
-    override fun send(chatId: ChatId) = when(photo) {
+    override val mediaName: String = "audio"
+
+    override fun send(chatId: ChatId): MessageResponse = when(audio) {
         is InputFile.ByteArray, is InputFile.File -> {
-            service.sendPhoto(
+            service.sendAudio(
                 chatId = chatId.toRequestBody(),
-                photo = getMediaMultipartBody(),
+                audio = getMediaMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
                 captionEntities = _caption?.getEntitiesString()?.toRequestBody(),
+                duration = duration?.toString()?.toRequestBody(),
+                performer = performer?.toRequestBody(),
+                title = title?.toRequestBody(),
+                thumb = getThumbMultipartBody(),
                 disableNotification = disableNotification?.toString()?.toRequestBody(),
                 protectContent = protectContent?.toString()?.toRequestBody(),
                 replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
@@ -32,12 +42,15 @@ class PhotoMessage(override val service: TelegramService, override val fileServi
             ).execute().body() ?: errorBody()
         }
         is InputFile.FileIdOrUrl -> {
-            service.sendPhoto(
+            service.sendAudio(
                 chatId = chatId,
-                photo = (media as InputFile.FileIdOrUrl).value,
+                audio = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,
                 captionEntities = _caption?.getEntitiesString(),
+                duration = duration,
+                performer = performer,
+                title = title,
                 disableNotification = disableNotification,
                 protectContent = protectContent,
                 replyToMessageId = replyToMessageId,
@@ -48,3 +61,4 @@ class PhotoMessage(override val service: TelegramService, override val fileServi
         null -> error("$mediaName is required")
     }
 }
+

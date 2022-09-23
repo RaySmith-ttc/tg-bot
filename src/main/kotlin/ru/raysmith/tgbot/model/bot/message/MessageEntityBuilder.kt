@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntity

@@ -25,3 +25,4 @@ data class Location(
     /** Maximum distance for proximity alerts about approaching another chat member, in meters. For sent live locations only. */
     @SerialName("proximity_alert_radius") val proximityAlertRadius: Int? = null,
 )
+

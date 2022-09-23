@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.utils
 
 import org.jetbrains.exposed.sql.SizedIterable
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 
 class Pagination<T>(

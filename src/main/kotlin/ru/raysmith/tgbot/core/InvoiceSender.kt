@@ -5,8 +5,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.InlineKeyboardCreator
-import ru.raysmith.tgbot.model.bot.MessageKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice

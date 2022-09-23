@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.125"
+version = "0.0.1-alpha.143"
 
 repositories {
     mavenCentral()
@@ -48,7 +48,7 @@ java {
 dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j:2.17.2")
@@ -83,8 +83,8 @@ dependencies {
 tasks {
     withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
-            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+            freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
+            freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
             jvmTarget = JavaVersion.VERSION_1_8.toString()
         }
     }

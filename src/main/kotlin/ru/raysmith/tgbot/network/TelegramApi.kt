@@ -14,10 +14,9 @@ import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.bot.ChatIdConverterFactory
-import ru.raysmith.tgbot.model.bot.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.MessageKeyboard
-import ru.raysmith.tgbot.model.bot.MessageReplyKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageReplyKeyboard
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.command.*
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup

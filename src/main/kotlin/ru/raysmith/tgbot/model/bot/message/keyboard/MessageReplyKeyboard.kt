@@ -1,24 +1,10 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message.keyboard
 
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardButton
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 
 @Serializable
-@KeyboardDsl
-class RemoveKeyboard : MessageKeyboard {
-    var selective: Boolean? = null
-
-    override fun toMarkup(): KeyboardMarkup {
-        return ReplyKeyboardRemove(selective = selective)
-    }
-
-}
-
-@Serializable
-@KeyboardDsl
 class MessageReplyKeyboard : MessageKeyboard {
     var resizeKeyboard: Boolean? = true
     var oneTimeKeyboard: Boolean? = null

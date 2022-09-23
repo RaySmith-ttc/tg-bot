@@ -22,16 +22,15 @@ import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
 
-private var stoppingJob: Job? = null
-private var job = SupervisorJob()
-
 // TODO impl string-length safe util (sendMessage -> text.take(4096))
 class Bot(
     val token: String? = null,
     val timeout: Int = 50,
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + job),
+    val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     var lastUpdateId: Int? = null,
 ) : ApiCaller {
+
+    private var stoppingJob: Job? = null
 
     // callbacks
     private var onError: (e: Exception) -> Unit = { }
@@ -289,7 +288,7 @@ class Bot(
         updateRequest?.cancel()
         stoppingJob = scope.launch {
             logger.info("Waiting all processing updates...")
-            job.children.forEach {
+            scope.coroutineContext[Job]!!.children.forEach {
                 it.cancelAndJoin()
             }
 

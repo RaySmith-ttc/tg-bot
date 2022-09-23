@@ -1,26 +1,15 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message.keyboard
 
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.core.HandlerDsl
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.IKeyboardButton
 import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
-import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.Pagination
-
-interface MessageKeyboardRow <T : MessageKeyboardButton> : Iterable<T> {
-    fun getRow(): List<T>
-    fun button(button: T)
-}
-interface MessageKeyboardButton {
-    fun toKeyboardButton(): IKeyboardButton
-}
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
 // TODO [kodoctor] remove serializable & row & button; move inner classes
 @Serializable
-@KeyboardDsl
 class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()) : MessageKeyboard, Iterable<MessageInlineKeyboard.MessageInlineKeyboardRow> {
     fun getRows(): List<MessageInlineKeyboardRow> = rows
 

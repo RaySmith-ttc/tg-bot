@@ -6,12 +6,14 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.BotContextDsl
 import ru.raysmith.tgbot.utils.errorBody
 
 /** Allows to change a bot for the [handler][T] */
-interface BotContext<T : EventHandler> : ChatIdHolder, ApiCaller {
+interface BotContext<T : EventHandler> : ISender {
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
+    @BotContextDsl
     fun withBot(bot: Bot, block: BotContext<T>.() -> Any)
 
     /**
@@ -45,21 +47,6 @@ interface BotContext<T : EventHandler> : ChatIdHolder, ApiCaller {
         return service.sendMessage(
             chatId, text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
             replyToMessageId, allowSendingWithoutReply, keyboardMarkup
-        ).execute().body()?.result ?: errorBody()
-    }
-
-    fun editMessageText(
-        messageId: Int? = null,
-        inlineMessageId: String? = null,
-        text: String,
-        parseMode: ParseMode? = null,
-        entities: String? = null,
-        disableWebPagePreview: Boolean? = null,
-        replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
-    ): Message {
-        return service.editMessageText(
-            chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview, replyMarkup
         ).execute().body()?.result ?: errorBody()
     }
 
@@ -123,6 +110,21 @@ interface BotContext<T : EventHandler> : ChatIdHolder, ApiCaller {
         ).execute().body()?.result ?: errorBody()
     }
 
+    fun editMessageText(
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        text: String,
+        parseMode: ParseMode? = null,
+        entities: String? = null,
+        disableWebPagePreview: Boolean? = null,
+        replyMarkup: KeyboardMarkup? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): Message {
+        return service.editMessageText(
+            chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview, replyMarkup
+        ).execute().body()?.result ?: errorBody()
+    }
+
     fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()) =
         service.deleteMessage(chatId, messageId).execute().body()?.result ?: errorBody()
 
@@ -133,5 +135,48 @@ interface BotContext<T : EventHandler> : ChatIdHolder, ApiCaller {
      * */
     fun sendInvoice(chatId: ChatId = this.getChatIdOrThrow(), buildAction: InvoiceSender.() -> Unit): Message {
         return InvoiceSender(service, fileService).apply(buildAction).send(chatId).result
+    }
+
+    /**
+     * Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat,
+     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator
+     * right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of a message to pin
+     * @param disableNotification Pass True, if it is not necessary to send a notification to all chat members
+     * about the new pinned message. Notifications are always disabled in channels and private chats.
+     * */
+    fun pinChatMessage(chatId: ChatId, messageId: Int, disableNotification: Boolean? = null,): Boolean {
+        return service.pinChatMessage(chatId, messageId, disableNotification).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a
+     * private chat, the bot must be an administrator in the chat for this to work and must have the
+     * 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
+     * Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of a message to unpin.
+     * If not specified, the most recent pinned message (by sending date) will be unpinned.
+     * */
+    fun unpinChatMessage(chatId: ChatId, messageId: Int? = null): Boolean {
+        return service.unpinChatMessage(chatId, messageId).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat,
+     * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages'
+     * administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
+     * Returns True on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * */
+    fun unpinAllChatMessages(chatId: ChatId): Boolean {
+        return service.unpinAllChatMessages(chatId).execute().body()?.result ?: errorBody()
     }
 }

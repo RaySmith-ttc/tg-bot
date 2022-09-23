@@ -2,15 +2,20 @@ package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.Location
+import ru.raysmith.tgbot.model.network.Poll
 import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.model.network.Venue
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
+import ru.raysmith.tgbot.network.TelegramService
 
 @Serializable
 /** This object represents a message. */
@@ -119,15 +124,13 @@ data class Message(
 
     // TODO [game support] add game field (https://core.telegram.org/bots/api#message)
 
-    // TODO [poll support]
-//    /** Message is a native poll, information about the poll */
-//    @SerialName("poll") val poll: Poll? = null,
-//
-    // TODO [venue support]
-//    /** Message is a venue, information about the venue. For backward compatibility, when this field is set, the location field will also be set */
-//    @SerialName("venue") val venue: Venue? = null,
+    /** Message is a native poll, information about the poll */
+    @SerialName("poll") val poll: Poll? = null,
 
     /** Message is a venue, information about the venue. For backward compatibility, when this field is set, the location field will also be set */
+    @SerialName("venue") val venue: Venue? = null,
+
+    /** Message is a shared location, information about the location */
     @SerialName("location") val location: Location? = null,
 
     /** New members that were added to the group or supergroup and information about them (the bot itself may be one of these members) */
@@ -254,6 +257,7 @@ data class Message(
         else -> null
     }
 
+    // TODO
     /**
      * Use this method to delete a message, including service messages, with the following limitations:
      * - A message can only be deleted if it was sent less than 48 hours ago.
@@ -266,8 +270,14 @@ data class Message(
      *
      * Returns True on success.
      * */
-    fun delete() = TelegramApi.service.deleteMessage(chat.id, messageId).execute().body()?.result ?: false
+    fun delete(context: BotContext<*>) = delete(context.service)
+    fun delete(service: TelegramService) = service.deleteMessage(chat.id, messageId).execute().body()?.result ?: false
+    fun delete(bot: Bot) = delete(bot.service)
+    fun delete(token: String) = delete(TelegramApi.serviceWithToken(token))
 
     /** A safe version of the [delete] method that does not throw a [TelegramApiException]. Return true if message success deleted */
-    fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }
+    fun safeDelete(service: TelegramService) = try { delete(service) } catch (e: TelegramApiException) { false }
+    fun safeDelete(bot: Bot) = safeDelete(bot.service)
+    fun safeDelete(token: String) = safeDelete(TelegramApi.serviceWithToken(token))
+    fun safeDelete(context: BotContext<*>) = safeDelete(context.service)
 }

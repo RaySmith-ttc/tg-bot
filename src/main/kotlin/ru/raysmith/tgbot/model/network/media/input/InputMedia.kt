@@ -15,5 +15,7 @@ import kotlinx.serialization.Serializable
 @Polymorphic
 @Serializable
 sealed class InputMedia {
+
+    /** Type of the result */
     abstract val type: String
 }

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.bot
 
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
@@ -9,55 +8,9 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody
-import retrofit2.Converter
-import retrofit2.Retrofit
-import java.lang.reflect.Type
-
-internal class ChatIdConverterFactory : Converter.Factory() {
-    override fun requestBodyConverter(
-        type: Type,
-        parameterAnnotations: Array<out Annotation>,
-        methodAnnotations: Array<out Annotation>,
-        retrofit: Retrofit
-    ): Converter<*, RequestBody>? {
-        if (type != ChatId::class.java) return null
-
-        return Converter<ChatId, RequestBody> { chatId -> chatId.toRequestBody() }
-    }
-
-    override fun stringConverter(
-        type: Type,
-        annotations: Array<out Annotation>,
-        retrofit: Retrofit
-    ): Converter<*, String>? {
-        if (type != ChatId::class.java) return null
-
-        return Converter<ChatId, String> { chatId -> chatId.toStringValue() }
-    }
-
-    override fun responseBodyConverter(
-        type: Type,
-        annotations: Array<out Annotation>,
-        retrofit: Retrofit
-    ): Converter<ResponseBody, *>? {
-        if (type != ChatId::class.java) return null
-
-        return Converter<ResponseBody, ChatId?> { body -> body.string().toLongOrNull()?.let { ChatId.of(it) } }
-    }
-}
-
-object ChatIdSerializer : JsonContentPolymorphicSerializer<ChatId>(ChatId::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out ChatId> {
-        println("RES: ${element.jsonPrimitive.isString}")
-        return if (element.jsonPrimitive.isString) ChatId.UsernameSerializer else ChatId.IDSerializer
-    }
-}
+import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
 @Polymorphic
 @Serializable(with = ChatIdSerializer::class)

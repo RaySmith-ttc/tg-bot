@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
  * “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org),
  * “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text),
  * “strikethrough” (strikethrough text), “code” (monowidth string), “pre” (monowidth block),
- * “text_link” (for clickable text URLs), “text_mention” (for users without usernames)
+ * “text_link” (for clickable text URLs), “text_mention” (for users without usernames),
+ * “custom_emoji” (for inline custom emoji stickers)
  *
  * @see <a href="https://telegram.org/blog/edit#new-mentions">New Mentions</a>
  * */
@@ -29,5 +30,6 @@ enum class MessageEntityType {
     @SerialName("code") CODE,
     @SerialName("pre") PRE,
     @SerialName("text_link") TEXT_LINK,
-    @SerialName("text_mention") TEXT_MENTION;
+    @SerialName("text_mention") TEXT_MENTION,
+    @SerialName("custom_emoji") CUSTOM_EMOJI;
 }

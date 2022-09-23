@@ -1,19 +1,21 @@
-package ru.raysmith.tgbot.model.bot
+package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.MessageResponse
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.withSafeLength
 
-@DslMarker
-annotation class TextMessageDsl
-
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
 @TextMessageDsl
-class TextMessage(override val service: TelegramService, override val fileService: TelegramFileService) : EditableMessage, KeyboardCreator {
+class TextMessage(override val service: TelegramService, override val fileService: TelegramFileService) :
+    EditableMessage, KeyboardCreator {
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -78,5 +80,10 @@ class TextMessage(override val service: TelegramService, override val fileServic
             replyMarkup = keyboardMarkup?.toMarkup(),
             disableWebPagePreview = disableWebPagePreview
         ).execute().body() ?: errorBody()
+    }
+
+    fun datePicker(datePicker: DatePicker, data: String? = null) {
+        textWithEntities { datePickerMessageText(datePicker, data) }
+        inlineKeyboard { createDatePicker(datePicker, data) }
     }
 }

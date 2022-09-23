@@ -37,6 +37,12 @@ data class MessageEntity(
 
     /** For “pre” only, the programming language of the entity text */
     @SerialName("language") val language: String? = null,
+
+    /**
+     * For “custom_emoji” only, unique identifier of the custom emoji.
+     * Use [getCustomEmojiStickers](https://core.telegram.org/bots/api#getcustomemojistickers) to get full information about the sticker // TODO link to method
+     * */
+    @SerialName("custom_emoji_id") val customEmojiId: String? = null,
 ) {
 
     @Suppress("Deprecation")
