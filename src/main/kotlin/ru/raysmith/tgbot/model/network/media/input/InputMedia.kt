@@ -2,6 +2,8 @@ package ru.raysmith.tgbot.model.network.media.input
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import ru.raysmith.tgbot.network.TelegramApi
 
 /**
  * This object represents the content of a media message to be sent. It should be one of

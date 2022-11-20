@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
-import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 
 interface EditableMessage : IMessage<MessageResponse> {
 

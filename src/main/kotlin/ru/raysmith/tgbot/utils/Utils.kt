@@ -1,5 +1,10 @@
 package ru.raysmith.tgbot.utils
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.UnknownEventHandler
@@ -11,6 +16,12 @@ import ru.raysmith.tgbot.network.TelegramService
 
 // should never be called
 internal fun errorBody(): Nothing = throw NullPointerException("The method did not return a body")
+internal fun KSerializer<*>.fieldNotFound(filed: String): Nothing =
+    error("The ${descriptor.serialName} json object must contains '$filed'")
+internal fun KSerializer<*>.getPrimitive(element: JsonObject, field: String) =
+    element.jsonObject[field]?.jsonPrimitive?.content ?: fieldNotFound(field)
+internal fun KSerializer<*>.getJsonObject(element: JsonObject, field: String) =
+    element.jsonObject[field]?.jsonObject ?: fieldNotFound(field)
 
 fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.service, bot.fileService, withChatId)
 fun botContext(token: String, withChatId: ChatId? = null) = createBotContext(

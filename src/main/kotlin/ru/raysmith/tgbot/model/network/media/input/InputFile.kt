@@ -1,6 +1,10 @@
 package ru.raysmith.tgbot.model.network.media.input
 
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.nio.file.Files
 
 fun String.asTgFile() = InputFile.FileIdOrUrl(this)
 fun File.asTgFile() = InputFile.File(this)
@@ -27,4 +31,17 @@ sealed class InputFile {
             return byteArray.contentHashCode()
         }
     }
+}
+
+fun InputFile.toRequestBody(name: String) = when(this) {
+    is InputFile.ByteArray -> {
+        val body = byteArray.toRequestBody(mimeType.toMediaType())
+        MultipartBody.Part.createFormData(name, filename, body)
+    }
+    is InputFile.File -> {
+        val mimeType = Files.probeContentType(file.toPath()).toMediaType()
+        val body = file.readBytes().toRequestBody(mimeType)
+        MultipartBody.Part.createFormData(name, file.name, body)
+    }
+    is InputFile.FileIdOrUrl -> MultipartBody.Part.createFormData(name, value)
 }

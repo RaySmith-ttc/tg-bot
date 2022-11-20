@@ -185,14 +185,18 @@ class MessageText(private val type: MessageTextType) {
         }
         if (parseMode == ParseMode.MARKDOWNV2) {
             entities.forEachIndexed { i, entity ->
-                if (i != 0 && i != entities.size - 1 &&
+                if (i != 0 && i != entities.size - 1 && entity.offset + entity.length == entities[i + 1].offset &&
                     (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (
                         ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
                         ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
                     )
                 ) {
                     // TODO show text with problem
-                    throw IllegalStateException("MarkdownV2 not allowed to append italic and underline entities. Use the mix method or create an HTML string instead")
+                    throw IllegalStateException(
+                        "MarkdownV2 not allowed to append italic and underline entities. " +
+                                "Use the mix method for append both types, append another type " +
+                                "if you try to append two italic/underline in a row, or create an HTML string instead"
+                    )
                 }
             }
         }

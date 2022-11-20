@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.model.bot.message
 import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
-import ru.raysmith.tgbot.model.network.message.MessageRes
+import ru.raysmith.tgbot.model.network.response.MessageRes
 
 interface IMessage<T : MessageRes> : ApiCaller {
     companion object {

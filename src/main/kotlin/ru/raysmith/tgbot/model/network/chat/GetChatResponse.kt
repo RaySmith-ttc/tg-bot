@@ -9,3 +9,15 @@ data class GetChatResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("result") val result: Chat
 )
+
+@Serializable
+data class ChatMemberResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("result") val result: ChatMember
+)
+
+@Serializable
+data class ChatMembersResponse(
+    @SerialName("ok") val ok: Boolean,
+    @SerialName("result") val result: List<ChatMember>
+)

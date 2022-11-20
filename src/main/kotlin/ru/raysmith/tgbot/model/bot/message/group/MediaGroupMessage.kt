@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
-import ru.raysmith.tgbot.model.network.message.MessageResponseArray
+import ru.raysmith.tgbot.model.network.response.MessageResponseArray
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramFileService

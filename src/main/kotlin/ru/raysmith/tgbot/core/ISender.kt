@@ -7,10 +7,13 @@ import ru.raysmith.tgbot.model.bot.message.group.DocumentMediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.group.PhotoMediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.group.VideoMediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.media.*
+import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
+import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.toChatId
 
+// TODO add docs for methods
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, ApiCaller {
 
@@ -60,13 +63,13 @@ interface ISender : ChatIdHolder, ApiCaller {
     }
 
     fun editMessageLiveLocation(chatId: Long, latitude: Double, longitude: Double, messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit) = editMessageLiveLocation(latitude, longitude, chatId.toChatId(), messageId, inlineMessageId, message)
-    fun editMessageLiveLocation(latitude: Double, longitude: Double, chatId: ChatId? = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): MessageResponse {
+    fun editMessageLiveLocation(latitude: Double, longitude: Double, chatId: ChatId? = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse {
         return LocationMessage(latitude, longitude, service, fileService).apply(message).edit(chatId, messageId, inlineMessageId)
     }
 
-    fun stopMessageLiveLocation(chatId: Long, messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): Message = stopMessageLiveLocation(chatId.toChatId(), messageId, inlineMessageId, message)
-    fun stopMessageLiveLocation(chatId: ChatId = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): Message {
-        return LocationMessage(0.0, 0.0, service, fileService).apply(message).stop(chatId, messageId, inlineMessageId).result
+    fun stopMessageLiveLocation(chatId: Long, messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse = stopMessageLiveLocation(chatId.toChatId(), messageId, inlineMessageId, message)
+    fun stopMessageLiveLocation(chatId: ChatId = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse {
+        return LocationMessage(0.0, 0.0, service, fileService).apply(message).stop(chatId, messageId, inlineMessageId)
     }
 
     fun sendVenue(chatId: Long, latitude: Double, longitude: Double, title: String, address: String, message: VenueMessage.() -> Unit): Message = sendVenue(latitude, longitude, title, address, chatId.toChatId(), message)
@@ -82,6 +85,16 @@ interface ISender : ChatIdHolder, ApiCaller {
     fun sendPoll(chatId: Long, question: String, options: List<String>, message: PollMessage.() -> Unit): Message = sendPoll(question, options, chatId.toChatId(), message)
     fun sendPoll(question: String, options: List<String>, chatId: ChatId = getChatIdOrThrow(), message: PollMessage.() -> Unit): Message {
         return PollMessage(question, options, service, fileService).apply(message).send(chatId).result
+    }
+
+    fun sendDice(chatId: Long, emoji: String, message: DiceMessage.() -> Unit): Message = sendDice(emoji, chatId.toChatId(), message)
+    fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
+        return DiceMessage(emoji, service, fileService).apply(message).send(chatId).result
+    }
+
+    fun sendChatAction(chatId: Long, action: ChatAction): Boolean = sendChatAction(action, chatId.toChatId())
+    fun sendChatAction(action: ChatAction, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return service.sendChatAction(chatId, action).execute().body()?.result ?: errorBody()
     }
 
     fun sendAudioMediaGroup(chatId: Long, message: AudioMediaGroupMessage.() -> Unit): List<Message> = sendAudioMediaGroup(chatId.toChatId(), message)

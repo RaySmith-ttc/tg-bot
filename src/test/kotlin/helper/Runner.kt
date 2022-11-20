@@ -20,6 +20,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.InlineQueryResultArticle
 import ru.raysmith.tgbot.model.network.InputTextMessageContent
+import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
 import ru.raysmith.tgbot.model.network.chat.ChatMember
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeChat
@@ -32,7 +33,7 @@ import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
-import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
+import ru.raysmith.tgbot.model.network.menubutton.*
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
@@ -373,6 +374,66 @@ class Runner {
                             })
                         }
 
+                        isCommand("me") {
+                            send {
+                                textWithEntities {
+                                    text("userId: ").code(message.from?.id?.value).n()
+                                    text("chatId: ").code(message.chat.id.value).n()
+                                }
+                            }
+                        }
+
+                        isCommand("exportChatInviteLink") {
+                            send(exportChatInviteLink())
+                        }
+
+                        isCommand("createChatInviteLink") {
+                            send(createChatInviteLink().toString())
+                        }
+
+                        isCommand("setChatPhoto1") {
+                            setChatPhoto("files/image1.png".asResources().asTgFile())
+                        }
+
+                        isCommand("setChatPhoto2") {
+                            setChatPhoto("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile())
+                        }
+
+                        isCommand("deleteChatPhoto") {
+                            deleteChatPhoto()
+                        }
+
+                        isCommand("setChatStickerSet") {
+                            setChatStickerSet("thinking")
+                        }
+
+                        isCommand("testItalic") {
+                            val a = buildMarkdownV2String {
+                                text("Новое сообщение от врача пациенту ").let {
+                                    textLink("Неизвестный", "https://google.com")
+                                }.text(":").n()
+                                n()
+                                italic("some text")
+
+                                n()
+                                italic("[Go to google page(https://google.com)]")
+                            }
+                            println(a)
+                            send {
+                                textWithEntities {
+                                    italic("123").italic("321")
+                                }
+                            }
+                        }
+
+                        isCommand("getChatAdministrators") {
+                            send(buildString {
+                                getChatAdministrators().forEach {
+                                    append(it.toString())
+                                }
+                            })
+                        }
+
                         isCommand("exception") {
                             throw IOException("test")
                         }
@@ -427,6 +488,34 @@ class Runner {
                                     setupTestMessage(message)
                                 }
                             }
+                        }
+
+                        isCommand("setChatMenuButtonWeb") {
+                            setChatMenuButton(MenuButtonWebApp("text", WebAppInfo("https://google.com")))
+                            send("success")
+                        }
+
+                        isCommand("setChatMenuButtonDefault") {
+                            setChatMenuButton(MenuButtonDefault)
+                            send("success")
+                        }
+
+                        isCommand("setChatMenuButtonCommands") {
+                            setChatMenuButton(MenuButtonCommands)
+                            send("success")
+                        }
+
+                        isCommand("getChatMenuButton") {
+                            send(getChatMenuButton().toString())
+                        }
+
+                        isCommand("setMyDefaultAdministratorRights") {
+                            setMyDefaultAdministratorRights(ChatAdministratorRights(isAnonymous = true))
+                            send("success")
+                        }
+
+                        isCommand("getMyDefaultAdministratorRights") {
+                            send(getMyDefaultAdministratorRights().toString())
                         }
 
                         isCommand("mrkd2") {

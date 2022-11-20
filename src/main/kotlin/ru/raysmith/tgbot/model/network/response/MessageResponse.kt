@@ -1,8 +1,10 @@
-package ru.raysmith.tgbot.model.network.message
+package ru.raysmith.tgbot.model.network.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.*
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.MessageId
 
 interface MessageRes
 
@@ -10,7 +12,7 @@ interface MessageRes
 data class MessageResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("result") val result: Message
-) : MessageRes
+) : MessageRes, LiveLocationResponse()
 
 @Serializable
 data class MessageIdResponse(

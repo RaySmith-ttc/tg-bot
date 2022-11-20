@@ -1,7 +1,8 @@
-package ru.raysmith.tgbot.model.network
+package ru.raysmith.tgbot.model.network.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.network.User
 
 @Serializable
 data class GetMeResponse(

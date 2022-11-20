@@ -7,6 +7,7 @@ import retrofit2.Call
 import ru.raysmith.tgbot.core.handler.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 import ru.raysmith.tgbot.network.TelegramApi
@@ -47,7 +48,7 @@ class Bot(
 
     // states
     var isActive = false
-    private var updateRequest: Call<UpdatesResult>? = null
+    private var updateRequest: Call<NetworkResponse<List<Update>>>? = null
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
@@ -64,7 +65,7 @@ class Bot(
         val printNulls = properties.getOrDefault("printNulls", "false").toBoolean()
         val defaultProviderToken = properties?.getOrNull("providerToken")
         val emptyCallbackQuery = properties.getOrDefault("emptyCallbackQuery", " ")
-        val token = properties?.getOrNull("token")
+        val token = properties?.getOrNull("token") ?: System.getenv("BOT_TOKEN")
 
         val defaultRows: Int = properties.getOrDefault("pagination.rows", "5").toIntOrNull()
             ?: throw IllegalArgumentException("Property pagination.rows is not Int")

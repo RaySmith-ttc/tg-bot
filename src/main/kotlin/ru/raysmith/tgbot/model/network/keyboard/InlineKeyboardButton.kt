@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
+import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
 interface IKeyboardButton
 @Serializable

@@ -8,23 +8,29 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.BooleanResponse
-import ru.raysmith.tgbot.model.network.BotCommandsResponse
-import ru.raysmith.tgbot.model.network.GetMeResponse
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.chat.ChatAction
-import ru.raysmith.tgbot.model.network.chat.GetChatResponse
+import ru.raysmith.tgbot.model.network.*
+import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
-import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.*
+import ru.raysmith.tgbot.model.network.response.*
 import ru.raysmith.tgbot.model.network.updates.UpdatesResult
+import ru.raysmith.tgbot.model.network.menubutton.MenuButton
+import ru.raysmith.tgbot.model.network.updates.Update
 
 interface TelegramService {
+
+    @POST("getUpdates")
+    fun getUpdates(
+        @Query("offset") offset: Int? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("timeout") timeout: Int? = null,
+        @Query("allowed_updates") allowedUpdates: String? = null
+    ): Call<NetworkResponse<List<Update>>>
 
     /**
      * A simple method for testing your bot's auth token. Requires no parameters.
@@ -32,7 +38,7 @@ interface TelegramService {
      * Returns basic information about the bot in form of a [User] object.
      * */
     @POST("getMe")
-    fun getMe(): Call<GetMeResponse>
+    fun getMe(): Call<NetworkResponse<User>>
 
     /**
      * Use this method to log out from the cloud Bot API server before launching the bot locally.
@@ -41,7 +47,7 @@ interface TelegramService {
      * to log in back to the cloud Bot API server for 10 minutes. Returns *True* on success. Requires no parameters.
      * */
     @POST("logOut")
-    fun logOut(): Call<BooleanResponse>
+    fun logOut(): Call<NetworkResponse<Boolean>>
 
     /**
      * Use this method to close the bot instance before moving it from one local server to another.
@@ -50,7 +56,7 @@ interface TelegramService {
      * Returns *True* on success. Requires no parameters.
      * */
     @POST("close")
-    fun close(): Call<BooleanResponse>
+    fun close(): Call<NetworkResponse<Boolean>>
 
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
@@ -364,22 +370,6 @@ interface TelegramService {
     ): Call<MessageResponse>
 
     /**
-     * Use this method to get up to date information about the chat (current name of the user for one-on-one
-     * conversations, current username of a user, group or channel, etc.).
-     * Returns a [Chat][User] object on success.
-     * */
-    @POST("getChat")
-    fun getChat(@Query("chat_id") chatId: ChatId): Call<GetChatResponse>
-
-    @POST("getUpdates")
-    fun getUpdates(
-        @Query("offset") offset: Int? = null,
-        @Query("limit") limit: Int? = null,
-        @Query("timeout") timeout: Int? = null,
-        @Query("allowed_updates") allowedUpdates: String? = null
-    ): Call<UpdatesResult>
-
-    /**
      * Use this method to send a group of photos, videos, documents or audios as an album.
      * Documents and audio filescan be only grouped in an album with messages of the same type.
      * On success, an array of Messages that were sent is returned.
@@ -457,7 +447,7 @@ interface TelegramService {
         @Query("heading") heading: Int? = null,
         @Query("proximity_alert_radius") proximityAlertRadius: Int? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse> // TODO On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+    ): Call<LiveLocationResponse>
 
     @POST("stopMessageLiveLocation")
     fun stopMessageLiveLocation(
@@ -465,7 +455,7 @@ interface TelegramService {
         @Query("message_id") messageId: Int? = null,
         @Query("inline_message_id") inlineMessageId: String? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse> // TODO On success, if the edited message is not an inline message, the edited Message is returned, otherwise True is returned.
+    ): Call<LiveLocationResponse>
 
     @POST("sendVenue")
     fun sendVenue(
@@ -521,50 +511,221 @@ interface TelegramService {
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
 
-    @POST("editMessageText")
-    fun editMessageText(
+    @POST("sendDice")
+    fun sendDice(
         @Query("chat_id") chatId: ChatId? = null,
-        @Query("message_id") messageId: Int? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("text") text: String,
-        @Query("parse_mode") parseMode: ParseMode? = null,
-        @Query("entities") entities: String? = null,
-        @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+        @Query("emoji") emoji: String,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
     ): Call<MessageResponse>
 
-    @POST("editMessageCaption")
-    fun editMessageCaption(
+    @POST("sendChatAction")
+    fun sendChatAction(
         @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int? = null,
-        @Query("caption") caption: String,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("parse_mode") parseMode: ParseMode? = null
-    ): Call<MessageResponse>
+        @Query("action") action: ChatAction
+    ): Call<NetworkResponse<Boolean>>
 
-    @POST("editMessageMedia")
-    fun editMessageMedia(
+    @POST("getUserProfilePhotos")
+    fun getUserProfilePhotos(
+        @Query("user_id") userId: ChatId.ID,
+        @Query("offset") offset: Int? = null,
+        @Query("limit") limit: Int? = null,
+    ): Call<UserProfilePhotosResponse>
+
+    @POST("getFile")
+    fun getFile(
+        @Query("file_id") fileId: String
+    ): Call<FileResponse>
+
+    @POST("banChatMember")
+    fun banChatMember(
         @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int? = null,
-        @Query("media") media: InputMedia,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null
-    ): Call<MessageResponse>
+        @Query("user_id") userId: ChatId.ID,
+        @Query("until_date") untilDate: Int? = null,
+        @Query("revoke_messages") revokeMessages: Boolean? = null
+    ): Call<NetworkResponse<Boolean>>
 
-    @POST("editMessageReplyMarkup")
-    fun editMessageReplyMarkup(
-        @Query("chat_id") chatId: ChatId? = null,
-        @Query("message_id") messageId: Int? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse>
-
-    @POST("deleteMessage")
-    fun deleteMessage(
+    @POST("unbanChatMember")
+    fun unbanChatMember(
         @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int
-    ): Call<BooleanResponse>
+        @Query("user_id") userId: ChatId.ID,
+        @Query("only_if_banned") onlyIfBanned: Boolean? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("restrictChatMember")
+    fun restrictChatMember(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID,
+        @Query("permissions") permissions: ChatPermissions,
+        @Query("until_date") untilDate: Int? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("promoteChatMember")
+    fun promoteChatMember(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID,
+        @Query("is_anonymous") isAnonymous: Boolean? = null,
+        @Query("can_manage_chat") canManageChat: Boolean? = null,
+        @Query("can_post_messages") canPostMessages: Boolean? = null,
+        @Query("can_edit_messages") canEditMessages: Boolean? = null,
+        @Query("can_delete_messages") canDeleteMessages: Boolean? = null,
+        @Query("can_manage_video_chats") canManageVideoChats: Boolean? = null,
+        @Query("can_restrict_members") canRestrictMembers: Boolean? = null,
+        @Query("can_promote_members") canPromoteMembers: Boolean? = null,
+        @Query("can_change_info") canChangeInfo: Boolean? = null,
+        @Query("can_invite_users") canInviteUsers: Boolean? = null,
+        @Query("can_pin_messages") canPinMessages: Boolean? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setChatAdministratorCustomTitle")
+    fun setChatAdministratorCustomTitle(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID,
+        @Query("custom_title") customTitle: String,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("banChatSenderChat")
+    fun banChatSenderChat(
+        @Query("chat_id") chatId: ChatId,
+        @Query("sender_chat_id") senderChatId: ChatId.ID,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("unbanChatSenderChat")
+    fun unbanChatSenderChat(
+        @Query("chat_id") chatId: ChatId,
+        @Query("sender_chat_id") senderChatId: ChatId.ID,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setChatPermissions")
+    fun setChatPermissions(
+        @Query("chat_id") chatId: ChatId,
+        @Query("permissions") permissions: ChatPermissions,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("exportChatInviteLink")
+    fun exportChatInviteLink(
+        @Query("chat_id") chatId: ChatId
+    ): Call<StringResponse>
+
+    @POST("createChatInviteLink")
+    fun createChatInviteLink(
+        @Query("chat_id") chatId: ChatId,
+        @Query("name") name: String? = null,
+        @Query("expire_date") expireDate: Int? = null,
+        @Query("member_limit") memberLimit: Int? = null,
+        @Query("creates_join_request") createsJoinRequest: Boolean? = null,
+    ): Call<ChatInviteLinkResponse>
+
+    @POST("editChatInviteLink")
+    fun editChatInviteLink(
+        @Query("chat_id") chatId: ChatId,
+        @Query("invite_link") inviteLink: String,
+        @Query("name") name: String? = null,
+        @Query("expire_date") expireDate: Int? = null,
+        @Query("member_limit") memberLimit: Int? = null,
+        @Query("creates_join_request") createsJoinRequest: Boolean? = null,
+    ): Call<ChatInviteLinkResponse>
+
+    @POST("revokeChatInviteLink")
+    fun revokeChatInviteLink(
+        @Query("chat_id") chatId: ChatId,
+        @Query("invite_link") inviteLink: String,
+    ): Call<ChatInviteLinkResponse>
+
+    @POST("approveChatJoinRequest")
+    fun approveChatJoinRequest(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("declineChatJoinRequest")
+    fun declineChatJoinRequest(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID,
+    ): Call<NetworkResponse<Boolean>>
+
+    @Multipart
+    @POST("setChatPhoto")
+    fun setChatPhoto(
+        @Part("chat_id") chatId: RequestBody,
+        @Part photo: MultipartBody.Part
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteChatPhoto")
+    fun deleteChatPhoto(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setChatTitle")
+    fun setChatTitle(
+        @Query("chat_id") chatId: ChatId,
+        @Query("title") title: String
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setChatDescription")
+    fun setChatDescription(
+        @Query("chat_id") chatId: ChatId,
+        @Query("description") description: String? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("pinChatMessage")
+    fun pinChatMessage(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_id") messageId: Int,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+
+    @POST("unpinChatMessage")
+    fun unpinChatMessage(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_id") messageId: Int? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("unpinAllChatMessages")
+    fun unpinAllChatMessages(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("leaveChat")
+    fun leaveChat(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getChat")
+    fun getChat(
+        @Query("chat_id") chatId: ChatId
+    ): Call<GetChatResponse>
+
+    @POST("getChatAdministrators")
+    fun getChatAdministrators(
+        @Query("chat_id") chatId: ChatId
+    ): Call<ChatMembersResponse>
+
+    @POST("getChatMemberCount")
+    fun getChatMemberCount(
+        @Query("chat_id") chatId: ChatId
+    ): Call<IntResponse>
+
+    @POST("getChatMember")
+    fun getChatMember(
+        @Query("chat_id") chatId: ChatId,
+        @Query("user_id") userId: ChatId.ID
+    ): Call<ChatMemberResponse>
+
+    @POST("setChatStickerSet")
+    fun setChatStickerSet(
+        @Query("chat_id") chatId: ChatId,
+        @Query("sticker_set_name") stickerSetName: String
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteChatStickerSet")
+    fun deleteChatStickerSet(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
 
     @POST("answerCallbackQuery")
     fun answerCallbackQuery(
@@ -573,61 +734,50 @@ interface TelegramService {
         @Query("show_alert") showAlert: Boolean? = null,
         @Query("url") url: String? = null,
         @Query("cache_time") cacheTime: Int? = null
-    ): Call<BooleanResponse>
+    ): Call<NetworkResponse<Boolean>>
 
-    @POST("sendChatAction")
-    fun sendChatAction(
-        @Query("chat_id") chatId: ChatId,
-        @Query("action") action: ChatAction
-    ): Call<BooleanResponse>
+    @POST("setMyCommands")
+    fun setMyCommands(
+        @Query("commands") commandsJson: String,
+        @Query("scope") scope: BotCommandScope? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<Boolean>>
 
-    @POST("getFile")
-    fun getFile(
-        @Query("file_id") fileId: String
-    ): Call<FileResponse>
+    @POST("deleteMyCommands")
+    fun deleteMyCommands(
+        @Query("scope") scope: BotCommandScope? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<Boolean>>
 
-    /**
-     * Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels,
-     * the user will not be able to return to the chat on their own using invite links, etc., unless [unbanned][unbanChatMember] first.
-     * The bot must be an administrator in the chat for this to work and must have the appropriate admin rights.
-     * Returns True on success.
-     *
-     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
-     * (in the format `@channelusername`)
-     * @param userId Unique identifier of the target user
-     * @param untilDate Date when the user will be unbanned, unix time.
-     * If user is banned for more than 366 days or less than 30 seconds from the current time they are considered
-     * to be banned forever. Applied for supergroups and channels only.
-     * @param revokeMessages Pass True to delete all messages from the chat for the user that is being removed.
-     * If False, the user will be able to see messages in the group that were sent before the user was removed.
-     * Always True for supergroups and channels.
-     * */
-    @POST("banChatMember")
-    fun banChatMember(
-        @Query("chat_id") chatId: ChatId,
-        @Query("user_id") userId: Long,
-        @Query("until_date") untilDate: Int? = null,
-        @Query("revoke_messages") revokeMessages: Boolean? = null
-    ): Call<BooleanResponse>
+    @POST("getMyCommands")
+    fun getMyCommands(
+        @Query("scope") scope: BotCommandScope? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<List<BotCommand>>>
 
-    /**
-     * Use this method to unban a previously banned user in a supergroup or channel. The user will **not** return to the
-     * group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for
-     * this to work. By default, this method guarantees that after the call the user is not a member of the chat,
-     * but will be able to join it. So if the user is a member of the chat they will also be **removed** from the chat.
-     * If you don't want this, use the parameter only_if_banned. Returns True on success.
-     *
-     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
-     * (in the format @username)
-     * @param userId Unique identifier of the target user
-     * @param onlyIfBanned Do nothing if the user is not banned
-     * */
-    @POST("unbanChatMember")
-    fun unbanChatMember(
-        @Query("chat_id") chatId: ChatId,
-        @Query("user_id") userId: Long,
-        @Query("only_if_banned") onlyIfBanned: Boolean? = null
-    ): Call<BooleanResponse>
+    @POST("setChatMenuButton")
+    fun setChatMenuButton(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("menu_button") menuButton: String? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getChatMenuButton")
+    fun getChatMenuButton(
+        @Query("chat_id") chatId: ChatId? = null
+    ): Call<NetworkResponse<MenuButton>>
+
+    @POST("setMyDefaultAdministratorRights")
+    fun setMyDefaultAdministratorRights(
+        @Query("rights") rights: ChatAdministratorRights? = null,
+        @Query("for_channels") forChannels: Boolean? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getMyDefaultAdministratorRights")
+    fun getMyDefaultAdministratorRights(
+        @Query("for_channels") forChannels: Boolean? = null,
+    ): Call<NetworkResponse<ChatAdministratorRights>>
+
+
 
     /**
      * Use this method to send invoices. On success, the sent Message is returned.
@@ -729,7 +879,7 @@ interface TelegramService {
         @Query("pre_checkout_query_id") preCheckoutQueryId: String,
         @Query("ok") ok: Boolean,
         @Query("error_message") errorMessage: String? = null
-    ): Call<BooleanResponse>
+    ): Call<NetworkResponse<Boolean>>
 
     /**
      * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
@@ -750,52 +900,7 @@ interface TelegramService {
         @Query("ok") ok: Boolean,
         @Query("shipping_options") shippingOptions: String? = null,
         @Query("error_message") errorMessage: String? = null
-    ): Call<BooleanResponse>
-
-    /**
-     * Use this method to change the list of the bot's commands.
-     *
-     * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands. Returns True on success
-     * */
-    @POST("setMyCommands")
-    fun setMyCommands(
-        /** A JSON-serialized list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified. */
-        @Query("commands") commandsJson: String,
-
-        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
-        @Query("scope") scope: BotCommandScope? = null,
-
-        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
-        @Query("language_code") languageCode: String? = null
-    ): Call<BooleanResponse>
-
-    /**
-     * Use this method to delete the list of the bot's commands for the given scope and user language.
-     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns True on success.
-     * */
-    @POST("deleteMyCommands")
-    fun deleteMyCommands(
-
-        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
-        @Query("scope") scope: BotCommandScope? = null,
-
-        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
-        @Query("language_code") languageCode: String? = null
-    ): Call<BooleanResponse>
-
-    /**
-     * Use this method to get the current list of the bot's commands for the given scope and user language.
-     * Returns Array of [BotCommand] on success. If commands aren't set, an empty list is returned.
-     * */
-    @POST("getMyCommands")
-    fun getMyCommands(
-
-        /** A JSON-serialized object, describing scope of users for which the commands are relevant. Defaults to [BotCommandScopeDefault]. */
-        @Query("scope") scope: BotCommandScope? = null,
-
-        /** A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands */
-        @Query("language_code") languageCode: String? = null
-    ): Call<BotCommandsResponse>
+    ): Call<NetworkResponse<Boolean>>
 
     /**
      * Use this method to send answers to an inline query. On success, True is returned.
@@ -829,25 +934,51 @@ interface TelegramService {
         @Query("next_offset") nextOffset: String? = null,
         @Query("switch_pm_text") switchPmText: String? = null,
         @Query("switch_pm_parameter") switchPmParameter: String? = null,
-    ): Call<BooleanResponse>
+    ): Call<NetworkResponse<Boolean>>
 
-    @POST("pinChatMessage")
-    fun pinChatMessage(
+    @POST("editMessageText")
+    fun editMessageText(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("text") text: String,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("entities") entities: String? = null,
+        @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("editMessageCaption")
+    fun editMessageCaption(
         @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int,
-        @Query("disable_notification") disableNotification: Boolean? = null,
-    ): Call<BooleanResponse>
+        @Query("message_id") messageId: Int? = null,
+        @Query("caption") caption: String,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null
+    ): Call<MessageResponse>
 
-
-    @POST("unpinChatMessage")
-    fun unpinChatMessage(
+    @POST("editMessageMedia")
+    fun editMessageMedia(
         @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int? = null
-    ): Call<BooleanResponse>
+        @Query("message_id") messageId: Int? = null,
+        @Query("media") media: InputMedia,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null
+    ): Call<MessageResponse>
 
-    @POST("unpinAllChatMessages")
-    fun unpinAllChatMessages(
-        @Query("chat_id") chatId: ChatId
-    ): Call<BooleanResponse>
+    @POST("editMessageReplyMarkup")
+    fun editMessageReplyMarkup(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("deleteMessage")
+    fun deleteMessage(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_id") messageId: Int
+    ): Call<NetworkResponse<Boolean>>
 }
 

@@ -8,7 +8,8 @@ import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.response.MessageResponse
+import ru.raysmith.tgbot.model.network.media.input.toRequestBody
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import java.nio.file.Files
 
@@ -26,19 +27,12 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageR
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
 
-    protected fun getMediaMultipartBody() = when(media) {
-        is InputFile.ByteArray -> {
-            val media = media as InputFile.ByteArray
-            val body = media.byteArray.toRequestBody(media.mimeType.toMediaType())
-            MultipartBody.Part.createFormData(mediaName, media.filename, body)
+    protected fun getMediaMultipartBody(): MultipartBody.Part {
+        if (media is InputFile.FileIdOrUrl) {
+            error("Only ByteArray and File can be multipart")
         }
-        is InputFile.File -> {
-            val media = media as InputFile.File
-            val mimeType = Files.probeContentType(media.file.toPath()).toMediaType()
-            val body = media.file.readBytes().toRequestBody(mimeType)
-            MultipartBody.Part.createFormData(mediaName, media.file.name, body)
-        }
-        else -> error("Only ByteArray and File can be multipart")
+
+        return media?.toRequestBody(mediaName) ?: error("media must be not null")
     }
 }
 

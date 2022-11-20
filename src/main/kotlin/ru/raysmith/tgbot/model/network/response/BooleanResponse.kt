@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.model.network
+package ru.raysmith.tgbot.model.network.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -7,4 +7,5 @@ import kotlinx.serialization.Serializable
 data class BooleanResponse(
     @SerialName("ok") val ok: Boolean,
     @SerialName("result") val result: Boolean
-)
+) : LiveLocationResponse()
+

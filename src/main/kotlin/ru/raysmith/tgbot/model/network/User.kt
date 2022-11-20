@@ -2,7 +2,10 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.media.PhotoSize
+import ru.raysmith.tgbot.utils.errorBody
 
 @Serializable
 /** This object represents a Telegram user or bot. */
@@ -41,4 +44,29 @@ data class User(
 
     /** True, if the bot supports inline queries. Returned only in getMe. */
     @SerialName("supports_inline_queries") val supportsInlineQueries: Boolean? = null,
-)
+) {
+
+    /**
+     * Use this method to get a list of profile pictures for a user. Returns a list of list of [PhotoSize] object.
+     * @param context bot context
+     * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
+     * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+     * */
+    fun getProfilePhotos(context: ApiCaller, offset: Int? = null, limit: Int? = null): List<List<PhotoSize>> {
+        return context.getUserProfilePhotos(id, offset, limit).photos
+    }
+
+    /**
+     * Returns list of list of [PhotoSize] of all profile pictures for a user.
+     * @param context bot context
+     * */
+    fun getAllProfilePhotos(context: ApiCaller): List<List<PhotoSize>> = buildList {
+        var offset = 0
+        do {
+            val res = context.getUserProfilePhotos(id, offset)
+            addAll(res.photos)
+            offset += 100
+        } while (size < res.totalCount)
+    }
+
+}

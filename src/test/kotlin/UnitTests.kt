@@ -1,4 +1,5 @@
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -6,7 +7,13 @@ import kotlinx.serialization.serializer
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
+import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
+import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.utils.botContext
 import ru.raysmith.tgbot.utils.buildHTMLString
 import ru.raysmith.tgbot.utils.buildMarkdownString
 import ru.raysmith.tgbot.utils.buildMarkdownV2String
@@ -16,6 +23,49 @@ import java.time.LocalDate
 import kotlin.reflect.typeOf
 
 class UnitTests {
+
+    @Test
+    fun allPhotos() {
+        botContext {
+            val r = User(ChatId.ID(243562346), false, "").getAllProfilePhotos(this)
+            println(r)
+        }
+    }
+
+    @Test
+    fun ser() {
+        println(TelegramApi.json.encodeToString(MenuButtonDefault))
+    }
+
+    @Test
+    fun deserialize() {
+        val booleanRes = """
+            {
+                "ok": true,
+                "result": true
+            }
+        """.trimIndent()
+
+        val messageRes = """
+            {
+                "ok": true,
+                "result": {
+                    "message_id": 1,
+                    "date": 1,
+                    "chat": {
+                        "id": 1,
+                        "type": "private"
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val r1: LiveLocationResponse = Json.decodeFromString(booleanRes)
+        val r2: LiveLocationResponse = Json.decodeFromString(messageRes)
+
+        println(r1)
+        println(r2)
+    }
 
     @Test
     fun a() {

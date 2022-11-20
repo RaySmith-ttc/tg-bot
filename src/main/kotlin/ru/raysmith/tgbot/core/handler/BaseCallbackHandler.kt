@@ -1,7 +1,6 @@
 package ru.raysmith.tgbot.core.handler
 
 import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
-import ru.raysmith.tgbot.model.network.BooleanResponse
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
@@ -14,7 +13,7 @@ open class BaseCallbackHandler(open val query: CallbackQuery, open val service: 
     fun answer(text: String) = answer { this.text = text }
     fun alert(text: String) = answer { this.text = text; showAlert = true }
 
-    override fun answer(init: AnswerCallbackQuery.() -> Unit): BooleanResponse {
+    override fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean {
         return AnswerCallbackQuery().apply(init).let {
             service.answerCallbackQuery(
                 callbackQueryId = query.id,
@@ -27,7 +26,7 @@ open class BaseCallbackHandler(open val query: CallbackQuery, open val service: 
                     isAnswered = true
                 }
             }
-        }.body() ?: errorBody()
+        }.body()?.result ?: errorBody()
 
     }
 }

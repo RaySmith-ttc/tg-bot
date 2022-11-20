@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.model.bot.message.media
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.message.MessageResponse
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody

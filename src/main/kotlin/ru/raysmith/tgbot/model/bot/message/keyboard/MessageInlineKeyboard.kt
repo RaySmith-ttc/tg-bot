@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.webapp.WebAppInfo
+import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.utils.Pagination
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 

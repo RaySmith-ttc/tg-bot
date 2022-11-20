@@ -1,9 +1,6 @@
 package ru.raysmith.tgbot.model.network.keyboard
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Required
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
 import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.TelegramApi
@@ -36,6 +33,6 @@ data class ReplyKeyboardRemove(
     val removeKeyboard: Boolean = true
 
     override fun toString(): String {
-        return TelegramApi.json.encodeToJsonElement(this).toString()
+        return TelegramApi.json.encodeToString(this)
     }
 }

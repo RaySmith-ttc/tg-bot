@@ -23,6 +23,10 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
+import ru.raysmith.tgbot.model.network.menubutton.MenuButton
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -98,6 +102,11 @@ object TelegramApi {
                 subclass(BotCommandScopeChatMember::class, BotCommandScopeChatMember.serializer())
                 subclass(BotCommandScopeDefault::class, BotCommandScopeDefault.serializer())
             }
+//            polymorphic(MenuButton::class) {
+//                subclass(MenuButtonCommands::class, MenuButtonCommands.serializer())
+//                subclass(MenuButtonDefault::class, MenuButtonDefault.serializer())
+//                subclass(MenuButtonWebApp::class, MenuButtonWebApp.serializer())
+//            }
         }
     }
 
