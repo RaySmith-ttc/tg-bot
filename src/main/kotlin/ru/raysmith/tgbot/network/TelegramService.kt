@@ -777,7 +777,58 @@ interface TelegramService {
         @Query("for_channels") forChannels: Boolean? = null,
     ): Call<NetworkResponse<ChatAdministratorRights>>
 
+    @POST("editMessageText")
+    fun editMessageText(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("text") text: String,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("entities") entities: String? = null,
+        @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
 
+    @POST("editMessageCaption")
+    fun editMessageCaption(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("caption") caption: String,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") entities: String? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("editMessageMedia")
+    fun editMessageMedia(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("media") media: InputMedia,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("editMessageReplyMarkup")
+    fun editMessageReplyMarkup(
+        @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_id") messageId: Int? = null,
+        @Query("inline_message_id") inlineMessageId: String? = null,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @POST("stopPoll")
+    fun stopPoll(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_id") messageId: Int,
+        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
+    ): Call<NetworkResponse<Poll>>
+
+    @POST("deleteMessage")
+    fun deleteMessage(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_id") messageId: Int
+    ): Call<NetworkResponse<Boolean>>
 
     /**
      * Use this method to send invoices. On success, the sent Message is returned.
@@ -934,51 +985,6 @@ interface TelegramService {
         @Query("next_offset") nextOffset: String? = null,
         @Query("switch_pm_text") switchPmText: String? = null,
         @Query("switch_pm_parameter") switchPmParameter: String? = null,
-    ): Call<NetworkResponse<Boolean>>
-
-    @POST("editMessageText")
-    fun editMessageText(
-        @Query("chat_id") chatId: ChatId? = null,
-        @Query("message_id") messageId: Int? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("text") text: String,
-        @Query("parse_mode") parseMode: ParseMode? = null,
-        @Query("entities") entities: String? = null,
-        @Query("disable_web_page_preview") disableWebPagePreview: Boolean? = null,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse>
-
-    @POST("editMessageCaption")
-    fun editMessageCaption(
-        @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int? = null,
-        @Query("caption") caption: String,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("parse_mode") parseMode: ParseMode? = null
-    ): Call<MessageResponse>
-
-    @POST("editMessageMedia")
-    fun editMessageMedia(
-        @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int? = null,
-        @Query("media") media: InputMedia,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null
-    ): Call<MessageResponse>
-
-    @POST("editMessageReplyMarkup")
-    fun editMessageReplyMarkup(
-        @Query("chat_id") chatId: ChatId? = null,
-        @Query("message_id") messageId: Int? = null,
-        @Query("inline_message_id") inlineMessageId: String? = null,
-        @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse>
-
-    @POST("deleteMessage")
-    fun deleteMessage(
-        @Query("chat_id") chatId: ChatId,
-        @Query("message_id") messageId: Int
     ): Call<NetworkResponse<Boolean>>
 }
 

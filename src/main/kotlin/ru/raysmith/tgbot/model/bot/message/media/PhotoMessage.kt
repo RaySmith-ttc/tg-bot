@@ -9,7 +9,7 @@ import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
-class PhotoMessage(override val service: TelegramService, override val fileService: TelegramFileService) : CaptionableMediaMessage() {
+class   PhotoMessage(override val service: TelegramService, override val fileService: TelegramFileService) : CaptionableMediaMessage() {
 
     var photo: InputFile?
         get() = media

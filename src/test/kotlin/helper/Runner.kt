@@ -1,6 +1,7 @@
 package helper
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -17,6 +18,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.media.PhotoMessage
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.InlineQueryResultArticle
 import ru.raysmith.tgbot.model.network.InputTextMessageContent
@@ -26,6 +28,7 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeChat
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.media.input.asTgFile
 import ru.raysmith.tgbot.model.network.media.inputStream
 import ru.raysmith.tgbot.model.network.message.Message
@@ -516,6 +519,49 @@ class Runner {
 
                         isCommand("getMyDefaultAdministratorRights") {
                             send(getMyDefaultAdministratorRights().toString())
+                        }
+
+                        isCommand("stopPoll") {
+                            val poll = sendPoll("Question", listOf("1", "2", "3")) {
+                                type = PollType.QUIZ
+                                correctOptionId = 0
+                                explanationWithEntities {
+                                    bold("Expl: ").text("Wrong answer")
+                                }
+                                openPeriod = 5
+                                inlineKeyboard {
+                                    row("Button", "btn")
+                                }
+                            }
+
+                            runBlocking { delay(2000) }
+                            stopPoll(poll.messageId) {
+                                row("New button", "btn")
+                            }
+                        }
+
+                        isCommand("editCaption") {
+                            val message = sendPhoto {
+                                caption = "Test"
+                                photo = "AgACAgIAAxkDAAPTYLzxe542hHekjNmlcA3vMMw7XVgAAlqyMRvfveFJJlmwc6u88jc3Bo-hLgADAQADAgADdwADuUkDAAEfBA".asTgFile()
+                            }
+                            runBlocking { delay(2000) }
+                            val editedMessage = editCaption(messageId = message.messageId) {
+                                italic("edited")
+                            }
+                            runBlocking { delay(2000) }
+                            editMedia<InputMediaPhoto>(messageId = message.messageId, media = InputMediaPhoto(
+                                media = "AgACAgIAAxkBAAI9AWOCdwVufweWJV-HNe5pkexZa83GAAKRwzEbKkIQSHYZWoXjyhFNAQADAgADcwADKwQ",
+                                caption = editedMessage.caption,
+                                parseMode = null,
+                                captionEntities = editedMessage.captionEntities
+                            )) {
+                                row("Button", "btn")
+                            }
+                            runBlocking { delay(2000) }
+                            editReplyMarkup(messageId = message.messageId) {
+                                row("New button", "btn")
+                            }
                         }
 
                         isCommand("mrkd2") {

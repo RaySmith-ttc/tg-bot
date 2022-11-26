@@ -78,3 +78,5 @@ fun createBotContext(
 
 @DslMarker
 annotation class BotContextDsl
+
+internal fun noimpl(): Nothing = throw NotImplementedError()

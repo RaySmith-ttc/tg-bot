@@ -32,6 +32,7 @@ class PollMessage(
     var explanationEntities: String? = null
     var openPeriod: Int? = null
     var closeDate: Int? = null
+    var isClosed: Boolean? = null
 
     private var _explanation: MessageText? = null
 
@@ -67,7 +68,13 @@ class PollMessage(
             explanationParseMode = explanationParseMode,
             explanationEntities = _explanation?.getEntitiesString(),
             openPeriod = openPeriod,
-            closeDate = closeDate
+            closeDate = closeDate,
+            isClosed = isClosed,
+            disableNotification = disableNotification,
+            protectContent = protectContent,
+            replyToMessageId = replyToMessageId,
+            allowSendingWithoutReply = allowSendingWithoutReply,
+            keyboardMarkup = keyboardMarkup?.toMarkup()
         ).execute().body() ?: errorBody()
     }
 }

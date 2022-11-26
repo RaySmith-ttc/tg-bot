@@ -15,7 +15,7 @@ import ru.raysmith.tgbot.utils.withSafeLength
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
 @TextMessageDsl
 class TextMessage(override val service: TelegramService, override val fileService: TelegramFileService) :
-    EditableMessage, KeyboardCreator {
+    MessageWithReplyMarkup {
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -79,6 +79,15 @@ class TextMessage(override val service: TelegramService, override val fileServic
             entities = messageText?.getEntitiesString(),
             replyMarkup = keyboardMarkup?.toMarkup(),
             disableWebPagePreview = disableWebPagePreview
+        ).execute().body() ?: errorBody()
+    }
+
+    override fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse {
+        return service.editMessageReplyMarkup(
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            replyMarkup = keyboardMarkup?.toMarkup()
         ).execute().body() ?: errorBody()
     }
 

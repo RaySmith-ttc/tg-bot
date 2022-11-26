@@ -1,9 +1,11 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.utils.withSafeLength
 
-abstract class CaptionableMessage {
+abstract class CaptionableMessage : EditableMessage {
     protected var _caption: MessageText? = null
 
     /** Simple caption text to send the message */

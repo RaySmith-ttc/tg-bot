@@ -2,9 +2,14 @@ package ru.raysmith.tgbot.core
 
 import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
+import ru.raysmith.tgbot.model.network.Poll
 import ru.raysmith.tgbot.model.network.chat.*
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
@@ -581,6 +586,21 @@ interface BotContext<T : EventHandler> : ISender {
         return service.getChatMenuButton(chatId).execute().body()?.result ?: errorBody()
     }
 
+    /**
+     * Use this method to edit text and game messages. On success, if the edited message is not an inline message,
+     * the edited [Message] is returned, otherwise True is returned.
+     *
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
+     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param text New text of the message, 1-4096 characters after entities parsing
+     * @param parseMode [ParseMode] for parsing entities in the message text
+     * @param entities A JSON-serialized list of special entities that appear in message text,
+     * which can be specified instead of parseMode
+     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * */
     fun editMessageText(
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -589,15 +609,122 @@ interface BotContext<T : EventHandler> : ISender {
         entities: String? = null,
         disableWebPagePreview: Boolean? = null,
         replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
+        chatId: ChatId? = getChatIdOrThrow()
     ): Message {
         return service.editMessageText(
             chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview, replyMarkup
         ).execute().body()?.result ?: errorBody()
     }
 
-    fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()) =
-        service.deleteMessage(chatId, messageId).execute().body()?.result ?: errorBody()
+    /**
+     * Use this method to edit captions of messages. On success, if the edited message is not an inline message,
+     * the edited [Message] is returned, otherwise True is returned.
+     *
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
+     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param caption New caption of the message, 0-1024 characters after entities parsing
+     * @param parseMode [ParseMode] for parsing entities in the message text
+     * @param captionEntities A JSON-serialized list of special entities that appear in the caption,
+     * which can be specified instead of parseMode
+     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * */
+    fun editMessageCaption(
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        caption: String,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        disableWebPagePreview: Boolean? = null,
+        replyMarkup: KeyboardMarkup? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): Message {
+        return service.editMessageCaption(
+            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities, replyMarkup
+        ).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to edit animation, audio, document, photo, or video messages.
+     * If a message is part of a message album, then it can be edited only to an audio for audio albums,
+     * only to a document for document albums and to a photo or a video otherwise.
+     * When an inline message is edited, a new file can't be uploaded; use a previously uploaded file
+     * via its file_id or specify a URL. On success, if the edited message is not an inline message,
+     * the edited [Message] is returned, otherwise *True* is returned.
+     *
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
+     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param media A JSON-serialized object for a new media content of the message
+     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * */
+    fun editMessageMedia(
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        media: InputMedia,
+        replyMarkup: KeyboardMarkup? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): Message {
+        return service.editMessageMedia(
+            chatId, messageId, inlineMessageId, media, replyMarkup
+        ).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to edit only the reply markup of messages. On success,
+     * if the edited message is not an inline message, the edited [Message] is returned, otherwise *True* is returned.
+     *
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
+     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * */
+    fun editMessageReplyMarkup(
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        replyMarkup: KeyboardMarkup? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): Message {
+        return service.editMessageReplyMarkup(
+            chatId, messageId, inlineMessageId, replyMarkup
+        ).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to stop a poll which was sent by the bot. On success, the stopped [Poll] is returned
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Identifier of the original message with the poll
+     * @param keyboard [MessageInlineKeyboard] builder for a new message inline keyboard.
+     * */
+    fun stopPoll(messageId: Int, chatId: ChatId = getChatIdOrThrow(), keyboard: MessageInlineKeyboard.() -> Unit): Poll {
+        val replyMarkup = buildInlineKeyboard(keyboard).toMarkup()
+        return service.stopPoll(chatId, messageId, replyMarkup).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to delete a message, including service messages, with the following limitations:
+     * - A message can only be deleted if it was sent less than 48 hours ago.
+     * - Service messages about a supergroup, channel, or forum topic creation can't be deleted.
+     * - A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+     * - Bots can delete outgoing messages in private chats, groups, and supergroups.
+     * - Bots can delete incoming messages in private chats.
+     * - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+     * - If the bot is an administrator of a group, it can delete any message there.
+     * - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+     *
+     * Returns *True* on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param messageId Identifier of the message to delete
+     * */
+    fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return service.deleteMessage(chatId, messageId).execute().body()?.result ?: errorBody()
+    }
 
     /**
      * Send invoice to chat with [chatId] using the given [buildAction]. On success, the sent [Message] is returned.

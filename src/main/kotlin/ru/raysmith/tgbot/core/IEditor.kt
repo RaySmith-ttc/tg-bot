@@ -2,9 +2,16 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.TextMessage
+import ru.raysmith.tgbot.model.bot.message.*
+import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
+import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.Pagination
@@ -20,6 +27,41 @@ interface IEditor : ChatIdHolder, ApiCaller {
 
     override val service: TelegramService
     override val fileService: TelegramFileService
+
+    fun editCaption(
+        chatId: ChatId = getChatIdOrThrow(),
+        messageId: Int? = this.messageId,
+        inlineMessageId: String? = this.inlineMessageId,
+        caption: MessageText.() -> Unit
+    ): Message {
+        return CaptionableMediaMessage.instance(this)
+            .apply { captionWithEntities(caption) }
+            .edit(chatId, messageId, inlineMessageId).result
+    }
+
+    fun editReplyMarkup(
+        chatId: ChatId = getChatIdOrThrow(),
+        messageId: Int? = this.messageId,
+        inlineMessageId: String? = this.inlineMessageId,
+        keyboard: MessageInlineKeyboard.() -> Unit
+    ): Message {
+        return MessageWithReplyMarkup.instance(this)
+            .apply { inlineKeyboard(keyboard) }
+            .editReplyMarkup(chatId, messageId, inlineMessageId)
+            .result
+    }
+
+    fun <T : InputMedia> editMedia(
+        chatId: ChatId = getChatIdOrThrow(),
+        messageId: Int? = this.messageId,
+        inlineMessageId: String? = this.inlineMessageId,
+        media: InputMedia,
+        keyboard: MessageInlineKeyboard.() -> Unit
+    ): Message {
+        return CaptionableMediaMessage.instance(this)
+            .apply { inlineKeyboard(keyboard) }
+            .editMedia<T>(chatId, messageId, inlineMessageId, media).result
+    }
 
     fun edit(
         chatId: ChatId = getChatIdOrThrow(),
