@@ -103,7 +103,7 @@ abstract class MediaMessage : IMessage<MessageResponse>, KeyboardCreator {
         }
         is InputFile.File -> {
             val media = media as InputFile.File
-            val mimeType = Files.probeContentType(media.file.toPath()).toMediaType()
+            val mimeType = Files.probeContentType(media.file.toPath())?.toMediaType()
             val body = media.file.readBytes().toRequestBody(mimeType)
             MultipartBody.Part.createFormData(mediaName, media.file.name, body)
         }

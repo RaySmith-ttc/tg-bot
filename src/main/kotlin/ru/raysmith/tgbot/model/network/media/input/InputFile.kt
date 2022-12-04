@@ -39,7 +39,7 @@ fun InputFile.toRequestBody(name: String) = when(this) {
         MultipartBody.Part.createFormData(name, filename, body)
     }
     is InputFile.File -> {
-        val mimeType = Files.probeContentType(file.toPath()).toMediaType()
+        val mimeType = Files.probeContentType(file.toPath())?.toMediaType()
         val body = file.readBytes().toRequestBody(mimeType)
         MultipartBody.Part.createFormData(name, file.name, body)
     }

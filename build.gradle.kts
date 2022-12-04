@@ -7,16 +7,17 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.146"
+version = "0.0.1-alpha.149"
 
 repositories {
     mavenCentral()
+    mavenLocal()
     jcenter()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/raysmith-ttc/utils")
         credentials {
-            username = System.getenv("git.username")
+            username = System.getenv("GIT_USERNAME")
             password = System.getenv("GIT_TOKEN_READ")
         }
     }
@@ -63,7 +64,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    implementation("ru.raysmith:utils:1.2.4")
+    api("ru.raysmith:utils:1.4.2")
 
     // Extensions for
     implementation("org.jetbrains.exposed:exposed-core:0.40.1")

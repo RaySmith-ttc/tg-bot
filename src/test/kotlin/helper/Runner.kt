@@ -213,7 +213,7 @@ class Runner {
                     handleMessage {
                         Delegates.notNull<Int>()
                         if (message.photo != null) {
-                            message.photo!!.last().inputStream(this).readAllBytes().size.let {
+                            message.photo!!.last().inputStream(this).readBytes().size.let {
                                 send("Bytes: $it")
                             }
                         } else if (message.audio != null) {

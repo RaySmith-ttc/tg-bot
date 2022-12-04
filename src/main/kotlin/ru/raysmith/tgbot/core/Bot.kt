@@ -38,8 +38,8 @@ class Bot(
     private var onShutdown: suspend () -> Unit = { }
     private var onUpdate: (updates: List<Update>) -> Unit = { }
     private var onMessageSend: (message: Message) -> Unit = { }
-    private var onStart: () -> Unit = { }
-    private var onStop: () -> Unit = { }
+    private var onStart: Bot.() -> Unit = { }
+    private var onStop: Bot.() -> Unit = { }
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
@@ -203,7 +203,7 @@ class Bot(
         isActive = true
 
         try {
-            onStart()
+            onStart(this)
 
             while (isActive) {
                 safeNetwork {
@@ -258,13 +258,13 @@ class Bot(
         return this
     }
 
-    fun onStop(onStop: () -> Unit): Bot {
+    fun onStop(onStop: Bot.() -> Unit): Bot {
         this.onStop = onStop
         return this
     }
 
 
-    fun onStart(onStart: () -> Unit): Bot {
+    fun onStart(onStart: Bot.() -> Unit): Bot {
         this.onStart = onStart
         return this
     }
@@ -297,7 +297,7 @@ class Bot(
         }
 
         stoppingJob?.join()
-        onStop()
+        onStop(this)
     }
 }
 
