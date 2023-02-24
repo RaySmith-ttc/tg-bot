@@ -28,4 +28,5 @@ data class ChatMemberUpdated(
     @SerialName("invite_link") val inviteLink: ChatInviteLink? = null,
 ) : ChatIdHolder {
     override fun getChatId() = chat.id
+    override fun getChatIdOrThrow() = chat.id
 }

@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.EventHandler
 import ru.raysmith.tgbot.core.HandlerDsl
+import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
@@ -21,6 +22,7 @@ class CallbackQueryHandler(
 ) : EventHandler, BaseCallbackHandler(query, service, fileService), BotContext<CallbackQueryHandler> {
 
     override fun getChatId() = query.message?.chat?.id
+    override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
     override var messageId: Int? = query.message?.messageId
     override var inlineMessageId: String? = query.inlineMessageId
 

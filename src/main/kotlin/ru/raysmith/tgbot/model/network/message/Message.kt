@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
+import ru.raysmith.tgbot.model.network.sticker.Sticker
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.network.TelegramService
@@ -217,6 +218,9 @@ data class Message(
     /** Service message: new participants invited to a voice chat */
     @SerialName("voice_chat_participants_invited") val voiceChatParticipantsInvited: VoiceChatParticipantsInvited? = null,
 
+    /** Service message: new participants invited to a voice chat */
+    @SerialName("web_app_data") val webAppData: WebAppData? = null,
+
     /** Inline keyboard attached to the message. `login_url` buttons are represented as ordinary `url` buttons. */
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null
 
@@ -230,6 +234,7 @@ data class Message(
     }
 
     override fun getChatId() = chat.id
+    override fun getChatIdOrThrow() = chat.id
 
     /** Return true if entities has one or more link */
     fun hasUrl() : Boolean = entities?.any { it.type == MessageEntityType.URL } ?: false

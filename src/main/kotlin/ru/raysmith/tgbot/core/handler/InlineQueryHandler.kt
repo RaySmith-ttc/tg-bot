@@ -20,6 +20,7 @@ class InlineQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineQuery.from.id
+    override fun getChatIdOrThrow() = inlineQuery.from.id
     override suspend fun handle() = handler()
 
     fun answerInlineQuery(

@@ -25,6 +25,7 @@ class ChatMemberHandler(
 ) : EventHandler, BotContext<ChatMemberHandler> {
 
     override fun getChatId() = chat.id
+    override fun getChatIdOrThrow() = chat.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 

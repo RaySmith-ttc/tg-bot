@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.ChatIdHolder
+import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.message.Message
 
 @Serializable
@@ -53,4 +54,5 @@ data class CallbackQuery(
     }
 
     override fun getChatId() = message?.chat?.id
+    override fun getChatIdOrThrow() = message?.chat?.id ?: throw UnknownChatIdException()
 }

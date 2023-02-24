@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /**
  * Type of the entity. Can be “mention” (@username), “hashtag” (#hashtag), “cashtag” ($USD),
  * “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org),
@@ -14,6 +13,7 @@ import kotlinx.serialization.Serializable
  *
  * @see <a href="https://telegram.org/blog/edit#new-mentions">New Mentions</a>
  * */
+@Serializable
 enum class MessageEntityType {
     @SerialName("mention") MENTION,
     @SerialName("hashtag") HASHTAG,

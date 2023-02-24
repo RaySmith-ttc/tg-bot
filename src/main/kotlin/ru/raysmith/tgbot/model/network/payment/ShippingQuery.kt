@@ -21,4 +21,5 @@ data class ShippingQuery(
     @SerialName("shipping_address") val shippingAddress: ShippingAddress,
 ) : ChatIdHolder {
     override fun getChatId() = from.id
+    override fun getChatIdOrThrow() = from.id
 }

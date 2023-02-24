@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.bot.message.keyboard
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
+import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
 @Serializable
 class MessageReplyKeyboard : MessageKeyboard {
@@ -50,10 +51,11 @@ class MessageReplyKeyboard : MessageKeyboard {
             var text: String = ""
             var requestContact: Boolean? = null
             var requestLocation: Boolean? = null
+            var webApp: WebAppInfo? = null
 
             internal fun toKeyboardButton(): KeyboardButton {
                 require(text.isNotEmpty()) { "Button text must be is not empty" }
-                return KeyboardButton(text, requestContact, requestLocation)
+                return KeyboardButton(text, requestContact, requestLocation, webApp)
             }
         }
     }

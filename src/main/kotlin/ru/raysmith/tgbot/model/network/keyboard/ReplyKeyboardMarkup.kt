@@ -1,9 +1,7 @@
 package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramApi
 
 @Serializable
 /** This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). */
@@ -37,8 +35,4 @@ data class ReplyKeyboardMarkup(
      * to select the new language. Other users in the group don't see the keyboard.
      * */
     @SerialName("selective") val selective: Boolean? = null
-) : KeyboardMarkup() {
-    override fun toString(): String {
-        return TelegramApi.json.encodeToString(this)
-    }
-}
+) : KeyboardMarkup()

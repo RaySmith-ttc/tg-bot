@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.utils.datepicker
 
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.EventHandlerFactory
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
@@ -8,6 +9,10 @@ import ru.raysmith.tgbot.model.network.CallbackQuery
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
+
+interface BotFeature {
+    fun handler(h: (eventHandlerFactory: EventHandlerFactory) -> Unit)
+}
 
 class DatePicker(val callbackQueryPrefix: String) {
 
@@ -28,27 +33,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var monthPickerEnabled = true
     var yearsPickerEnabled = true
 
-    var allowToday = true
-
-    @Deprecated("Removed soon")
-    var allowPastDays = true
-        set(value) {
-            monthLimitBack = 0
-            field = value
-        }
-    @Deprecated("Removed soon")
-    var allowFutureDays = true
-        set(value) {
-            monthLimitForward = 0
-            field = value
-        }
-
     var messageText: MessageText.(data: String?, state: DatePickerState) -> Unit = { _, _ -> text("Pick the date") }
-
-//    var defaultMessageText = "Pick the date"
-//    var yearsPickMessageText = { defaultMessageText }
-//    var monthPickMessageText: (year: Int) -> String = { _ -> defaultMessageText }
-//    var dayPickMessageText: (year: Int, month: Int) -> String = { _, _ -> defaultMessageText }
 
     var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
     var additionalRows: MessageInlineKeyboard.(data: String?) -> Unit = { }
@@ -63,9 +48,13 @@ class DatePicker(val callbackQueryPrefix: String) {
     var startWithState = DatePickerState.DAY
 
     var dates: (data: String?) -> ClosedRange<LocalDate> = { LocalDate.of(1900, 1, 1)..LocalDate.of(2099, 12, 31) }
+    
+    
+//    private val allowPastDays = dates
+//    var allowFutureDays = true
 
     var yearsColumns = 5
-        get() = field.coerceAtMost(8)
+        get() = field.coerceIn(1, 8)
 
     var yearsRows = 10
 
@@ -270,8 +259,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         row {
             val diff = getMonthsDiff(year, month)
 
-            val allowByPastDaysDeny = !(!allowPastDays && isCurrentMonth)
-            if ((monthLimitBack == -1 || diff < monthLimitBack) && allowByPastDaysDeny && allowPastByDates) {
+            if ((monthLimitBack == -1 || diff < monthLimitBack) && allowPastByDates) {
                 val updatedYear = (if (month == 1) year - 1 else year)
                 val updatedMonth = (if (month == 1) 12 else month - 1)
                 button("«", "${callbackQueryPrefix}{${data ?: ""}}y${updatedYear.toIso(true)}m${updatedMonth.toIso()}")
@@ -283,9 +271,8 @@ class DatePicker(val callbackQueryPrefix: String) {
                 if (monthPickerEnabled) "${callbackQueryPrefix}{${data ?: ""}}y${year.toIso(true)}"
                 else CallbackQuery.EMPTY_CALLBACK_DATA
             )
-
-            val allowByFutureDaysDeny = !(!allowFutureDays && isCurrentMonth)
-            if ((monthLimitForward == -1 || diff > -monthLimitForward) && allowByFutureDaysDeny && allowFutureByDates) {
+            
+            if ((monthLimitForward == -1 || diff > -monthLimitForward) && allowFutureByDates) {
                 val updatedYear = (if (month == 12) year + 1 else year)
                 val updatedMonth = (if (month == 12) 1 else month + 1)
                 button("»", "${callbackQueryPrefix}{${data ?: ""}}y${updatedYear.toIso(true)}m${updatedMonth.toIso()}")
@@ -348,15 +335,15 @@ class DatePicker(val callbackQueryPrefix: String) {
                     if (it == -1) button(" ", CallbackQuery.EMPTY_CALLBACK_DATA)
                     else {
                         val title = when {
-                            !allowToday && it == now.dayOfMonth -> " "
-                            !allowPastDays && ((year <= now.year && month <= now.monthValue) && it < now.dayOfMonth) -> " "
-                            !allowFutureDays && ((year >= now.year && month >= now.monthValue) && it > now.dayOfMonth) -> " "
+//                            !allowToday && it == now.dayOfMonth -> " "
+//                            !allowPastDays && ((year <= now.year && month <= now.monthValue) && it < now.dayOfMonth) -> " "
+//                            !allowFutureDays && ((year >= now.year && month >= now.monthValue) && it > now.dayOfMonth) -> " "
                             else -> if (isCurrentMonth && it == now.dayOfMonth) "·$it·" else it.toString()
                         }
                         val callbackQuery = when {
-                            !allowToday && it == now.dayOfMonth -> CallbackQuery.EMPTY_CALLBACK_DATA
-                            !allowPastDays && ((year <= now.year && month <= now.monthValue) && it < now.dayOfMonth) -> CallbackQuery.EMPTY_CALLBACK_DATA
-                            !allowFutureDays && ((year >= now.year && month >= now.monthValue) && it > now.dayOfMonth) -> CallbackQuery.EMPTY_CALLBACK_DATA
+//                            !allowToday && it == now.dayOfMonth -> CallbackQuery.EMPTY_CALLBACK_DATA
+//                            !allowPastDays && ((year <= now.year && month <= now.monthValue) && it < now.dayOfMonth) -> CallbackQuery.EMPTY_CALLBACK_DATA
+//                            !allowFutureDays && ((year >= now.year && month >= now.monthValue) && it > now.dayOfMonth) -> CallbackQuery.EMPTY_CALLBACK_DATA
                             else -> "r${callbackQueryPrefix}{${data ?: ""}}y${year.toIso()}m${month.toIso()}d${it.toIso()}"
                         }
                         button(title, callbackQuery)

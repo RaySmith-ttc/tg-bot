@@ -108,10 +108,8 @@ class Pagination<T>(
                                 else -> page - pages_paddings
                             }
 
-                            // last page in a row for current state // TODO replace with coerceMethod
-                            val lastPage =
-                                if ((firstPage + max_displayed_pages) - 1 > totalPages) totalPages
-                                else (firstPage + max_displayed_pages) - 1
+                            // last page in a row for current state
+                            val lastPage = ((firstPage + max_displayed_pages) - 1).coerceAtMost(totalPages)
 
                             (((lastPage - firstPage) - max_displayed_pages) + 1).let {
                                 if (totalPages > max_displayed_pages && it != 0L) firstPage += it

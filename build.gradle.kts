@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
-    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    kotlin("jvm") version "1.8.10"
     id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "0.0.1-alpha.149"
+version = "0.0.1-alpha.152"
 
 repositories {
     mavenCentral()
@@ -75,6 +75,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("org.mockito:mockito-core:4.8.0")
+    
+    val ktorVersion = "2.2.1"
+    testImplementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    testImplementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    testImplementation("io.ktor:ktor-network-tls-certificates:$ktorVersion")
 
     val slf4jVersion = "2.0.3"
     testImplementation("org.slf4j:slf4j-api:$slf4jVersion")
@@ -91,5 +96,15 @@ tasks {
     }
     withType<Test> {
         useJUnitPlatform()
+    }
+}
+
+fun RepositoryHandler.mavenRaySmith(name: String) {
+    maven {
+        url = uri("https://maven.pkg.github.com/raysmith-ttc/$name")
+        credentials {
+            username = System.getenv("GIT_USERNAME")
+            password = System.getenv("GIT_TOKEN_READ")
+        }
     }
 }

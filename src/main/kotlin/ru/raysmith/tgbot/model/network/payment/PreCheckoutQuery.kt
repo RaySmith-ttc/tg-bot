@@ -36,4 +36,5 @@ data class PreCheckoutQuery(
     @SerialName("order_info") val orderInfo: OrderInfo? = null,
 ) : ChatIdHolder {
     override fun getChatId() = from.id
+    override fun getChatIdOrThrow() = from.id
 }

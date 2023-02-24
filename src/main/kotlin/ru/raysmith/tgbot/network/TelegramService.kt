@@ -12,14 +12,19 @@ import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
+import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.file.FileResponse
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.response.*
-import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
+import ru.raysmith.tgbot.model.network.sticker.MaskPosition
+import ru.raysmith.tgbot.model.network.sticker.Sticker
+import ru.raysmith.tgbot.model.network.sticker.StickerSet
+import ru.raysmith.tgbot.model.network.sticker.StickerType
 import ru.raysmith.tgbot.model.network.updates.Update
 
 interface TelegramService {
@@ -829,6 +834,114 @@ interface TelegramService {
         @Query("chat_id") chatId: ChatId,
         @Query("message_id") messageId: Int
     ): Call<NetworkResponse<Boolean>>
+
+    @POST("sendSticker")
+    fun sendSticker(
+        @Query("chat_id") chatId: ChatId,
+        @Query("sticker") sticker: String,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
+
+    @Multipart
+    @POST("sendSticker")
+    fun sendSticker(
+        @Part("chat_id") chatId: ChatId,
+        @Part sticker: MultipartBody.Part,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("getStickerSet")
+    fun getStickerSet(
+        @Query("name") name: String
+    ): Call<NetworkResponse<StickerSet>>
+
+    @POST("getCustomEmojiStickers")
+    fun getCustomEmojiStickers(
+        @Query("custom_emoji_ids") customEmojiIds: List<String>
+    ): Call<NetworkResponse<List<Sticker>>>
+
+    @POST("uploadStickerFile")
+    fun uploadStickerFile(
+        @Query("user_id") userId: ChatId.ID,
+        @Query("png_sticker") pngSticker: String,
+    ): Call<NetworkResponse<File>>
+
+    @Multipart
+    @POST("uploadStickerFile")
+    fun uploadStickerFile(
+        @Query("user_id") userId: ChatId.ID,
+        @Part pngSticker: MultipartBody.Part,
+    ): Call<NetworkResponse<File>>
+
+    @POST("createNewStickerSet")
+    fun createNewStickerSet(
+        @Query("user_id") userId: ChatId.ID,
+        @Query("name") name: String,
+        @Query("title") title: String,
+        @Query("png_sticker") pngSticker: String?,
+        @Query("sticker_type") stickerType: StickerType? = null,
+        @Query("emojis") emojis: String? = null,
+        @Query("mask_position") maskPosition: MaskPosition? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @Multipart
+    @POST("createNewStickerSet")
+    fun createNewStickerSet(
+        @Part("user_id") userId: ChatId.ID,
+        @Part("name") name: RequestBody,
+        @Part("title") title: RequestBody,
+        @Part pngSticker: MultipartBody.Part? = null,
+        @Part tgsSticker: MultipartBody.Part? = null,
+        @Part webmSticker: MultipartBody.Part? = null,
+        @Part("sticker_type") stickerType: StickerType? = null,
+        @Part("emojis") emojis: RequestBody? = null,
+        @Part("mask_position") maskPosition: MaskPosition? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("addStickerToSet")
+    fun addStickerToSet(
+        @Query("user_id") userId: ChatId.ID,
+        @Query("name") name: String?,
+        @Query("png_sticker") pngSticker: String?,
+        @Query("sticker_type") stickerType: StickerType? = null,
+        @Query("emojis") emojis: String? = null,
+        @Query("mask_position") maskPosition: MaskPosition? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @Multipart
+    @POST("addStickerToSet")
+    fun addStickerToSet(
+        @Part("user_id") userId: ChatId.ID,
+        @Part("name") name: RequestBody,
+        @Part pngSticker: MultipartBody.Part? = null,
+        @Part tgsSticker: MultipartBody.Part? = null,
+        @Part webmSticker: MultipartBody.Part? = null,
+        @Part("sticker_type") stickerType: StickerType? = null,
+        @Part("emojis") emojis: RequestBody? = null,
+        @Part("mask_position") maskPosition: MaskPosition? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setStickerPositionInSet")
+    fun setStickerPositionInSet(
+        @Query("sticker") sticker: String,
+        @Query("position") position: Int,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteStickerFromSet")
+    fun deleteStickerFromSet(
+        @Query("sticker") sticker: String,
+    ): Call<NetworkResponse<Boolean>>
+
+
+    // TODO setStickerSetThumb
 
     /**
      * Use this method to send invoices. On success, the sent Message is returned.

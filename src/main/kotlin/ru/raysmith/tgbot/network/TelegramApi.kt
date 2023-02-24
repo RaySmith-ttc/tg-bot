@@ -4,8 +4,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,19 +12,8 @@ import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageReplyKeyboard
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.command.*
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
-import ru.raysmith.tgbot.model.network.menubutton.MenuButton
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -76,38 +63,7 @@ object TelegramApi {
         isLenient = true
         ignoreUnknownKeys = true
         encodeDefaults = false
-        classDiscriminator = "clazz" // resolve `type` field naming conflict
-        serializersModule = SerializersModule {
-            polymorphic(KeyboardMarkup::class) {
-                subclass(ReplyKeyboardMarkup::class, ReplyKeyboardMarkup.serializer())
-                subclass(ReplyKeyboardRemove::class, ReplyKeyboardRemove.serializer())
-                subclass(InlineKeyboardMarkup::class, InlineKeyboardMarkup.serializer())
-            }
-            polymorphic(InlineQueryResult::class) {
-                subclass(InlineQueryResultArticle::class, InlineQueryResultArticle.serializer())
-            }
-            polymorphic(InputMessageContent::class) {
-                subclass(InputTextMessageContent::class, InputTextMessageContent.serializer())
-            }
-            polymorphic(MessageKeyboard::class) {
-                subclass(MessageInlineKeyboard::class, MessageInlineKeyboard.serializer())
-                subclass(MessageReplyKeyboard::class, MessageReplyKeyboard.serializer())
-            }
-            polymorphic(BotCommandScope::class) {
-                subclass(BotCommandScopeAllChatAdministrators::class, BotCommandScopeAllChatAdministrators.serializer())
-                subclass(BotCommandScopeAllGroupChats::class, BotCommandScopeAllGroupChats.serializer())
-                subclass(BotCommandScopeAllPrivateChats::class, BotCommandScopeAllPrivateChats.serializer())
-                subclass(BotCommandScopeChat::class, BotCommandScopeChat.serializer())
-                subclass(BotCommandScopeChatAdministrators::class, BotCommandScopeChatAdministrators.serializer())
-                subclass(BotCommandScopeChatMember::class, BotCommandScopeChatMember.serializer())
-                subclass(BotCommandScopeDefault::class, BotCommandScopeDefault.serializer())
-            }
-//            polymorphic(MenuButton::class) {
-//                subclass(MenuButtonCommands::class, MenuButtonCommands.serializer())
-//                subclass(MenuButtonDefault::class, MenuButtonDefault.serializer())
-//                subclass(MenuButtonWebApp::class, MenuButtonWebApp.serializer())
-//            }
-        }
+        classDiscriminator = "#type"
     }
 
     fun buildService(token: String?, type: ServiceType): Retrofit {
@@ -118,9 +74,9 @@ object TelegramApi {
             .client(getClient())
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .addConverterFactory(NetworkUtils.ConverterFactory())
-            .addConverterFactory(ChatIdConverterFactory())
             .build()
     }
+
 
     private val services = mutableMapOf<String, TelegramService>()
     private val filesServices = mutableMapOf<String, TelegramFileService>()

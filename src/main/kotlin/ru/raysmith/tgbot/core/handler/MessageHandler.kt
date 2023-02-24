@@ -16,6 +16,7 @@ open class MessageHandler(
 ) : EventHandler, BotContext<MessageHandler> {
 
     override fun getChatId() = message.chat.id
+    override fun getChatIdOrThrow() = message.chat.id
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 

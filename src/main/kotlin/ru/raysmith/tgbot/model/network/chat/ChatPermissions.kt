@@ -2,11 +2,10 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import ru.raysmith.tgbot.network.TelegramApi
 
 interface Permission
 
+@Serializable
 enum class ChatPermission : Permission {
     CAN_SEND_MESSAGES,
     CAN_SEND_MEDIA_MESSAGES,
@@ -57,10 +56,6 @@ data class ChatPermissions(
         ChatPermission.CAN_CHANGE_INFO -> canChangeInfo
         ChatPermission.CAN_INVITE_USERS -> canInviteUsers
         ChatPermission.CAN_PIN_MESSAGES -> canPinMessages
-    }
-
-    override fun toString(): String {
-        return TelegramApi.json.encodeToString(this)
     }
 
     companion object {

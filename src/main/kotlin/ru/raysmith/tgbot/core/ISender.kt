@@ -116,4 +116,9 @@ interface ISender : ChatIdHolder, ApiCaller {
     fun sendVideoMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: VideoMediaGroupMessage.() -> Unit): List<Message> {
         return VideoMediaGroupMessage(service, fileService).apply(message).send(chatId).results
     }
+
+    fun sendSticker(chatId: Long, message: StickerMessage.() -> Unit): Message = sendSticker(chatId.toChatId(), message)
+    fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
+        return StickerMessage(service, fileService).apply(message).send(chatId).result
+    }
 }

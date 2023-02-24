@@ -113,7 +113,7 @@ import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
  * - Escaping inside entities is not allowed, so entity must be closed first and reopened again: use `_snake_\__case_`
  * for italic `snake_case` and `*2*\**2=4*` for bold `2*2=4`.
  * */
-@Serializable(with = ParseModeSerializer::class)
+@Serializable(with = ParseModeSerializer::class) // TODO
 enum class ParseMode {
     HTML,
 

@@ -39,6 +39,7 @@ data class InlineQuery(
     @SerialName("location") val location: Location? = null,
 ) : ChatIdHolder {
     override fun getChatId() = from.id
+    override fun getChatIdOrThrow() = from.id
 }
 
 @Polymorphic

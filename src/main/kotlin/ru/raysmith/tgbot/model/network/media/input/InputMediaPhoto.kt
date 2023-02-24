@@ -3,10 +3,8 @@ package ru.raysmith.tgbot.model.network.media.input
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramApi
 
 /**
  * Represents a photo to be sent.
@@ -45,8 +43,4 @@ data class InputMediaPhoto(
     /** Type of the result */
     @Required
     @SerialName("type") override val type: String = "photo"
-
-    override fun toString(): String {
-        return TelegramApi.json.encodeToString(this)
-    }
 }

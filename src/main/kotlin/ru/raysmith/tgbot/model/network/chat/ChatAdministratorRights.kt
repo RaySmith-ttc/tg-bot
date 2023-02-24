@@ -2,9 +2,8 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import ru.raysmith.tgbot.network.TelegramApi
 
+@Serializable
 enum class ChatAdministratorRight : Permission {
     IS_ANONYMOUS,
     CAN_MANAGE_CHAT,
@@ -64,8 +63,4 @@ data class ChatAdministratorRights(
     /** True, if the user is allowed to pin messages; groups and supergroups only */
     @SerialName("can_pin_messages") val canPinMessages: Boolean? = null,
 
-) {
-    override fun toString(): String {
-        return TelegramApi.json.encodeToString(this)
-    }
-}
+)

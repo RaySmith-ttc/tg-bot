@@ -1,12 +1,13 @@
 package ru.raysmith.tgbot.utils
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
+import ru.raysmith.tgbot.core.EventHandler
 import ru.raysmith.tgbot.core.handler.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -80,3 +81,9 @@ fun createBotContext(
 annotation class BotContextDsl
 
 internal fun noimpl(): Nothing = throw NotImplementedError()
+
+/**
+ * Calls [getMe][ApiCaller.getMe] method for current bot in context and
+ * returns sticker name with base [name] appended with `_by_<bot_username>`
+ * */
+fun <T : EventHandler> BotContext<T>.stickerSetName(name: String) = "${name}_by_${getMe().username}"

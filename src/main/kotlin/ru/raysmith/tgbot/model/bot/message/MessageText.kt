@@ -166,7 +166,7 @@ class MessageText(private val type: MessageTextType) {
             }
         }
 
-        return if (blacklist.isNotEmpty()) fixed(res).also { println("REQ") }
+        return if (blacklist.isNotEmpty()) fixed(res)
         else res.also {
             val textString = getTextString()
             it.forEach {

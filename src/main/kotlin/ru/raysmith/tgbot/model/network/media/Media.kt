@@ -20,9 +20,4 @@ interface Media {
     val fileName: String?
 }
 
-fun Media.inputStream(apiCaller: ApiCaller): InputStream {
-    val fileResponse = apiCaller.service.getFile(fileId).execute().body() ?: errorBody()
-    return apiCaller.fileService.downLoad(fileResponse.file.path!!).execute().let {
-        (it.body() ?: errorBody()).byteStream()
-    }
-}
+fun Media.inputStream(apiCaller: ApiCaller) = apiCaller.downloadFile(fileId)

@@ -20,6 +20,7 @@ class ShippingQueryHandler(
 ) : EventHandler, BotContext<ShippingQueryHandler> {
 
     override fun getChatId() = shippingQuery.from.id
+    override fun getChatIdOrThrow() = shippingQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 

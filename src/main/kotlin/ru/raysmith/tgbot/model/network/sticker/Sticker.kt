@@ -1,8 +1,9 @@
-package ru.raysmith.tgbot.model.network.message
+package ru.raysmith.tgbot.model.network.sticker
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.media.PhotoSize
+import ru.raysmith.tgbot.model.network.message.MaskPosition
 
 @Serializable
 /** This object represents a sticker. */
@@ -42,3 +43,4 @@ data class Sticker(
     @SerialName("file_size") val fileSize: Int? = null
 
 )
+

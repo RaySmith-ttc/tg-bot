@@ -17,6 +17,7 @@ class PreCheckoutQueryHandler(
 ) : EventHandler, BotContext<PreCheckoutQueryHandler> {
 
     override fun getChatId() = preCheckoutQuery.from.id
+    override fun getChatIdOrThrow() = preCheckoutQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 

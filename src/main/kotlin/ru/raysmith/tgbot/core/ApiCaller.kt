@@ -9,10 +9,17 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
+import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.toRequestBody
+import ru.raysmith.tgbot.model.network.sticker.AddStickerInStickerSet
+import ru.raysmith.tgbot.model.network.sticker.NewStickerSet
+import ru.raysmith.tgbot.model.network.sticker.Sticker
+import ru.raysmith.tgbot.model.network.sticker.StickerSet
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
+import java.io.InputStream
 
 interface ApiCaller {
     val service: TelegramService
@@ -148,4 +155,105 @@ interface ApiCaller {
 //    fun setMyCommands(
 //        commands: Iterable<BotCommand>, scope: BotCommandScope?, languageCode:
 //    )
+
+    /**
+     * Use this method to get a sticker set. On success, a [StickerSet] object is returned.
+     *
+     * @param name Name of the sticker set
+     * */
+    fun getStickerSet(name: String): StickerSet {
+        return service.getStickerSet(name).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to get information about custom emoji stickers by their identifiers.
+     * Returns an Array of [Sticker] objects.
+     *
+     * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
+     * */
+    fun getCustomEmojiStickers(customEmojiIds: List<String>): List<Sticker> {
+        return service.getCustomEmojiStickers(customEmojiIds).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to upload a .PNG file with a sticker for later use in *[createNewStickerSet]* and
+     * *[addStickerToSet]* methods (can be used multiple times). Returns the uploaded File on success.
+     *
+     * @param userId User identifier of sticker file owner
+     * @param pngSticker **PNG** image with the sticker, must be up to 512 kilobytes in size,
+     * dimensions must not exceed 512px, and either width or height must be exactly 512px.
+     * */
+    fun uploadStickerFile(userId: ChatId.ID, pngSticker: InputFile): File {
+        return service.uploadStickerFile(userId, pngSticker.toRequestBody("png_sticker")).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to create a new sticker set owned by a user.
+     * The bot will be able to edit the sticker set thus created. You **must** use exactly one of the
+     * fields *[pngSticker][NewStickerSet.pngSticker]*, *[tgsSticker][NewStickerSet.tgsSticker]*,
+     * or *[webmSticker][NewStickerSet.webmSticker]*. Returns *True* on success.
+     *
+     * @param userId User identifier of created sticker set owner
+     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
+     * Can contain only English letters, digits and underscores. Must begin with a letter,
+     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
+     * `<bot_username>` is case insensitive. 1-64 characters.
+     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
+     * bot in context
+     * @param title Sticker set title, 1-64 characters
+     * @param block Sticker set builder
+     * */
+    fun createNewStickerSet(userId: ChatId.ID, name: String, title: String, emojis: String, block: NewStickerSet.() -> Unit): Boolean {
+        return NewStickerSet(userId, name, title, emojis).apply(block).create(service)
+    }
+
+    /**
+     * Use this method to add a new sticker to a set created by the bot.
+     * You must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
+     * Animated stickers can be added to animated sticker sets and only to them.
+     * Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
+     * Returns True on success.
+     *
+     * @param userId User identifier of created sticker set owner
+     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
+     * Can contain only English letters, digits and underscores. Must begin with a letter,
+     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
+     * `<bot_username>` is case insensitive. 1-64 characters.
+     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
+     * bot in context
+     * @param block Add sticker set builder
+     * */
+    fun addStickerToSet(userId: ChatId.ID, name: String, emojis: String, block: AddStickerInStickerSet.() -> Unit): Boolean {
+        return AddStickerInStickerSet(userId, name, emojis).apply(block).add(service)
+    }
+
+    /**
+     * Use this method to move a sticker in a set created by the bot to a specific position. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param position New sticker position in the set, zero-based
+     * */
+    fun setStickerPositionInSet(sticker: String, position: Int): Boolean {
+        return service.setStickerPositionInSet(sticker, position).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to delete a sticker from a set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * */
+    fun deleteStickerFromSet(sticker: String): Boolean {
+        return service.deleteStickerFromSet(sticker).execute().body()?.result ?: errorBody()
+    }
+
+    fun downloadFile(fileId: String): InputStream {
+        val fileResponse = service.getFile(fileId).execute().body() ?: errorBody()
+        return downloadFile(fileResponse.file)
+    }
+
+    fun downloadFile(file: File): InputStream {
+        return fileService.downLoad(file.path!!).execute().let {
+            (it.body() ?: errorBody()).byteStream()
+        }
+    }
 }

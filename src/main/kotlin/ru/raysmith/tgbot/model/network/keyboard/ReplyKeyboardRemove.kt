@@ -1,9 +1,7 @@
 package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramApi
 
 @Serializable
 /** Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and
@@ -31,8 +29,4 @@ data class ReplyKeyboardRemove(
     @Required
     @SerialName("remove_keyboard")
     val removeKeyboard: Boolean = true
-
-    override fun toString(): String {
-        return TelegramApi.json.encodeToString(this)
-    }
 }

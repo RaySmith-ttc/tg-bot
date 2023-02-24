@@ -1,8 +1,10 @@
 package ru.raysmith.tgbot.model.network.media.input
 
+import kotlinx.serialization.Serializable
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import ru.raysmith.tgbot.network.serializer.FileIdOrUrlSerializer
 import java.io.File
 import java.nio.file.Files
 
@@ -11,11 +13,12 @@ fun File.asTgFile() = InputFile.File(this)
 fun ByteArray.asTgFile(filename: String, mimeType: String) = InputFile.ByteArray(this, filename, mimeType)
 
 sealed class InputFile {
+    @Serializable(with = FileIdOrUrlSerializer::class)
     data class FileIdOrUrl(val value: String) : InputFile()
-//    data class Url(val url: String) : TgFile()
     data class File(val file: java.io.File) : InputFile(), NotReusableInputFile
-    data class ByteArray(val byteArray: kotlin.ByteArray, val filename: String, val mimeType: String) : InputFile(),
-        NotReusableInputFile {
+    data class ByteArray(
+        val byteArray: kotlin.ByteArray, val filename: String, val mimeType: String
+    ) : InputFile(), NotReusableInputFile {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -33,6 +36,7 @@ sealed class InputFile {
     }
 }
 
+fun NotReusableInputFile.toRequestBody(name: String) = (this as InputFile).toRequestBody(name)
 fun InputFile.toRequestBody(name: String) = when(this) {
     is InputFile.ByteArray -> {
         val body = byteArray.toRequestBody(mimeType.toMediaType())

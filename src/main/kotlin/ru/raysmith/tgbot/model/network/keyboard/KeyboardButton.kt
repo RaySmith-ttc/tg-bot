@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
 @Serializable
 /**
@@ -13,11 +14,13 @@ import kotlinx.serialization.Serializable
 data class KeyboardButton(
     /** Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed */
     @SerialName("text") val text: String,
-
+    
     /** If True, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only */
     @SerialName("request_contact") val requestContact: Boolean? = null,
-
+    
     /** If True, the user's current location will be sent when the button is pressed. Available in private chats only */
     @SerialName("request_location") val requestLocation: Boolean? = null,
     // TODO [poll support] add request_poll field (https://core.telegram.org/bots/api#keyboardbutton)
+    
+    @SerialName("web_app") val webApp: WebAppInfo? = null
 ) : IKeyboardButton

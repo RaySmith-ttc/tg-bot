@@ -9,7 +9,6 @@ import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdatesResult
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.network.TelegramService
@@ -17,6 +16,10 @@ import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.getOrDefault
+import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationsWrapper
+import ru.raysmith.tgbot.utils.locations.LocationsDSL
+import ru.raysmith.utils.letIf
 import ru.raysmith.utils.properties.PropertiesFactory
 import ru.raysmith.utils.properties.getOrNull
 import java.io.IOException
@@ -35,11 +38,10 @@ class Bot(
 
     // callbacks
     private var onError: (e: Exception) -> Unit = { }
-    private var onShutdown: suspend () -> Unit = { }
     private var onUpdate: (updates: List<Update>) -> Unit = { }
     private var onMessageSend: (message: Message) -> Unit = { }
     private var onStart: Bot.() -> Unit = { }
-    private var onStop: Bot.() -> Unit = { }
+    private var onStop: Bot.(handler: CommandHandler?) -> Unit = { }
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
@@ -94,19 +96,14 @@ class Bot(
         return this
     }
 
-    fun onShutdown(onShutdown: suspend () -> Unit): Bot {
-        this.onShutdown = onShutdown
-        return this
-    }
-
-
     private val queue = mutableMapOf<Any, Job>()
 
     private fun Update.withBlockingObject(action: (Any) -> Unit) {
         blockingSelector?.invoke(this)?.apply(action)
     }
 
-    private val eventHandlerFactory = EventHandlerFactory()
+    private lateinit var eventHandlerFactory: EventHandlerFactory
+    private var additionalEventHandlers: MutableList<(eventHandlerFactory: EventHandlerFactory) -> Unit> = mutableListOf()
 
     fun Map<Any, Pair<UUID, Job>>?.data(key: Any) = this?.get(key).let { it?.first to it?.second }
 
@@ -129,17 +126,26 @@ class Bot(
         try {
             scope.launch {
                 try {
-                    eventHandlerFactory.getHandler(update, service, fileService).run {
+                    val handler = if (isLocationsMode) {
+                        locationsWrapper!!.getHandlerFactory(update).apply {
+                            additionalEventHandlers.forEach {
+                                apply(it)
+                            }
+                        }.getHandler(update, service, fileService)
+                    } else {
+                        eventHandlerFactory.getHandler(update, service, fileService)
+                    }
+                    
+                    with(handler) {
                         if (this is CommandHandler && command.body == shutdownCommand) {
-                            val chatId = update.message?.chat?.id
-                            val userId = update.message?.from?.id
+                            val chatId = update.message?.chat?.id?.value
+                            val userId = update.message?.from?.id?.value
                             logger.info("Shutdown command was called from chat #${chatId} by user #${userId}")
-                            onShutdown()
                             logger.info("Shutting down bot...")
-                            stop()
-                            return@run
+                            stop(this)
+                            return@with
                         }
-
+    
                         handle()
                     }
                 } catch (e: Exception) {
@@ -181,7 +187,9 @@ class Bot(
             safeOnError(e)
             throw e
         } catch (e: IOException) {
-            safeOnError(e)
+            if (isActive) {
+                safeOnError(e)
+            }
         } catch (e: TelegramApiException) {
             safeOnError(e)
         } catch (e: Exception) {
@@ -202,15 +210,27 @@ class Bot(
         logger.info("Bot started")
         isActive = true
 
+        additionalEventHandlers.forEach {
+            eventHandlerFactory.apply(it)
+        }
+        
         try {
             onStart(this)
+    
+            val allowedUpdates = if (isLocationsMode) {
+                val loc = locationsWrapper!!.locations.map { it.value.handlerFactory.allowedUpdates }.flatten().toSet()
+                val additional = eventHandlerFactory.allowedUpdates
+                (loc + additional).toList().asParameter()
+            } else {
+                eventHandlerFactory.allowedUpdates.toList().asParameter()
+            }
 
             while (isActive) {
                 safeNetwork {
                     updateRequest = service.getUpdates(
                         offset = lastUpdateId?.plus(1),
                         timeout = timeout,
-                        allowedUpdates = eventHandlerFactory.getAllowedUpdateTypes().asParameter()
+                        allowedUpdates = allowedUpdates
                     )
 
                     val updates = updateRequest!!.execute()
@@ -235,7 +255,7 @@ class Bot(
     suspend fun restart() {
         logger.info("Restarting...")
         if (isActive) {
-            stop()
+            stop(null)
         }
         startBot()
     }
@@ -243,13 +263,27 @@ class Bot(
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
     suspend fun start(updateHandler: EventHandlerFactory.(bot: Bot) -> Unit) {
-        eventHandlerFactory.updateHandler(this) // setup handlers
+        eventHandlerFactory = EventHandlerFactoryImpl()
+        eventHandlerFactory.updateHandler(this)
         startBot()
     }
+    
+    private var isLocationsMode = false
+    private var locationsWrapper: LocationsWrapper<*>? = null
+    @LocationsDSL
+    suspend fun <T : LocationConfig> locations(setup: LocationsWrapper<T>.() -> Unit) {
+        locationsWrapper = LocationsWrapper<T>().apply(setup)
+        eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<T>)
+        isLocationsMode = true
+        startBot()
+    }
+//    @LocationsDSL
+//    suspend fun locations(setup: LocationsWrapper<DefaultLocationConfigImpl>.() -> Unit) =
+//        locations<DefaultLocationConfigImpl>(setup)
 
     private var shutdownCommand: String? = null
     fun shutdownCommand(command: String): Bot {
-        this.shutdownCommand = command
+        this.shutdownCommand = command.letIf({ it.startsWith("/") }) { it.drop(1) }
         return this
     }
 
@@ -258,7 +292,7 @@ class Bot(
         return this
     }
 
-    fun onStop(onStop: Bot.() -> Unit): Bot {
+    fun onStop(onStop: Bot.(handler: CommandHandler?) -> Unit): Bot {
         this.onStop = onStop
         return this
     }
@@ -275,7 +309,9 @@ class Bot(
     }
 
     fun registerDatePicker(datePicker: DatePicker): Bot {
-        eventHandlerFactory.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker)
+        additionalEventHandlers.add {
+            it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker)
+        }
         return this
     }
 
@@ -284,20 +320,14 @@ class Bot(
         return this
     }
 
-    suspend fun stop() {
+    suspend fun stop(handler: CommandHandler? = null) {
         isActive = false
         updateRequest?.cancel()
-        stoppingJob = scope.launch {
-            logger.info("Waiting all processing updates...")
-            scope.coroutineContext[Job]!!.children.forEach {
-                it.cancelAndJoin()
-            }
-
-            logger.info("Done")
+        onStop(this, handler)
+        logger.info("Waiting all processing updates...")
+        scope.coroutineContext[Job]!!.children.forEach {
+            it.cancelAndJoin()
         }
-
-        stoppingJob?.join()
-        onStop(this)
     }
 }
 
