@@ -50,6 +50,7 @@ class Bot(
 
     // states
     var isActive = false
+        private set
     private var updateRequest: Call<NetworkResponse<List<Update>>>? = null
 
     companion object {
@@ -67,7 +68,7 @@ class Bot(
         val printNulls = properties.getOrDefault("printNulls", "false").toBoolean()
         val defaultProviderToken = properties?.getOrNull("providerToken")
         val emptyCallbackQuery = properties.getOrDefault("emptyCallbackQuery", " ")
-        val token = properties?.getOrNull("token") ?: System.getenv("BOT_TOKEN")
+        val token = properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN") ?: System.getenv("BOT_TOKEN")
 
         val defaultRows: Int = properties.getOrDefault("pagination.rows", "5").toIntOrNull()
             ?: throw IllegalArgumentException("Property pagination.rows is not Int")
@@ -80,7 +81,7 @@ class Bot(
         } ?: Locale.getDefault()
 
         fun init() {
-
+            // init fields
         }
     }
 
@@ -178,12 +179,16 @@ class Bot(
             }
         }
     }
+    
+    private fun incLastUpdateId() {
+        lastUpdateId = (lastUpdateId ?: 0) + 1
+    }
 
     private fun safeNetwork(action: () -> Unit) {
         try {
             action()
         } catch (e: BotException) {
-            lastUpdateId = (lastUpdateId ?: 0) + 1
+            incLastUpdateId()
             safeOnError(e)
             throw e
         } catch (e: IOException) {
@@ -193,7 +198,7 @@ class Bot(
         } catch (e: TelegramApiException) {
             safeOnError(e)
         } catch (e: Exception) {
-            lastUpdateId = (lastUpdateId ?: 0) + 1
+            incLastUpdateId()
             safeOnError(e)
         }
     }
@@ -207,13 +212,12 @@ class Bot(
     }
 
     private suspend fun startBot() {
-        logger.info("Bot started")
-        isActive = true
-
         additionalEventHandlers.forEach {
             eventHandlerFactory.apply(it)
         }
         
+        isActive = true
+        logger.info("Tg bot started...")
         try {
             onStart(this)
     
@@ -262,9 +266,9 @@ class Bot(
 
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
-    suspend fun start(updateHandler: EventHandlerFactory.(bot: Bot) -> Unit) {
+    suspend fun start(updateHandler: EventHandlerFactoryImpl.(bot: Bot) -> Unit) {
         eventHandlerFactory = EventHandlerFactoryImpl()
-        eventHandlerFactory.updateHandler(this)
+        (eventHandlerFactory as EventHandlerFactoryImpl).updateHandler(this)
         startBot()
     }
     
@@ -273,13 +277,10 @@ class Bot(
     @LocationsDSL
     suspend fun <T : LocationConfig> locations(setup: LocationsWrapper<T>.() -> Unit) {
         locationsWrapper = LocationsWrapper<T>().apply(setup)
-        eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<T>)
+        eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)
         isLocationsMode = true
         startBot()
     }
-//    @LocationsDSL
-//    suspend fun locations(setup: LocationsWrapper<DefaultLocationConfigImpl>.() -> Unit) =
-//        locations<DefaultLocationConfigImpl>(setup)
 
     private var shutdownCommand: String? = null
     fun shutdownCommand(command: String): Bot {
@@ -310,7 +311,17 @@ class Bot(
 
     fun registerDatePicker(datePicker: DatePicker): Bot {
         additionalEventHandlers.add {
-            it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker)
+            when (it) {
+                is EventHandlerFactoryImpl -> {
+                    it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                }
+    
+                is LocationEventHandlerFactory<*> -> {
+                    it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                }
+    
+                else -> return@add
+            }
         }
         return this
     }

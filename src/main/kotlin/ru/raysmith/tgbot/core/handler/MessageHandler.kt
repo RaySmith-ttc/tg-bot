@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.network.TelegramService
 open class MessageHandler(
     val message: Message,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: MessageHandler.() -> Unit
+    private val handler: MessageHandler.() -> Unit = { }
 ) : EventHandler, BotContext<MessageHandler> {
 
     override fun getChatId() = message.chat.id

@@ -14,9 +14,9 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.file.FileResponse
+import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.response.*
@@ -876,7 +876,7 @@ interface TelegramService {
 
     @Multipart
     @POST("uploadStickerFile")
-    fun uploadStickerFile(
+    fun     uploadStickerFile(
         @Query("user_id") userId: ChatId.ID,
         @Part pngSticker: MultipartBody.Part,
     ): Call<NetworkResponse<File>>
@@ -939,10 +939,56 @@ interface TelegramService {
     fun deleteStickerFromSet(
         @Query("sticker") sticker: String,
     ): Call<NetworkResponse<Boolean>>
-
-
-    // TODO setStickerSetThumb
-
+    
+    @Multipart
+    @POST("setStickerSetThumb")
+    fun setStickerSetThumb(
+        @Part("name") name: RequestBody,
+        @Part("user_id") userId: ChatId.ID,
+        @Part thumb: MultipartBody.Part? = null,
+    ): Call<NetworkResponse<Boolean>>
+    
+    /**
+     * Use this method to send answers to an inline query. On success, True is returned.
+     * No more than 50 results per query are allowed.
+     *
+     * @param inlineQueryId Unique identifier for the answered query
+     * @param results A JSON-serialized array of results for the inline query
+     * @param cacheTime The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
+     * @param isPersonal Pass True, if results may be cached on the server side only for the user that sent the query.
+     * By default, results may be returned to any user who sends the same query
+     * @param isPersonal Pass the offset that a client should send in the next query with the same text to receive
+     * more results. Pass an empty string if there are no more results or if you don't support pagination.
+     * Offset length can't exceed 64 bytes.
+     * @param switchPmParameter [Deep-linking](https://core.telegram.org/bots#deep-linking) parameter
+     * for the /start message sent to the bot when user presses the switch button.
+     * 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
+     *
+     * Example: An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account
+     * to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the
+     * results, or even before showing any. The user presses the button, switches to a private chat with the bot and,
+     * in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can
+     * offer a switch_inline button so that the user can easily return to the chat where they wanted to use the bot's
+     * inline capabilities.
+     * */
+    @POST("answerInlineQuery")
+    fun answerInlineQuery(
+        @Query("inline_query_id") inlineQueryId: String,
+        @Query("results") results: String,
+        @Query("cache_time") cacheTime: Int? = null,
+        @Query("is_personal") isPersonal: Boolean? = null,
+        @Query("next_offset") nextOffset: String? = null,
+        @Query("switch_pm_text") switchPmText: String? = null,
+        @Query("switch_pm_parameter") switchPmParameter: String? = null,
+    ): Call<NetworkResponse<Boolean>>
+    
+    // TODO test
+    @POST("answerWebAppQuery")
+    fun answerWebAppQuery(
+        @Query("web_app_query_id") webAppQueryId: String,
+        @Query("result") result: InlineQueryResult,
+    ): Call<NetworkResponse<SentWebAppMessage>>
+    
     /**
      * Use this method to send invoices. On success, the sent Message is returned.
      *
@@ -1022,6 +1068,8 @@ interface TelegramService {
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") replyMarkup: InlineKeyboardMarkup? = null
     ): Call<MessageResponse>
+    
+    // TODO createInvoiceLink
 
     /**
      * Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation
@@ -1064,40 +1112,6 @@ interface TelegramService {
         @Query("ok") ok: Boolean,
         @Query("shipping_options") shippingOptions: String? = null,
         @Query("error_message") errorMessage: String? = null
-    ): Call<NetworkResponse<Boolean>>
-
-    /**
-     * Use this method to send answers to an inline query. On success, True is returned.
-     * No more than 50 results per query are allowed.
-     *
-     * @param inlineQueryId Unique identifier for the answered query
-     * @param results A JSON-serialized array of results for the inline query
-     * @param cacheTime The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
-     * @param isPersonal Pass True, if results may be cached on the server side only for the user that sent the query.
-     * By default, results may be returned to any user who sends the same query
-     * @param isPersonal Pass the offset that a client should send in the next query with the same text to receive
-     * more results. Pass an empty string if there are no more results or if you don't support pagination.
-     * Offset length can't exceed 64 bytes.
-     * @param switchPmParameter [Deep-linking](https://core.telegram.org/bots#deep-linking) parameter
-     * for the /start message sent to the bot when user presses the switch button.
-     * 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
-     *
-     * Example: An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account
-     * to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the
-     * results, or even before showing any. The user presses the button, switches to a private chat with the bot and,
-     * in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can
-     * offer a switch_inline button so that the user can easily return to the chat where they wanted to use the bot's
-     * inline capabilities.
-     * */
-    @POST("answerInlineQuery")
-    fun answerInlineQuery(
-        @Query("inline_query_id") inlineQueryId: String,
-        @Query("results") results: String,
-        @Query("cache_time") cacheTime: Int? = null,
-        @Query("is_personal") isPersonal: Boolean? = null,
-        @Query("next_offset") nextOffset: String? = null,
-        @Query("switch_pm_text") switchPmText: String? = null,
-        @Query("switch_pm_parameter") switchPmParameter: String? = null,
     ): Call<NetworkResponse<Boolean>>
 }
 

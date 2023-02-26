@@ -1,6 +1,7 @@
 package helper
 
 import kotlinx.coroutines.*
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -9,14 +10,32 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.EventHandler
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.isCommand
 import ru.raysmith.tgbot.core.send
+import ru.raysmith.tgbot.model.Currency
+import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.network.InlineQueryResultArticle
+import ru.raysmith.tgbot.model.network.InputTextMessageContent
+import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
+import ru.raysmith.tgbot.model.network.chat.ChatMember
+import ru.raysmith.tgbot.model.network.command.BotCommand
+import ru.raysmith.tgbot.model.network.command.BotCommandScopeChat
+import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
+import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
+import ru.raysmith.tgbot.model.network.media.input.asTgFile
 import ru.raysmith.tgbot.model.network.menubutton.*
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
+import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
@@ -25,8 +44,10 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import java.io.File
+import java.io.IOException
 import java.time.LocalDate
 import java.util.*
+import kotlin.time.Duration.Companion.minutes
 
 inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
 
@@ -186,7 +207,7 @@ class Runner {
                 }
                 
                 global {
-                    handleCommand("Global") {
+                    handleCommand {
                         isCommand("menu") {
                             toLocation("menu")
                         }
@@ -213,6 +234,10 @@ class Runner {
                             }
                         }
                         
+                        handleMessage {
+                            send("handled in $name")
+                        }
+                        
                         handleUnknown {
                             send("unknown")
                         }
@@ -221,13 +246,15 @@ class Runner {
                 }
                 
                 location("other") {
-    
                     onEnter {
                         send("in other")
                     }
                     
                     handle {
                         handleCommand {
+                            isCommand("repeat") {
+                                onEnter()
+                            }
                             isCommand("other") {
                                 send("other")
                             }
@@ -243,6 +270,10 @@ class Runner {
                                 }
                             }
                         }
+    
+                        handleMessage {
+                            send("handled in $name")
+                        }
                         
                         handleCallbackQuery {
                             datePickerResult(datePicker) {
@@ -253,7 +284,7 @@ class Runner {
                 }
             }
             
-            /*bot.start { bot ->
+            bot.start { bot ->
                 handleInlineQuery {
                     println(inlineQuery)
 
@@ -282,20 +313,20 @@ class Runner {
                 }
 
                 handleMessage {
-//                    messageContact()
+//                    messageContact() // TODO ?
 //                        .convert { }
 //                        .verify { }
 //                        .use {
 //                            send(it)
 //                        }
                     
-                    *//*messageContact(verification = { it.phoneNumber != "" }) {
-                        send(it)
+                    messageContact(/*verification = { it.phoneNumber != "" }*/) {
+                        send(it.toString())
 //                    } ?: messagePhoto {
 //                        it.inputStream(this).readBytes().size.let {
 //                            send("Bytes: $it")
 //                        }
-                    } ?:*//* messagePhoto<String>()
+                    } ?: messagePhoto<String>()
                         .verify { it.height != 9999 }
                         .convert { it.fileName ?: "unknown" }
                         .use {
@@ -1158,8 +1189,15 @@ class Runner {
                             pngSticker("BQACAgIAAxUHY406pjEI4wABA8wMxxtEeOXcVw0hAAJSKwAC0oBoSIac6VfNgGZKKwQ".asTgFile())
                         }
                     }
+    
+                    isCommand("setStickerSetThumb") {
+                        setStickerSetThumb(
+                            stickerSetName("name"), getChatIdOrThrow(),
+                            InputFile.FileIdOrUrl("https://i.ibb.co/ZS7TT09/image.png")
+                        )
+                    }
                 }
-            }*/
+            }
             
             delay(Long.MAX_VALUE)
         }

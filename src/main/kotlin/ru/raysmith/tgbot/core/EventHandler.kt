@@ -15,3 +15,9 @@ interface LocationHandler<T : LocationConfig> : EventHandler {
     
     fun config() = locationsWrapper.configCreator(update)
 }
+
+internal fun <T : LocationConfig> LocationHandler<T>.defaultToLocation(name: String) {
+    val config = locationsWrapper.configCreator(update)
+    val location = locationsWrapper.onToLocation(config, name)
+    location.onEnter(this)
+}

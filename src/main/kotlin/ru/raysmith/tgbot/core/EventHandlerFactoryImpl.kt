@@ -9,87 +9,13 @@ import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
-import ru.raysmith.tgbot.utils.locations.LocationConfig
-import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 @DslMarker
 annotation class HandlerDsl
 
 @HandlerDsl
-interface EventHandlerFactory {
-    companion object {
-        private val logger = LoggerFactory.getLogger("event-handler-factory")
-    }
-    
-    val allowedUpdates: Set<UpdateType>
-    
-    fun handleUnknown(handler: UnknownEventHandler.() -> Unit)
-    
-    fun getHandler(update: Update, service: TelegramService, fileService: TelegramFileService): EventHandler
-    
-    @HandlerDsl
-    fun handleCallbackQuery(
-        alwaysAnswer: Boolean = false,
-        handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        datePicker: DatePicker? = null,
-        handler: (CallbackQueryHandler.() -> Unit)? = null
-    )
-}
-
-@HandlerDsl
-class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper: LocationsWrapper<T>) : EventHandlerFactory {
-    
-    private val logger = LoggerFactory.getLogger("event-handler-factory")
-    override val allowedUpdates = mutableSetOf<UpdateType>()
-    
-    private var commandHandler: MutableMap<String, LocationCommendHandlerData<T>> = mutableMapOf()
-    private val callbackQueryHandler: MutableMap<String, CallbackQueryHandlerData> = mutableMapOf()
-    private var unknownHandler: UnknownEventHandler.() -> Unit = { }
-    
-    private var alwaysAnswer: Boolean = false
-    
-    override fun getHandler(
-        update: Update, service: TelegramService, fileService: TelegramFileService
-    ): EventHandler = when {
-        update.message?.type == MessageType.COMMAND ->
-            LocationCommandHandler(update, service, fileService, commandHandler, locationsWrapper)
-    
-        update.callbackQuery != null ->
-            CallbackQueryHandler(update.callbackQuery, alwaysAnswer, callbackQueryHandler, service, fileService)
-        
-        else -> UnknownEventHandler(update, service, fileService, unknownHandler)
-    }
-    
-    override fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
-        unknownHandler = handler
-    }
-    
-    @HandlerDsl
-    fun handleCommand(handlerId: String = "Default", handler: LocationCommandHandler<T>.(config: T) -> Unit) {
-        allowedUpdates.add(UpdateType.MESSAGE)
-        commandHandler[handlerId] = LocationCommendHandlerData(handler)
-    }
-    
-    @HandlerDsl
-    override fun handleCallbackQuery(
-        alwaysAnswer: Boolean,
-        handlerId: String,
-        datePicker: DatePicker?,
-        handler: (CallbackQueryHandler.() -> Unit)?
-    ) {
-        if (callbackQueryHandler.containsKey(handlerId)) return
-
-        this.alwaysAnswer = alwaysAnswer
-        allowedUpdates.add(UpdateType.CALLBACK_QUERY)
-        logger.debug("[loc] Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, datePicker)
-    }
-}
-
-@HandlerDsl
 open class EventHandlerFactoryImpl : EventHandlerFactory {
 
-    private val logger = LoggerFactory.getLogger("event-handler-factory")
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
     private var unknownHandler: UnknownEventHandler.() -> Unit = { }
@@ -105,7 +31,6 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
 
     override fun getHandler(update: Update, service: TelegramService, fileService: TelegramFileService): EventHandler {
         return when {
-
             commandHandler != null && update.message?.type == MessageType.COMMAND ->
                 CommandHandler(BotCommand(update.message.text!!), update.message, service, fileService, commandHandler!!)
 
@@ -135,7 +60,7 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
     }
     
     @HandlerDsl
-    override fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
+    fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
     }
 
@@ -146,10 +71,10 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
     }
     
     @HandlerDsl
-    override fun handleCallbackQuery(
-        alwaysAnswer: Boolean,
-        handlerId: String,
-        datePicker: DatePicker?,
+    fun handleCallbackQuery(
+        alwaysAnswer: Boolean = false,
+        handlerId: String = CallbackQueryHandler.HANDLER_ID,
+        datePicker: DatePicker? = null,
         handler: (CallbackQueryHandler.() -> Unit)?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) {
@@ -158,7 +83,7 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
 
         this.alwaysAnswer = alwaysAnswer
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
-        logger.debug("Register callbackQueryHandler '${handlerId}'")
+        EventHandlerFactory.logger.debug("Register callbackQueryHandler '${handlerId}'")
         callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, datePicker)
     }
 

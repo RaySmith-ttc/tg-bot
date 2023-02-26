@@ -1,12 +1,15 @@
 package ru.raysmith.tgbot.utils.locations
 
 import ru.raysmith.tgbot.core.EventHandler
-import ru.raysmith.tgbot.core.EventHandlerFactory
 import ru.raysmith.tgbot.core.LocationEventHandlerFactory
+import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 
 @DslMarker
 annotation class LocationsDSL
+
+@DslMarker
+annotation class LocationsDSLConfig
 
 interface LocationConfig {
     val update: Update
@@ -23,10 +26,16 @@ class Location<T : LocationConfig>(internal val handlerFactory: LocationEventHan
         internal set
     
     internal var onEnter: EventHandler.() -> Unit = {  }
+    
+    @LocationsDSLConfig
     fun onEnter(block: EventHandler.() -> Unit) {
         this.onEnter = block
     }
+    fun EventHandler.onEnter() {
+        onEnter.invoke(this)
+    }
     
+    @LocationsDSLConfig
     fun handle(block: LocationEventHandlerFactory<T>.(location: Location<T>) -> Unit) {
         block(handlerFactory, this)
     }
@@ -45,17 +54,17 @@ class LocationsWrapper<T : LocationConfig> {
     internal val locations = mutableMapOf<String, Location<T>>()
     
     private var locationNameGetter: T.() -> String = { error("TODO") }
-    fun getLocation(locationNameGetter: T.() -> String) {
+    @LocationsDSLConfig fun getLocation(locationNameGetter: T.() -> String) {
         this.locationNameGetter = locationNameGetter
     }
     
     internal var configCreator: (update: Update) -> T = { error("TODO") }
-    fun config(configCreator: (update: Update) -> T) {
+    @LocationsDSLConfig fun config(configCreator: (update: Update) -> T) {
         this.configCreator = configCreator
     }
     
     private var updateLocation: T.(location: Location<T>) -> Unit = {  }
-    fun updateLocation(block: T.(location: Location<T>) -> Unit) {
+    @LocationsDSLConfig fun updateLocation(block: T.(location: Location<T>) -> Unit) {
         this.updateLocation = block
     }
     
@@ -69,9 +78,12 @@ class LocationsWrapper<T : LocationConfig> {
         locations[location.name] = location
     }
     
-    private val additionalEventHandlers: MutableList<LocationEventHandlerFactory<T>.(T) -> Unit> = mutableListOf()
-    fun global(setup: LocationEventHandlerFactory<T>.(config: T) -> Unit) {
-        additionalEventHandlers.add(setup)
+    private val additionalEventHandlers: MutableMap<String, LocationEventHandlerFactory<T>.(T) -> Unit> = mutableMapOf()
+    @LocationsDSLConfig fun global(
+        handlersId: String = CallbackQueryHandler.GLOBAL_HANDLER_ID,
+        setup: LocationEventHandlerFactory<T>.(config: T) -> Unit
+    ) {
+        additionalEventHandlers[handlersId] = setup
     }
     
     @LocationsDSL
@@ -87,8 +99,10 @@ class LocationsWrapper<T : LocationConfig> {
         val location = locations[locationNameGetter(config)] ?: error("TODO")
         config.updateLocation(location)
         return location.handlerFactory.apply {
-            additionalEventHandlers.forEach {
-                apply { it(config) }
+            additionalEventHandlers.forEach { (handlerId, handler) ->
+                withHandlerId(handlerId) {
+                    handler(config)
+                }
             }
         }
     }

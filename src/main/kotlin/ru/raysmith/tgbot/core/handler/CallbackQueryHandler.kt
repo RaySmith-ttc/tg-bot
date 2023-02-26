@@ -14,9 +14,9 @@ import ru.raysmith.tgbot.utils.handleAll
 import java.time.LocalDate
 
 @HandlerDsl
-class CallbackQueryHandler(
-    override val query: CallbackQuery,
-    private val alwaysAnswer: Boolean,
+open class CallbackQueryHandler(
+    final override val query: CallbackQuery,
+    protected val alwaysAnswer: Boolean,
     private val handlerData: Map<String, CallbackQueryHandlerData>,
     override val service: TelegramService, override val fileService: TelegramFileService
 ) : EventHandler, BaseCallbackHandler(query, service, fileService), BotContext<CallbackQueryHandler> {
@@ -28,6 +28,7 @@ class CallbackQueryHandler(
 
     companion object {
         const val HANDLER_ID = "default"
+        const val GLOBAL_HANDLER_ID = "global"
         val logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
