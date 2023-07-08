@@ -13,14 +13,13 @@ import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.*
-import ru.raysmith.tgbot.model.network.command.*
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
 object TelegramApi {
 
     val logger: Logger = LoggerFactory.getLogger("tg-api")
-    private var TOKEN = Bot.Config.token
+    private var TOKEN = Bot.config.token
     const val BASE_URL = "https://api.telegram.org"
 
     fun setToken(newToken: String) {

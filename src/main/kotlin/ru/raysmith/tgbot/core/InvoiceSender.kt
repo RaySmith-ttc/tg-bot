@@ -19,7 +19,7 @@ class InvoiceSender(override var service: TelegramService, override val fileServ
     var title: String? = null
     var description: String? = null
     var payload: String? = null
-    var providerToken: String? = Bot.Config.defaultProviderToken
+    var providerToken: String? = Bot.config.defaultProviderToken
     var currency: Currency? = null
     var prices: List<LabeledPrice>? = null
     var maxTipAmount: Int? = null

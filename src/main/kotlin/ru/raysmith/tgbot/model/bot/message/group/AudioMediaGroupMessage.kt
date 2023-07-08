@@ -26,8 +26,8 @@ class AudioMediaGroupMessage(override val service: TelegramService, override val
 
     fun audio(
         audio: InputFile, thumb: NotReusableInputFile? = null, duration: Int? = null, performer: String? = null,
-        title: String? = null, printNulls: Boolean = Bot.Config.printNulls,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
+        title: String? = null, printNulls: Boolean = Bot.config.printNulls,
+        safeTextLength: Boolean = Bot.config.safeTextLength, caption: MessageText.() -> Unit
     ) {
         inputMedia.add(
             InputMediaAudio(

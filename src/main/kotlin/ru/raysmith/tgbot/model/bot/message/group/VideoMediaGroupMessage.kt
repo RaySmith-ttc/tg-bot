@@ -26,8 +26,8 @@ class VideoMediaGroupMessage(override val service: TelegramService, override val
 
     fun video(
         video: InputFile, thumb: NotReusableInputFile? = null, width: Int? = null, height: Int? = null, duration: Int? = null,
-        supportsStreaming: Boolean? = null, printNulls: Boolean = Bot.Config.printNulls,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
+        supportsStreaming: Boolean? = null, printNulls: Boolean = Bot.config.printNulls,
+        safeTextLength: Boolean = Bot.config.safeTextLength, caption: MessageText.() -> Unit
     ) {
         inputMedia.add(
             InputMediaVideo(

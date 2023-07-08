@@ -8,14 +8,14 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationMessageHandlerData<T : LocationConfig>(
-    val handler: (context(T) LocationMessageHandler<T>.() -> Unit)? = null
+data class LocationChannelPostHandlerData<T : LocationConfig>(
+    val handler: (context(T) LocationChannelPostHandler<T>.() -> Unit)? = null
 )
 
 @HandlerDsl
-open class LocationMessageHandler<T : LocationConfig>(
+open class LocationChannelPostHandler<T : LocationConfig>(
     override val update: Update, service: TelegramService, fileService: TelegramFileService,
-    private val handlerData: Map<String, LocationMessageHandlerData<T>>,
+    private val handlerData: Map<String, LocationChannelPostHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : MessageHandler(update.message!!, service, fileService), LocationHandler<T> {
     
@@ -26,7 +26,7 @@ open class LocationMessageHandler<T : LocationConfig>(
         }
     }
     override fun withBot(bot: Bot, block: BotContext<MessageHandler>.() -> Any) {
-        LocationMessageHandler(update, service, fileService, handlerData, locationsWrapper).apply {
+        LocationChannelPostHandler(update, service, fileService, handlerData, locationsWrapper).apply {
             this.block()
         }
     }

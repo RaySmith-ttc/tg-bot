@@ -2,7 +2,6 @@ package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.message.ParseMode
@@ -30,7 +29,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
     var disableWebPagePreview: Boolean? = null
 
     /** Whether test should be truncated if text length is greater than 4096 */
-    var safeTextLength: Boolean = Bot.Config.safeTextLength
+    var safeTextLength: Boolean = Bot.config.safeTextLength
 
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null

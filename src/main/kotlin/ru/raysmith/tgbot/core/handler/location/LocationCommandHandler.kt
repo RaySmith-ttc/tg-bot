@@ -1,7 +1,6 @@
 package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.*
-import ru.raysmith.tgbot.core.defaultToLocation
 import ru.raysmith.tgbot.core.handler.CommandHandler
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -10,6 +9,10 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
+data class LocationCommandHandlerData<T : LocationConfig>(
+    val handler: (context(T) LocationCommandHandler<T>.() -> Unit)? = null
+)
+
 @HandlerDsl
 class LocationCommandHandler<T : LocationConfig>(
     override val update: Update, service: TelegramService, fileService: TelegramFileService,
@@ -17,10 +20,12 @@ class LocationCommandHandler<T : LocationConfig>(
     override val locationsWrapper: LocationsWrapper<T>
 ) : CommandHandler(BotCommand(update.message!!.text!!), update.message, service, fileService), LocationHandler<T> {
     
-    override fun toLocation(name: String) = defaultToLocation(name)
+    override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config()) }
+            it.value.handler?.let { it1 ->
+                it1(config, this)
+            }
         }
     }
     

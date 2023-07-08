@@ -6,8 +6,14 @@ import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
+
+data class LocationCallbackQueryHandlerData<T : LocationConfig>(
+    val handler: (context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
+    val datePicker: DatePicker? = null
+)
 
 @HandlerDsl
 open class LocationCallbackQueryHandler<T : LocationConfig>(
@@ -16,14 +22,14 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
     override val locationsWrapper: LocationsWrapper<T>
 ) : CallbackQueryHandler(update.callbackQuery!!, alwaysAnswer, emptyMap(), service, fileService), LocationHandler<T> {
     
-    override fun toLocation(name: String) = defaultToLocation(name)
+    override val config by lazy { config() }
     override suspend fun handle() {
         if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
     
         for (data in handlerData) {
             if (isAnswered) break
     
-            data.value.datePicker?.handle(this) ?: data.value.handler?.let { it1 -> it1(config()) }
+            data.value.datePicker?.handle(this) ?: data.value.handler?.let { it1 -> it1(config, this) }
         }
     }
     override fun withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> Any) {

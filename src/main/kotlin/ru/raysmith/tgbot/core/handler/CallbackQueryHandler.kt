@@ -61,10 +61,17 @@ open class CallbackQueryHandler(
         }
     }
 
-    fun isDataEqual(value: String, equalHandler: DataCallbackQueryHandler.(data: String) -> Unit) {
-        if (!isAnswered && query.data == value) {
+    fun isDataEqual(vararg value: String, equalHandler: DataCallbackQueryHandler.(data: String) -> Unit) {
+        if (!isAnswered && query.data != null && query.data in value) {
             DataCallbackQueryHandler(query, query.data, service, fileService)
                 .apply { equalHandler(query.data!!) }
+        }
+    }
+    
+    fun isDataRegex(regex: Regex, regexHandler: DataCallbackQueryHandler.(value: String) -> Unit) {
+        if (!isAnswered && query.data?.matches(regex) == true) {
+            DataCallbackQueryHandler(query, query.data, service, fileService)
+                .apply { regexHandler(query.data!!) }
         }
     }
 
@@ -81,14 +88,17 @@ open class CallbackQueryHandler(
     }
 
     fun isDataStartWith(
-        startWith: String,
+        vararg startWith: String,
         startWithHandler: ValueDataCallbackQueryHandler.(value: String) -> Unit
     ) {
-        if (!isAnswered && query.data != null && query.data.startsWith(startWith)) {
-            val value = query.data.substring(startWith.length)
-            if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
-                ValueDataCallbackQueryHandler(query, value, service, fileService)
-                    .apply { startWithHandler(value) }
+        startWith.forEach { startWithEntry ->
+            if (!isAnswered && query.data != null && query.data.startsWith(startWithEntry)) {
+                val value = query.data.substring(startWithEntry.length)
+                if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
+                    ValueDataCallbackQueryHandler(query, value, service, fileService)
+                        .apply { startWithHandler(value) }
+                    return@forEach
+                }
             }
         }
     }

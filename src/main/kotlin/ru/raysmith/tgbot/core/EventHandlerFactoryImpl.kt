@@ -26,6 +26,7 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
     private var preCheckoutQueryHandler: (PreCheckoutQueryHandler.() -> Unit)? = null
     private var shippingQueryHandler: (ShippingQueryHandler.() -> Unit)? = null
     private var inlineQueryHandler: (InlineQueryHandler.() -> Unit)? = null
+    private var channelPostHandler: (ChannelPostHandler.() -> Unit)? = null
 
     private var alwaysAnswer: Boolean = false
 
@@ -54,6 +55,9 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
 
             inlineQueryHandler != null && update.inlineQuery != null ->
                 InlineQueryHandler(update.inlineQuery, service, fileService, inlineQueryHandler!!)
+            
+            channelPostHandler != null && update.channelPost != null ->
+                ChannelPostHandler(update.channelPost, service, fileService, channelPostHandler!!)
 
             else -> UnknownEventHandler(update, service, fileService, unknownHandler)
         }
@@ -62,6 +66,12 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
     @HandlerDsl
     fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
+    }
+
+    @HandlerDsl
+    fun handleChannelPost(handler: ChannelPostHandler.() -> Unit) {
+        allowedUpdates.add(UpdateType.CHANNEL_POST)
+        channelPostHandler = handler
     }
 
     @HandlerDsl
@@ -83,7 +93,7 @@ open class EventHandlerFactoryImpl : EventHandlerFactory {
 
         this.alwaysAnswer = alwaysAnswer
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
-        EventHandlerFactory.logger.debug("Register callbackQueryHandler '${handlerId}'")
+        Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
         callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, datePicker)
     }
 

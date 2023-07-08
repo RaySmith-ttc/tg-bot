@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.network.TelegramService
 class DocumentMediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) : ru.raysmith.tgbot.model.bot.message.group.MediaGroupMessage(service, fileService) {
     fun document(
         document: InputFile, thumb: NotReusableInputFile? = null, disableContentTypeDetection: Boolean? = null,
-        printNulls: Boolean = Bot.Config.printNulls, safeTextLength: Boolean = Bot.Config.safeTextLength,
+        printNulls: Boolean = Bot.config.printNulls, safeTextLength: Boolean = Bot.config.safeTextLength,
         caption: MessageText.() -> Unit
     ) {
         inputMedia.add(

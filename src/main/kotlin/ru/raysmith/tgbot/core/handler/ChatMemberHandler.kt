@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
-class ChatMemberHandler(
+open class ChatMemberHandler(
     val chat: Chat,
     val from: User,
     val date: Int,
@@ -21,7 +21,7 @@ class ChatMemberHandler(
     val newChatMember: ChatMember,
     val inviteLink: ChatInviteLink? = null,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ChatMemberHandler.() -> Unit
+    private val handler: ChatMemberHandler.() -> Unit = { }
 ) : EventHandler, BotContext<ChatMemberHandler> {
 
     override fun getChatId() = chat.id
@@ -29,7 +29,7 @@ class ChatMemberHandler(
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    constructor(chatMember: ChatMemberUpdated, service: TelegramService, fileService: TelegramFileService, handler: ChatMemberHandler.() -> Unit) : this(
+    constructor(chatMember: ChatMemberUpdated, service: TelegramService, fileService: TelegramFileService, handler: ChatMemberHandler.() -> Unit = { }) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,
         chatMember.inviteLink, service, fileService, handler
     )

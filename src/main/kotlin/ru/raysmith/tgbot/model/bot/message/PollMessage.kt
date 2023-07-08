@@ -42,7 +42,7 @@ class PollMessage(
     fun hasExplanation() = explanation != null || _explanation != null
 
     /** Whether test should be truncated if caption length is greater than 200 */
-    var safeTextLength: Boolean = Bot.Config.safeTextLength
+    var safeTextLength: Boolean = Bot.config.safeTextLength
 
     /**
      * Sets a explanation as [MessageText] object

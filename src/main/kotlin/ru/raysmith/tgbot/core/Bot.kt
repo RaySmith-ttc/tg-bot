@@ -15,24 +15,39 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
-import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.locations.LocationConfig
-import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 import ru.raysmith.tgbot.utils.locations.LocationsDSL
+import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 import ru.raysmith.utils.letIf
 import ru.raysmith.utils.properties.PropertiesFactory
-import ru.raysmith.utils.properties.getOrNull
 import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
 
-// TODO impl string-length safe util (sendMessage -> text.take(4096))
+
+// TODO impl string-length safe util (sendMessage -> text.take(4096)), throw error or loop sending
+/**
+ * Creates bot instance
+ *
+ * @param token Bot token from @BotFather. Can be null if is set via environment variable or properties
+ * @param timeout Timeout in seconds for long polling. Defaults to 50. Should be positive, short polling should be used for testing purposes only.
+ * @param scope Coroutine scope for new updates
+ * @param lastUpdateId Identifier of the first update to be returned. Must be greater by one than the highest among
+ * the identifiers of previously received updates. If null, updates starting with the earliest unconfirmed update
+ * are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than
+ * its update_id. The negative offset can be specified to retrieve updates starting from -offset update from the end
+ * of the updates queue. All previous updates will be forgotten.
+ * */
 class Bot(
     val token: String? = null,
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
-    var lastUpdateId: Int? = null,
+    private var lastUpdateId: Int? = null, // TODO can be negative, reverse mode?
 ) : ApiCaller {
+
+    init {
+        check(timeout >= 0) { "timeout should be positive" }
+    }
 
     private var stoppingJob: Job? = null
 
@@ -51,7 +66,6 @@ class Bot(
     // states
     var isActive = false
         private set
-    private var updateRequest: Call<NetworkResponse<List<Update>>>? = null
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
@@ -60,36 +74,37 @@ class Bot(
         @Deprecated("This constant returns the bot for a default service instance. Use the getMe() method from bot context", ReplaceWith("botContext { getMe() }"))
         val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
 
-        val properties = PropertiesFactory.fromOrNull("bot.properties")
-    }
-
-    object Config {
-        val safeTextLength = properties.getOrDefault("safeTextLength", "true").toBoolean()
-        val printNulls = properties.getOrDefault("printNulls", "false").toBoolean()
-        val defaultProviderToken = properties?.getOrNull("providerToken")
-        val emptyCallbackQuery = properties.getOrDefault("emptyCallbackQuery", " ")
-        val token = properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN") ?: System.getenv("BOT_TOKEN")
-
-        val defaultRows: Int = properties.getOrDefault("pagination.rows", "5").toIntOrNull()
-            ?: throw IllegalArgumentException("Property pagination.rows is not Int")
-        val defaultColumns: Int = properties.getOrDefault("pagination.columns", "1").toIntOrNull()
-            ?: throw IllegalArgumentException("Property pagination.columns is not Int")
-        val firstPageSymbol = properties.getOrDefault("pagination.firstPageSymbol", "«")
-        val lastPageSymbol = properties.getOrDefault("pagination.lastPageSymbol", "»")
-        val locale = properties?.getOrNull("calendar_locale")?.let {
-            Locale.forLanguageTag(it)
-        } ?: Locale.getDefault()
-
-        fun init() {
-            // init fields
+        internal var properties = setProperties()
+        internal fun setProperties(): Properties? {
+            return PropertiesFactory.fromOrNull("tgbot.properties") ?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
+        
+        internal var config = BotConfig()
     }
+    
+    private var needRefreshMe = false
+    @get:JvmName("getMeProp")
+    var me by MeDelegate(needRefreshMe)
+        private set
 
     init {
-        Config.init()
         if (token != null) {
+            config.token = token
             TelegramApi.setToken(token)
         }
+    }
+    
+    /** Reloads config from properties file */
+    fun reloadConfig() {
+        properties = setProperties()
+        needRefreshMe = true
+    }
+    
+    /** Setup new bot config */
+    fun config(setup: BotConfig.() -> Unit): Bot {
+        config = BotConfig().apply(setup)
+        needRefreshMe = true
+        return this
     }
 
     fun enableBlocking(selector: (Update) -> Any?): Bot {
@@ -117,7 +132,7 @@ class Bot(
                 val job = queue[it]
                 if (job != null) {
                     blockingTime = measureTimeMillis {
-                        logger.debug("Wait end blocking for $it...")
+                        logger.debug("Wait end blocking for {}...", it)
                         job.join()
                     }
                 }
@@ -129,6 +144,8 @@ class Bot(
                 try {
                     val handler = if (isLocationsMode) {
                         locationsWrapper!!.getHandlerFactory(update).apply {
+                            
+                            // TODO delete?
                             additionalEventHandlers.forEach {
                                 apply(it)
                             }
@@ -166,7 +183,7 @@ class Bot(
                 if (blockingSelector != null) {
                     update.withBlockingObject {
                         val uuid = UUID.randomUUID()
-                        logger.debug("Add blocking for $it ($uuid)")
+                        logger.debug("Add blocking for {} ({})", it, uuid)
                         queue[it] = job
                     }
                 }
@@ -174,7 +191,7 @@ class Bot(
         } catch (e: Exception) {
             logger.error(e.message, e)
             update.withBlockingObject {
-                logger.debug("Release blocking for $it after $blockingTime ms.")
+                logger.debug("Release blocking for {} after {} ms.", it, blockingTime)
                 queue.remove(it)
             }
         }
@@ -211,6 +228,7 @@ class Bot(
         }
     }
 
+    private var updateRequest: Call<NetworkResponse<List<Update>>>? = null
     private suspend fun startBot() {
         additionalEventHandlers.forEach {
             eventHandlerFactory.apply(it)
@@ -222,9 +240,8 @@ class Bot(
             onStart(this)
     
             val allowedUpdates = if (isLocationsMode) {
-                val loc = locationsWrapper!!.locations.map { it.value.handlerFactory.allowedUpdates }.flatten().toSet()
-                val additional = eventHandlerFactory.allowedUpdates
-                (loc + additional).toList().asParameter()
+                (eventHandlerFactory as LocationEventHandlerFactory<*>).locationsWrapper
+                    .allowedUpdates().toList().asParameter()
             } else {
                 eventHandlerFactory.allowedUpdates.toList().asParameter()
             }

@@ -255,7 +255,7 @@ data class Message(
         document != null -> document
         animation != null -> animation
         audio != null -> audio
-        photo != null && photo.isNotEmpty() -> photo.last()
+        !photo.isNullOrEmpty() -> photo.last()
         video != null -> video
         videoNote != null -> videoNote
         voice != null -> voice

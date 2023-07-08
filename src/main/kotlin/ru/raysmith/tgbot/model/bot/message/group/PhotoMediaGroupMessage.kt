@@ -13,7 +13,7 @@ class PhotoMediaGroupMessage(override val service: TelegramService, override val
     // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
     fun photo(
         photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, captionEntities: List<MessageEntity>? = null
+        safeTextLength: Boolean = Bot.config.safeTextLength, captionEntities: List<MessageEntity>? = null
     ) {
         inputMedia.add(
             InputMediaPhoto(
@@ -22,8 +22,8 @@ class PhotoMediaGroupMessage(override val service: TelegramService, override val
         )
     }
     fun photo(
-        photo: InputFile, printNulls: Boolean = Bot.Config.printNulls,
-        safeTextLength: Boolean = Bot.Config.safeTextLength, caption: MessageText.() -> Unit
+        photo: InputFile, printNulls: Boolean = Bot.config.printNulls,
+        safeTextLength: Boolean = Bot.config.safeTextLength, caption: MessageText.() -> Unit
     ) {
         inputMedia.add(
             InputMediaPhoto(

@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.utils.letIf
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -37,10 +38,10 @@ class DatePicker(val callbackQueryPrefix: String) {
 
     var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
     var additionalRows: MessageInlineKeyboard.(data: String?) -> Unit = { }
-    var additionalRowsVisibleOnStates = DatePickerState.values().toSet()
+    var additionalRowsVisibleOnStates = DatePickerState.entries.toSet()
 
     var timeZone = ZoneId.systemDefault()
-    var locale = Bot.Config.locale
+    var locale = Bot.config.locale
 
     private val now get() = LocalDate.now(timeZone)
 
@@ -158,7 +159,12 @@ class DatePicker(val callbackQueryPrefix: String) {
         val lastYear = getLastDate(datesRange).year
 
         val pages = (firstYear..lastYear).chunked(yearsRows * yearsColumns) as List<List<Int?>>
-        val pageIndex = pages.indexOfFirst { it.contains(fromYear) }
+        val pageIndex = pages.indexOfFirst { it.contains(fromYear) }.letIf({ it == -1 }) {
+            val diffWithStart = fromYear - datesRange.start.year
+            val diffWithEnd = datesRange.endInclusive.year - fromYear
+            
+            if (diffWithStart < diffWithEnd) 0 else pages.lastIndex
+        }
 
         if (!(pageIndex == 0 && pageIndex == pages.size - 1)) {
             row {

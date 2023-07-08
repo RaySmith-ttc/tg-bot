@@ -2,16 +2,14 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.*
-import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageWithReplyMarkup
+import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.Pagination
@@ -86,7 +84,7 @@ interface IEditor : ChatIdHolder, ApiCaller {
         return "${pagePrefix}p${getPreviousPage(pagePrefix)}"
     }
 
-    fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
+    private fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
         var res: InlineKeyboardButton? = null
         if (query.message?.replyMarkup?.keyboard != null) {
             keyboard@ for (row in query.message.replyMarkup.keyboard) {
@@ -113,10 +111,23 @@ interface IEditor : ChatIdHolder, ApiCaller {
         else Pagination.PAGE_FIRST
     }
 
-    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Long  {
-        return getPreviousPageButton(pagePrefix).getPage()
+    /**
+     * Return the previous page or null if page not found
+     * @param pagePrefix callback query prefix that used for create [pagination][Pagination]
+     * */
+    fun IEditor.getPreviousPageOrNull(pagePrefix: String? = null): Long? {
+        return if (this is CallbackQueryHandler) getPreviousPageOrNull(pagePrefix)
+        else null
     }
 
-    private fun InlineKeyboardButton?.getPage(): Long =
-        this?.text?.filterNot { it == Pagination.SYMBOL_CURRENT_PAGE }?.toLongOrNull() ?: Pagination.PAGE_FIRST
+    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Long  {
+        return getPreviousPageButton(pagePrefix)?.getPageOrNull() ?: Pagination.PAGE_FIRST
+    }
+
+    private fun CallbackQueryHandler.getPreviousPageOrNull(pagePrefix: String? = null): Long? {
+        return getPreviousPageButton(pagePrefix)?.getPageOrNull()
+    }
+
+    private fun InlineKeyboardButton.getPageOrNull(): Long? =
+        this.text.filterNot { it == Pagination.SYMBOL_CURRENT_PAGE }.toLongOrNull()
 }

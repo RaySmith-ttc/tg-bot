@@ -11,6 +11,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 @HandlerDsl
 interface EventHandlerFactory {
     companion object {
+        @Deprecated("Use main logger", ReplaceWith("Bot.logger"))
         internal val logger = LoggerFactory.getLogger("event-handler-factory")
     }
     

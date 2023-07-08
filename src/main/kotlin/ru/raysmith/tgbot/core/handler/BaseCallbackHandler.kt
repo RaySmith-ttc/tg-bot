@@ -7,7 +7,7 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
 /** Base implementation of query callback handler */
-open class BaseCallbackHandler(open val query: CallbackQuery, open val service: TelegramService, open val fileService: TelegramFileService) : ICallbackHandler {
+abstract class BaseCallbackHandler(open val query: CallbackQuery, open val service: TelegramService, open val fileService: TelegramFileService) : ICallbackHandler {
     var isAnswered = false
 
     fun answer(text: String) = answer { this.text = text }
@@ -27,6 +27,5 @@ open class BaseCallbackHandler(open val query: CallbackQuery, open val service: 
                 }
             }
         }.body()?.result ?: errorBody()
-
     }
 }

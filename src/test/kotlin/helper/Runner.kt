@@ -28,7 +28,10 @@ import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.media.input.asTgFile
-import ru.raysmith.tgbot.model.network.menubutton.*
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
+import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
+import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
@@ -49,16 +52,13 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
+val locations = true
 inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
-
-val ME = botContext {
-    getMe()
-}
 
 var loc: String = "menu"
 
 val datePicker = DatePicker("sys").apply {
-    locale = Locale.forLanguageTag("us")
+//    locale = Locale.forLanguageTag("us")
     messageText = { data, state ->
         bold("Title").n()
         n()
@@ -166,7 +166,6 @@ class Runner {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     @Test
     fun run() {
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -181,8 +180,10 @@ class Runner {
                 .onUpdate { updates ->
 //                    updates.forEach { println(it.callbackQuery?.data ?: it.message?.text) }
                     println(updates.firstOrNull())
+                }.config {
+                    this.locale = Locale.JAPAN
                 }
-                .registerDatePicker(datePicker)
+//                .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
 //                .enableBlocking { u -> u.findFrom() }
                 .enableBlocking { u -> u.findChatId() }
@@ -192,93 +193,148 @@ class Runner {
                 }
     
             class LocationConfigImpl(override val update: Update) : LocationConfig {
-                val userId = update.findFrom()!!.id.value
+                val userId by lazy { update.findFrom()?.id?.value ?: -1 }
+                var foo = "bar"
             }
             
-            bot.locations<LocationConfigImpl> {
-                getLocation {
-                    loc
-                }
-                config {
-                    LocationConfigImpl(it)
-                }
-                updateLocation {
-                    loc = it.name
-                }
-                
-                global {
-                    handleCommand {
-                        isCommand("menu") {
-                            toLocation("menu")
-                        }
-                        isCommand("other") {
-                            toLocation("other")
-                        }
+            if (locations) {
+                bot.locations<LocationConfigImpl> {
+                    getLocation {
+                        userId
+                        loc
                     }
-                }
-                
-                location("menu") {
-                    
-                    onEnter {
-                        send("in menu")
+                    config {
+                        LocationConfigImpl(it)
+                    }
+                    updateLocation {
+                        loc = it.name
                     }
                     
-                    handle {
+                    filter { true }
+                    
+                    global {
+                        handleMyChatMember {
+                            send(update.findChatId()!!) {
+                                text = update.findChatId()!!.toString()
+                            }
+                        }
                         handleCommand {
-                            isCommand("menu") {
-                                send("menu")
-                            }
-        
-                            isCommand("toother") {
-                                toLocation("other")
-                            }
-                        }
-                        
-                        handleMessage {
-                            send("handled in $name")
-                        }
-                        
-                        handleUnknown {
-                            send("unknown")
-                        }
-                    }
-                    
-                }
-                
-                location("other") {
-                    onEnter {
-                        send("in other")
-                    }
-                    
-                    handle {
-                        handleCommand {
-                            isCommand("repeat") {
-                                onEnter()
-                            }
-                            isCommand("other") {
-                                send("other")
-                            }
-                            isCommand("tomenu") {
-                                toLocation("menu")
-                            }
-                            isCommand("dp") {
+                            isCommand(ru.raysmith.tgbot.model.bot.BotCommand.START) {
                                 send {
-                                    text = "dp"
+                                    text = "test"
                                     inlineKeyboard {
-                                        createDatePicker(datePicker)
+                                        row("asd", "asd")
                                     }
                                 }
                             }
+                            isCommand("menu") {
+                                toLocation("menu")
+                            }
+                            isCommand("other") {
+                                toLocation("other")
+                            }
                         }
-    
-                        handleMessage {
-                            send("handled in $name")
+
+                        handleChannelPost {
+                            println(message)
+                        }
+
+                        handleCallbackQuery {
+                            edit {
+                                text = "edited from global"
+                            }
                         }
                         
-                        handleCallbackQuery {
-                            datePickerResult(datePicker) {
-                                send("result: $it")
+                        handleMessage {
+                            send {
+                                text = "test"
+                                inlineKeyboard {
+                                    row("asd", "asd")
+                                }
                             }
+                        }
+                        handleCallbackQuery {
+                            edit {
+                                text = "test2"
+                                inlineKeyboard {
+                                    row("asd2", "asd2")
+                                }
+                            }
+                        }
+                    }
+                    
+                    location("menu") {
+                        
+                        onEnter {
+                            send("in menu")
+                        }
+                        
+                        handle {
+                            handleCommand {
+                                isCommand("menu") {
+                                    send("menu")
+                                }
+                                
+                                isCommand("toother") {
+                                    foo = "changed"
+                                    toLocation("other")
+                                }
+                            }
+                            
+                            handleMessage {
+                                send("handled in $name")
+                            }
+                            
+                            handleUnknown {
+                                send("unknown")
+                            }
+                        }
+                        
+                    }
+                    
+                    location("other") {
+                        onEnter {
+                            send("in other\nfoo:${foo}")
+                        }
+                        
+                        handle {
+                            handleCommand {
+                                isCommand("repeat") {
+                                    toLocation("other")
+                                }
+                                isCommand("other") {
+                                    send("other")
+                                }
+                                isCommand("tomenu") {
+                                    toLocation("menu")
+                                }
+                                isCommand("dp") {
+                                    send {
+                                        text = "dp"
+                                        inlineKeyboard {
+                                            createDatePicker(datePicker)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            handleMessage {
+                                send("handled in $name")
+
+                                messageText()
+                                    .verify { it.contains(".") }
+                                    .convert { it.toFloatOrNull() }
+                                    .verify { it > 0.0 }
+                                    .use {
+                                        send("value: $it")
+                                    } ?: send("incorrect")
+                            }
+
+//                        handleCallbackQuery {
+//                            datePickerResult(datePicker) {
+//                                send("result: $it")
+//                            }
+//                        }
                         }
                     }
                 }
@@ -313,12 +369,12 @@ class Runner {
                 }
 
                 handleMessage {
-//                    messageContact() // TODO ?
-//                        .convert { }
-//                        .verify { }
-//                        .use {
-//                            send(it)
-//                        }
+                    messageContact()
+                        .verify { (it.userId ?: 0) > 0 }
+                        .convert { it.firstName + " " + it.lastName }
+                        .use {
+                            send(it)
+                        }
                     
                     messageContact(/*verification = { it.phoneNumber != "" }*/) {
                         send(it.toString())
@@ -326,7 +382,7 @@ class Runner {
 //                        it.inputStream(this).readBytes().size.let {
 //                            send("Bytes: $it")
 //                        }
-                    } ?: messagePhoto<String>()
+                    } ?: messagePhoto()
                         .verify { it.height != 9999 }
                         .convert { it.fileName ?: "unknown" }
                         .use {
@@ -364,7 +420,7 @@ class Runner {
                                 textWithEntities {
                                     setupTestMessage(message)
                                 }
-            
+
                                 inlineKeyboard {
                                     row {
                                         button("hello", "hello")
@@ -386,7 +442,7 @@ class Runner {
                 }
 
                 handleCallbackQuery(alwaysAnswer = true) {
-                    isDataEqual("media_group_file") {
+                    isDataEqual("media_group_file", "") {
                         sendPhotoMediaGroup {
                             val caption = generateSequence("") { "123456780".random().toString() }
 
@@ -470,7 +526,7 @@ class Runner {
                 }
 
                 handleCommand {
-                    if (!command.mentionIsCurrentBot(getMe())) return@handleCommand
+                    if (!command.mentionIsCurrentBot(bot.me)) return@handleCommand
 
                     fun getChatIdFromCommandsCommand(args: String?) =
                         (args?.split("\n")?.find { it.startsWith("chat_id") }?.split("=")?.last()?.toLongOrNull() ?: message.chat.id.value).toChatId()
@@ -501,8 +557,13 @@ class Runner {
                             textWithEntities {
                                 text("userId: ").code(message.from?.id?.value).n()
                                 text("chatId: ").code(message.chat.id.value).n()
+                                text("botId: ").code(bot.me.id.value).n()
                             }
                         }
+                    }
+                    
+                    isCommand("reloadConfig") {
+                        bot.reloadConfig()
                     }
 
                     isCommand("exportChatInviteLink") {

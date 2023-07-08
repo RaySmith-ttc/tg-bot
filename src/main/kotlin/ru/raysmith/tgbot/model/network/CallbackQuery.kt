@@ -50,7 +50,7 @@ data class CallbackQuery(
     @SerialName("game_short_name") val gameShortName: String? = null,
 )  : ChatIdHolder {
     companion object {
-        val EMPTY_CALLBACK_DATA = Bot.Config.emptyCallbackQuery
+        val EMPTY_CALLBACK_DATA = Bot.config.emptyCallbackQuery
     }
 
     override fun getChatId() = message?.chat?.id

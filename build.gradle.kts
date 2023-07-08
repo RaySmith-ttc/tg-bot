@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
-    kotlin("jvm") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    kotlin("jvm") version "1.9.0"
     id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "1.0.0-alpha.2"
+version = "1.0.0-alpha.14"
 
 repositories {
     mavenCentral()
@@ -48,8 +48,7 @@ java {
 
 dependencies {
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j:2.19.0")
@@ -64,10 +63,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
     // Utils
-    api("ru.raysmith:utils:1.4.2")
+    implementation("ru.raysmith:utils:1.4.2")
 
     // Extensions for
-    implementation("org.jetbrains.exposed:exposed-core:0.40.1")
+    api("org.jetbrains.exposed:exposed-core:0.40.1")
 
     // Testing
     testImplementation("org.assertj:assertj-core:3.23.1")
@@ -75,6 +74,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("org.mockito:mockito-core:4.8.0")
+    
     
     val ktorVersion = "2.2.1"
     testImplementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
@@ -89,8 +89,10 @@ dependencies {
 tasks {
     withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
-            freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
+            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+            freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
+            freeCompilerArgs += "-Xcontext-receivers"
+            freeCompilerArgs += "-XXLanguage:+UnitConversionsOnArbitraryExpressions"
             jvmTarget = JavaVersion.VERSION_1_8.toString()
         }
     }
