@@ -4,6 +4,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
 data class CallbackQueryHandlerData(
     val handler: (CallbackQueryHandler.() -> Unit)? = null,
-    val datePicker: DatePicker? = null
+    val datePicker: DatePicker? = null,
+    val alwaysAnswer: Boolean
 )
 

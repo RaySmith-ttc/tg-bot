@@ -27,7 +27,7 @@ interface BotContext<T : EventHandler> : ISender {
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl
-    fun withBot(bot: Bot, block: BotContext<T>.() -> Any)
+    fun <R> withBot(bot: Bot, block: BotContext<T>.() -> R): R
 
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.

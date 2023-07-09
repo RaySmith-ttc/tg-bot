@@ -11,9 +11,9 @@ interface EventHandler : ChatIdHolder, IEditor, ISender {
 interface LocationHandler<T : LocationConfig> : EventHandler {
     val update: Update
     val locationsWrapper: LocationsWrapper<T>
-    fun toLocation(name: String) {
+    fun BotContext<*>.toLocation(name: String) {
         val location = locationsWrapper.onToLocation(config, name)
-        location.onEnter(config, this)
+        location.onEnter(config, this, this@LocationHandler)
     }
     
     val config: T

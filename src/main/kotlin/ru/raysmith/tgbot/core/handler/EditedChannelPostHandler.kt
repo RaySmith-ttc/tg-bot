@@ -9,20 +9,19 @@ import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
-open class ChannelPostHandler(
+open class EditedChannelPostHandler(
     val channelPost: Message,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ChannelPostHandler.() -> Unit = {}
-) : EventHandler, BotContext<ChannelPostHandler> {
+    private val handler: EditedChannelPostHandler.() -> Unit = {}
+) : EventHandler, BotContext<EditedChannelPostHandler> {
     override fun getChatId() = channelPost.chat.id
     override fun getChatIdOrThrow() = channelPost.chat.id
     override var messageId: Int? = channelPost.messageId
     override var inlineMessageId: String? = null
-    
+
     override suspend fun handle() = handler()
-    
-    override fun <R> withBot(bot: Bot, block: BotContext<ChannelPostHandler>.() -> R): R {
-        return ChannelPostHandler(channelPost, bot.service, bot.fileService, handler).block()
+
+    override fun <R> withBot(bot: Bot, block: BotContext<EditedChannelPostHandler>.() -> R): R {
+        return EditedChannelPostHandler(channelPost, bot.service, bot.fileService, handler).block()
     }
 }
-

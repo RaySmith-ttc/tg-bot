@@ -25,9 +25,7 @@ open class CommandHandler(
     override suspend fun handle() = handler()
 
     @BotContextDsl
-    override fun withBot(bot: Bot, block: BotContext<CommandHandler>.() -> Any) {
-        CommandHandler(command, message, bot.service, bot.fileService, handler).apply {
-            this.block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<CommandHandler>.() -> R): R {
+        return CommandHandler(command, message, bot.service, bot.fileService, handler).block()
     }
 }

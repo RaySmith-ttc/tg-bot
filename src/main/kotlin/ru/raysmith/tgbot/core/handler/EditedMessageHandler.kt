@@ -9,12 +9,13 @@ import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
-open class MessageHandler(
+open class EditedMessageHandler(
     val message: Message,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: MessageHandler.() -> Unit = { }
-) : EventHandler, BotContext<MessageHandler> {
+    private val handler: EditedMessageHandler.() -> Unit = { }
+) : EventHandler, BotContext<EditedMessageHandler> {
 
+    val editDate = message.editDate!!
     override fun getChatId() = message.chat.id
     override fun getChatIdOrThrow() = message.chat.id
     override var messageId: Int? = message.messageId
@@ -22,7 +23,7 @@ open class MessageHandler(
 
     override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<MessageHandler>.() -> R): R {
-        return MessageHandler(message, bot.service, bot.fileService, handler).block()
+    override fun <R> withBot(bot: Bot, block: BotContext<EditedMessageHandler>.() -> R): R {
+        return EditedMessageHandler(message, bot.service, bot.fileService, handler).block()
     }
 }

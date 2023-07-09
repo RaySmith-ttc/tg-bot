@@ -6,6 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class MessageType {
     TEXT,
-    COMMAND,
-    INLINE_DATA
+    COMMAND
 }

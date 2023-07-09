@@ -1,8 +1,6 @@
 package ru.raysmith.tgbot.utils
 
 import kotlinx.serialization.builtins.ListSerializer
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandlerData
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
@@ -12,14 +10,6 @@ import java.util.*
 
 internal fun List<UpdateType>.asParameter(): String {
     return TelegramApi.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
-}
-
-internal fun Map<*, CallbackQueryHandlerData>.handleAll(handler: CallbackQueryHandler) {
-    for (it in this) {
-        if (handler.isAnswered) break
-
-        it.value.datePicker?.handle(handler) ?: it.value.handler?.invoke(handler)
-    }
 }
 
 internal fun Properties?.getOrDefault(key: String, default: String) = this?.getOrDefault(key, default)?.toString() ?: default

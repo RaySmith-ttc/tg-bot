@@ -35,8 +35,8 @@ class LocationCommandHandler<T : LocationConfig>(
         }
     }
     
-    override fun withBot(bot: Bot, block: BotContext<CommandHandler>.() -> Any) {
-        LocationCommandHandler(update, service, fileService, handlerData, locationsWrapper).apply {
+    override fun <R> withBot(bot: Bot, block: BotContext<CommandHandler>.() -> R): R {
+        return LocationCommandHandler(update, bot.service, bot.fileService, handlerData, locationsWrapper).let {
             this.block()
         }
     }

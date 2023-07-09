@@ -10,6 +10,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
 
+// TODO impl other
 /**
  * This object represents an incoming inline query.
  * When the user sends an empty query, your bot could return some default or trending results.
@@ -33,7 +34,7 @@ data class InlineQuery(
      * inline query sender, “private”, “group”, “supergroup”, or “channel”. The chat type should be always known for
      * requests sent from official clients and most third-party clients, unless the request was sent from a secret chat
      * */
-    @SerialName("chat_type") val chat_type: ChatType,
+    @SerialName("chat_type") val chatType: ChatType,
 
     /** Sender location, only for bots that request user location */
     @SerialName("location") val location: Location? = null,

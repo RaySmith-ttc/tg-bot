@@ -18,7 +18,6 @@ data class BotCommandScopeChat(
 ): BotCommandScope() {
 
     /** Scope type, must be *chat* */
-    @OptIn(ExperimentalSerializationApi::class)
     @EncodeDefault
     override val type: String = "chat"
 }

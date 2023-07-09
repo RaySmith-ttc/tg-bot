@@ -25,10 +25,8 @@ open class LocationMessageHandler<T : LocationConfig>(
             it.value.handler?.let { it1 -> it1(config, this) }
         }
     }
-    override fun withBot(bot: Bot, block: BotContext<MessageHandler>.() -> Any) {
-        LocationMessageHandler(update, service, fileService, handlerData, locationsWrapper).apply {
-            this.block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<MessageHandler>.() -> R): R {
+        return LocationMessageHandler(update, bot.service, bot.fileService, handlerData, locationsWrapper).block()
     }
 }
 

@@ -228,8 +228,7 @@ data class Message(
 
     /** [Type][MessageType] of the message. It can be text, command or inline data */
     val type = when {
-        replyMarkup != null -> MessageType.INLINE_DATA
-        entities != null && entities.isNotEmpty() && entities.first().type == MessageEntityType.BOT_COMMAND -> MessageType.COMMAND
+        !entities.isNullOrEmpty() && entities.first().type == MessageEntityType.BOT_COMMAND -> MessageType.COMMAND
         else -> MessageType.TEXT
     }
 

@@ -26,7 +26,7 @@ enum class UpdateType {
      * documentation on the [feedback collecting](https://core.telegram.org/bots/inline#collecting-feedback) for
      * details on how to enable these updates for your bot.
      * */
-    @SerialName("chosen_inline_query") CHOSEN_INLINE_RESULT,
+    @SerialName("chosen_inline_result") CHOSEN_INLINE_RESULT,
 
     /** New incoming callback query */
     @SerialName("callback_query") CALLBACK_QUERY,
@@ -52,8 +52,17 @@ enum class UpdateType {
      * */
     @SerialName("my_chat_member") MY_CHAT_MEMBER,
 
-    /** A chat member's status was updated in a chat. The bot must be an administrator in the chat and must explicitly
+    /**
+     * A chat member's status was updated in a chat. The bot must be an administrator in the chat and must explicitly
      * specify “chat_member” in the list of allowed_updates to receive these updates.
      * */
-    @SerialName("chat_member") CHAT_MEMBER
+    @SerialName("chat_member") CHAT_MEMBER,
+
+    // TODO add chat_join_request
+
+    /**
+     * A request to join the chat has been sent. The bot must have the can_invite_users
+     * administrator right in the chat to receive these updates.
+     * */
+    @SerialName("chat_join_request") CHAT_JOIN_REQUEST
 }

@@ -22,4 +22,6 @@ class BotConfig {
     var locale = Bot.properties?.getOrNull("calendar_locale")?.let {
         Locale.forLanguageTag(it)
     } ?: Locale.getDefault()
+
+    var alwaysAnswerCallback: Boolean = false
 }

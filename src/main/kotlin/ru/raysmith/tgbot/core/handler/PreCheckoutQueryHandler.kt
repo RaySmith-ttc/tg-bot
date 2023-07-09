@@ -10,21 +10,20 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
 @HandlerDsl
-class PreCheckoutQueryHandler(
+open class PreCheckoutQueryHandler(
     val preCheckoutQuery: PreCheckoutQuery,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: PreCheckoutQueryHandler.() -> Unit
+    private val handler: PreCheckoutQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<PreCheckoutQueryHandler> {
 
     override fun getChatId() = preCheckoutQuery.from.id
-    override fun getChatIdOrThrow() = preCheckoutQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
     override suspend fun handle() = handler()
 
-    override fun withBot(bot: Bot, block: BotContext<PreCheckoutQueryHandler>.() -> Any) {
-        PreCheckoutQueryHandler(preCheckoutQuery, service, fileService, handler).apply {
+    override fun <R> withBot(bot: Bot, block: BotContext<PreCheckoutQueryHandler>.() -> R): R {
+        return PreCheckoutQueryHandler(preCheckoutQuery, bot.service, bot.fileService, handler).let {
             this.block()
         }
     }

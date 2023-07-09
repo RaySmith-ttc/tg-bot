@@ -13,10 +13,10 @@ import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
 @HandlerDsl
-class ShippingQueryHandler(
+open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ShippingQueryHandler.() -> Unit
+    private val handler: ShippingQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<ShippingQueryHandler> {
 
     override fun getChatId() = shippingQuery.from.id
@@ -26,10 +26,8 @@ class ShippingQueryHandler(
 
     override suspend fun handle() = handler()
 
-    override fun withBot(bot: Bot, block: BotContext<ShippingQueryHandler>.() -> Any) {
-        ShippingQueryHandler(shippingQuery, service, fileService, handler).apply {
-            this.block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<ShippingQueryHandler>.() -> R): R {
+        return ShippingQueryHandler(shippingQuery, bot.service, bot.fileService, handler).block()
     }
 
     fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {

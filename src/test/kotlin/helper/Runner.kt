@@ -1,7 +1,6 @@
 package helper
 
 import kotlinx.coroutines.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -46,13 +45,14 @@ import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
+import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
 import java.time.LocalDate
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
-val locations = true
+val locations = false
 inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
 
 var loc: String = "menu"
@@ -179,11 +179,13 @@ class Runner {
                 .onError { e -> logger.error(e.message, e) }
                 .onUpdate { updates ->
 //                    updates.forEach { println(it.callbackQuery?.data ?: it.message?.text) }
-                    println(updates.firstOrNull())
+                    updates.forEach {
+                        println("${it.type}: ${it.toJson()}")
+                    }
                 }.config {
                     this.locale = Locale.JAPAN
                 }
-//                .registerDatePicker(datePicker)
+                .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
 //                .enableBlocking { u -> u.findFrom() }
                 .enableBlocking { u -> u.findChatId() }
@@ -233,16 +235,29 @@ class Runner {
                             isCommand("other") {
                                 toLocation("other")
                             }
+                            isCommand("poll") {
+                                toLocation("poll")
+                            }
+
+                            val me = withBot(bot) {
+                                getMe()
+                            }
+                        }
+
+                        handleEditedMessage {
+                            println("Message was edit")
                         }
 
                         handleChannelPost {
-                            println(message)
+                            println(channelPost)
                         }
 
-                        handleCallbackQuery {
-                            edit {
-                                text = "edited from global"
-                            }
+                        handleEditedChannelPost {
+                            println(channelPost)
+                        }
+
+                        handleCallbackQuery(alwaysAnswer = true) {
+                            println("handleCallbackQuery [global]")
                         }
                         
                         handleMessage {
@@ -253,20 +268,16 @@ class Runner {
                                 }
                             }
                         }
-                        handleCallbackQuery {
-                            edit {
-                                text = "test2"
-                                inlineKeyboard {
-                                    row("asd2", "asd2")
-                                }
-                            }
-                        }
                     }
                     
                     location("menu") {
-                        
                         onEnter {
-                            send("in menu")
+                            send {
+                                text = "in menu"
+                                inlineKeyboard {
+                                    row("dont do anything", "fv932mdcl")
+                                }
+                            }
                         }
                         
                         handle {
@@ -283,6 +294,10 @@ class Runner {
                             
                             handleMessage {
                                 send("handled in $name")
+                            }
+
+                            handleCallbackQuery(alwaysAnswer = false) {
+                                println("handleCallbackQuery [menu]")
                             }
                             
                             handleUnknown {
@@ -317,6 +332,10 @@ class Runner {
                                     }
                                 }
                             }
+
+                            handleEditedMessage {
+                                println("Message was edit in other")
+                            }
                             
                             handleMessage {
                                 send("handled in $name")
@@ -337,13 +356,56 @@ class Runner {
 //                        }
                         }
                     }
+
+                    location("poll") {
+                        onEnter {
+                            val poll = sendPoll("Question", listOf("1", "2", "3")) {
+                                isAnonymous = false
+                                type = PollType.QUIZ
+                                correctOptionId = 0
+                                explanationWithEntities {
+                                    bold("Expl: ").text("Wrong answer")
+                                }
+                                openPeriod = 10
+                                inlineKeyboard {
+                                    row("Button", "btn")
+                                }
+                            }
+
+                            runBlocking { delay(5000) }
+                            stopPoll(poll.messageId) {
+                                row("New button", "btn")
+                            }
+                        }
+
+                        handle {
+                            handlePoll {
+                                println("Receive poll #${poll.id}")
+                            }
+
+                            handlePollAnswer {
+                                println("Receive poll answer: ${pollAnswer.optionIds}")
+                            }
+                        }
+                    }
                 }
             }
             
             bot.start { bot ->
-                handleInlineQuery {
-                    println(inlineQuery)
+                handleEditedMessage {
+                    send(buildString {
+                        append("Detect editing: \n")
+                        append("New text: ${message.text?.takeOrCut(256)}\n")
+                        append("Date: $editDate")
+                    })
+                }
 
+                handleChatJoinRequest {
+                    println(chatJoinRequest)
+                    approve()
+                }
+
+                handleInlineQuery {
                     val res = buildList {
                         repeat(1000) {
                             add(InlineQueryResultArticle(
@@ -352,10 +414,15 @@ class Runner {
                         }
                     }
 
-                    answerInlineQuery(
+                    answer(
                         id = inlineQuery.id,
-                        results = res.filter { it.title.contains(inlineQuery.query) }.take(50)
+                        results = res.filter { it.title.contains(inlineQuery.query) }.drop(inlineQuery.offset.toIntOrNull() ?: 0).take(50),
+                        nextOffset = ((inlineQuery.offset.toIntOrNull() ?: 0) + 50).toString()
                     )
+                }
+
+                handleChosenInlineQuery { 
+                    println("handleChosenInlineQuery: ${inlineResult.resultId}")
                 }
 
                 handleMyChatMember {
@@ -441,90 +508,6 @@ class Runner {
                     }
                 }
 
-                handleCallbackQuery(alwaysAnswer = true) {
-                    isDataEqual("media_group_file", "") {
-                        sendPhotoMediaGroup {
-                            val caption = generateSequence("") { "123456780".random().toString() }
-
-                            photo("files/image1.png".asResources().asTgFile()) {
-                                bold("Test").n()
-                                italic("Message")
-                            }
-                            photo("files/image1.png".asResources().asTgFile(), caption.take(1024).joinToString(""))
-                            photo("files/image1.png".asResources().asTgFile(), caption.take(2000).joinToString(""))
-                            photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(1024).joinToString("")}</b>", parseMode = ParseMode.HTML)
-//                                photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(2000).joinToString("")}</b>", parseMode = ParseMode.HTML) // error
-                            photo("files/image2.jpg".asResources().asTgFile()) {
-                                text(caption.take(2000).joinToString(""))
-                            }
-                        }
-                    }
-
-                    isDataEqual("media_group_id") {
-                        sendPhotoMediaGroup {
-                            photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
-
-                                text("test")
-                            }
-                            photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile())
-                        }
-                    }
-
-                    datePickerResult(datePicker) { date ->
-                        edit {
-                            text = "Date: $date"
-                        }
-                    }
-
-                    isPage("pagination") { page -> sendPagination(page) }
-
-                    isDataStartWith("pitem") { data ->
-                        println("Item #$data")
-                    }
-
-                    isDataEqual("dpinit") {
-                        edit {
-                            text = "test"
-                            inlineKeyboard {
-                                createDatePicker(datePicker)
-                            }
-                        }
-                    }
-
-                    isDataStartWith("item_") { value ->
-                        edit {
-                            text = "Item #$value"
-                            inlineKeyboard { row { button("back", "item_back") } }
-                        }
-                    }
-
-                    isDataEqual("hello") {
-                        sendHelloMessage("It was hello (${System.currentTimeMillis()})", true)
-                    }
-                    isDataStartWith(CALLBACK_PREFIX) { value ->
-                        sendHelloMessage("Data is $value")
-                    }
-
-                    isDataEqual("no_answer") { sendPagination2(1, "no_answer_p_"); answer() }
-                    isDataEqual("answer") { sendPagination2(1, "answer_p_"); answer() }
-                    isDataStartWith("no_answer_p_") { page ->
-                        sendPagination2(page.toLong(), "no_answer_p_")
-                    }
-                    isDataStartWith("answer_p_") { page ->
-                        sendPagination2(page.toLong(), "answer_p_")
-                        answer()
-                    }
-
-                    isDataEqual("answertest") {
-                        sendAnswerVariants(MessageAction.EDIT)
-                        answer()
-                    }
-
-                    isUnhandled {
-                        logger.warn("Unhandled query (${query.data}): $query")
-                    }
-                }
-
                 handleCommand {
                     if (!command.mentionIsCurrentBot(bot.me)) return@handleCommand
 
@@ -561,7 +544,7 @@ class Runner {
                             }
                         }
                     }
-                    
+
                     isCommand("reloadConfig") {
                         bot.reloadConfig()
                     }
@@ -1039,7 +1022,7 @@ class Runner {
                     }
 
                     isCommand("service") {
-                       //                            withService(TelegramApi.service) {
+                        //                            withService(TelegramApi.service) {
 //                                send("main")
 //                                withService(telegramServiceOfNotifierBot) {
 //                                    send("second")
@@ -1048,11 +1031,11 @@ class Runner {
 //                            withService(telegramServiceOfNotifierBot) {
 //                                send("second")
 //                            }
-                       withBot(notifierBot) {
-                           send("second")
-                       }
+                        withBot(notifierBot) {
+                            send("second")
+                        }
 
-                       send("main")
+                        send("main")
                     }
 
                     isCommand("safe2") {
@@ -1250,7 +1233,7 @@ class Runner {
                             pngSticker("BQACAgIAAxUHY406pjEI4wABA8wMxxtEeOXcVw0hAAJSKwAC0oBoSIac6VfNgGZKKwQ".asTgFile())
                         }
                     }
-    
+
                     isCommand("setStickerSetThumb") {
                         setStickerSetThumb(
                             stickerSetName("name"), getChatIdOrThrow(),
@@ -1258,8 +1241,93 @@ class Runner {
                         )
                     }
                 }
+
+                handleCallbackQuery(alwaysAnswer = true) {
+                    isDataEqual("media_group_file", "") {
+                        sendPhotoMediaGroup {
+                            val caption = generateSequence("") { "123456780".random().toString() }
+
+                            photo("files/image1.png".asResources().asTgFile()) {
+                                bold("Test").n()
+                                italic("Message")
+                            }
+                            photo("files/image1.png".asResources().asTgFile(), caption.take(1024).joinToString(""))
+                            photo("files/image1.png".asResources().asTgFile(), caption.take(2000).joinToString(""))
+                            photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(1024).joinToString("")}</b>", parseMode = ParseMode.HTML)
+//                                photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(2000).joinToString("")}</b>", parseMode = ParseMode.HTML) // error
+                            photo("files/image2.jpg".asResources().asTgFile()) {
+                                text(caption.take(2000).joinToString(""))
+                            }
+                        }
+                    }
+
+                    isDataEqual("media_group_id") {
+                        sendPhotoMediaGroup {
+                            photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
+
+                                text("test")
+                            }
+                            photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile())
+                        }
+                    }
+
+                    datePickerResult(datePicker) { date ->
+                        edit {
+                            text = "Date: $date"
+                        }
+                    }
+
+                    isPage("pagination") { page -> sendPagination(page) }
+
+                    isDataStartWith("pitem") { data ->
+                        println("Item #$data")
+                    }
+
+                    isDataEqual("dpinit") {
+                        edit {
+                            text = "test"
+                            inlineKeyboard {
+                                createDatePicker(datePicker)
+                            }
+                        }
+                    }
+
+                    isDataStartWith("item_") { value ->
+                        edit {
+                            text = "Item #$value"
+                            inlineKeyboard { row { button("back", "item_back") } }
+                        }
+                    }
+
+                    isDataEqual("hello") {
+                        sendHelloMessage("It was hello (${System.currentTimeMillis()})", true)
+                    }
+                    isDataStartWith(CALLBACK_PREFIX) { value ->
+                        sendHelloMessage("Data is $value")
+                    }
+
+                    isDataEqual("no_answer") { sendPagination2(1, "no_answer_p_"); answer() }
+                    isDataEqual("answer") { sendPagination2(1, "answer_p_"); answer() }
+                    isDataStartWith("no_answer_p_") { page ->
+                        sendPagination2(page.toLong(), "no_answer_p_")
+                    }
+                    isDataStartWith("answer_p_") { page ->
+                        sendPagination2(page.toLong(), "answer_p_")
+                        answer()
+                    }
+
+                    isDataEqual("answertest") {
+                        sendAnswerVariants(MessageAction.EDIT)
+                        answer()
+                    }
+
+                    isUnhandled {
+                        logger.warn("Unhandled query (${query.data}): $query")
+                    }
+                }
+
             }
-            
+
             delay(Long.MAX_VALUE)
         }
     }

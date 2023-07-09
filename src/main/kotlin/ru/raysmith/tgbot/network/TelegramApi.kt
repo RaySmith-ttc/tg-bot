@@ -2,8 +2,11 @@ package ru.raysmith.tgbot.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -13,6 +16,7 @@ import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.*
+import ru.raysmith.tgbot.model.network.chat.ChatMember
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -63,6 +67,21 @@ object TelegramApi {
         ignoreUnknownKeys = true
         encodeDefaults = false
         classDiscriminator = "#type"
+        namingStrategy = JsonNamingStrategy.SnakeCase
+
+        serializersModule = SerializersModule {
+            polymorphic(InputMessageContent::class) {
+                subclass(InputTextMessageContent::class)
+            }
+            polymorphic(ChatMember::class) {
+                subclass(ChatMember.ChatMemberOwner::class)
+                subclass(ChatMember.ChatMemberLeft::class)
+                subclass(ChatMember.ChatMemberMember::class)
+                subclass(ChatMember.ChatMemberAdministrator::class)
+                subclass(ChatMember.ChatMemberBanned::class)
+                subclass(ChatMember.ChatMemberRestricted::class)
+            }
+        }
     }
 
     fun buildService(token: String?, type: ServiceType): Retrofit {

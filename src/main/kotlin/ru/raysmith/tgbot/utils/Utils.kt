@@ -70,10 +70,8 @@ fun createBotContext(
     override val fileService: TelegramFileService = fileService
 
     override fun getChatId(): ChatId? = withChatId
-    override fun withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> Any) {
-        UnknownEventHandler(Update(-1), service, fileService).apply {
-            block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> R): R {
+        return UnknownEventHandler(Update(-1), bot.service, bot.fileService).block()
     }
 }
 

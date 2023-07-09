@@ -1,22 +1,18 @@
 package ru.raysmith.tgbot.core.handler
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.EventHandler
-import ru.raysmith.tgbot.core.HandlerDsl
+import ru.raysmith.tgbot.core.*
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
-import ru.raysmith.tgbot.utils.handleAll
 import java.time.LocalDate
 
 @HandlerDsl
 open class CallbackQueryHandler(
     final override val query: CallbackQuery,
-    protected val alwaysAnswer: Boolean,
     private val handlerData: Map<String, CallbackQueryHandlerData>,
     override val service: TelegramService, override val fileService: TelegramFileService
 ) : EventHandler, BaseCallbackHandler(query, service, fileService), BotContext<CallbackQueryHandler> {
@@ -29,15 +25,24 @@ open class CallbackQueryHandler(
     companion object {
         const val HANDLER_ID = "default"
         const val GLOBAL_HANDLER_ID = "global"
-        val logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
+        val logger: Logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
-    override suspend fun handle() = run {
+    override suspend fun handle() {
         if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
-        else handlerData.handleAll(this).also {
-            if (alwaysAnswer && !isAnswered) answer()
+        else {
+            for (it in handlerData) {
+                if (isAnswered) {
+                    break
+                }
+
+                it.value.datePicker?.handle(this) ?: it.value.handler?.invoke(this)
+            }
+
+            if (!isAnswered && handlerData.any { it.value.alwaysAnswer }) {
+                answer()
+            }
         }
-        Unit
     }
 
     fun datePickerResult(datePicker: DatePicker, datePickerHandler: DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
@@ -113,9 +118,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    override fun withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> Any) {
-        CallbackQueryHandler(query, alwaysAnswer, handlerData, service, fileService).apply {
-            block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> R): R {
+        return CallbackQueryHandler(query, handlerData, bot.service, bot.fileService).block()
     }
 }

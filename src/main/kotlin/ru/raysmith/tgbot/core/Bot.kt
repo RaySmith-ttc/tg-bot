@@ -283,9 +283,9 @@ class Bot(
 
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
-    suspend fun start(updateHandler: EventHandlerFactoryImpl.(bot: Bot) -> Unit) {
-        eventHandlerFactory = EventHandlerFactoryImpl()
-        (eventHandlerFactory as EventHandlerFactoryImpl).updateHandler(this)
+    suspend fun start(updateHandler: BaseEventHandlerFactory.(bot: Bot) -> Unit) {
+        eventHandlerFactory = BaseEventHandlerFactory()
+        (eventHandlerFactory as BaseEventHandlerFactory).updateHandler(this)
         startBot()
     }
     
@@ -326,15 +326,15 @@ class Bot(
         return this
     }
 
-    fun registerDatePicker(datePicker: DatePicker): Bot {
+    fun registerDatePicker(datePicker: DatePicker, alwaysAnswer: Boolean = config.alwaysAnswerCallback): Bot {
         additionalEventHandlers.add {
             when (it) {
-                is EventHandlerFactoryImpl -> {
-                    it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                is BaseEventHandlerFactory -> {
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
                 }
     
                 is LocationEventHandlerFactory<*> -> {
-                    it.handleCallbackQuery(handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
                 }
     
                 else -> return@add

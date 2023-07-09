@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 data class ChosenInlineResult(
 
     /** The unique identifier for the result that was chosen */
-    @SerialName("result_id") val result_id: String,
+    @SerialName("result_id") val resultId: String,
 
     /** The user that chose the result */
     @SerialName("from") val from: User,

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.network.serializer.ChatMemberSerializer
 
-@Polymorphic
+//@Polymorphic
 @Serializable(with = ChatMemberSerializer::class)
 sealed class ChatMember {
 

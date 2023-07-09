@@ -5,10 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.serializer
 import retrofit2.Converter
 import retrofit2.Retrofit
-import ru.raysmith.tgbot.model.network.command.BotCommandScope
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import java.lang.reflect.Type
-import java.util.Collections
 
 internal object NetworkUtils {
 

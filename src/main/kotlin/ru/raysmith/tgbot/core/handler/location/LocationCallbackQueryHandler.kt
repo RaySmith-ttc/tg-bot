@@ -12,29 +12,34 @@ import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationCallbackQueryHandlerData<T : LocationConfig>(
     val handler: (context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
-    val datePicker: DatePicker? = null
+    val datePicker: DatePicker? = null,
+    val alwaysAnswer: Boolean
 )
 
 @HandlerDsl
 open class LocationCallbackQueryHandler<T : LocationConfig>(
-    override val update: Update, service: TelegramService, fileService: TelegramFileService, alwaysAnswer: Boolean,
+    override val update: Update, service: TelegramService, fileService: TelegramFileService,
     private val handlerData: Map<String, LocationCallbackQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : CallbackQueryHandler(update.callbackQuery!!, alwaysAnswer, emptyMap(), service, fileService), LocationHandler<T> {
+) : CallbackQueryHandler(update.callbackQuery!!, emptyMap(), service, fileService), LocationHandler<T> {
     
     override val config by lazy { config() }
     override suspend fun handle() {
         if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
-    
+
         for (data in handlerData) {
-            if (isAnswered) break
+            if (isAnswered) {
+                break
+            }
     
-            data.value.datePicker?.handle(this) ?: data.value.handler?.let { it1 -> it1(config, this) }
+            data.value.datePicker?.handle(this) ?: data.value.handler?.let { h -> h(config, this) }
+        }
+
+        if (!isAnswered && handlerData.any { it.value.alwaysAnswer }) {
+            answer()
         }
     }
-    override fun withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> Any) {
-        LocationCallbackQueryHandler(update, service, fileService, alwaysAnswer, handlerData, locationsWrapper).apply {
-            this.block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> R): R {
+        return LocationCallbackQueryHandler(update, bot.service, bot.fileService, handlerData, locationsWrapper).block()
     }
 }

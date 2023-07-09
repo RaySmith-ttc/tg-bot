@@ -49,10 +49,6 @@ class DatePicker(val callbackQueryPrefix: String) {
     var startWithState = DatePickerState.DAY
 
     var dates: (data: String?) -> ClosedRange<LocalDate> = { LocalDate.of(1900, 1, 1)..LocalDate.of(2099, 12, 31) }
-    
-    
-//    private val allowPastDays = dates
-//    var allowFutureDays = true
 
     var yearsColumns = 5
         get() = field.coerceIn(1, 8)
@@ -69,14 +65,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     }
 
     fun setupMarkup(messageInlineKeyboard: MessageInlineKeyboard, data: String?) {
-        val datesRange = dates(data)
-        val date = initDate ?: run {
-            when {
-                now.isBefore(datesRange.start) -> datesRange.start
-                now.isAfter(datesRange.endInclusive) -> datesRange.endInclusive
-                else -> now
-            }
-        }
+        val date = initDate
         messageInlineKeyboard.setupMarkup(startWithState, data) {
             when(startWithState) {
                 DatePickerState.DAY -> setupDaysMarkup(date.year, date.monthValue, data)

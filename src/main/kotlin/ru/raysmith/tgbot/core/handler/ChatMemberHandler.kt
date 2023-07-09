@@ -36,9 +36,10 @@ open class ChatMemberHandler(
 
     override suspend fun handle() = handler()
 
-    override fun withBot(bot: Bot, block: BotContext<ChatMemberHandler>.() -> Any) {
-        ChatMemberHandler(chat, from, date, oldChatMember, newChatMember, inviteLink, service, fileService, handler).apply {
-            block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<ChatMemberHandler>.() -> R): R {
+        return ChatMemberHandler(
+            chat, from, date, oldChatMember, newChatMember, inviteLink, bot.service, bot.fileService, handler
+        ).block()
     }
 }
+

@@ -3,11 +3,9 @@ package ru.raysmith.tgbot.model.network.updates
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.model.network.ChosenInlineResult
-import ru.raysmith.tgbot.model.network.InlineQuery
-import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
+import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
@@ -60,13 +58,11 @@ data class Update(
     /** New incoming pre-checkout query. Contains full information about checkout */
     @SerialName("pre_checkout_query") val preCheckoutQuery: PreCheckoutQuery? = null,
 
-    // TODO [poll support]
-//    /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot */
-//    @SerialName("poll") val poll: Poll? = null,
+    /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot */
+    @SerialName("poll") val poll: Poll? = null,
 
-    // TODO [poll support]
-//    /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
-//    @SerialName("poll_answer") val pollAnswer: PollAnswer? = null,
+    /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
+    @SerialName("poll_answer") val pollAnswer: PollAnswer? = null,
 
     /**
      * The bot's chat member status was updated in a chat. For private chats, this update is received only when the
@@ -80,6 +76,12 @@ data class Update(
      * */
     @SerialName("chat_member") val chatMember: ChatMemberUpdated? = null,
 
+    /**
+     * A request to join the chat has been sent. The bot must have the can_invite_users administrator
+     * right in the chat to receive these updates.
+     * */
+    @SerialName("chat_join_request") val chatJoinRequest: ChatJoinRequest? = null,
+
     ) {
 
     /** Type of update. Null if unknown */
@@ -91,19 +93,17 @@ data class Update(
         inlineQuery != null -> UpdateType.INLINE_QUERY
         chosenInlineResult != null -> UpdateType.CHOSEN_INLINE_RESULT
         callbackQuery != null -> UpdateType.CALLBACK_QUERY
-
-        // TODO [poll support] uncomment
-//        poll != null -> UpdateType.POLL
-//        pollAnswer != null -> UpdateType.POLL_ANSWER
-
+        poll != null -> UpdateType.POLL
+        pollAnswer != null -> UpdateType.POLL_ANSWER
         myChatMember != null -> UpdateType.MY_CHAT_MEMBER
         chatMember != null -> UpdateType.CHAT_MEMBER
         shippingQuery != null -> UpdateType.SHIPPING_QUERY
         preCheckoutQuery != null -> UpdateType.PRE_CHECKOUT_QUERY
+        chatJoinRequest != null -> UpdateType.CHAT_JOIN_REQUEST
         else -> null
     }
 
-    /** Find [from][User] by current update.  */
+    /** Find [from][User] by current update. Always `null` for [UpdateType.POLL]  */
     fun findFrom(): User? = when(type) {
         UpdateType.MESSAGE -> message!!.from
         UpdateType.EDITED_MESSAGE -> editedMessage!!.from
@@ -112,30 +112,32 @@ data class Update(
         UpdateType.INLINE_QUERY -> inlineQuery!!.from
         UpdateType.CHOSEN_INLINE_RESULT -> chatMember!!.from
         UpdateType.CALLBACK_QUERY -> callbackQuery!!.from
-        UpdateType.POLL -> null // TODO [poll support]
-        UpdateType.POLL_ANSWER -> null // TODO [poll support]
+        UpdateType.POLL -> null
+        UpdateType.POLL_ANSWER -> pollAnswer!!.user
         UpdateType.MY_CHAT_MEMBER -> myChatMember!!.from
         UpdateType.CHAT_MEMBER -> chatMember!!.from
         UpdateType.SHIPPING_QUERY -> shippingQuery!!.from
         UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.from
+        UpdateType.CHAT_JOIN_REQUEST -> chatJoinRequest!!.from
         null -> null
     }
 
-    /** Find [chat][Chat] id by current update. */
+    /** Find [chat][Chat] id by current update. Always `null` for [UpdateType.POLL] and [UpdateType.POLL_ANSWER] updates */
     fun findChatId(): ChatId? = when(type) {
         UpdateType.MESSAGE -> message!!.getChatId()
         UpdateType.EDITED_MESSAGE -> editedMessage!!.getChatId()
         UpdateType.CHANNEL_POST -> channelPost!!.getChatId()
         UpdateType.EDITED_CHANNEL_POST -> editedChannelPost!!.getChatId()
         UpdateType.INLINE_QUERY -> inlineQuery!!.getChatId()
-        UpdateType.CHOSEN_INLINE_RESULT -> chatMember!!.getChatId()
+        UpdateType.CHOSEN_INLINE_RESULT -> chosenInlineResult!!.getChatId()
         UpdateType.CALLBACK_QUERY -> callbackQuery!!.getChatId()
-        UpdateType.POLL -> null // TODO [poll support]
-        UpdateType.POLL_ANSWER -> null // TODO [poll support]
+        UpdateType.POLL -> null
+        UpdateType.POLL_ANSWER -> null
         UpdateType.MY_CHAT_MEMBER -> myChatMember!!.getChatId()
         UpdateType.CHAT_MEMBER -> chatMember!!.getChatId()
         UpdateType.SHIPPING_QUERY -> shippingQuery!!.getChatId()
         UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.getChatId()
+        UpdateType.CHAT_JOIN_REQUEST -> chatJoinRequest!!.getChatId()
         null -> null
     }
 
@@ -143,7 +145,7 @@ data class Update(
     /**
      * Indicates whether an update handler was found and processing was started.
      *
-     * If you are handling updates using the dsl [handleUnknown][ru.raysmith.tgbot.core.EventHandlerFactoryImpl.handleUnknown] method, explicitly set the value yourself.  */
+     * If you are handling updates using the dsl [handleUnknown][ru.raysmith.tgbot.core.BaseEventHandlerFactory.handleUnknown] method, explicitly set the value yourself.  */
     var isHandled: Boolean = false
 }
 

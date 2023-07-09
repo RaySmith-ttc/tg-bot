@@ -20,9 +20,7 @@ class UnknownEventHandler(
     override var messageId = update.message?.messageId
     override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
-    override fun withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> Any) {
-        UnknownEventHandler(update, service, fileService, handler).apply {
-            block()
-        }
+    override fun <R> withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> R): R {
+        return UnknownEventHandler(update, bot.service, bot.fileService, handler).block()
     }
 }

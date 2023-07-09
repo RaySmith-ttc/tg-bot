@@ -55,3 +55,4 @@ data class Poll(
     @SerialName("close_date") val closeDate: Int? = null,
 )
 
+
