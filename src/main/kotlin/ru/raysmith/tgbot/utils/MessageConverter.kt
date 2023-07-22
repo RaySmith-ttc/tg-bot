@@ -79,10 +79,10 @@ fun MessageHandler.messageDocument(block: (Document) -> Unit) = message.document
 
 // Image
 /** Returns [MessageConverter] instance for message image (document or compressed photo) */
-fun MessageHandler.messageImage() = MessageConverter(message.photo?.last() ?: message.document)
+fun MessageHandler.messageImage() = MessageConverter(message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })
 
 /** Applies a [block] to the message image (document or compressed photo) or returns null if message doesn't contain image */
-fun MessageHandler.messageImage(block: (Media) -> Unit) = (message.photo?.last() ?: message.document)?.also(block)
+fun MessageHandler.messageImage(block: (Media) -> Unit) = (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also(block)
 
 
 // Audio
