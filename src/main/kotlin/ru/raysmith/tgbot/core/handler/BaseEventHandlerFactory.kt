@@ -1,8 +1,7 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
-import ru.raysmith.tgbot.core.handler.*
-import ru.raysmith.tgbot.core.handler.location.LocationCommandHandler
-import ru.raysmith.tgbot.core.handler.location.LocationMessageHandler
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.handler.base.*
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update

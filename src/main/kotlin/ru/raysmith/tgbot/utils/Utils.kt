@@ -7,8 +7,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.EventHandler
-import ru.raysmith.tgbot.core.handler.UnknownEventHandler
+import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi

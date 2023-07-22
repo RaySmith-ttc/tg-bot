@@ -1,12 +1,13 @@
-package ru.raysmith.tgbot.core.handler
+package ru.raysmith.tgbot.core.handler.utils
 
+import ru.raysmith.tgbot.core.handler.base.BaseCallbackHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 
-data class PaginationCallbackQueryHandler(
+data class DataCallbackQueryHandler(
     override val query: CallbackQuery,
-    val page: Long,
+    val data: String,
     override val service: TelegramService,
     override val fileService: TelegramFileService
 ) : BaseCallbackHandler(query, service, fileService)

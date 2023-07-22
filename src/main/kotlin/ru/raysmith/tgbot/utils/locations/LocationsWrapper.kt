@@ -1,8 +1,8 @@
 package ru.raysmith.tgbot.utils.locations
 
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.LocationEventHandlerFactory
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
+import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 

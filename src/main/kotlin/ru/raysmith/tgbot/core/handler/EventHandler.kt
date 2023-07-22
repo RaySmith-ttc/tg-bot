@@ -1,5 +1,9 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
+import ru.raysmith.tgbot.core.BotContext
+import ru.raysmith.tgbot.core.ChatIdHolder
+import ru.raysmith.tgbot.core.IEditor
+import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper

@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.model.network.updates.Update

@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.utils
 
-import ru.raysmith.tgbot.core.handler.MessageHandler
+import ru.raysmith.tgbot.core.handler.base.MessageHandler
 import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.Poll
 import ru.raysmith.tgbot.model.network.Venue

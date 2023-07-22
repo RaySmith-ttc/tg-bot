@@ -1,8 +1,8 @@
 package ru.raysmith.tgbot.utils.datepicker
 
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.EventHandlerFactory
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.EventHandlerFactory
+import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery

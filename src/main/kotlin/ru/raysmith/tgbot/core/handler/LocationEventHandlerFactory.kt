@@ -1,7 +1,8 @@
-package ru.raysmith.tgbot.core
+package ru.raysmith.tgbot.core.handler
 
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.core.handler.UnknownEventHandler
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -13,7 +14,8 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 @HandlerDsl
-open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper: LocationsWrapper<T>) : EventHandlerFactory {
+open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper: LocationsWrapper<T>) :
+    EventHandlerFactory {
     
     protected open var defaultHandlerId = CallbackQueryHandler.HANDLER_ID
     

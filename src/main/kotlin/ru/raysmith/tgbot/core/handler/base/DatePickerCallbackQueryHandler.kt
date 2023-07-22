@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.core.handler
+package ru.raysmith.tgbot.core.handler.base
 
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService

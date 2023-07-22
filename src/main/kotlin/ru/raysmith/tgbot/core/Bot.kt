@@ -4,7 +4,10 @@ import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import retrofit2.Call
-import ru.raysmith.tgbot.core.handler.CommandHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandlerFactory
+import ru.raysmith.tgbot.core.handler.EventHandlerFactory
+import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
+import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.NetworkResponse

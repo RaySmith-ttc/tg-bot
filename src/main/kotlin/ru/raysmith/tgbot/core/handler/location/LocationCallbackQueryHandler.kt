@@ -1,7 +1,9 @@
 package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.*
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.HandlerDsl
+import ru.raysmith.tgbot.core.handler.LocationHandler
+import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramFileService

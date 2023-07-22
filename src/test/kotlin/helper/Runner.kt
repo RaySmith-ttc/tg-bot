@@ -6,10 +6,10 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.EventHandler
+import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.ISender
-import ru.raysmith.tgbot.core.handler.CallbackQueryHandler
-import ru.raysmith.tgbot.core.handler.isCommand
+import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.base.isCommand
 import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId

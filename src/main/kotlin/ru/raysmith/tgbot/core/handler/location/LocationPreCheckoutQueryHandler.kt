@@ -2,9 +2,9 @@ package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.HandlerDsl
-import ru.raysmith.tgbot.core.LocationHandler
-import ru.raysmith.tgbot.core.handler.PreCheckoutQueryHandler
+import ru.raysmith.tgbot.core.handler.HandlerDsl
+import ru.raysmith.tgbot.core.handler.LocationHandler
+import ru.raysmith.tgbot.core.handler.base.PreCheckoutQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService

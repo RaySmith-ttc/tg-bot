@@ -1,14 +1,23 @@
-package ru.raysmith.tgbot.core.handler
+package ru.raysmith.tgbot.core.handler.base
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.*
+import ru.raysmith.tgbot.core.handler.*
+import ru.raysmith.tgbot.core.handler.utils.DataCallbackQueryHandler
+import ru.raysmith.tgbot.core.handler.utils.ValueDataCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import java.time.LocalDate
+
+data class CallbackQueryHandlerData(
+    val handler: (CallbackQueryHandler.() -> Unit)? = null,
+    val datePicker: DatePicker? = null,
+    val alwaysAnswer: Boolean
+)
 
 @HandlerDsl
 open class CallbackQueryHandler(
