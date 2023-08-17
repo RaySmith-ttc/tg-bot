@@ -1235,7 +1235,7 @@ class Runner {
                     }
 
                     isCommand("setStickerSetThumb") {
-                        setStickerSetThumb(
+                        setStickerSetThumbnail(
                             stickerSetName("name"), getChatIdOrThrow(),
                             InputFile.FileIdOrUrl("https://i.ibb.co/ZS7TT09/image.png")
                         )

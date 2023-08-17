@@ -1,16 +1,15 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.InlineQuery
 import ru.raysmith.tgbot.model.network.InlineQueryResult
-import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.model.network.inline.InlineQueryResultsButton
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
+import kotlin.time.Duration
 
 @HandlerDsl
 open class InlineQueryHandler(
@@ -25,19 +24,13 @@ open class InlineQueryHandler(
     override fun getChatIdOrThrow() = inlineQuery.from.id
     override suspend fun handle() = handler()
 
+    /**
+     * @see answerInlineQuery
+     * */
     fun answer(
-        id: String,
-        results: List<InlineQueryResult>,
-        cacheTime: Int? = null,
-        isPersonal: Boolean? = null,
-        nextOffset: String? = null,
-        switchPmText: String? = null,
-        switchPmParameter: String? = null,
-    ): Boolean {
-        return service.answerInlineQuery(
-            id, TelegramApi.json.encodeToString(results), cacheTime, isPersonal, nextOffset, switchPmText, switchPmParameter
-        ).execute().body()?.result ?: errorBody()
-    }
+        id: String, results: List<InlineQueryResult>, cacheTime: Duration? = null, isPersonal: Boolean? = null,
+        nextOffset: String? = null, button: InlineQueryResultsButton? = null
+    ) = answerInlineQuery(id, results, cacheTime, isPersonal, nextOffset, button)
 
     override fun <R> withBot(bot: Bot, block: BotContext<InlineQueryHandler>.() -> R): R {
         return InlineQueryHandler(inlineQuery, bot.service, bot.fileService, handler).block()

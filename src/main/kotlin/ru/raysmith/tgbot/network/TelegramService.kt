@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.file.FileResponse
+import ru.raysmith.tgbot.model.network.inline.InlineQueryResultsButton
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -234,7 +235,7 @@ interface TelegramService {
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("disable_content_type_detection") disableContentType_Detection: RequestBody? = null,
+        @Part("disable_content_type_detection") disableContentTypeDetection: RequestBody? = null, // TODO not using
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
@@ -939,15 +940,50 @@ interface TelegramService {
     fun deleteStickerFromSet(
         @Query("sticker") sticker: String,
     ): Call<NetworkResponse<Boolean>>
-    
+
+    @POST("setStickerEmojiList")
+    fun setStickerEmojiList(
+        @Query("sticker") sticker: String,
+        @Query("emoji_list") emojiList: List<String>,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setStickerKeywords")
+    fun setStickerKeywords(
+        @Query("sticker") sticker: String,
+        @Query("keywords") keywords: List<String>?,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setStickerMaskPosition")
+    fun setStickerMaskPosition(
+        @Query("sticker") sticker: String,
+        @Query("mask_position") maskPosition: MaskPosition?,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("setStickerSetTitle")
+    fun setStickerSetTitle(
+        @Query("name") name: String,
+        @Query("title") title: String,
+    ): Call<NetworkResponse<Boolean>>
+
     @Multipart
-    @POST("setStickerSetThumb")
-    fun setStickerSetThumb(
+    @POST("setStickerSetThumbnail")
+    fun setStickerSetThumbnail(
         @Part("name") name: RequestBody,
         @Part("user_id") userId: ChatId.ID,
-        @Part thumb: MultipartBody.Part? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
     ): Call<NetworkResponse<Boolean>>
-    
+
+    @POST("setCustomEmojiStickerSetThumbnail")
+    fun setCustomEmojiStickerSetThumbnail(
+        @Query("name") name: String,
+        @Query("custom_emoji_id") customEmojiId: String?,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteStickerSet")
+    fun deleteStickerSet(
+        @Query("name") name: String,
+    ): Call<NetworkResponse<Boolean>>
+
     /**
      * Use this method to send answers to an inline query. On success, True is returned.
      * No more than 50 results per query are allowed.
@@ -978,10 +1014,9 @@ interface TelegramService {
         @Query("cache_time") cacheTime: Int? = null,
         @Query("is_personal") isPersonal: Boolean? = null,
         @Query("next_offset") nextOffset: String? = null,
-        @Query("switch_pm_text") switchPmText: String? = null,
-        @Query("switch_pm_parameter") switchPmParameter: String? = null,
+        @Query("button") button: InlineQueryResultsButton? = null
     ): Call<NetworkResponse<Boolean>>
-    
+
     // TODO test
     @POST("answerWebAppQuery")
     fun answerWebAppQuery(
@@ -1072,8 +1107,29 @@ interface TelegramService {
     // TODO createInvoiceLink
 
     /**
+     * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
+     * will send an [Update][Update] with a *shipping_query* field to the bot.
+     * Use this method to reply to shipping queries. On success, True is returned.
+     *
+     * @param shippingQueryId Unique identifier for the query to be answered
+     * @param ok Specify True if delivery to the specified address is possible and False if there are any problems
+     * (for example, if delivery to the specified address is not possible)
+     * @param shippingOptions Required if *ok* is True. A JSON-serialized array of available shipping options.
+     * @param errorMessage Required if *ok* is False. Error message in human readable form that explains why it is
+     * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
+     * Telegram will display this message to the user.
+     * */
+    @POST("answerShippingQuery")
+    fun answerShippingQuery(
+        @Query("shipping_query_id") shippingQueryId: String,
+        @Query("ok") ok: Boolean,
+        @Query("shipping_options") shippingOptions: String? = null,
+        @Query("error_message") errorMessage: String? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    /**
      * Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation
-     * in the form of an [Update][ru.raysmith.tgbot.model.network.updates.Update] with the field *pre_checkout_query*.
+     * in the form of an [Update][Update] with the field *pre_checkout_query*.
      * Use this method to respond to such pre-checkout queries.
      * On success, True is returned. **Note:** The Bot API must receive an answer within 10 seconds after
      * the pre-checkout query was sent.
@@ -1093,25 +1149,6 @@ interface TelegramService {
         @Query("error_message") errorMessage: String? = null
     ): Call<NetworkResponse<Boolean>>
 
-    /**
-     * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
-     * will send an [Update][ru.raysmith.tgbot.model.network.updates.Update] with a *shipping_query* field to the bot.
-     * Use this method to reply to shipping queries. On success, True is returned.
-     *
-     * @param shippingQueryId Unique identifier for the query to be answered
-     * @param ok Specify True if delivery to the specified address is possible and False if there are any problems
-     * (for example, if delivery to the specified address is not possible)
-     * @param shippingOptions Required if *ok* is True. A JSON-serialized array of available shipping options.
-     * @param errorMessage Required if *ok* is False. Error message in human readable form that explains why it is
-     * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
-     * Telegram will display this message to the user.
-     * */
-    @POST("answerShippingQuery")
-    fun answerShippingQuery(
-        @Query("shipping_query_id") shippingQueryId: String,
-        @Query("ok") ok: Boolean,
-        @Query("shipping_options") shippingOptions: String? = null,
-        @Query("error_message") errorMessage: String? = null
-    ): Call<NetworkResponse<Boolean>>
+    // TODO [games] sendGame
 }
 

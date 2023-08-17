@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.core
 import kotlinx.serialization.encodeToString
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.InlineQueryResult
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.UserProfilePhotos
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
@@ -10,17 +11,17 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
+import ru.raysmith.tgbot.model.network.inline.InlineQueryResultsButton
+import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
-import ru.raysmith.tgbot.model.network.sticker.AddStickerInStickerSet
-import ru.raysmith.tgbot.model.network.sticker.NewStickerSet
-import ru.raysmith.tgbot.model.network.sticker.Sticker
-import ru.raysmith.tgbot.model.network.sticker.StickerSet
+import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 import java.io.InputStream
+import kotlin.time.Duration
 
 interface ApiCaller {
     val service: TelegramService
@@ -77,7 +78,7 @@ interface ApiCaller {
      * Use this method to change the list of the bot's commands.
      *
      * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands.
-     * Returns True on success
+     * Returns *True* on success
      *
      * @param commands list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
      * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
@@ -91,7 +92,7 @@ interface ApiCaller {
 
     /**
      * Use this method to delete the list of the bot's commands for the given scope and user language.
-     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns True on success.
+     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns *True* on success.
      *
      * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
      * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
@@ -114,11 +115,11 @@ interface ApiCaller {
     /**
      * Use this method to change the default administrator rights requested by the bot when it's added as an
      * administrator to groups or channels. These rights will be suggested to users, but they are are free to
-     * modify the list before adding the bot. Returns True on success.
+     * modify the list before adding the bot. Returns *True* on success.
      *
      * @param rights [ChatAdministratorRights] object describing new default administrator rights.
      * If not specified, the default administrator rights will be cleared.
-     * @param forChannels Pass True to change the default administrator rights of the bot in channels.
+     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
      * Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
      * */
     fun setMyDefaultAdministratorRights(rights: ChatAdministratorRights? = null, forChannels: Boolean? = null): Boolean {
@@ -129,7 +130,7 @@ interface ApiCaller {
      * Use this method to get the current default administrator rights of the bot.
      * Returns ChatAdministratorRights on success.
      *
-     * @param forChannels Pass True to change the default administrator rights of the bot in channels.
+     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
      * Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
      * */
     fun getMyDefaultAdministratorRights(forChannels: Boolean? = null): ChatAdministratorRights {
@@ -213,7 +214,7 @@ interface ApiCaller {
      * You must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
      * Animated stickers can be added to animated sticker sets and only to them.
      * Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
-     * Returns True on success.
+     * Returns *True* on success.
      *
      * @param userId User identifier of created sticker set owner
      * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
@@ -248,12 +249,55 @@ interface ApiCaller {
     }
 
     /**
-     * Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set for animated
-     * sticker sets only. Video thumbnails can be set only for video sticker sets only. Returns *True* on success.
+     * Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
+     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param emojiList 1-20 emoji associated with the sticker
+     * */
+    fun setStickerEmojiList(sticker: String, emojiList: List<String>): Boolean {
+        return service.setStickerEmojiList(sticker, emojiList).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to change search keywords assigned to a regular or custom emoji sticker.
+     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param keywords 0-20 search keywords for the sticker with total length of up to 64 characters
+     * */
+    fun setStickerKeywords(sticker: String, keywords: List<String>): Boolean {
+        return service.setStickerKeywords(sticker, keywords).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to change the [mask position][MaskPosition] of a mask sticker.
+     * The sticker must belong to a sticker set that was created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param maskPosition position where the mask should be placed on faces. Omit the parameter to remove the mask position.
+     * */
+    fun setStickerMaskPosition(sticker: String, maskPosition: MaskPosition?): Boolean {
+        return service.setStickerMaskPosition(sticker, maskPosition).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to set the title of a created sticker set. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * @param title Sticker set title, 1-64 characters
+     * */
+    fun setStickerSetTitle(name: String, title: String): Boolean {
+        return service.setStickerSetTitle(name, title).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to set the thumbnail of a regular or mask sticker set.
+     * The format of the thumbnail file must match the format of the stickers in the set. Returns *True* on success.
      *
      * @param name Sticker set name
      * @param userId User identifier of the sticker set owner
-     * @param thumb A **PNG** image with the thumbnail, must be up to 128 kilobytes in size and have width and height
+     * @param thumbnail A **PNG** image with the thumbnail, must be up to 128 kilobytes in size and have width and height
      * exactly 100px, or a **TGS** animation with the thumbnail up to 32 kilobytes in size;
      * see [Animation Requirements](https://core.telegram.org/stickers#animated-sticker-requirements)
      * for animated sticker technical requirements, or a **WEBM** video with the thumbnail up to 32 kilobytes in size;
@@ -263,15 +307,75 @@ interface ApiCaller {
      * or upload a new one. [More information on Sending Files »](https://core.telegram.org/bots/api#sending-files).
      * Animated sticker set thumbnails can't be uploaded via HTTP URL.
      * */
-    fun setStickerSetThumb(name: String, userId: ChatId.ID, thumb: InputFile): Boolean {
-        return service.setStickerSetThumb(name.toRequestBody(), userId, thumb.toRequestBody("thumb")).execute().body()?.result ?: errorBody()
+    fun setStickerSetThumbnail(name: String, userId: ChatId.ID, thumbnail: InputFile): Boolean {
+        return service.setStickerSetThumbnail(name.toRequestBody(), userId, thumbnail.toRequestBody("thumbnail")).execute().body()?.result ?: errorBody()
     }
 
+    /**
+     * Use this method to set the thumbnail of a custom emoji sticker set. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * @param customEmojiId Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail.
+     * */
+    fun setCustomEmojiStickerSetThumbnail(name: String, customEmojiId: String?): Boolean {
+        return service.setCustomEmojiStickerSetThumbnail(name, customEmojiId).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to delete a sticker set that was created by the bot. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * */
+    fun deleteStickerSet(name: String): Boolean {
+        return service.deleteStickerSet(name).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to send answers to an inline query. On success, *True* is returned.
+     * No more than 50 results per query are allowed.
+     *
+     * @param id Unique identifier for the answered query
+     * @param results List of results for the inline query
+     * @param cacheTime The maximum amount of time that the result of the inline query may be cached on the server.
+     * Defaults to 300 seconds.
+     * @param isPersonal Pass *True* if results may be cached on the server side only for the user that sent the query.
+     * By default, results may be returned to any user who sends the same query.
+     * @param nextOffset Pass the offset that a client should send in the next query with the same text to receive
+     * more results. Pass an empty string if there are no more results or if you don't support pagination.
+     * Offset length can't exceed 64 bytes.
+     * */
+    fun answerInlineQuery(
+        id: String,
+        results: List<InlineQueryResult>,
+        cacheTime: Duration?,
+        isPersonal: Boolean? = null,
+        nextOffset: String? = null,
+        button: InlineQueryResultsButton? = null
+    ): Boolean {
+        return service.answerInlineQuery(
+            id, TelegramApi.json.encodeToString(results), cacheTime?.inWholeSeconds?.toInt(), isPersonal, nextOffset, button
+        ).execute().body()?.result ?: errorBody()
+    }
+
+    /**
+     * Use this method to set the result of an interaction with a [Web App](https://core.telegram.org/bots/webapps)
+     * and send a corresponding message on behalf of the user to the chat from which the query originated.
+     * On success, a [SentWebAppMessage] object is returned.
+     *
+     * @param webAppQueryId Unique identifier for the query to be answered
+     * @param result Object describing the message to be sent
+     * */
+    fun answerWebAppQuery(webAppQueryId: String, result: InlineQueryResult): SentWebAppMessage {
+        return service.answerWebAppQuery(webAppQueryId, result).execute().body()?.result ?: errorBody()
+    }
+
+    // TODO docs
     fun downloadFile(fileId: String): InputStream {
         val fileResponse = service.getFile(fileId).execute().body() ?: errorBody()
         return downloadFile(fileResponse.file)
     }
 
+    // TODO docs
     fun downloadFile(file: File): InputStream {
         return fileService.downLoad(file.path!!).execute().let {
             (it.body() ?: errorBody()).byteStream()

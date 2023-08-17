@@ -102,7 +102,7 @@ interface ISender : ChatIdHolder, ApiCaller {
         return AudioMediaGroupMessage(service, fileService).apply(message).send(chatId).results
     }
 
-    fun sendPhotoMediaGroup(chatId: Long, message: AudioMediaGroupMessage.() -> Unit): List<Message> = sendAudioMediaGroup(chatId.toChatId(), message)
+    fun sendPhotoMediaGroup(chatId: Long, message: PhotoMediaGroupMessage.() -> Unit): List<Message> = sendPhotoMediaGroup(chatId.toChatId(), message)
     fun sendPhotoMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: PhotoMediaGroupMessage.() -> Unit): List<Message> {
         return PhotoMediaGroupMessage(service, fileService).apply(message).send(chatId).results
     }
