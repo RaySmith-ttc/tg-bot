@@ -1,8 +1,6 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.CaptionableMessage
@@ -11,14 +9,13 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.noimpl
-import java.nio.file.Files
 
 abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageResponse>, KeyboardCreator {
 
@@ -32,6 +29,7 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageR
                 override val service: TelegramService = apiCaller.service
                 override val fileService: TelegramFileService = apiCaller.fileService
                 override fun send(chatId: ChatId) = send(chatId)
+
                 override fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
                 ): MessageResponse = noimpl()
@@ -45,6 +43,7 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageR
     protected var media: InputFile? = null
     protected abstract val mediaName: String
 
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -82,30 +81,3 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageR
     }
 }
 
-// TODO add auto ChatAction + global config
-abstract class MediaMessage : IMessage<MessageResponse>, KeyboardCreator {
-
-    protected var media: InputFile? = null
-    protected abstract val mediaName: String
-
-    override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
-    override var keyboardMarkup: MessageKeyboard? = null
-    override var protectContent: Boolean? = null
-
-    protected fun getMediaMultipartBody() = when(media) {
-        is InputFile.ByteArray -> {
-            val media = media as InputFile.ByteArray
-            val body = media.byteArray.toRequestBody(media.mimeType.toMediaType())
-            MultipartBody.Part.createFormData(mediaName, media.filename, body)
-        }
-        is InputFile.File -> {
-            val media = media as InputFile.File
-            val mimeType = Files.probeContentType(media.file.toPath())?.toMediaType()
-            val body = media.file.readBytes().toRequestBody(mimeType)
-            MultipartBody.Part.createFormData(mediaName, media.file.name, body)
-        }
-        else -> error("Only ByteArray and File can be multipart")
-    }
-}

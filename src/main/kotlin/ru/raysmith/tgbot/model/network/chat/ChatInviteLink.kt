@@ -22,10 +22,10 @@ data class ChatInviteLink(
     /** Creator of the link */
     @SerialName("creator") val creator: User,
 
-    /** True, if the link is primary */
+    /** *True*, if the link is primary */
     @SerialName("is_primary") val isPrimary: Boolean,
 
-    /** True, if the link is revoked */
+    /** *True*, if the link is revoked */
     @SerialName("is_revoked") val isRevoked: Boolean,
 
     /** Point in time (Unix timestamp) when the link will expire or has been expired */

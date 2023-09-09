@@ -12,6 +12,6 @@ data class Audio(
     @SerialName("title") val title: String? = null,
     @SerialName("file_name") override val fileName: String? = null,
     @SerialName("mime_type") val mimeType: String? = null,
-    @SerialName("file_size") override val fileSize: Int? = null,
-    @SerialName("thumb") val thumb: PhotoSize? = null,
+    @SerialName("file_size") override val fileSize: Long? = null,
+    @SerialName("thumbnail") val thumbnail: PhotoSize? = null,
 ) : Media

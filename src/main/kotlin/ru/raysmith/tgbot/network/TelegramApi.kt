@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.network.*
-import ru.raysmith.tgbot.model.network.chat.ChatMember
+import ru.raysmith.tgbot.model.network.Error
+import ru.raysmith.tgbot.model.network.chat.member.*
+import ru.raysmith.tgbot.model.network.inline.content.InputMessageContent
+import ru.raysmith.tgbot.model.network.inline.content.InputTextMessageContent
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -74,12 +76,12 @@ object TelegramApi {
                 subclass(InputTextMessageContent::class)
             }
             polymorphic(ChatMember::class) {
-                subclass(ChatMember.ChatMemberOwner::class)
-                subclass(ChatMember.ChatMemberLeft::class)
-                subclass(ChatMember.ChatMemberMember::class)
-                subclass(ChatMember.ChatMemberAdministrator::class)
-                subclass(ChatMember.ChatMemberBanned::class)
-                subclass(ChatMember.ChatMemberRestricted::class)
+                subclass(ChatMemberOwner::class)
+                subclass(ChatMemberLeft::class)
+                subclass(ChatMemberMember::class)
+                subclass(ChatMemberAdministrator::class)
+                subclass(ChatMemberBanned::class)
+                subclass(ChatMemberRestricted::class)
             }
         }
     }

@@ -16,6 +16,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
         internal fun instance(apiCaller: ApiCaller) = object : MessageWithReplyMarkup {
             override val service: TelegramService = apiCaller.service
             override val fileService: TelegramFileService = apiCaller.fileService
+            override var messageThreadId: Int? = null
             override var disableNotification: Boolean? = null
             override var replyToMessageId: Int? = null
             override var allowSendingWithoutReply: Boolean? = null

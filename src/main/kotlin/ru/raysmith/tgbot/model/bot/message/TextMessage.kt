@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.bot.message
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
@@ -31,6 +31,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
     /** Whether test should be truncated if text length is greater than 4096 */
     var safeTextLength: Boolean = Bot.config.safeTextLength
 
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -56,6 +57,7 @@ class TextMessage(override val service: TelegramService, override val fileServic
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendMessage(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             text = getMessageText(),
             parseMode = getParseModeIfNeed(),
             entities = messageText?.getEntitiesString(),
@@ -78,15 +80,6 @@ class TextMessage(override val service: TelegramService, override val fileServic
             entities = messageText?.getEntitiesString(),
             replyMarkup = keyboardMarkup?.toMarkup(),
             disableWebPagePreview = disableWebPagePreview
-        ).execute().body() ?: errorBody()
-    }
-
-    override fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse {
-        return service.editMessageReplyMarkup(
-            chatId = chatId,
-            messageId = messageId,
-            inlineMessageId = inlineMessageId,
-            replyMarkup = keyboardMarkup?.toMarkup()
         ).execute().body() ?: errorBody()
     }
 

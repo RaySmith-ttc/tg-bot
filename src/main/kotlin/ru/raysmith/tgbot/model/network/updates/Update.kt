@@ -6,7 +6,8 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
-import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
+import ru.raysmith.tgbot.model.network.chat.member.ChatMemberUpdated
+import ru.raysmith.tgbot.model.network.inline.InlineQuery
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
 import ru.raysmith.tgbot.model.network.payment.ShippingQuery

@@ -8,7 +8,7 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.utils.Pagination
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
-// TODO [kodoctor] remove serializable & row & button; move inner classes
+// TODO remove serializable & row & button; move inner classes
 @Serializable
 class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()) : MessageKeyboard, Iterable<MessageInlineKeyboard.MessageInlineKeyboardRow> {
     fun getRows(): List<MessageInlineKeyboardRow> = rows
@@ -74,11 +74,15 @@ class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardR
             var callbackData: String? = null
             var webApp: WebAppInfo? = null
             var switchInlineQuery: String? = null
+            var switchInlineQueryCurrentChat: String? = null
+            var switchInlineQueryChosenChat: String? = null
             var pay: Boolean? = null
 
             override fun toKeyboardButton(): InlineKeyboardButton {
-                require(text.isNotEmpty()) { "Button text must be is not empty" }
-                return InlineKeyboardButton(text, callbackData, webApp, url, loginUrl, switchInlineQuery, pay)
+                return InlineKeyboardButton(
+                    text, url, callbackData, webApp, loginUrl, switchInlineQuery, switchInlineQueryCurrentChat,
+                    switchInlineQueryChosenChat, pay
+                )
             }
         }
     }

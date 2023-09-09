@@ -30,7 +30,7 @@ data class InputMediaVideo(
      *
      * @see <a href="https://core.telegram.org/bots/api#sending-files">More info on Sending Files »</a>
      * */
-    @SerialName("thumb") val thumb: String? = null,
+    @SerialName("thumbnail") val thumbnail: String? = null,
 
     /** Caption of the photo to be sent, 0-1024 characters after entities parsing */
     @SerialName("caption") val caption: String? = null,
@@ -38,7 +38,7 @@ data class InputMediaVideo(
     /** Mode for parsing entities in the photo caption. */
     @SerialName("parse_mode") val parseMode: ParseMode? = null,
 
-    /** List of special entities that appear in the caption, which can be specified instead of *parse_mode* */
+    /** List of special entities that appear in the caption, which can be specified instead of *[parseMode]* */
     @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
 
     /** Video width */
@@ -51,9 +51,12 @@ data class InputMediaVideo(
     @SerialName("duration") val duration: Int? = null,
 
     /** Pass True if the uploaded video is suitable for streaming */
-    @SerialName("supports_streaming") val supportsStreaming: Boolean? = null
+    @SerialName("supports_streaming") val supportsStreaming: Boolean? = null,
 
-) : InputMedia() {
+    /** Pass *True* if the video needs to be covered with a spoiler animation */
+    @SerialName("has_spoiler") val hasSpoiler: Boolean? = null,
+
+    ) : InputMedia() {
 
     @Required
     @SerialName("type") override val type: String = "video"

@@ -1,5 +1,8 @@
 package ru.raysmith.tgbot.utils
 
+// TODO replace lib with Provider class:
+//  allow to set to a config pagination provider that determines how to get the page data from the entire list
+//  create new module with exposed extensions; use a lambda that returns list query (e.g. by last id) with offset method by default
 import org.jetbrains.exposed.sql.SizedIterable
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard

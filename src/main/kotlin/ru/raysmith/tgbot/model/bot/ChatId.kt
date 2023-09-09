@@ -12,6 +12,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
+// TODO docs
 @Polymorphic
 @Serializable(with = ChatIdSerializer::class)
 sealed class ChatId {
@@ -27,12 +28,12 @@ sealed class ChatId {
 
     fun toRequestBody(): RequestBody = when (this) {
         is ID -> value.toString().toRequestBody()
-        is Username -> username.toRequestBody()
+        is Username -> value.toRequestBody()
     }
 
     fun toStringValue() = when (this) {
         is ID -> value.toString()
-        is Username -> username
+        is Username -> value
     }
 
     companion object {
@@ -48,10 +49,13 @@ sealed class ChatId {
     @Serializable(with = IDSerializer::class)
     data class ID(val value: Long) : ChatId()
 
+    /** Represents username of the user or supergroup (in any format `@username` or `username`)*/
     @Serializable(with = UsernameSerializer::class)
-    data class Username(val username: String) : ChatId()
+    data class Username(private val _value: String) : ChatId() {
+        val value = _value.replaceFirstChar { if (it == '@') "@" else "@$it" }
+    }
 
-    object IDSerializer : KSerializer<ID> {
+    internal object IDSerializer : KSerializer<ID> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ChatId.ID", PrimitiveKind.LONG)
         override fun deserialize(decoder: Decoder): ID = ID(decoder.decodeLong())
         override fun serialize(encoder: Encoder, value: ID) {
@@ -59,11 +63,11 @@ sealed class ChatId {
         }
     }
 
-    object UsernameSerializer : KSerializer<Username> {
+    internal object UsernameSerializer : KSerializer<Username> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ChatId.Username", PrimitiveKind.STRING)
         override fun deserialize(decoder: Decoder): Username = Username(decoder.decodeString())
         override fun serialize(encoder: Encoder, value: Username) {
-            encoder.encodeString(value.username)
+            encoder.encodeString(value.value)
         }
     }
 }

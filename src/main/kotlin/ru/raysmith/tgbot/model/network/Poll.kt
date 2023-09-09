@@ -21,16 +21,16 @@ data class Poll(
     /** Total number of users that voted in the poll */
     @SerialName("total_voter_count") val totalVoterCount: Int,
 
-    /** _True_, if the poll is closed */
+    /** *True*, if the poll is closed */
     @SerialName("is_closed") val isClosed: Boolean,
 
-    /** _True_, if the poll is anonymous */
+    /** *True*, if the poll is anonymous */
     @SerialName("is_anonymous") val isAnonymous: Boolean,
 
     /** Poll type, currently can be "regular" or "quiz" */
     @SerialName("type") val type: PollType,
 
-    /** _True_, if the poll allows multiple answers */
+    /** *True*, if the poll allows multiple answers */
     @SerialName("allows_multiple_answers") val allowsMultipleAnswers: Boolean,
 
     /**

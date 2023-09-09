@@ -12,6 +12,9 @@ interface IMessage<T : MessageRes> : ApiCaller {
         const val MAX_POLL_EXPLANATION_LENGTH = 200
     }
 
+    /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
+    var messageThreadId: Int?
+
     /**
      * Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
@@ -33,4 +36,3 @@ interface IMessage<T : MessageRes> : ApiCaller {
     /** Send message to chat with [chatId] */
     fun send(chatId: ChatId): T
 }
-

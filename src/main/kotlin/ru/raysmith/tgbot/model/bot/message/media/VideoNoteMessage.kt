@@ -23,6 +23,7 @@ class VideoNoteMessage(override val service: TelegramService, override val fileS
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendVideoNote(
                 chatId = chatId.toRequestBody(),
+                messageThreadId = messageThreadId?.toString()?.toRequestBody(),
                 videoNote = getMediaMultipartBody(),
                 duration = duration?.toString()?.toRequestBody(),
                 length = length?.toString()?.toRequestBody(),
@@ -36,6 +37,7 @@ class VideoNoteMessage(override val service: TelegramService, override val fileS
         is InputFile.FileIdOrUrl -> {
             service.sendVideoNote(
                 chatId = chatId,
+                messageThreadId = messageThreadId,
                 videoNote = (media as InputFile.FileIdOrUrl).value,
                 duration = duration,
                 length = length,

@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
+import ru.raysmith.tgbot.model.network.message.Message
 
 @Serializable
 /**
@@ -12,15 +13,40 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
  * are mutually exclusive.
  * */
 data class KeyboardButton(
-    /** Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed */
+    /**
+     * Text of the button. If none of the optional fields are used,
+     * it will be sent as a message when the button is pressed
+     * */
     @SerialName("text") val text: String,
     
-    /** If True, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only */
+    /**
+     * If specified, pressing the button will open a list of suitable users.
+     * Tapping on any user will send their identifier to the bot in a [userShared][Message.userShared] service message.
+     * Available in private chats only.
+     * */
+    @SerialName("request_user") val requestUser: KeyboardButtonRequestUser? = null,
+
+    /**
+     * If specified, pressing the button will open a list of suitable chats.
+     * Tapping on a chat will send its identifier to the bot in a [chatShared][Message.chatShared] service message.
+     * Available in private chats only.
+     * */
+    @SerialName("request_chat") val requestChat: KeyboardButtonRequestChat? = null,
+
+    /**
+     * If True, the user's phone number will be sent as a contact when the button is pressed.
+     * Available in private chats only
+     * */
     @SerialName("request_contact") val requestContact: Boolean? = null,
     
     /** If True, the user's current location will be sent when the button is pressed. Available in private chats only */
     @SerialName("request_location") val requestLocation: Boolean? = null,
-    // TODO [poll support] add request_poll field (https://core.telegram.org/bots/api#keyboardbutton)
+
+    /**
+     * If specified, the user will be asked to create a poll and send it to the bot when the button is pressed.
+     * Available in private chats only.
+     * */
+    @SerialName("request_poll") val requestPoll: KeyboardButtonPollType? = null,
     
     @SerialName("web_app") val webApp: WebAppInfo? = null
 ) : IKeyboardButton

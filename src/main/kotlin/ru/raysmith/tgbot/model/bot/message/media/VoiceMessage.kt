@@ -26,6 +26,7 @@ class VoiceMessage(override val service: TelegramService, override val fileServi
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendVoice(
                 chatId = chatId.toRequestBody(),
+                messageThreadId = messageThreadId?.toString()?.toRequestBody(),
                 voice = getMediaMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
@@ -41,6 +42,7 @@ class VoiceMessage(override val service: TelegramService, override val fileServi
         is InputFile.FileIdOrUrl -> {
             service.sendVoice(
                 chatId = chatId,
+                messageThreadId = messageThreadId,
                 voice = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,

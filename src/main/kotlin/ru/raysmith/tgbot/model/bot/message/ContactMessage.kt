@@ -13,6 +13,8 @@ class ContactMessage(
     override val service: TelegramService,
     override val fileService: TelegramFileService
 ) : IMessage<MessageResponse>, KeyboardCreator {
+
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -25,6 +27,7 @@ class ContactMessage(
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendContact(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             phoneNumber = phoneNumber,
             firstName = firstName,
             lastName = lastName,
@@ -43,6 +46,8 @@ class DiceMessage(
     override val service: TelegramService,
     override val fileService: TelegramFileService
 ) : IMessage<MessageResponse>, KeyboardCreator {
+
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -52,6 +57,7 @@ class DiceMessage(
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendDice(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             emoji = emoji,
             disableNotification = disableNotification,
             protectContent = protectContent,

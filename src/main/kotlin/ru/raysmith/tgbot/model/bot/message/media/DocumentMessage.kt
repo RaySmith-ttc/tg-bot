@@ -22,8 +22,9 @@ class DocumentMessage(override val service: TelegramService, override val fileSe
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendDocument(
                 chatId = chatId.toRequestBody(),
+                messageThreadId = messageThreadId?.toString()?.toRequestBody(),
                 document = getMediaMultipartBody(),
-                thumb = getThumbMultipartBody(),
+                thumbnail = getThumbMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
                 captionEntities = _caption?.getEntitiesString()?.toRequestBody(),
@@ -37,6 +38,7 @@ class DocumentMessage(override val service: TelegramService, override val fileSe
         is InputFile.FileIdOrUrl -> {
             service.sendDocument(
                 chatId = chatId,
+                messageThreadId = messageThreadId,
                 document = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,

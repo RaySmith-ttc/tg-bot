@@ -1,13 +1,22 @@
 package ru.raysmith.tgbot.model.network.keyboard
 
-import kotlinx.serialization.*
+import kotlinx.serialization.Required
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
 
 @Serializable
 /** This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). */
 data class ReplyKeyboardMarkup(
+
     /** Array of button rows, each represented by an Array of [KeyboardButton][KeyboardButton] objects */
     @SerialName("keyboard") @Required val keyboard: List<List<KeyboardButton>>,
+
+    /**
+     * Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to false,
+     * in which case the custom keyboard can be hidden and opened with a keyboard icon.
+     * */
+    @SerialName("is_persistent") val isPersistent: Boolean? = null,
 
     /**
      * Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller

@@ -1,4 +1,4 @@
-<!-- v. 6.7 -->
+<!-- v. 6.8 -->
 
 <!-- Formatting to diff                                                                       -->
 <!-- 1. Copy dev_page block from https://core.telegram.org/bots/api                           -->
@@ -9,10 +9,13 @@
   <div id="dev_page_content_wrap" class=" ">
     <div class="dev_side_nav_wrap">
       <div class="dev_side_nav">
-        <ul class="nav navbar-nav navbar-default affix">
+        <ul class="nav navbar-nav navbar-default affix-top">
           <li>
             <a href="#recent-changes" data-target="#recent-changes" onmouseenter="showTitleIfOverflows(this)">Recent changes</a>
             <ul class="nav">
+              <li>
+                <a href="#august-18-2023" data-target="#august-18-2023" onmouseenter="showTitleIfOverflows(this)">August 18, 2023</a>
+              </li>
               <li>
                 <a href="#april-21-2023" data-target="#april-21-2023" onmouseenter="showTitleIfOverflows(this)">April 21, 2023</a>
               </li>
@@ -36,7 +39,7 @@
             </ul>
           </li>
           <li>
-            <a href="#using-a-local-bot-api-server" data-target="#using-a-local-bot-api-server" onmouseenter="showTitleIfOverflows(this)" title="Using a Local Bot API Server">Using a Local Bot API Server</a>
+            <a href="#using-a-local-bot-api-server" data-target="#using-a-local-bot-api-server" onmouseenter="showTitleIfOverflows(this)">Using a Local Bot API Server</a>
             <ul class="nav">
               <li>
                 <a href="#do-i-need-a-local-bot-api-server" data-target="#do-i-need-a-local-bot-api-server" onmouseenter="showTitleIfOverflows(this)">Do I need a Local Bot API Server</a>
@@ -95,6 +98,9 @@
               </li>
               <li>
                 <a href="#document" data-target="#document" onmouseenter="showTitleIfOverflows(this)">Document</a>
+              </li>
+              <li>
+                <a href="#story" data-target="#story" onmouseenter="showTitleIfOverflows(this)">Story</a>
               </li>
               <li>
                 <a href="#video" data-target="#video" onmouseenter="showTitleIfOverflows(this)">Video</a>
@@ -540,6 +546,9 @@
                 <a href="#unhidegeneralforumtopic" data-target="#unhidegeneralforumtopic" onmouseenter="showTitleIfOverflows(this)">unhideGeneralForumTopic</a>
               </li>
               <li>
+                <a href="#unpinallgeneralforumtopicmessages" data-target="#unpinallgeneralforumtopicmessages" onmouseenter="showTitleIfOverflows(this)">unpinAllGeneralForumTopicMessages</a>
+              </li>
+              <li>
                 <a href="#answercallbackquery" data-target="#answercallbackquery" onmouseenter="showTitleIfOverflows(this)">answerCallbackQuery</a>
               </li>
               <li>
@@ -670,7 +679,7 @@
                 <a href="#setstickersetthumbnail" data-target="#setstickersetthumbnail" onmouseenter="showTitleIfOverflows(this)">setStickerSetThumbnail</a>
               </li>
               <li>
-                <a href="#setcustomemojistickersetthumbnail" data-target="#setcustomemojistickersetthumbnail" onmouseenter="showTitleIfOverflows(this)" title="setCustomEmojiStickerSetThumbnail">setCustomEmojiStickerSetThumbnail</a>
+                <a href="#setcustomemojistickersetthumbnail" data-target="#setcustomemojistickersetthumbnail" onmouseenter="showTitleIfOverflows(this)">setCustomEmojiStickerSetThumbnail</a>
               </li>
               <li>
                 <a href="#deletestickerset" data-target="#deletestickerset" onmouseenter="showTitleIfOverflows(this)">deleteStickerSet</a>
@@ -872,7 +881,7 @@
               </li>
             </ul>
           </li>
-          <li class="active">
+          <li>
             <a href="#games" data-target="#games" onmouseenter="showTitleIfOverflows(this)">Games</a>
             <ul class="nav">
               <li>
@@ -887,7 +896,7 @@
               <li>
                 <a href="#setgamescore" data-target="#setgamescore" onmouseenter="showTitleIfOverflows(this)">setGameScore</a>
               </li>
-              <li class="active">
+              <li>
                 <a href="#getgamehighscores" data-target="#getgamehighscores" onmouseenter="showTitleIfOverflows(this)">getGameHighScores</a>
               </li>
               <li>
@@ -928,6 +937,21 @@
         <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a>
         </p>
       </blockquote>
+      <h4>
+        <a class="anchor" name="august-18-2023" href="#august-18-2023" id="august-18-2023">
+          <i class="anchor-icon"></i>
+        </a>August 18, 2023
+      </h4>
+      <p>
+        <strong>Bot API 6.8</strong>
+      </p>
+      <ul>
+        <li>Added the field <em>story</em> to the class <a href="#message">Message</a> for messages with forwarded stories. Currently, it holds no information. </li>
+        <li>Added the field <em>voter_chat</em> to the class <a href="#pollanswer">PollAnswer</a>, to contain channel chat voters in <a href="#poll">Polls</a>. For backward compatibility, the field <em>user</em> in such objects will contain the user 136817688 ( <a href="https://t.me/Channel_Bot">@Channel_Bot</a>). </li>
+        <li>Added the field <em>emoji_status_expiration_date</em> to the class <a href="#chat">Chat</a>. </li>
+        <li>Added the method <a href="#unpinallgeneralforumtopicmessages">unpinAllGeneralForumTopicMessages</a>. </li>
+        <li>Increased to 512 characters the maximum length of the <em>startapp</em> parameter in direct Web App links. </li>
+      </ul>
       <h4>
         <a class="anchor" name="april-21-2023" href="#april-21-2023" id="april-21-2023">
           <i class="anchor-icon"></i>
@@ -1016,8 +1040,8 @@
       </h3>
       <p>All queries to the Telegram Bot API must be served over HTTPS and need to be presented in this form: <code>https://api.telegram.org/bot&lt;token&gt;/METHOD_NAME</code>. Like this for example: </p>
       <pre>
-          <code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe</code>
-        </pre>
+					<code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe</code>
+				</pre>
       <p>We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. We support four ways of passing parameters in Bot API requests: </p>
       <ul>
         <li>
@@ -1637,6 +1661,13 @@
           </td>
         </tr>
         <tr>
+          <td>emoji_status_expiration_date</td>
+          <td>Integer</td>
+          <td>
+            <em>Optional</em>. Expiration date of the emoji status of the other party in a private chat in Unix time, if any. Returned only in <a href="#getchat">getChat</a>.
+          </td>
+        </tr>
+        <tr>
           <td>bio</td>
           <td>String</td>
           <td>
@@ -1990,6 +2021,15 @@
           </td>
           <td>
             <em>Optional</em>. Message is a sticker, information about the sticker
+          </td>
+        </tr>
+        <tr>
+          <td>story</td>
+          <td>
+            <a href="#story">Story</a>
+          </td>
+          <td>
+            <em>Optional</em>. Message is a forwarded story
           </td>
         </tr>
         <tr>
@@ -2702,6 +2742,12 @@
         </tbody>
       </table>
       <h4>
+        <a class="anchor" name="story" href="#story" id="story">
+          <i class="anchor-icon"></i>
+        </a>Story
+      </h4>
+      <p>This object represents a message about a forwarded story in the chat. Currently holds no information.</p>
+      <h4>
         <a class="anchor" name="video" href="#video" id="video">
           <i class="anchor-icon"></i>
         </a>Video
@@ -2995,16 +3041,27 @@
           <td>Unique poll identifier</td>
         </tr>
         <tr>
+          <td>voter_chat</td>
+          <td>
+            <a href="#chat">Chat</a>
+          </td>
+          <td>
+            <em>Optional</em>. The chat that changed the answer to the poll, if the voter is anonymous
+          </td>
+        </tr>
+        <tr>
           <td>user</td>
           <td>
             <a href="#user">User</a>
           </td>
-          <td>The user, who changed the answer to the poll</td>
+          <td>
+            <em>Optional</em>. The user that changed the answer to the poll, if the voter isn't anonymous
+          </td>
         </tr>
         <tr>
           <td>option_ids</td>
           <td>Array of Integer</td>
-          <td>0-based identifiers of answer options, chosen by the user. May be empty if the user retracted their vote.</td>
+          <td>0-based identifiers of chosen answer options. May be empty if the vote was retracted.</td>
         </tr>
         </tbody>
       </table>
@@ -4876,7 +4933,7 @@
         <tr>
           <td>until_date</td>
           <td>Integer</td>
-          <td>Date when restrictions will be lifted for this user; unix time. If 0, then the user is restricted forever</td>
+          <td>Date when restrictions will be lifted for this user; Unix time. If 0, then the user is restricted forever</td>
         </tr>
         </tbody>
       </table>
@@ -4939,7 +4996,7 @@
         <tr>
           <td>until_date</td>
           <td>Integer</td>
-          <td>Date when restrictions will be lifted for this user; unix time. If 0, then the user is banned forever</td>
+          <td>Date when restrictions will be lifted for this user; Unix time. If 0, then the user is banned forever</td>
         </tr>
         </tbody>
       </table>
@@ -6308,25 +6365,25 @@
       </h6>
       <p>To use this mode, pass <em>MarkdownV2</em> in the <em>parse_mode</em> field. Use the following syntax in your message: </p>
       <pre>
-                                                                                <code>*bold \*text*
-  _italic \*text_
-  __underline__
-  ~strikethrough~
-  ||spoiler||
-  *bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
-  [inline URL](http://www.example.com/)
-  [inline mention of a user](tg://user?id=123456789)
-  ![
-                                                                                  <img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">](tg://emoji?id=5368324170671202286)
-  `inline fixed-width code`
-  ```
-  pre-formatted fixed-width code block
-  ```
-  ```python
-  pre-formatted fixed-width code block written in the Python programming language
+																																								<code>*bold \*text*
+_italic \*text_
+__underline__
+~strikethrough~
+||spoiler||
+*bold _italic bold ~italic bold strikethrough ||italic bold strikethrough spoiler||~ __underline italic bold___ bold*
+[inline URL](http://www.example.com/)
+[inline mention of a user](tg://user?id=123456789)
+![
+																																									<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">](tg://emoji?id=5368324170671202286)
+`inline fixed-width code`
 ```
-                                                                                  </code>
-                                                                                </pre>
+pre-formatted fixed-width code block
+```
+```python
+pre-formatted fixed-width code block written in the Python programming language
+```
+																																									</code>
+																																								</pre>
       <p>Please note:</p>
       <ul>
         <li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding '\' character, in which case it is treated as an ordinary character and not a part of the markup. This implies that '\' character usually must be escaped with a preceding '\' character.</li>
@@ -6344,21 +6401,21 @@
       </h6>
       <p>To use this mode, pass <em>HTML</em> in the <em>parse_mode</em> field. The following tags are currently supported: </p>
       <pre>
-                                                                                  <code>&lt;b&gt;bold&lt;/b&gt;, &lt;strong&gt;bold&lt;/strong&gt;
-  &lt;i&gt;italic&lt;/i&gt;, &lt;em&gt;italic&lt;/em&gt;
-  &lt;u&gt;underline&lt;/u&gt;, &lt;ins&gt;underline&lt;/ins&gt;
-  &lt;s&gt;strikethrough&lt;/s&gt;, &lt;strike&gt;strikethrough&lt;/strike&gt;, &lt;del&gt;strikethrough&lt;/del&gt;
-  &lt;span class="tg-spoiler"&gt;spoiler&lt;/span&gt;, &lt;tg-spoiler&gt;spoiler&lt;/tg-spoiler&gt;
-  &lt;b&gt;bold &lt;i&gt;italic bold &lt;s&gt;italic bold strikethrough &lt;span class="tg-spoiler"&gt;italic bold strikethrough spoiler&lt;/span&gt;&lt;/s&gt; &lt;u&gt;underline italic bold&lt;/u&gt;&lt;/i&gt; bold&lt;/b&gt;
-  &lt;a href="http://www.example.com/"&gt;inline URL&lt;/a&gt;
-  &lt;a href="tg://user?id=123456789"&gt;inline mention of a user&lt;/a&gt;
-  &lt;tg-emoji emoji-id="5368324170671202286"&gt;
-                                                                                    <img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">&lt;/tg-emoji&gt;
-  &lt;code&gt;inline fixed-width code&lt;/code&gt;
-  &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
+																																									<code>&lt;b&gt;bold&lt;/b&gt;, &lt;strong&gt;bold&lt;/strong&gt;
+&lt;i&gt;italic&lt;/i&gt;, &lt;em&gt;italic&lt;/em&gt;
+&lt;u&gt;underline&lt;/u&gt;, &lt;ins&gt;underline&lt;/ins&gt;
+&lt;s&gt;strikethrough&lt;/s&gt;, &lt;strike&gt;strikethrough&lt;/strike&gt;, &lt;del&gt;strikethrough&lt;/del&gt;
+&lt;span class="tg-spoiler"&gt;spoiler&lt;/span&gt;, &lt;tg-spoiler&gt;spoiler&lt;/tg-spoiler&gt;
+&lt;b&gt;bold &lt;i&gt;italic bold &lt;s&gt;italic bold strikethrough &lt;span class="tg-spoiler"&gt;italic bold strikethrough spoiler&lt;/span&gt;&lt;/s&gt; &lt;u&gt;underline italic bold&lt;/u&gt;&lt;/i&gt; bold&lt;/b&gt;
+&lt;a href="http://www.example.com/"&gt;inline URL&lt;/a&gt;
+&lt;a href="tg://user?id=123456789"&gt;inline mention of a user&lt;/a&gt;
+&lt;tg-emoji emoji-id="5368324170671202286"&gt;
+																																										<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">&lt;/tg-emoji&gt;
+&lt;code&gt;inline fixed-width code&lt;/code&gt;
+&lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
 &lt;pre&gt;&lt;code class="language-python"&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
-                                                                                    </code>
-                                                                                  </pre>
+																																										</code>
+																																									</pre>
       <p>Please note:</p>
       <ul>
         <li>Only the tags mentioned above are currently supported.</li>
@@ -6377,18 +6434,18 @@
       </h6>
       <p>This is a legacy mode, retained for backward compatibility. To use this mode, pass <em>Markdown</em> in the <em>parse_mode</em> field. Use the following syntax in your message: </p>
       <pre>
-                                                                                    <code>*bold text*
-  _italic text_
-  [inline URL](http://www.example.com/)
-  [inline mention of a user](tg://user?id=123456789)
-  `inline fixed-width code`
-  ```
-  pre-formatted fixed-width code block
-  ```
-  ```python
-  pre-formatted fixed-width code block written in the Python programming language
+																																										<code>*bold text*
+_italic text_
+[inline URL](http://www.example.com/)
+[inline mention of a user](tg://user?id=123456789)
+`inline fixed-width code`
+```
+pre-formatted fixed-width code block
+```
+```python
+pre-formatted fixed-width code block written in the Python programming language
 ```</code>
-                                                                                  </pre>
+																																									</pre>
       <p>Please note:</p>
       <ul>
         <li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead. </li>
@@ -8008,7 +8065,7 @@
           <td>until_date</td>
           <td>Integer</td>
           <td>Optional</td>
-          <td>Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.</td>
+          <td>Date when the user will be unbanned; Unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.</td>
         </tr>
         <tr>
           <td>revoke_messages</td>
@@ -8100,7 +8157,7 @@
           <td>until_date</td>
           <td>Integer</td>
           <td>Optional</td>
-          <td>Date when restrictions will be lifted for the user, unix time. If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever</td>
+          <td>Date when restrictions will be lifted for the user; Unix time. If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever</td>
         </tr>
         </tbody>
       </table>
@@ -9267,6 +9324,30 @@
         </a>unhideGeneralForumTopic
       </h4>
       <p>Use this method to unhide the 'General' topic in a forum supergroup chat. The bot must be an administrator in the chat for this to work and must have the <em>can_manage_topics</em> administrator rights. Returns <em>True</em> on success. </p>
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>chat_id</td>
+          <td>Integer or String</td>
+          <td>Yes</td>
+          <td>Unique identifier for the target chat or username of the target supergroup (in the format <code>@supergroupusername</code>) </td>
+        </tr>
+        </tbody>
+      </table>
+      <h4>
+        <a class="anchor" name="unpinallgeneralforumtopicmessages" href="#unpinallgeneralforumtopicmessages" id="unpinallgeneralforumtopicmessages">
+          <i class="anchor-icon"></i>
+        </a>unpinAllGeneralForumTopicMessages
+      </h4>
+      <p>Use this method to clear the list of pinned messages in a General forum topic. The bot must be an administrator in the chat for this to work and must have the <em>can_pin_messages</em> administrator right in the supergroup. Returns <em>True</em> on success. </p>
       <table class="table">
         <thead>
         <tr>

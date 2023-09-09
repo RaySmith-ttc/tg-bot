@@ -3,20 +3,23 @@ package ru.raysmith.tgbot.core
 import kotlinx.serialization.encodeToString
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.InlineQueryResult
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.UserProfilePhotos
+import ru.raysmith.tgbot.model.network.WebhookInfo
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
-import ru.raysmith.tgbot.model.network.inline.InlineQueryResultsButton
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
+import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
+import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
 import ru.raysmith.tgbot.model.network.sticker.*
+import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApi.json
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
@@ -26,6 +29,73 @@ import kotlin.time.Duration
 interface ApiCaller {
     val service: TelegramService
     val fileService: TelegramFileService
+
+    /**
+     * Use this method to specify a URL and receive incoming updates via an outgoing webhook.
+     * Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL,
+     * containing a JSON-serialized [Update]. In case of an unsuccessful request, we will give up after a
+     * reasonable amount of attempts. Returns *True* on Success.
+     *
+     * If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter
+     * secret_token. If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token”
+     * with the secret token as content.
+     *
+     * **Notes:**
+     * 1. You will not be able to receive updates using getUpdates for as long as an outgoing webhook is set up.
+     * 2. To use a self-signed certificate, you need to upload your public key certificate using certificate parameter. Please upload as InputFile, sending a String will not work.
+     * 3. Ports currently supported for webhooks: 443, 80, 88, 8443.
+     *
+     * If you're having any trouble setting up webhooks, please check out this amazing guide to webhooks.
+     *
+     * @param url HTTPS URL to send updates to. Use an empty string to remove webhook integration
+     * @param certificate Upload your public key certificate so that the root certificate in use can be checked.
+     * See our [self-signed](https://core.telegram.org/bots/self-signed) guide for details.
+     * @param ipAddress The fixed IP address which will be used to send webhook requests
+     * instead of the IP address resolved through DNS
+     * @param maxConnections The maximum allowed number of simultaneous HTTPS connections to the webhook for update
+     * delivery, 1-100. Defaults to 40. Use lower values to limit the load on your bot's server, and higher
+     * values to increase your bot's throughput.
+     * @param allowedUpdates A JSON-serialized list of the update types you want your bot to receive.
+     * See [Update] for a complete list of available update types. Specify an empty list to receive all update
+     * types except chat_member (default). If not specified, the previous setting will be used.
+     *
+     * Please note that this parameter doesn't affect updates created before the call to the setWebhook,
+     * so unwanted updates may be received for a short period of time.
+     * @param dropPendingUpdates Pass *True* to drop all pending updates
+     * @param secretToken A secret token to be sent in a header “X-Telegram-Bot-Api-Secret-Token” in every webhook
+     * request, 1-256 characters. Only characters `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.
+     * The header is useful to ensure that the request comes from a webhook set by you.
+     * */
+    fun setWebhook(
+        url: String,
+        certificate: InputFile? = null,
+        ipAddress: String? = null,
+        maxConnections: Int? = null,
+        allowedUpdates: String? = null,
+        dropPendingUpdates: Boolean? = null,
+        secretToken: String? = null,
+    ) = service.setWebhook(
+        url.toRequestBody(), certificate?.toRequestBody("certificate"), ipAddress?.toRequestBody(),
+        maxConnections?.toString()?.toRequestBody(), allowedUpdates?.toRequestBody(),
+        dropPendingUpdates?.toString()?.toRequestBody(), secretToken?.toRequestBody()
+    ).execute().body()?.result ?: errorBody()
+
+    // TODO link to getUpdates
+    /**
+     * Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns *True* on success.
+     *
+     * @param dropPendingUpdates Pass *True* to drop all pending updates
+     * */
+    fun deleteWebhook(dropPendingUpdates: Boolean? = null) =
+        service.deleteWebhook(dropPendingUpdates).execute().body()?.result ?: errorBody()
+
+    // TODO link to getUpdates
+    /**
+     * Use this method to get current webhook status. Requires no parameters.
+     * On success, returns a [WebhookInfo] object. If the bot is using getUpdates,
+     * will return an object with the url field empty.
+     * */
+    fun getWebhookInfo() = service.getWebhookInfo().execute().body()?.result ?: errorBody()
 
     /**
      * A simple method for testing your bot's auth token. Requires no parameters.
@@ -137,11 +207,9 @@ interface ApiCaller {
         return service.getMyDefaultAdministratorRights(forChannels).execute().body()?.result ?: errorBody()
     }
 
-
-
     /**
      * Use this method to send answers to callback queries sent from [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
-     * to the user as a notification at the top of the chat screen or as an alert. On success, _True_ is returned.
+     * to the user as a notification at the top of the chat screen or as an alert. On success, *True* is returned.
      * */
     fun answerCallbackQuery(
         callbackQueryId: String,
@@ -152,11 +220,6 @@ interface ApiCaller {
     ): Boolean {
         return service.answerCallbackQuery(callbackQueryId, text, showAlert, url, cacheTime).execute().body()?.result ?: errorBody()
     }
-
-    // TODO
-//    fun setMyCommands(
-//        commands: Iterable<BotCommand>, scope: BotCommandScope?, languageCode:
-//    )
 
     /**
      * Use this method to get a sticker set. On success, a [StickerSet] object is returned.
@@ -174,7 +237,7 @@ interface ApiCaller {
      * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
      * */
     fun getCustomEmojiStickers(customEmojiIds: List<String>): List<Sticker> {
-        return service.getCustomEmojiStickers(customEmojiIds).execute().body()?.result ?: errorBody()
+        return service.getCustomEmojiStickers(json.encodeToString(customEmojiIds)).execute().body()?.result ?: errorBody()
     }
 
     /**
@@ -182,18 +245,17 @@ interface ApiCaller {
      * *[addStickerToSet]* methods (can be used multiple times). Returns the uploaded File on success.
      *
      * @param userId User identifier of sticker file owner
-     * @param pngSticker **PNG** image with the sticker, must be up to 512 kilobytes in size,
-     * dimensions must not exceed 512px, and either width or height must be exactly 512px.
+     * @param sticker A file with the sticker in .WEBP, .PNG, .TGS, or .WEBM format.
+     * See [https://core.telegram.org/stickers](https://core.telegram.org/stickers) for technical requirements.
+     * @param stickerFormat Format of the sticker
      * */
-    fun uploadStickerFile(userId: ChatId.ID, pngSticker: InputFile): File {
-        return service.uploadStickerFile(userId, pngSticker.toRequestBody("png_sticker")).execute().body()?.result ?: errorBody()
+    fun uploadStickerFile(userId: ChatId.ID, sticker: InputFile, stickerFormat: StickerFormat): File {
+        return UploadStickerFile(userId, sticker, stickerFormat).upload(service)
     }
 
     /**
      * Use this method to create a new sticker set owned by a user.
-     * The bot will be able to edit the sticker set thus created. You **must** use exactly one of the
-     * fields *[pngSticker][NewStickerSet.pngSticker]*, *[tgsSticker][NewStickerSet.tgsSticker]*,
-     * or *[webmSticker][NewStickerSet.webmSticker]*. Returns *True* on success.
+     * The bot will be able to edit the sticker set thus created. Returns *True* on success.
      *
      * @param userId User identifier of created sticker set owner
      * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
@@ -205,8 +267,8 @@ interface ApiCaller {
      * @param title Sticker set title, 1-64 characters
      * @param block Sticker set builder
      * */
-    fun createNewStickerSet(userId: ChatId.ID, name: String, title: String, emojis: String, block: NewStickerSet.() -> Unit): Boolean {
-        return NewStickerSet(userId, name, title, emojis).apply(block).create(service)
+    fun createNewStickerSet(userId: ChatId.ID, name: String, title: String, stickerFormat: StickerFormat, block: CreateNewStickerInStickerSet.() -> Unit): Boolean {
+        return CreateNewStickerInStickerSet(userId, name, title, stickerFormat).apply(block).create(service)
     }
 
     /**
@@ -225,8 +287,8 @@ interface ApiCaller {
      * bot in context
      * @param block Add sticker set builder
      * */
-    fun addStickerToSet(userId: ChatId.ID, name: String, emojis: String, block: AddStickerInStickerSet.() -> Unit): Boolean {
-        return AddStickerInStickerSet(userId, name, emojis).apply(block).add(service)
+    fun addStickerToSet(userId: ChatId.ID, name: String, sticker: InputSticker): Boolean {
+        return AddStickerInStickerSet(userId, name, sticker).add(service)
     }
 
     /**
@@ -308,7 +370,7 @@ interface ApiCaller {
      * Animated sticker set thumbnails can't be uploaded via HTTP URL.
      * */
     fun setStickerSetThumbnail(name: String, userId: ChatId.ID, thumbnail: InputFile): Boolean {
-        return service.setStickerSetThumbnail(name.toRequestBody(), userId, thumbnail.toRequestBody("thumbnail")).execute().body()?.result ?: errorBody()
+        return service.setStickerSetThumbnail(name, userId, thumbnail.toRequestBody("thumbnail")).execute().body()?.result ?: errorBody()
     }
 
     /**
@@ -343,6 +405,7 @@ interface ApiCaller {
      * @param nextOffset Pass the offset that a client should send in the next query with the same text to receive
      * more results. Pass an empty string if there are no more results or if you don't support pagination.
      * Offset length can't exceed 64 bytes.
+     * @param button Button to be shown above inline query results
      * */
     fun answerInlineQuery(
         id: String,
@@ -353,7 +416,8 @@ interface ApiCaller {
         button: InlineQueryResultsButton? = null
     ): Boolean {
         return service.answerInlineQuery(
-            id, TelegramApi.json.encodeToString(results), cacheTime?.inWholeSeconds?.toInt(), isPersonal, nextOffset, button
+            id, TelegramApi.json.encodeToString(results), cacheTime?.inWholeSeconds?.toInt(), isPersonal, nextOffset,
+            TelegramApi.json.encodeToString(button)
         ).execute().body()?.result ?: errorBody()
     }
 

@@ -26,6 +26,7 @@ class AudioMessage(override val service: TelegramService, override val fileServi
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendAudio(
                 chatId = chatId.toRequestBody(),
+                messageThreadId = messageThreadId?.toString()?.toRequestBody(),
                 audio = getMediaMultipartBody(),
                 caption = getCaptionText()?.toRequestBody(),
                 parseMode = parseMode?.let { TelegramApi.json.encodeToString(it) }?.toRequestBody(),
@@ -33,7 +34,7 @@ class AudioMessage(override val service: TelegramService, override val fileServi
                 duration = duration?.toString()?.toRequestBody(),
                 performer = performer?.toRequestBody(),
                 title = title?.toRequestBody(),
-                thumb = getThumbMultipartBody(),
+                thumbnail = getThumbMultipartBody(),
                 disableNotification = disableNotification?.toString()?.toRequestBody(),
                 protectContent = protectContent?.toString()?.toRequestBody(),
                 replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
@@ -44,6 +45,7 @@ class AudioMessage(override val service: TelegramService, override val fileServi
         is InputFile.FileIdOrUrl -> {
             service.sendAudio(
                 chatId = chatId,
+                messageThreadId = messageThreadId,
                 audio = (media as InputFile.FileIdOrUrl).value,
                 caption = getCaptionText(),
                 parseMode = parseMode,

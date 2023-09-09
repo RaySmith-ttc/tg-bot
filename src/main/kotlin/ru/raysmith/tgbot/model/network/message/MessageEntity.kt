@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.network.User
 
 /**
@@ -39,8 +40,8 @@ data class MessageEntity(
     @SerialName("language") val language: String? = null,
 
     /**
-     * For “custom_emoji” only, unique identifier of the custom emoji.
-     * Use [getCustomEmojiStickers](https://core.telegram.org/bots/api#getcustomemojistickers) to get full information about the sticker // TODO link to method
+     * For "custom_emoji" only, unique identifier of the custom emoji.
+     * Use [getCustomEmojiStickers][ApiCaller.getCustomEmojiStickers] to get full information about the sticker
      * */
     @SerialName("custom_emoji_id") val customEmojiId: String? = null,
 ) {
@@ -86,6 +87,11 @@ data class MessageEntity(
                 "<pre>${language?.let { "<code class=\"language-$it\">" } ?: ""}$string${language?.let { "</code>" } ?: ""}</pre>",
                 "```${language ?: ""}\n$string\n```",
                 "```${language ?: ""}\n$string\n```",
+            )
+            MessageEntityType.CUSTOM_EMOJI -> getForParseMode(
+                "<tg-emoji${customEmojiId?.let { " emoji-id=\"$it\"" } ?: ""}>$string</tg-emoji>",
+                "![$string]${customEmojiId?.let { "(tg://emoji?id=$it)" } ?: ""}",
+                string
             )
             else -> string
         }

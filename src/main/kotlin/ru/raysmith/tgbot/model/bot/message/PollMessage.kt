@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
@@ -18,6 +18,8 @@ class PollMessage(
     override val service: TelegramService,
     override val fileService: TelegramFileService
 ) : IMessage<MessageResponse>, KeyboardCreator {
+
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -58,6 +60,7 @@ class PollMessage(
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendPoll(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             question = question,
             options = Json.encodeToString(options),
             isAnonymous = isAnonymous,

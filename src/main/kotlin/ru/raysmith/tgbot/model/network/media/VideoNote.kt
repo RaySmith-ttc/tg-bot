@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
 data class VideoNote(
     @SerialName("file_id") override val fileId: String,
     @SerialName("file_unique_id") override val fileUniqueId: String,
-    @SerialName("thumb") val thumb: PhotoSize? = null,
+    @SerialName("thumbnail") val thumbnail: PhotoSize? = null,
     @SerialName("file_name") override val fileName: String? = null,
-    @SerialName("file_size") override val fileSize: Int? = null,
+    @SerialName("file_size") override val fileSize: Long? = null,
     @SerialName("length") val length: Int,
     @SerialName("duration") val duration: Int,
 ) : Media

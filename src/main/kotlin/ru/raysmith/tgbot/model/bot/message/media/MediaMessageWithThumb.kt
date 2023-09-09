@@ -8,20 +8,20 @@ import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import java.nio.file.Files
 
 abstract class MediaMessageWithThumb : CaptionableMediaMessage() {
-    var thumb: NotReusableInputFile? = null
+    var thumbnail: NotReusableInputFile? = null
 
-    protected fun getThumbMultipartBody() = when(thumb) {
+    protected fun getThumbMultipartBody() = when(thumbnail) {
         is InputFile.ByteArray -> {
-            val thumb = thumb as InputFile.ByteArray
+            val thumbnail = thumbnail as InputFile.ByteArray
             MultipartBody.Part.createFormData(
-                "thumb", thumb.filename, thumb.byteArray.toRequestBody(thumb.mimeType.toMediaType())
+                "thumbnail", thumbnail.filename, thumbnail.byteArray.toRequestBody(thumbnail.mimeType.toMediaType())
             )
         }
         is InputFile.File -> {
-            val thumb = thumb as InputFile.File
+            val thumbnail = thumbnail as InputFile.File
             MultipartBody.Part.createFormData(
-                "thumb", thumb.file.nameWithoutExtension,
-                thumb.file.readBytes().toRequestBody(Files.probeContentType(thumb.file.toPath()).toMediaType())
+                "thumbnail", thumbnail.file.nameWithoutExtension,
+                thumbnail.file.readBytes().toRequestBody(Files.probeContentType(thumbnail.file.toPath()).toMediaType())
             )
         }
         null -> null

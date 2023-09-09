@@ -13,6 +13,7 @@ class VenueMessage(
     override val service: TelegramService,
     override val fileService: TelegramFileService
 ) : IMessage<MessageResponse>, KeyboardCreator {
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -27,6 +28,7 @@ class VenueMessage(
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendVenue(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             latitude = latitude,
             longitude = longitude,
             title = title,

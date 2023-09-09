@@ -35,6 +35,7 @@ interface MessageKeyboard {
             }
             is ReplyKeyboardMarkup -> {
                 buildReplyKeyboard {
+                    this.isPersistent = keyboardMarkup.isPersistent
                     this.oneTimeKeyboard = keyboardMarkup.oneTimeKeyboard
                     this.resizeKeyboard = keyboardMarkup.resizeKeyboard
                     this.inputFieldPlaceholder = keyboardMarkup.inputFieldPlaceholder
@@ -46,6 +47,7 @@ interface MessageKeyboard {
                                     this.text = button.text
                                     this.requestContact = button.requestContact
                                     this.requestLocation = button.requestLocation
+                                    this.webApp = button.webApp
                                 }
                             }
                         }

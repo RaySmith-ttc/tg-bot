@@ -36,8 +36,11 @@ data class InputMediaPhoto(
     /** Mode for parsing entities in the photo caption. */
     @SerialName("parse_mode") val parseMode: ParseMode? = null,
 
-    /** List of special entities that appear in the caption, which can be specified instead of *parse_mode* */
-    @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null
+    /** List of special entities that appear in the caption, which can be specified instead of *[parseMode]* */
+    @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
+
+    /** Pass *True* if the photo needs to be covered with a spoiler animation */
+    @SerialName("has_spoiler") val hasSpoiler: Boolean? = null
 ) : InputMedia() {
 
     /** Type of the result */

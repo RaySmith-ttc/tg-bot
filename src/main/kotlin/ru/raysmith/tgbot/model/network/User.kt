@@ -1,11 +1,13 @@
+@file:Suppress("GrazieInspection")
+
 package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.ApiCaller
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.PhotoSize
-import ru.raysmith.tgbot.utils.errorBody
 
 @Serializable
 /** This object represents a Telegram user or bot. */
@@ -17,7 +19,7 @@ data class User(
      * */
     @SerialName("id") val id: ChatId.ID,
 
-    /** True, if this user is a bot */
+    /** *True*, if this user is a bot */
     @SerialName("is_bot") val isBot: Boolean,
 
     /** User's or bot's first name */
@@ -36,13 +38,19 @@ data class User(
      * */
     @SerialName("language_code") val languageCode: String? = null,
 
-    /** True, if the bot can be invited to groups. Returned only in getMe. */ // TODO link all (getMe) to method
+    /** *True*, if this user is a Telegram Premium user */
+    @SerialName("is_premium") val isPremium: Boolean? = null,
+
+    /** *True*, if this user added the bot to the attachment menu */
+    @SerialName("added_to_attachment_menu") val addedToAttachmentMenu: Boolean? = null,
+
+    /** *True*, if the bot can be invited to groups. Returned only in [getMe][BotContext.getMe]. */
     @SerialName("can_join_groups") val canJoinGroups: Boolean? = null,
 
-    /** True, if privacy mode is disabled for the bot. Returned only in getMe. */
+    /** *True*, if privacy mode is disabled for the bot. Returned only in [getMe][BotContext.getMe]. */
     @SerialName("can_read_all_group_messages") val canReadAllGroupMessages: Boolean? = null,
 
-    /** True, if the bot supports inline queries. Returned only in getMe. */
+    /** *True*, if the bot supports inline queries. Returned only in [getMe][BotContext.getMe]. */
     @SerialName("supports_inline_queries") val supportsInlineQueries: Boolean? = null,
 ) {
 

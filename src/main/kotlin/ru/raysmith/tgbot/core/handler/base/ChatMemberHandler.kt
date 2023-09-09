@@ -7,8 +7,8 @@ import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatInviteLink
-import ru.raysmith.tgbot.model.network.chat.ChatMember
-import ru.raysmith.tgbot.model.network.chat.ChatMemberUpdated
+import ru.raysmith.tgbot.model.network.chat.member.ChatMember
+import ru.raysmith.tgbot.model.network.chat.member.ChatMemberUpdated
 import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 

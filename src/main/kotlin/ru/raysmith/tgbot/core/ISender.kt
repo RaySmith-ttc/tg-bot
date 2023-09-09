@@ -2,10 +2,7 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.*
-import ru.raysmith.tgbot.model.bot.message.group.AudioMediaGroupMessage
-import ru.raysmith.tgbot.model.bot.message.group.DocumentMediaGroupMessage
-import ru.raysmith.tgbot.model.bot.message.group.PhotoMediaGroupMessage
-import ru.raysmith.tgbot.model.bot.message.group.VideoMediaGroupMessage
+import ru.raysmith.tgbot.model.bot.message.group.MediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.media.*
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.message.Message
@@ -17,6 +14,7 @@ import ru.raysmith.tgbot.utils.toChatId
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, ApiCaller {
 
+    // TODO change agts to chatId, messageThreadId = Int? = null
     fun send(chatId: Long, message: TextMessage.() -> Unit): Message = send(chatId.toChatId(), message)
     fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
         return TextMessage(service, fileService).apply(message).send(chatId).result
@@ -92,29 +90,14 @@ interface ISender : ChatIdHolder, ApiCaller {
         return DiceMessage(emoji, service, fileService).apply(message).send(chatId).result
     }
 
-    fun sendChatAction(chatId: Long, action: ChatAction): Boolean = sendChatAction(action, chatId.toChatId())
-    fun sendChatAction(action: ChatAction, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.sendChatAction(chatId, action).execute().body()?.result ?: errorBody()
+    fun sendChatAction(chatId: Long, messageThreadId: Int? = null, action: ChatAction): Boolean = sendChatAction(action, messageThreadId, chatId.toChatId())
+    fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return service.sendChatAction(chatId, action, messageThreadId).execute().body()?.result ?: errorBody()
     }
 
-    fun sendAudioMediaGroup(chatId: Long, message: AudioMediaGroupMessage.() -> Unit): List<Message> = sendAudioMediaGroup(chatId.toChatId(), message)
-    fun sendAudioMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: AudioMediaGroupMessage.() -> Unit): List<Message> {
-        return AudioMediaGroupMessage(service, fileService).apply(message).send(chatId).results
-    }
-
-    fun sendPhotoMediaGroup(chatId: Long, message: PhotoMediaGroupMessage.() -> Unit): List<Message> = sendPhotoMediaGroup(chatId.toChatId(), message)
-    fun sendPhotoMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: PhotoMediaGroupMessage.() -> Unit): List<Message> {
-        return PhotoMediaGroupMessage(service, fileService).apply(message).send(chatId).results
-    }
-
-    fun sendDocumentMediaGroup(chatId: Long, message: DocumentMediaGroupMessage.() -> Unit): List<Message> = sendDocumentMediaGroup(chatId.toChatId(), message)
-    fun sendDocumentMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: DocumentMediaGroupMessage.() -> Unit): List<Message> {
-        return DocumentMediaGroupMessage(service, fileService).apply(message).send(chatId).results
-    }
-
-    fun sendVideoMediaGroup(chatId: Long, message: VideoMediaGroupMessage.() -> Unit): List<Message> = sendVideoMediaGroup(chatId.toChatId(), message)
-    fun sendVideoMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: VideoMediaGroupMessage.() -> Unit): List<Message> {
-        return VideoMediaGroupMessage(service, fileService).apply(message).send(chatId).results
+    fun sendMediaGroup(chatId: Long, message: MediaGroupMessage.() -> Unit): List<Message> = sendMediaGroup(chatId.toChatId(), message)
+    fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
+        return MediaGroupMessage(service, fileService).apply(message).send(chatId).results
     }
 
     fun sendSticker(chatId: Long, message: StickerMessage.() -> Unit): Message = sendSticker(chatId.toChatId(), message)

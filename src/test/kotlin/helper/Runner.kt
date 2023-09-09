@@ -6,8 +6,8 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.ISender
+import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.base.isCommand
 import ru.raysmith.tgbot.core.send
@@ -17,13 +17,17 @@ import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.model.network.InlineQueryResultArticle
-import ru.raysmith.tgbot.model.network.InputTextMessageContent
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
-import ru.raysmith.tgbot.model.network.chat.ChatMember
+import ru.raysmith.tgbot.model.network.chat.forum.IconColor
+import ru.raysmith.tgbot.model.network.chat.member.ChatMemberMember
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeChat
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
+import ru.raysmith.tgbot.model.network.inline.content.InputTextMessageContent
+import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultArticle
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonPollType
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestChat
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestUser
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.media.input.asTgFile
@@ -36,6 +40,9 @@ import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.model.network.sticker.InputSticker
+import ru.raysmith.tgbot.model.network.sticker.StickerFormat
+import ru.raysmith.tgbot.model.network.sticker.StickerType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
@@ -104,7 +111,8 @@ fun MessageText.setupTestMessage(message: Message) {
     text("Mention: ").mention("@raysmithdev").n()
     text("Text mention: ").textMention("ray", message.from!!).n()
     spoiler("Spoiler").n()
-    text("text")
+//    text("emoji: ").emoji("\uD83D\uDC4D")
+    text("custom emoji: ").emoji("\uD83D\uDC4D", "5368324170671202286")
 
     entity(MessageEntityType.STRIKETHROUGH) {
         offset = 2
@@ -408,9 +416,11 @@ class Runner {
                 handleInlineQuery {
                     val res = buildList {
                         repeat(1000) {
-                            add(InlineQueryResultArticle(
+                            add(
+                                InlineQueryResultArticle(
                                 "iq_photo_$it", "test $it", InputTextMessageContent("Message text $it")
-                            ))
+                            )
+                            )
                         }
                     }
 
@@ -426,7 +436,7 @@ class Runner {
                 }
 
                 handleMyChatMember {
-                    if (newChatMember is ChatMember.ChatMemberMember) {
+                    if (newChatMember is ChatMemberMember) {
                         send("Я родился")
                     }
                 }
@@ -437,7 +447,7 @@ class Runner {
 
                 handleMessage {
                     messageContact()
-                        .verify { (it.userId ?: 0) > 0 }
+                        .verify { (it.userId?.value ?: 0) > 0 }
                         .convert { it.firstName + " " + it.lastName }
                         .use {
                             send(it)
@@ -794,6 +804,18 @@ class Runner {
                         }
                     }
 
+                    isCommand("wh_create") {
+                        send(setWebhook("https://google.com").toString())
+                    }
+
+                    isCommand("wh_info") {
+                        send(getWebhookInfo().toString())
+                    }
+
+                    isCommand("wh_delete") {
+                        send(deleteWebhook().toString())
+                    }
+
                     isCommand("get_commands") { args ->
                         val chatId = getChatIdFromCommandsCommand(args)
                         println(chatId)
@@ -806,6 +828,21 @@ class Runner {
                                 }
                             })
                         }
+                    }
+
+                    isCommand("paylink") {
+                        send(createInvoiceLink {
+                            title = "test"
+                            description = "Some desc"
+                            payload = "payload"
+                            currency = Currency.RUB
+                            prices = listOf(
+                                LabeledPrice("Item #1", 10000),
+                                LabeledPrice("Item #2", 15000),
+                                LabeledPrice("Item #3", 20000),
+                            )
+                            providerToken = "381764678:TEST:29287"
+                        })
                     }
 
                     isCommand("pay") {
@@ -954,7 +991,7 @@ class Runner {
                     isCommand("document") {
                         sendDocument {
                             document = "files/image1.png".asResources().asTgFile()
-                            thumb = "files/image1.png".asResources().asTgFile()
+                            thumbnail = "files/image1.png".asResources().asTgFile()
                             captionWithEntities {
                                 bold("Title").n()
                                 n()
@@ -964,7 +1001,7 @@ class Runner {
                     }
 
                     isCommand("document_group") {
-                        sendDocumentMediaGroup {
+                        sendMediaGroup {
                             document("files/image1.png".asResources().asTgFile(), "files/image1.png".asResources().asTgFile()) {
                                 text("1")
                             }
@@ -975,7 +1012,7 @@ class Runner {
                     }
 
                     isCommand("send_audio") {
-                        sendAudioMediaGroup {
+                        sendMediaGroup {
                             audio("audio2.mp3".asResources().asTgFile(), "files/size.small.jpg".asResources().asTgFile()) {
                                 bold("Test ").n().italic("message")
                             }
@@ -1112,6 +1149,7 @@ class Runner {
                                 n()
                                 text("Body")
                             }
+                            hasSpoiler = true
                             video = "files/video1.mp4".asResources().asTgFile()
                             duration = 30
                             width = 640
@@ -1121,13 +1159,13 @@ class Runner {
                     }
 
                     isCommand("video_group") {
-                        sendVideoMediaGroup {
+                        sendMediaGroup {
                             video("files/video1.mp4".asResources().asTgFile()) {
                                 bold("Title").n()
                                 n()
                                 text("Body")
                             }
-                            video("files/video2.webm".asResources().asTgFile())
+                            video("files/video2.webm".asResources().asTgFile(), hasSpoiler = true)
                         }
                     }
 
@@ -1139,6 +1177,7 @@ class Runner {
                                 text("Body")
                             }
                             animation = "files/anim1.gif".asResources().asTgFile()
+                            hasSpoiler = true
                         }
                     }
 
@@ -1211,15 +1250,20 @@ class Runner {
                     isCommand("uploadStickerFile") {
 //                            val file1 = uploadStickerFile(getChatIdOrThrow(), "https://png.pngtree.com/element_our/png/20180928/beautiful-hologram-water-color-frame-png_119551.jpg".asTgFile())
 //                            println(file1)
-//                            val file2 = uploadStickerFile(getChatIdOrThrow(), "files/image1.png".asResources().asTgFile())
-//                            println(file2)
-                        val file3 = uploadStickerFile(getChatIdOrThrow(), "files/logo2.png".asResources().asTgFile())
-                        println(file3)
+                        val file2 = uploadStickerFile(getChatIdOrThrow(), "files/logo2.png".asResources().asTgFile(), StickerFormat.STATIC)
+                        println(file2)
                     }
 
-                    isCommand("createNewStickerSet") {
-                        createNewStickerSet(getChatIdOrThrow(), stickerSetName("name"), "title", "\uD83D\uDE0E") {
-                            pngSticker("files/logo.png".asResources().asTgFile())
+                    isCommand("createNewStickerSet") { args ->
+
+                        if (args == null || args.count { it == ' ' } != 1) {
+                            send("Bad syntax: /createNewStickerSet <name> <title>")
+                            return@isCommand
+                        }
+                        val (name, title) = args.split(" ")
+                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, StickerFormat.STATIC) {
+                            stickerType = StickerType.REGULAR
+                            sticker("files/logo.png".asResources().asTgFile(), listOf("\uD83D\uDE0E"))
                         }
                     }
 
@@ -1227,25 +1271,130 @@ class Runner {
                         val stickerSet = getStickerSet(stickerSetName("name"))
                         println(stickerSet.toJson())
                     }
-
-                    isCommand("addStickerToSet") {
-                        addStickerToSet(getChatIdOrThrow(), stickerSetName("name"), "\uD83D\uDE08") {
-                            pngSticker("BQACAgIAAxUHY406pjEI4wABA8wMxxtEeOXcVw0hAAJSKwAC0oBoSIac6VfNgGZKKwQ".asTgFile())
-                        }
+//
+                    isCommand("addStickerToSet") { args ->
+                        val sticker = InputSticker(
+                            (args ?: "CAACAgIAAxkBAAJK3GTziBDbwOYDCcleop0DHBMk9CdYAAITIgAChpJJS6Z_IJsc_IGpMAQ").asTgFile(),
+                            listOf("\uD83D\uDE08"),
+                            keywords = listOf("asd")
+                        )
+                        addStickerToSet(getChatIdOrThrow(), stickerSetName("name"), sticker)
                     }
 
-                    isCommand("setStickerSetThumb") {
+                    isCommand("setStickerSetThumbnail") {
                         setStickerSetThumbnail(
                             stickerSetName("name"), getChatIdOrThrow(),
                             InputFile.FileIdOrUrl("https://i.ibb.co/ZS7TT09/image.png")
                         )
                     }
+
+                    isCommand("getForumTopicIconStickers") {
+                        println(getForumTopicIconStickers())
+                    }
+
+                    isCommand("createForumTopic") { args ->
+                        if (args == null || args.split(" ").size > 4) {
+                            send("Bad syntax: /createForumTopic <chatId> <name> [<iconColor>] [<iconCustomEmojiId>]")
+                            return@isCommand
+                        }
+
+                        val paths = args.split(" ")
+                        createForumTopic(
+                            paths[1],
+                            paths.getOrNull(2)?.toInt()?.let { v -> IconColor.entries.first { it.value == v } },
+                            paths.getOrNull(3),
+                            paths[0].toLong().toChatId()
+                        )
+                        send("Success")
+                    }
+
+                    isCommand("reply") {
+                        send {
+                            text = "text"
+                            replyKeyboard {
+                                row("Btn")
+                            }
+                        }
+                    }
+
+                    isCommand("reply_persistent") {
+                        send {
+                            text = "text"
+                            replyKeyboard {
+                                isPersistent = true
+                                row("Btn")
+                            }
+                        }
+                    }
+
+                    isCommand("reply_remove") {
+                        send {
+                            text = "removed"
+                            removeKeyboard {  }
+                        }
+                    }
+
+                    isCommand("sendMediaGroup") {
+                        sendMediaGroup {
+                            sendAction = true
+                            video("files/video1.mp4".asResources().asTgFile()) {
+                                bold("Title").n()
+                                n()
+                                text("Body")
+                            }
+                            photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile(), hasSpoiler = true)
+//                            document("files/image2.jpg".asResources().asTgFile(), "files/image2.jpg".asResources().asTgFile())
+//                            audio("audio2.mp3".asResources().asTgFile(), "files/size.small.jpg".asResources().asTgFile())
+                        }
+                    }
+
+                    isCommand("request_user") {
+                        send {
+                            text = "text"
+                            replyKeyboard {
+                                row {
+                                    button {
+                                        text = "user"
+                                        requestUser = KeyboardButtonRequestUser(1)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    isCommand("request_chat") {
+                        send {
+                            text = "text"
+                            replyKeyboard {
+                                row {
+                                    button {
+                                        text = "chat"
+                                        requestChat = KeyboardButtonRequestChat(1)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    isCommand("request_poll") {
+                        send {
+                            text = "text"
+                            replyKeyboard {
+                                row {
+                                    button {
+                                        text = "poll"
+                                        requestPoll = KeyboardButtonPollType(PollType.REGULAR)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 handleCallbackQuery(alwaysAnswer = true) {
                     isDataEqual("media_group_file", "") {
-                        sendPhotoMediaGroup {
-                            val caption = generateSequence("") { "123456780".random().toString() }
+                        sendMediaGroup {
+                            val caption = generateSequence("") { "1234567890".random().toString() }
 
                             photo("files/image1.png".asResources().asTgFile()) {
                                 bold("Test").n()
@@ -1262,7 +1411,7 @@ class Runner {
                     }
 
                     isDataEqual("media_group_id") {
-                        sendPhotoMediaGroup {
+                        sendMediaGroup {
                             photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
 
                                 text("test")
@@ -1325,7 +1474,6 @@ class Runner {
                         logger.warn("Unhandled query (${query.data}): $query")
                     }
                 }
-
             }
 
             delay(Long.MAX_VALUE)

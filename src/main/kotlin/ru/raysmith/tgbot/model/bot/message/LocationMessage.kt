@@ -23,6 +23,7 @@ class LocationMessage(
     var proximityAlertRadius: Int? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
+    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
@@ -31,6 +32,7 @@ class LocationMessage(
     override fun send(chatId: ChatId): MessageResponse {
         return service.sendLocation(
             chatId = chatId,
+            messageThreadId = messageThreadId,
             latitude = latitude,
             longitude = longitude,
             horizontalAccuracy = horizontalAccuracy,

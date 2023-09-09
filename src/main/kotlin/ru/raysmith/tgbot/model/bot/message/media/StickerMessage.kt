@@ -10,21 +10,23 @@ import ru.raysmith.tgbot.utils.errorBody
 
 class StickerMessage(override val service: TelegramService, override val fileService: TelegramFileService) : MediaMessage() {
 
+    /** Emoji associated with the sticker; only for just uploaded stickers */
+    var emoji: String? = null
+
+    /** Sticker to send. */
     var sticker: InputFile?
         get() = media
         set(value) { media = value }
-
-    var title: String? = null
-    var duration: Int? = null
-    var performer: String? = null
 
     override val mediaName: String = "sticker"
 
     override fun send(chatId: ChatId): MessageResponse = when(sticker) {
         is InputFile.ByteArray, is InputFile.File -> {
             service.sendSticker(
-                chatId = chatId/*.toRequestBody()*/,
+                chatId = chatId.toRequestBody(),
+                messageThreadId = messageThreadId?.toString()?.toRequestBody(),
                 sticker = getMediaMultipartBody(),
+                emoji = emoji?.toRequestBody(),
                 disableNotification = disableNotification?.toString()?.toRequestBody(),
                 protectContent = protectContent?.toString()?.toRequestBody(),
                 replyToMessageId = replyToMessageId?.toString()?.toRequestBody(),
@@ -35,7 +37,9 @@ class StickerMessage(override val service: TelegramService, override val fileSer
         is InputFile.FileIdOrUrl -> {
             service.sendSticker(
                 chatId = chatId,
+                messageThreadId = messageThreadId,
                 sticker = (media as InputFile.FileIdOrUrl).value,
+                emoji = emoji,
                 disableNotification = disableNotification,
                 protectContent = protectContent,
                 replyToMessageId = replyToMessageId,

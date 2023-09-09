@@ -86,15 +86,25 @@ class MessageText(private val type: MessageTextType) {
     fun pre(text: Any?, language: String? = null) = appendEntity(MessageEntityType.PRE, text, language = language)
     fun textLink(text: Any?, url: String) = appendEntity(MessageEntityType.TEXT_LINK, text, url = url)
     fun textMention(text: String?, user: User) = appendEntity(MessageEntityType.TEXT_MENTION, text, user = user)
+    fun emoji(emoji: String?, id: String) = appendEntity(MessageEntityType.CUSTOM_EMOJI, emoji, customEmojiId = id)
 
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
-    fun datePickerMessageText(datePicker: DatePicker, data: String? = null) = datePicker.messageText(this, data, datePicker.startWithState)
+    fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {
+        datePicker.messageText(this, data, datePicker.startWithState)
+    }
 
-    // TODO test
-    fun mix(text: Any?, url: String? = null, language: String? = null, user: User? = null, vararg types: MessageEntityType): MessageText {
+    fun mix(
+        text: Any?, url: String? = null, language: String? = null, user: User? = null, customEmojiId: String? = null,
+        vararg types: MessageEntityType
+    ): MessageText {
+        if (!printNulls && text == null) return this
+
         text.toString().also { t ->
             types.forEach {
-                entities.add(MessageEntity(it, offset = this.text.length, t.length, url = url, user = user, language = language))
+                entities.add(MessageEntity(
+                    it, offset = this.text.length, t.length, url = url, user = user, language = language,
+                    customEmojiId = customEmojiId
+                ))
             }
             this.text.append(t)
         }
@@ -264,10 +274,10 @@ class MessageText(private val type: MessageTextType) {
         }
     }
 
-    fun appendEntity(type: MessageEntityType, text: Any?, url: String? = null, language: String? = null, user: User? = null): MessageText {
+    fun appendEntity(type: MessageEntityType, text: Any?, url: String? = null, language: String? = null, user: User? = null, customEmojiId: String? = null): MessageText {
         if (!printNulls && text == null) return this
         text.toString().also { t ->
-            entities.add(MessageEntity(type, offset = this.text.length, t.length, url = url, language = language, user = user))
+            entities.add(MessageEntity(type, offset = this.text.length, t.length, url = url, language = language, user = user, customEmojiId = customEmojiId))
             this.text.append(t)
         }
         return this

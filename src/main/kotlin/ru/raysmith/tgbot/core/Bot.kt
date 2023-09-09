@@ -32,8 +32,10 @@ import kotlin.system.measureTimeMillis
 /**
  * Creates bot instance
  *
- * @param token Bot token from @BotFather. Can be null if is set via environment variable or properties
- * @param timeout Timeout in seconds for long polling. Defaults to 50. Should be positive, short polling should be used for testing purposes only.
+ * @param token Bot token from [@BotFather](https://t.me/botfather).
+ * Can be null if is set via environment variable or properties
+ * @param timeout Timeout in seconds for long polling. Defaults to 50.
+ * Should be positive, short polling should be used for testing purposes only.
  * @param scope Coroutine scope for new updates
  * @param lastUpdateId Identifier of the first update to be returned. Must be greater by one than the highest among
  * the identifiers of previously received updates. If null, updates starting with the earliest unconfirmed update

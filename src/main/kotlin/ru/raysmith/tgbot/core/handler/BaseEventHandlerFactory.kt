@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 @DslMarker
 annotation class HandlerDsl
 
+// TODO add userShared, chatShared
 @HandlerDsl
 open class BaseEventHandlerFactory : EventHandlerFactory {
 

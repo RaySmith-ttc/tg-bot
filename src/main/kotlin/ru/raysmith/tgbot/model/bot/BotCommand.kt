@@ -2,7 +2,6 @@ package ru.raysmith.tgbot.model.bot
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.utils.botContext
 
 /**
  * Represents a bot command
@@ -31,11 +30,7 @@ class BotCommand(val commandText: String) {
      *
      * For example, from command `/start myarg`, [argsString] would be `myarg`
      * */
-    val argsString: String? = if (hasArgs()) {
-        commandText.substring(getArgsStartIndex()).trim()
-    } else {
-        null
-    }
+    val argsString: String? = commandText.substring(getArgsStartIndex()).trim().ifEmpty { null }
 
     companion object {
         
@@ -53,10 +48,6 @@ class BotCommand(val commandText: String) {
         
         private val bodyArgsSeparateChars = charArrayOf(' ', '\n')
     }
-
-    /** Return true if the command has arguments */
-    // TODO not working
-    private fun hasArgs() = commandText.length != body.length + (botMention?.length?.let { it + 1 } ?: 0)
 
     private fun getArgsStartIndex() = commandText.indexOfAny(bodyArgsSeparateChars).let { if (it == -1) commandText.length else it + 1 }
 

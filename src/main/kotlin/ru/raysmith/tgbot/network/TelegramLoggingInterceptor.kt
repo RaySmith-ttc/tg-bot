@@ -6,7 +6,10 @@ import java.nio.charset.StandardCharsets
 
 object TelegramLoggingInterceptor : HttpLoggingInterceptor.Logger {
     override fun log(message: String) {
-        TelegramApi.logger.debug(URLDecoder.decode(message, StandardCharsets.UTF_8.toString()).replace("\n", "\\n"))
+        try {
+            TelegramApi.logger.debug(URLDecoder.decode(message, StandardCharsets.UTF_8.toString()).replace("\n", "\\n"))
+        } catch (e: Exception) {
+            TelegramApi.logger.debug(message)
+        }
     }
-
 }

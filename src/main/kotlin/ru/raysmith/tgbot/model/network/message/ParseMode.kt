@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.model.network.message
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
 
 /**
  * # Formatting options
@@ -113,14 +113,17 @@ import ru.raysmith.tgbot.network.serializer.ParseModeSerializer
  * - Escaping inside entities is not allowed, so entity must be closed first and reopened again: use `_snake_\__case_`
  * for italic `snake_case` and `*2*\**2=4*` for bold `2*2=4`.
  * */
-@Serializable(with = ParseModeSerializer::class) // TODO
+@Serializable
 enum class ParseMode {
-    HTML,
+    @SerialName("HTML") HTML,
 
     @Deprecated(
         "This is a legacy mode, retained for backward compatibility",
         ReplaceWith("MARKDOWNV2", "ru.raysmith.tgbot.model.network.message.ParseMode")
     )
+    @SerialName("Markdown")
     MARKDOWN,
+
+    @SerialName("MarkdownV2")
     MARKDOWNV2
 }

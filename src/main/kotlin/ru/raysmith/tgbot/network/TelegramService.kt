@@ -7,25 +7,31 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
+import ru.raysmith.tgbot.model.bot.BotDescription
+import ru.raysmith.tgbot.model.bot.BotName
+import ru.raysmith.tgbot.model.bot.BotShortDescription
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.*
+import ru.raysmith.tgbot.model.network.Poll
+import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.model.network.WebhookInfo
 import ru.raysmith.tgbot.model.network.chat.*
+import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
+import ru.raysmith.tgbot.model.network.chat.forum.IconColor
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.file.FileResponse
-import ru.raysmith.tgbot.model.network.inline.InlineQueryResultsButton
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
+import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.message.*
-import ru.raysmith.tgbot.model.network.response.*
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
-import ru.raysmith.tgbot.model.network.sticker.MaskPosition
-import ru.raysmith.tgbot.model.network.sticker.Sticker
-import ru.raysmith.tgbot.model.network.sticker.StickerSet
-import ru.raysmith.tgbot.model.network.sticker.StickerType
+import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.response.*
+import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
 
 interface TelegramService {
@@ -37,6 +43,26 @@ interface TelegramService {
         @Query("timeout") timeout: Int? = null,
         @Query("allowed_updates") allowedUpdates: String? = null
     ): Call<NetworkResponse<List<Update>>>
+
+    @Multipart
+    @POST("setWebhook")
+    fun setWebhook(
+        @Part("url") url: RequestBody,
+        @Part certificate: MultipartBody.Part? = null,
+        @Part("ip_address") ipAddress: RequestBody? = null,
+        @Part("max_connections") maxConnections: RequestBody? = null,
+        @Part("allowed_updates") allowedUpdates: RequestBody? = null,
+        @Part("drop_pending_updates") dropPendingUpdates: RequestBody? = null,
+        @Part("secret_token") secretToken: RequestBody? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteWebhook")
+    fun deleteWebhook(
+        @Query("drop_pending_updates") dropPendingUpdates: Boolean? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getWebhookInfo")
+    fun getWebhookInfo(): Call<NetworkResponse<WebhookInfo>>
 
     /**
      * A simple method for testing your bot's auth token. Requires no parameters.
@@ -70,7 +96,7 @@ interface TelegramService {
      * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @param text Text of the message to be sent, 1-4096 characters after entities parsing
      * @param parseMode [ParseMode] for parsing entities in the message text.
-     * @param entities List of special entities that appear in message text, which can be specified instead of *parse_mode*
+     * @param entities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
      * @param disableWebPagePreview Disables link previews for links in this message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
@@ -83,6 +109,7 @@ interface TelegramService {
     @POST("sendMessage")
     fun sendMessage(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("text") text: String,
         @Query("parse_mode") parseMode: ParseMode? = null,
         @Query("entities") entities: String? = null,
@@ -107,6 +134,7 @@ interface TelegramService {
     @POST("forwardMessage")
     fun forwardMessage(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("from_chat_id") fromChatId: ChatId,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
@@ -122,7 +150,7 @@ interface TelegramService {
      * @param messageId Message identifier in the chat specified in [fromChatId]
      * @param caption New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
      * @param parseMode [ParseMode] for parsing entities in the message caption.
-     * @param captionEntities List of special entities that appear in message text, which can be specified instead of *parse_mode*
+     * @param captionEntities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
      * @param protectContent Protects the contents of the sent message from forwarding and saving
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
@@ -134,6 +162,7 @@ interface TelegramService {
     @POST("copyMessage")
     fun copyMessage(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("from_chat_id") fromChatId: ChatId,
         @Query("message_id") messageId: Int,
         @Query("caption") caption: String? = null,
@@ -149,9 +178,11 @@ interface TelegramService {
     @POST("sendPhoto")
     fun sendPhoto(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("photo") photo: String,
         @Query("caption") caption: String? = null,
         @Query("caption_entities") captionEntities: String? = null,
+        @Query("has_spoiler") hasSpoiler: Boolean? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
@@ -164,10 +195,12 @@ interface TelegramService {
     @POST("sendPhoto")
     fun sendPhoto(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part photo: MultipartBody.Part,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
@@ -178,6 +211,7 @@ interface TelegramService {
     @POST("sendAudio")
     fun sendAudio(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("audio") audio: String,
         @Query("caption") caption: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
@@ -196,6 +230,7 @@ interface TelegramService {
     @POST("sendAudio")
     fun sendAudio(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part audio: MultipartBody.Part,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
@@ -203,7 +238,7 @@ interface TelegramService {
         @Part("duration") duration: RequestBody? = null,
         @Part("performer") performer: RequestBody? = null,
         @Part("title") title: RequestBody? = null,
-        @Part thumb: MultipartBody.Part? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
@@ -214,6 +249,7 @@ interface TelegramService {
     @POST("sendDocument")
     fun sendDocument(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("document") document: String,
         @Query("caption") caption: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
@@ -230,8 +266,9 @@ interface TelegramService {
     @POST("sendDocument")
     fun sendDocument(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part document: MultipartBody.Part,
-        @Part thumb: MultipartBody.Part? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
@@ -246,6 +283,7 @@ interface TelegramService {
     @POST("sendVideo")
     fun sendVideo(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("video") video: String,
         @Query("duration") duration: Int? = null,
         @Query("width") width: Int? = null,
@@ -253,6 +291,7 @@ interface TelegramService {
         @Query("caption") caption: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
         @Query("caption_entities") captionEntities: String? = null,
+        @Query("has_spoiler") hasSpoiler: Boolean? = null,
         @Query("supports_streaming") supportsStreaming: Boolean? = null,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
@@ -265,14 +304,16 @@ interface TelegramService {
     @POST("sendVideo")
     fun sendVideo(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part video: MultipartBody.Part,
         @Part("duration") duration: RequestBody? = null,
         @Part("width") width: RequestBody? = null,
         @Part("height") height: RequestBody? = null,
-        @Part thumb: MultipartBody.Part? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
         @Part("supports_streaming") supportsStreaming: RequestBody? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
@@ -281,35 +322,62 @@ interface TelegramService {
         @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
-//    @POST("sendAnimation")
-//    fun sendAnimation(
-//        @Query("chat_id") chatId: ChatId,
-//        @Query("animation") animation: String,
-//        @Query("duration") duration: Int? = null,
-//        @Query("width") width: Int? = null,
-//        @Query("height") height: Int? = null,
-//        @Query("caption") caption: String? = null,
-//        @Query("parse_mode") parseMode: ParseMode? = null,
-//        @Query("caption_entities") captionEntities: String? = null,
-//        @Query("disable_notification") disableNotification: Boolean? = null,
-//        @Query("protect_content") protectContent: Boolean? = null,
-//        @Query("reply_to_message_id") replyToMessageId: Int? = null,
-//        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
-//        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-//    ): Call<MessageResponse>
+    @Multipart
+    @POST("sendVideo")
+    fun sendVideo(
+        @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Part("video") video: RequestBody,
+        @Part("duration") duration: RequestBody? = null,
+        @Part("width") width: RequestBody? = null,
+        @Part("height") height: RequestBody? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
+        @Part("caption") caption: RequestBody? = null,
+        @Part("parse_mode") parseMode: RequestBody? = null,
+        @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
+        @Part("supports_streaming") supportsStreaming: RequestBody? = null,
+        @Part("disable_notification") disableNotification: RequestBody? = null,
+        @Part("protect_content") protectContent: RequestBody? = null,
+        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
+    @POST("sendAnimation")
+    fun sendAnimation(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+        @Query("animation") animation: String,
+        @Query("duration") duration: Int? = null,
+        @Query("width") width: Int? = null,
+        @Query("height") height: Int? = null,
+        @Query("thumbnail") thumbnail: String? = null,
+        @Query("caption") caption: String? = null,
+        @Query("parse_mode") parseMode: ParseMode? = null,
+        @Query("caption_entities") captionEntities: String? = null,
+        @Query("has_spoiler") hasSpoiler: Boolean? = null,
+        @Query("disable_notification") disableNotification: Boolean? = null,
+        @Query("protect_content") protectContent: Boolean? = null,
+        @Query("reply_to_message_id") replyToMessageId: Int? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
+        @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
+    ): Call<MessageResponse>
 
     @Multipart
     @POST("sendAnimation")
     fun sendAnimation(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part animation: MultipartBody.Part,
         @Part("duration") duration: RequestBody? = null,
         @Part("width") width: RequestBody? = null,
         @Part("height") height: RequestBody? = null,
-        @Part thumb: MultipartBody.Part? = null,
+        @Part thumbnail: MultipartBody.Part? = null,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
         @Part("caption_entities") captionEntities: RequestBody? = null,
+        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
@@ -320,6 +388,7 @@ interface TelegramService {
     @POST("sendVoice")
     fun sendVoice(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("voice") voice: String,
         @Query("caption") caption: String? = null,
         @Query("parse_mode") parseMode: ParseMode? = null,
@@ -336,6 +405,7 @@ interface TelegramService {
     @POST("sendVoice")
     fun sendVoice(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part voice: MultipartBody.Part,
         @Part("caption") caption: RequestBody? = null,
         @Part("parse_mode") parseMode: RequestBody? = null,
@@ -351,6 +421,7 @@ interface TelegramService {
     @POST("sendVideoNote")
     fun sendVideoNote(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("video_note") videoNote: String,
         @Query("duration") duration: Int? = null,
         @Query("length") length: Int? = null,
@@ -365,6 +436,7 @@ interface TelegramService {
     @POST("sendVideoNote")
     fun sendVideoNote(
         @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part videoNote: MultipartBody.Part,
         @Part("duration") duration: RequestBody? = null,
         @Part("length") length: RequestBody? = null,
@@ -389,6 +461,7 @@ interface TelegramService {
     @POST("sendMediaGroup")
     fun sendMediaGroup(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("media") media: String,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
@@ -410,9 +483,10 @@ interface TelegramService {
     @POST("sendMediaGroup")
     fun sendMediaGroup(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("media") media: String,
         @Part mediaPart1: MultipartBody.Part,
-        @Part mediaPart2: MultipartBody.Part,
+        @Part mediaPart2: MultipartBody.Part? = null,
         @Part mediaPart3: MultipartBody.Part? = null,
         @Part mediaPart4: MultipartBody.Part? = null,
         @Part mediaPart5: MultipartBody.Part? = null,
@@ -429,6 +503,7 @@ interface TelegramService {
     @POST("sendLocation")
     fun sendLocation(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("horizontal_accuracy") horizontalAccuracy: Double? = null,
@@ -466,6 +541,7 @@ interface TelegramService {
     @POST("sendVenue")
     fun sendVenue(
         @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("title") title: String,
@@ -484,6 +560,7 @@ interface TelegramService {
     @POST("sendContact")
     fun sendContact(
         @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("phone_number") phoneNumber: String,
         @Query("first_name") firstName: String,
         @Query("last_name") lastName: String? = null,
@@ -498,6 +575,7 @@ interface TelegramService {
     @POST("sendPoll")
     fun sendPoll(
         @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("question") question: String,
         @Query("options") options: String,
         @Query("is_anonymous") isAnonymous: Boolean? = null,
@@ -520,6 +598,7 @@ interface TelegramService {
     @POST("sendDice")
     fun sendDice(
         @Query("chat_id") chatId: ChatId? = null,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("emoji") emoji: String,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
@@ -531,7 +610,8 @@ interface TelegramService {
     @POST("sendChatAction")
     fun sendChatAction(
         @Query("chat_id") chatId: ChatId,
-        @Query("action") action: ChatAction
+        @Query("action") action: ChatAction,
+        @Query("message_thread_id") messageThreadId: Int? = null
     ): Call<NetworkResponse<Boolean>>
 
     @POST("getUserProfilePhotos")
@@ -566,6 +646,7 @@ interface TelegramService {
         @Query("chat_id") chatId: ChatId,
         @Query("user_id") userId: ChatId.ID,
         @Query("permissions") permissions: ChatPermissions,
+        @Query("use_independent_chat_permissions") useIndependentChatPermissions: Boolean? = null,
         @Query("until_date") untilDate: Int? = null,
     ): Call<NetworkResponse<Boolean>>
 
@@ -584,6 +665,7 @@ interface TelegramService {
         @Query("can_change_info") canChangeInfo: Boolean? = null,
         @Query("can_invite_users") canInviteUsers: Boolean? = null,
         @Query("can_pin_messages") canPinMessages: Boolean? = null,
+        @Query("can_manage_topics") canManageTopics: Boolean? = null,
     ): Call<NetworkResponse<Boolean>>
 
     @POST("setChatAdministratorCustomTitle")
@@ -609,6 +691,7 @@ interface TelegramService {
     fun setChatPermissions(
         @Query("chat_id") chatId: ChatId,
         @Query("permissions") permissions: ChatPermissions,
+        @Query("use_independent_chat_permissions") useIndependentChatPermissions: Boolean? = null,
     ): Call<NetworkResponse<Boolean>>
 
     @POST("exportChatInviteLink")
@@ -733,6 +816,80 @@ interface TelegramService {
         @Query("chat_id") chatId: ChatId
     ): Call<NetworkResponse<Boolean>>
 
+    @POST("getForumTopicIconStickers")
+    fun getForumTopicIconStickers(): Call<NetworkResponse<List<Sticker>>>
+
+    @POST("createForumTopic")
+    fun createForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("name") name: String,
+        @Query("icon_color") iconColor: IconColor? = null,
+        @Query("icon_custom_emoji_id") iconCustomEmojiId: String? = null,
+    ): Call<NetworkResponse<ForumTopic>>
+
+    @POST("editForumTopic")
+    fun editForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+        @Query("name") name: String? = null,
+        @Query("icon_custom_emoji_id") iconCustomEmojiId: String? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("closeForumTopic")
+    fun closeForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("reopenForumTopic")
+    fun reopenForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("deleteForumTopic")
+    fun deleteForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("unpinAllForumTopicMessages")
+    fun unpinAllForumTopicMessages(
+        @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("editGeneralForumTopic")
+    fun editGeneralForumTopic(
+        @Query("chat_id") chatId: ChatId,
+        @Query("name") name: String,
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("closeGeneralForumTopic")
+    fun closeGeneralForumTopic(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("reopenGeneralForumTopic")
+    fun reopenGeneralForumTopic(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("hideGeneralForumTopic")
+    fun hideGeneralForumTopic(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("unhideGeneralForumTopic")
+    fun unhideGeneralForumTopic(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("unpinAllGeneralForumTopicMessages")
+    fun unpinAllGeneralForumTopicMessages(
+        @Query("chat_id") chatId: ChatId
+    ): Call<NetworkResponse<Boolean>>
+
     @POST("answerCallbackQuery")
     fun answerCallbackQuery(
         @Query("callback_query_id") callbackQueryId: String,
@@ -760,6 +917,39 @@ interface TelegramService {
         @Query("scope") scope: BotCommandScope? = null,
         @Query("language_code") languageCode: String? = null
     ): Call<NetworkResponse<List<BotCommand>>>
+
+    @POST("setMyName")
+    fun setMyName(
+        @Query("name") name: String? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getMyName")
+    fun getMyName(
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<BotName>>
+
+    @POST("setMyDescription")
+    fun setMyDescription(
+        @Query("description") description: String? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getMyDescription")
+    fun getMyDescription(
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<BotDescription>>
+
+    @POST("setMyShortDescription")
+    fun setMyShortDescription(
+        @Query("short_description") shortDescription: String? = null,
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<Boolean>>
+
+    @POST("getMyShortDescription")
+    fun getMyShortDescription(
+        @Query("language_code") languageCode: String? = null
+    ): Call<NetworkResponse<BotShortDescription>>
 
     @POST("setChatMenuButton")
     fun setChatMenuButton(
@@ -839,7 +1029,9 @@ interface TelegramService {
     @POST("sendSticker")
     fun sendSticker(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("sticker") sticker: String,
+        @Query("emoji") emoji: String? = null,
         @Query("disable_notification") disableNotification: Boolean? = null,
         @Query("protect_content") protectContent: Boolean? = null,
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
@@ -850,8 +1042,10 @@ interface TelegramService {
     @Multipart
     @POST("sendSticker")
     fun sendSticker(
-        @Part("chat_id") chatId: ChatId,
+        @Part("chat_id") chatId: RequestBody,
+        @Part("message_thread_id") messageThreadId: RequestBody? = null,
         @Part sticker: MultipartBody.Part,
+        @Part("emoji") emoji: RequestBody? = null,
         @Part("disable_notification") disableNotification: RequestBody? = null,
         @Part("protect_content") protectContent: RequestBody? = null,
         @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
@@ -866,68 +1060,112 @@ interface TelegramService {
 
     @POST("getCustomEmojiStickers")
     fun getCustomEmojiStickers(
-        @Query("custom_emoji_ids") customEmojiIds: List<String>
+        @Query("custom_emoji_ids") customEmojiIds: String // TODO List<String> not work; check other methods
     ): Call<NetworkResponse<List<Sticker>>>
 
     @POST("uploadStickerFile")
     fun uploadStickerFile(
         @Query("user_id") userId: ChatId.ID,
-        @Query("png_sticker") pngSticker: String,
+        @Query("sticker") sticker: String,
+        @Query("sticker_format") stickerFormat: StickerFormat
     ): Call<NetworkResponse<File>>
 
     @Multipart
     @POST("uploadStickerFile")
-    fun     uploadStickerFile(
+    fun uploadStickerFile(
         @Query("user_id") userId: ChatId.ID,
-        @Part pngSticker: MultipartBody.Part,
+        @Part sticker: MultipartBody.Part,
+        @Query("sticker_format") stickerFormat: StickerFormat
     ): Call<NetworkResponse<File>>
 
+//    @POST("createNewStickerSet")
+//    fun createNewStickerSet(
+//        @Query("user_id") userId: ChatId.ID,
+//        @Query("name") name: String,
+//        @Query("title") title: String,
+//        @Query("stickers") stickers: String,
+//        @Query("sticker_format") stickerFormat: StickerFormat? = null,
+//        @Query("sticker_type") stickerType: StickerType? = null,
+//        @Query("needs_repainting") needsRepainting: Boolean? = null,
+//    ): Call<NetworkResponse<Boolean>>
+
+    @Multipart
     @POST("createNewStickerSet")
     fun createNewStickerSet(
         @Query("user_id") userId: ChatId.ID,
         @Query("name") name: String,
         @Query("title") title: String,
-        @Query("png_sticker") pngSticker: String?,
+        @Query("stickers") stickers: String,
+        @Query("sticker_format") stickerFormat: StickerFormat? = null,
         @Query("sticker_type") stickerType: StickerType? = null,
-        @Query("emojis") emojis: String? = null,
-        @Query("mask_position") maskPosition: MaskPosition? = null,
-    ): Call<NetworkResponse<Boolean>>
+        @Query("needs_repainting") needsRepainting: Boolean? = null,
 
-    @Multipart
-    @POST("createNewStickerSet")
-    fun createNewStickerSet(
-        @Part("user_id") userId: ChatId.ID,
-        @Part("name") name: RequestBody,
-        @Part("title") title: RequestBody,
-        @Part pngSticker: MultipartBody.Part? = null,
-        @Part tgsSticker: MultipartBody.Part? = null,
-        @Part webmSticker: MultipartBody.Part? = null,
-        @Part("sticker_type") stickerType: StickerType? = null,
-        @Part("emojis") emojis: RequestBody? = null,
-        @Part("mask_position") maskPosition: MaskPosition? = null,
+        @Part mediaPart1: MultipartBody.Part? = null,
+        @Part mediaPart2: MultipartBody.Part? = null,
+        @Part mediaPart3: MultipartBody.Part? = null,
+        @Part mediaPart4: MultipartBody.Part? = null,
+        @Part mediaPart5: MultipartBody.Part? = null,
+        @Part mediaPart6: MultipartBody.Part? = null,
+        @Part mediaPart7: MultipartBody.Part? = null,
+        @Part mediaPart8: MultipartBody.Part? = null,
+        @Part mediaPart9: MultipartBody.Part? = null,
+        @Part mediaPart10: MultipartBody.Part? = null,
+        @Part mediaPart11: MultipartBody.Part? = null,
+        @Part mediaPart12: MultipartBody.Part? = null,
+        @Part mediaPart13: MultipartBody.Part? = null,
+        @Part mediaPart14: MultipartBody.Part? = null,
+        @Part mediaPart15: MultipartBody.Part? = null,
+        @Part mediaPart16: MultipartBody.Part? = null,
+        @Part mediaPart17: MultipartBody.Part? = null,
+        @Part mediaPart18: MultipartBody.Part? = null,
+        @Part mediaPart19: MultipartBody.Part? = null,
+        @Part mediaPart20: MultipartBody.Part? = null,
+        @Part mediaPart21: MultipartBody.Part? = null,
+        @Part mediaPart22: MultipartBody.Part? = null,
+        @Part mediaPart23: MultipartBody.Part? = null,
+        @Part mediaPart24: MultipartBody.Part? = null,
+        @Part mediaPart25: MultipartBody.Part? = null,
+        @Part mediaPart26: MultipartBody.Part? = null,
+        @Part mediaPart27: MultipartBody.Part? = null,
+        @Part mediaPart28: MultipartBody.Part? = null,
+        @Part mediaPart29: MultipartBody.Part? = null,
+        @Part mediaPart30: MultipartBody.Part? = null,
+        @Part mediaPart31: MultipartBody.Part? = null,
+        @Part mediaPart32: MultipartBody.Part? = null,
+        @Part mediaPart33: MultipartBody.Part? = null,
+        @Part mediaPart34: MultipartBody.Part? = null,
+        @Part mediaPart35: MultipartBody.Part? = null,
+        @Part mediaPart36: MultipartBody.Part? = null,
+        @Part mediaPart37: MultipartBody.Part? = null,
+        @Part mediaPart38: MultipartBody.Part? = null,
+        @Part mediaPart39: MultipartBody.Part? = null,
+        @Part mediaPart40: MultipartBody.Part? = null,
+        @Part mediaPart41: MultipartBody.Part? = null,
+        @Part mediaPart42: MultipartBody.Part? = null,
+        @Part mediaPart43: MultipartBody.Part? = null,
+        @Part mediaPart44: MultipartBody.Part? = null,
+        @Part mediaPart45: MultipartBody.Part? = null,
+        @Part mediaPart46: MultipartBody.Part? = null,
+        @Part mediaPart47: MultipartBody.Part? = null,
+        @Part mediaPart48: MultipartBody.Part? = null,
+        @Part mediaPart49: MultipartBody.Part? = null,
+        @Part mediaPart50: MultipartBody.Part? = null,
     ): Call<NetworkResponse<Boolean>>
 
     @POST("addStickerToSet")
     fun addStickerToSet(
         @Query("user_id") userId: ChatId.ID,
-        @Query("name") name: String?,
-        @Query("png_sticker") pngSticker: String?,
-        @Query("sticker_type") stickerType: StickerType? = null,
-        @Query("emojis") emojis: String? = null,
-        @Query("mask_position") maskPosition: MaskPosition? = null,
+        @Query("name") name: String,
+        @Query("sticker") sticker: String,
     ): Call<NetworkResponse<Boolean>>
 
     @Multipart
     @POST("addStickerToSet")
     fun addStickerToSet(
-        @Part("user_id") userId: ChatId.ID,
-        @Part("name") name: RequestBody,
-        @Part pngSticker: MultipartBody.Part? = null,
-        @Part tgsSticker: MultipartBody.Part? = null,
-        @Part webmSticker: MultipartBody.Part? = null,
-        @Part("sticker_type") stickerType: StickerType? = null,
-        @Part("emojis") emojis: RequestBody? = null,
-        @Part("mask_position") maskPosition: MaskPosition? = null,
+        @Query("user_id") userId: ChatId.ID,
+        @Query("name") name: String,
+        @Query("sticker") sticker: String,
+        @Part file: MultipartBody.Part? = null,
     ): Call<NetworkResponse<Boolean>>
 
     @POST("setStickerPositionInSet")
@@ -968,8 +1206,8 @@ interface TelegramService {
     @Multipart
     @POST("setStickerSetThumbnail")
     fun setStickerSetThumbnail(
-        @Part("name") name: RequestBody,
-        @Part("user_id") userId: ChatId.ID,
+        @Query("name") name: String,
+        @Query("user_id") userId: ChatId.ID,
         @Part thumbnail: MultipartBody.Part? = null,
     ): Call<NetworkResponse<Boolean>>
 
@@ -984,29 +1222,6 @@ interface TelegramService {
         @Query("name") name: String,
     ): Call<NetworkResponse<Boolean>>
 
-    /**
-     * Use this method to send answers to an inline query. On success, True is returned.
-     * No more than 50 results per query are allowed.
-     *
-     * @param inlineQueryId Unique identifier for the answered query
-     * @param results A JSON-serialized array of results for the inline query
-     * @param cacheTime The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
-     * @param isPersonal Pass True, if results may be cached on the server side only for the user that sent the query.
-     * By default, results may be returned to any user who sends the same query
-     * @param isPersonal Pass the offset that a client should send in the next query with the same text to receive
-     * more results. Pass an empty string if there are no more results or if you don't support pagination.
-     * Offset length can't exceed 64 bytes.
-     * @param switchPmParameter [Deep-linking](https://core.telegram.org/bots#deep-linking) parameter
-     * for the /start message sent to the bot when user presses the switch button.
-     * 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
-     *
-     * Example: An inline bot that sends YouTube videos can ask the user to connect the bot to their YouTube account
-     * to adapt search results accordingly. To do this, it displays a 'Connect your YouTube account' button above the
-     * results, or even before showing any. The user presses the button, switches to a private chat with the bot and,
-     * in doing so, passes a start parameter that instructs the bot to return an OAuth link. Once done, the bot can
-     * offer a switch_inline button so that the user can easily return to the chat where they wanted to use the bot's
-     * inline capabilities.
-     * */
     @POST("answerInlineQuery")
     fun answerInlineQuery(
         @Query("inline_query_id") inlineQueryId: String,
@@ -1014,7 +1229,7 @@ interface TelegramService {
         @Query("cache_time") cacheTime: Int? = null,
         @Query("is_personal") isPersonal: Boolean? = null,
         @Query("next_offset") nextOffset: String? = null,
-        @Query("button") button: InlineQueryResultsButton? = null
+        @Query("button") button: String? = null
     ): Call<NetworkResponse<Boolean>>
 
     // TODO test
@@ -1023,60 +1238,11 @@ interface TelegramService {
         @Query("web_app_query_id") webAppQueryId: String,
         @Query("result") result: InlineQueryResult,
     ): Call<NetworkResponse<SentWebAppMessage>>
-    
-    /**
-     * Use this method to send invoices. On success, the sent Message is returned.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     * (in the format `@channelusername`)
-     * @param title Product name, 1-32 characters
-     * @param description Product description, 1-255 characters
-     * @param payload Bot-defined invoice payload, 1-128 bytes.
-     * This will not be displayed to the user, use for your internal processes.
-     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
-     * @param currency Three-letter ISO 4217 currency code, see
-     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
-     * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.)
-     * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
-     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
-     * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
-     * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
-     * Defaults to 0
-     * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
-     * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
-     * The suggested tip amounts must be positive, passed in a strictly increased order and must
-     * not exceed *max_tip_amount*.
-     * @param startParameter Unique deep-linking parameter. If left empty, *forwarded copies* of the sent message will
-     * have a *Pay* button, allowing multiple users to pay directly from the forwarded message, using the same invoice.
-     * If non-empty, forwarded copies of the sent message will have a URL button with a deep link to the bot
-     * (instead of a *Pay* button), with the value used as the start parameter
-     * @param providerData A JSON-serialized data about the invoice, which will be shared with the payment provider.
-     * A detailed description of required fields should be provided by the payment provider.
-     * @param photoUrl URL of the product photo for the invoice. Can be a photo of the goods or a marketing
-     * image for a service. People like it better when they see what they are paying for.
-     * @param photoSize Photo size
-     * @param photoWidth Photo width
-     * @param photoHeight Photo height
-     * @param needName Pass *True*, if you require the user's full name to complete the order
-     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
-     * @param needEmail Pass *True*, if you require the user's email address to complete the order
-     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
-     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
-     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
-     * @param isFlexible Pass *True*, if the final price depends on the shipping method
-     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
-     * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to
-     * message is not found
-     * @param replyMarkup A JSON-serialized object for an
-     * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating).
-     * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
-     * */
+
     @POST("sendInvoice")
     fun sendInvoice(
         @Query("chat_id") chatId: ChatId,
+        @Query("message_thread_id") messageThreadId: Int? = null,
         @Query("title") title: String,
         @Query("description") description: String,
         @Query("payload") payload: String,
@@ -1103,8 +1269,30 @@ interface TelegramService {
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") replyMarkup: InlineKeyboardMarkup? = null
     ): Call<MessageResponse>
-    
-    // TODO createInvoiceLink
+
+    @POST("createInvoiceLink")
+    fun createInvoiceLink(
+        @Query("title") title: String,
+        @Query("description") description: String,
+        @Query("payload") payload: String,
+        @Query("provider_token") providerToken: String,
+        @Query("currency") currency: String,
+        @Query("prices") prices: String,
+        @Query("max_tip_amount") maxTipAmount: Int? = null,
+        @Query("suggested_tip_amounts") suggestedTipAmounts: String? = null,
+        @Query("provider_data") providerData: String? = null,
+        @Query("photo_url") photoUrl: String? = null,
+        @Query("photo_size") photoSize: Int? = null,
+        @Query("photo_width") photoWidth: Int? = null,
+        @Query("photo_height") photoHeight: Int? = null,
+        @Query("need_name") needName: Boolean? = null,
+        @Query("need_phone_number") needPhoneNumber: Boolean? = null,
+        @Query("need_email") needEmail: Boolean? = null,
+        @Query("need_shipping_address") needShippingAddress: Boolean? = null,
+        @Query("send_phone_number_to_provider") sendPhoneNumberToProvider: Boolean? = null,
+        @Query("send_email_to_provider") sendEmailToProvider: Boolean? = null,
+        @Query("is_flexible") isFlexible: Boolean? = null,
+    ): Call<StringResponse>
 
     /**
      * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
@@ -1149,6 +1337,10 @@ interface TelegramService {
         @Query("error_message") errorMessage: String? = null
     ): Call<NetworkResponse<Boolean>>
 
+    // TODO [passport] setPassportDataErrors
+
     // TODO [games] sendGame
+    // TODO [games] setGameScore
+    // TODO [games] getGameHighScores
 }
 

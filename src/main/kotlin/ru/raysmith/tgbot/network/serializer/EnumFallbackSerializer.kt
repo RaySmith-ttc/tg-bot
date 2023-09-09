@@ -7,12 +7,13 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import ru.raysmith.tgbot.network.NetworkUtils.getSerialName
-import kotlin.reflect.KClass
+import kotlin.enums.EnumEntries
 
-open class EnumFallbackSerializer<E>(
-    private val kClass: KClass<E>, private val fallback: E
+internal open class EnumFallbackSerializer<E>(
+    serialName: String,
+    private val entries: EnumEntries<E>, private val fallback: E, kind: PrimitiveKind = PrimitiveKind.STRING
 ) : KSerializer<E> where  E : Enum<E> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("EnumSerialNameSerializer", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(serialName, kind)
 
     override fun serialize(encoder: Encoder, value: E) {
         encoder.encodeString(value.getSerialName())
@@ -20,6 +21,6 @@ open class EnumFallbackSerializer<E>(
 
     override fun deserialize(decoder: Decoder): E =
         decoder.decodeString().let { value ->
-            kClass.java.enumConstants.firstOrNull { it.getSerialName() == value } ?: fallback
+            entries.find { it.getSerialName() == value } ?: fallback
         }
 }

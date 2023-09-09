@@ -20,10 +20,8 @@ data class File(
     @SerialName("file_unique_id") val uniqueId: String,
 
     /** File size, if known */
-    @SerialName("file_size") val size: Int? = null,
+    @SerialName("file_size") val size: Long? = null,
 
     /** File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. */
     @SerialName("file_path") val path: String? = null
-
-
 )

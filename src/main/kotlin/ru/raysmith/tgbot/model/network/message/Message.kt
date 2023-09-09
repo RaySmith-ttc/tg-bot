@@ -5,11 +5,9 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatIdHolder
-import ru.raysmith.tgbot.model.network.Location
-import ru.raysmith.tgbot.model.network.Poll
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.Venue
+import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
+import ru.raysmith.tgbot.model.network.chat.forum.*
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
@@ -24,6 +22,9 @@ data class Message(
 
     /** Unique message identifier inside this chat */
     @SerialName("message_id") val messageId: Int,
+
+    /** Unique identifier of a message thread to which the message belongs; for supergroups only */
+    @SerialName("message_thread_id") val messageThreadId: Int? = null,
 
     /** Sender, empty for messages sent to channels */
     @SerialName("from") val from: User? = null,
@@ -57,7 +58,13 @@ data class Message(
     @SerialName("forward_sender_name") val forwardSenderName: String? = null,
 
     /** For forwarded messages, date the original message was sent in Unix time */
-    @SerialName("forward_date") val forwardDate: Int? = null,
+    @SerialName("forward_date") val forwardDate: Int? = null, // TODO change to ZonedDateTime; create serializer
+
+    /** *True*, if the message is sent to a forum topic */
+    @SerialName("is_topic_message") val isTopicMessage: Boolean? = null,
+
+    /** *True*, if the message is a channel post that was automatically forwarded to the connected discussion group */
+    @SerialName("is_automatic_forward") val isAutomaticForward: Boolean? = null,
 
     /**
      * For replies, the original message. Note that the Message object in this field will not contain further
@@ -69,7 +76,10 @@ data class Message(
     @SerialName("via_bot") val viaBot: User? = null,
 
     /** Date the message was last edited in Unix time */
-    @SerialName("edit_date") val editDate: Int? = null,
+    @SerialName("edit_date") val editDate: Int? = null, // TODO change to ZonedDateTime; create serializer
+
+    /** *True*, if the message can't be forwarded */
+    @SerialName("has_protected_content") val hasProtectedContent: Boolean? = null,
 
     /** The unique identifier of a media message group this message belongs to */
     @SerialName("media_group_id") val mediaGroupId: String? = null,
@@ -98,13 +108,15 @@ data class Message(
     /** Message is a sticker, information about the sticker */
     @SerialName("sticker") val sticker: Sticker? = null,
 
+    /** Message is a forwarded story */
+    @SerialName("story") val story: Story? = null,
+
     /** Message is a video, information about the video */
     @SerialName("video") val video: Video? = null,
 
     /**
-     * Message is a video note, information about the video message
-     *
-     * @see <a href="https://telegram.org/blog/video-messages-and-telescope">video note</a>
+     * Message is a [video note](https://telegram.org/blog/video-messages-and-telescope), information about the
+     * video message
      * */
     @SerialName("video_note") val videoNote: VideoNote? = null,
 
@@ -116,6 +128,9 @@ data class Message(
 
     /** For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption */
     @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
+
+    /** *True*, if the message media is covered by a spoiler animation */
+    @SerialName("has_media_spoiler") val hasMediaSpoiler: Boolean? = null,
 
     /** Message is a shared contact, information about the contact */
     @SerialName("contact") val contact: Contact? = null,
@@ -159,6 +174,13 @@ data class Message(
      * */
     @SerialName("supergroup_chat_created") val supergroupChatCreated: Boolean? = null,
 
+    /**
+     * Service message: the channel has been created. This field can't be received in a message coming through updates,
+     * because bot can't be a member of a channel when it is created. It can only be found in reply_to_message
+     * if someone replies to a very first message in a channel.
+     * */
+    @SerialName("channel_chat_created") val channelChatCreated: Boolean? = null,
+
     /** Service message: auto-delete timer settings changed in the chat */
     @SerialName("message_auto_delete_timer_changed") val messageAutoDeleteTimerChanged: MessageAutoDeleteTimerChanged? = null,
 
@@ -196,27 +218,54 @@ data class Message(
      * */
     @SerialName("successful_payment") val successfulPayment: SuccessfulPayment? = null,
 
+    /** Service message: a user was shared with the bot */
+    @SerialName("user_shared") val userShared: UserShared? = null,
+
+    /** Service message: a chat was shared with the bot */
+    @SerialName("chat_shared") val chatShared: ChatShared? = null,
+
     /**
      * The domain name of the website on which the user has logged in.
      * @see <a href="https://core.telegram.org/widgets/login">More about Telegram Login »</a>
      * */
     @SerialName("connected_website") val connectedWebsite: String? = null,
+
+    /** Service message: the user allowed the bot added to the attachment menu to write messages */
+    @SerialName("write_access_allowed") val writeAccessAllowed: WriteAccessAllowed? = null,
     // TODO [passport support] add passport_data field (https://core.telegram.org/bots/api#message)
 
     /** Service message. A user in the chat triggered another user's proximity alert while sharing Live Location. */
     @SerialName("proximity_alert_triggered") val proximityAlertTriggered: ProximityAlertTriggered? = null,
 
-    /** Service message: voice chat scheduled */
-    @SerialName("voice_chat_scheduled") val voiceChatScheduled: VoiceChatScheduled? = null,
+    /** Service message: forum topic created */
+    @SerialName("forum_topic_created") val forumTopicCreated: ForumTopicCreated? = null,
 
-    /** Service message: voice chat started */
-    @SerialName("voice_chat_started") val voiceChatStarted: VoiceChatStarted? = null,
+    /** Service message: forum topic edited */
+    @SerialName("forum_topic_edited") val forumTopicEdited: ForumTopicEdited? = null,
 
-    /** Service message: voice chat ended */
-    @SerialName("voice_chat_ended") val voiceChatEnded: VoiceChatEnded? = null,
+    /** Service message: forum topic closed */
+    @SerialName("forum_topic_closed") val forumTopicClosed: ForumTopicClosed? = null,
 
-    /** Service message: new participants invited to a voice chat */
-    @SerialName("voice_chat_participants_invited") val voiceChatParticipantsInvited: VoiceChatParticipantsInvited? = null,
+    /** Service message: forum topic reopened */
+    @SerialName("forum_topic_reopened") val forumTopicReopened: ForumTopicReopened? = null,
+
+    /** Service message: the 'General' forum topic hidden */
+    @SerialName("general_forum_topic_hidden") val generalForumTopicHidden: GeneralForumTopicHidden? = null,
+
+    /** Service message: the 'General' forum topic hidden */
+    @SerialName("general_forum_topic_unhidden") val generalForumTopicUnhidden: GeneralForumTopicUnhidden? = null,
+
+    /** Service message: video chat scheduled */
+    @SerialName("video_chat_scheduled") val videoChatScheduled: VideoChatScheduled? = null,
+
+    /** Service message: video chat started */
+    @SerialName("video_chat_started") val videoChatStarted: VideoChatStarted? = null,
+
+    /** Service message: video chat ended */
+    @SerialName("video_chat_ended") val videoChatEnded: VideoChatEnded? = null,
+
+    /** Service message: new participants invited to a video chat */
+    @SerialName("video_chat_participants_invited") val videoChatParticipantsInvited: VideoChatParticipantsInvited? = null,
 
     /** Service message: new participants invited to a voice chat */
     @SerialName("web_app_data") val webAppData: WebAppData? = null,
@@ -272,7 +321,7 @@ data class Message(
      * - If the bot is an administrator of a group, it can delete any message there.
      * - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
      *
-     * Returns True on success.
+     * Returns *True* on Success.
      * */
     fun delete(context: BotContext<*>) = delete(context.service)
     fun delete(service: TelegramService) = service.deleteMessage(chat.id, messageId).execute().body()?.result ?: false

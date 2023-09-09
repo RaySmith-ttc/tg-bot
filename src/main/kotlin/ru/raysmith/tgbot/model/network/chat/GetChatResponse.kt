@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.network.chat.member.ChatMember
 
 @Serializable
 data class GetChatResponse(
