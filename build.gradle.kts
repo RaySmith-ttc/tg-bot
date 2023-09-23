@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    alias(libs.plugins.kotlinx.serialization)
     kotlin("jvm") version "1.9.0"
     id("maven-publish")
 }
@@ -48,9 +48,10 @@ java {
 
 dependencies {
     // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation(libs.kotlinx.coroutines.core)
 
     // Logging
+//    implementation(libs.log4j.core)
     implementation("org.apache.logging.log4j:log4j:2.19.0")
 
     // Network
@@ -59,14 +60,14 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.ktor.client.jvm)
 
     // Utils
-    implementation("ru.raysmith:utils:1.4.2")
+    implementation(libs.raysmith.utils)
 
     // Extensions for
-    api("org.jetbrains.exposed:exposed-core:0.40.1")
+    api(libs.exposed.core)
 
     // Testing
     testImplementation("org.assertj:assertj-core:3.23.1")
@@ -74,17 +75,14 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("org.mockito:mockito-core:4.8.0")
-    testImplementation("com.lemonappdev:konsist:0.12.1")
-
-    
-    val ktorVersion = "2.2.1"
-    testImplementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
-    testImplementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    testImplementation("io.ktor:ktor-network-tls-certificates:$ktorVersion")
-
-    val slf4jVersion = "2.0.3"
-    testImplementation("org.slf4j:slf4j-api:$slf4jVersion")
-    testImplementation("org.slf4j:slf4j-log4j12:$slf4jVersion")
+    testImplementation(libs.konsist)
+    testImplementation(libs.ktor.server.core.jvm)
+    testImplementation(libs.ktor.server.netty)
+    testImplementation(libs.ktor.server.netty)
+    testImplementation(libs.ktor.network.tlsCertificates)
+    testImplementation(libs.log4j.slf4j18.impl)
+//    testImplementation(libs.slf4j.api)
+//    testImplementation(libs.slf4j.reload4j)
 }
 
 tasks {
