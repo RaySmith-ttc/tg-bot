@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network.payment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /** This object represents information about an order. */
+@Serializable
 data class OrderInfo(
     /** User name */
     @SerialName("name") val name: String? = null,

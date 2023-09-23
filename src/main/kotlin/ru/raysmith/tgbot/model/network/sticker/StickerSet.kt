@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.media.PhotoSize
 
-@Serializable
 /** This object represents a sticker set. */
+@Serializable
 data class StickerSet(
 
     /** Sticker set name */

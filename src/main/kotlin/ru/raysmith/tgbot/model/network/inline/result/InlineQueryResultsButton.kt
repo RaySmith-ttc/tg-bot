@@ -20,9 +20,9 @@ data class InlineQueryResultsButton(
     /**
      * Description of the [Web App](https://core.telegram.org/bots/webapps) that will be launched when the user
      * presses the button. The Web App will be able to switch back to the inline mode using the method
-     * [switchInlineQuery](https://core.telegram.org/bots/webapps#initializing-web-apps) inside the Web App.
+     * [switchInlineQuery](https://core.telegram.org/bots/webapps#initializing-mini-apps) inside the Web App.
      * */
-    @SerialName("web_app") val webApp: WebAppInfo?,
+    @SerialName("web_app") val webApp: WebAppInfo? = null,
 
     /**
      * [Deep-linking](https://core.telegram.org/bots/features#deep-linking) parameter for the /start message sent to
@@ -35,6 +35,6 @@ data class InlineQueryResultsButton(
      * offer a [switchInline-][InlineKeyboardButton] button so that the user can easily return to the chat where
      * they wanted to use the bot's inline capabilities.
      * */
-    @SerialName("start_parameter") val startParameter: String?
+    @SerialName("start_parameter") val startParameter: String? = null
 
 )

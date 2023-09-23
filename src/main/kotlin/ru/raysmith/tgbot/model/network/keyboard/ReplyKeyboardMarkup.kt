@@ -5,8 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
 
-@Serializable
 /** This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). */
+@Serializable
 data class ReplyKeyboardMarkup(
 
     /** Array of button rows, each represented by an Array of [KeyboardButton][KeyboardButton] objects */

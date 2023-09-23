@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network.sticker
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /** This object describes the position on faces where a mask should be placed by default. */
+@Serializable
 data class MaskPosition(
 
     /** The part of the face relative to which the mask should be placed */

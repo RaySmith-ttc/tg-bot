@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.Currency
 
-@Serializable
 /** This object contains basic information about an invoice. */
+@Serializable
 data class Invoice(
 
     /** Product name */

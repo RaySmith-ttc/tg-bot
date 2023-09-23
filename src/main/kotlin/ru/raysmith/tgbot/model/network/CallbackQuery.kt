@@ -7,7 +7,6 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.message.Message
 
-@Serializable
 /**
  * This object represents an incoming callback query from a callback button in an inline keyboard.
  * If the button that originated the query was attached to a message sent by the bot, the field message will be present.
@@ -22,6 +21,7 @@ import ru.raysmith.tgbot.model.network.message.Message
  * @see <a href="https://core.telegram.org/bots/api#answercallbackquery">answerCallbackQuery</a> TODO link to answer method
  *
  * */
+@Serializable
 data class CallbackQuery(
     /** Unique identifier for this query */
     @SerialName("id") val id: String,
@@ -48,7 +48,7 @@ data class CallbackQuery(
      * @see <a href="https://core.telegram.org/bots/api#games">games</>
      * */
     @SerialName("game_short_name") val gameShortName: String? = null,
-)  : ChatIdHolder {
+) : ChatIdHolder {
     companion object {
         val EMPTY_CALLBACK_DATA = Bot.config.emptyCallbackQuery
     }

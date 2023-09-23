@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** Represents a chat member that was banned in the chat and can't return to the chat or view chat messages. */
+@Serializable
 data class ChatMemberBanned(
     /** The member's status in the chat, always “kicked” */
     override val status: String,

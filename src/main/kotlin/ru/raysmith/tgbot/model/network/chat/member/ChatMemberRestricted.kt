@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** Represents a chat member that is under certain restrictions in the chat. Supergroups only. */
+@Serializable
 data class ChatMemberRestricted(
     /** The member's status in the chat, always “restricted” */
     override val status: String,

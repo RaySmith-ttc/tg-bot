@@ -7,8 +7,8 @@ import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatInviteLink
 
-@Serializable
 /** This object represents changes in the status of a chat member. */
+@Serializable
 data class ChatMemberUpdated(
 
     /** Chat the user belongs to */

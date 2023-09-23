@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network.payment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /** This object represents a portion of the price for goods or services. */
+@Serializable
 data class LabeledPrice(
 
     /** Portion label */

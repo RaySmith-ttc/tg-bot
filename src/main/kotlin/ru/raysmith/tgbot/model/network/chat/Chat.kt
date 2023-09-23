@@ -9,8 +9,8 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.utils.toChatId
 import ru.raysmith.utils.notNull
 
-@Serializable
 /** This object represents a chat. */
+@Serializable
 data class Chat(
 
     /**

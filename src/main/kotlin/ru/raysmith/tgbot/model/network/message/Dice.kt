@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /** This object represents an animated emoji that displays a random value. */
+@Serializable
 data class Dice(
 
     /** Emoji on which the dice throw animation is based */

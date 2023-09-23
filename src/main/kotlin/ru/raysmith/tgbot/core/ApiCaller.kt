@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.UserProfilePhotos
 import ru.raysmith.tgbot.model.network.WebhookInfo
+import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
 import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
@@ -143,6 +144,17 @@ interface ApiCaller {
      * @param id File identifier to get information about
      * */
     fun getFile(id: String) = service.getFile(id).execute().body()?.file ?: errorBody()
+
+    /**
+     * Use this method to get up to date information about the chat (current name of the user for one-on-one
+     * conversations, current username of a user, group or channel, etc.).
+     * Returns a [Chat] object on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * */
+    fun getChat(chatId: ChatId): Chat {
+        return service.getChat(chatId).execute().body()?.result ?: errorBody()
+    }
 
     /**
      * Use this method to change the list of the bot's commands.

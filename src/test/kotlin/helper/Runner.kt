@@ -59,7 +59,7 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
-val locations = false
+val locations = true
 inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
 
 var loc: String = "menu"

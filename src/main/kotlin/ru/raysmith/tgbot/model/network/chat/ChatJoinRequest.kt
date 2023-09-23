@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** Represents a join request sent to a chat. */
+@Serializable
 data class ChatJoinRequest(
 
     /** Chat to which the request was sent */

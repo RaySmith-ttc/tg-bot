@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
 interface IKeyboardButton
-@Serializable
 /** This object represents one button of an inline keyboard. You **must** use exactly one of the optional fields. */
+@Serializable
 data class InlineKeyboardButton(
 
     /** Label text on the button */

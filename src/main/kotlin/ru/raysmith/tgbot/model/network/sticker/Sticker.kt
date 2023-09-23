@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.media.PhotoSize
 import ru.raysmith.tgbot.model.network.message.MaskPosition
 
-@Serializable
 /** This object represents a sticker. */
+@Serializable
 data class Sticker(
 
     /** Identifier for this file, which can be used to download or reuse the file */

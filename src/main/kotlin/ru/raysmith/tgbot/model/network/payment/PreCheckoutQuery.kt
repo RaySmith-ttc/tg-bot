@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** This object contains information about an incoming pre-checkout query. */
+@Serializable
 data class PreCheckoutQuery(
     /** Unique query identifier */
     @SerialName("id") val id: String,

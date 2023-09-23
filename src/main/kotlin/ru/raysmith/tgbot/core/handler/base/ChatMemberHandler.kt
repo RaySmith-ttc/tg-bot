@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
 open class ChatMemberHandler(
+    @get:JvmName("chatOfHandler")
     val chat: Chat,
     val from: User,
     val date: Int,

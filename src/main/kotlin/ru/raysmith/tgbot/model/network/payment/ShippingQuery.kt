@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** This object contains information about an incoming shipping query. */
+@Serializable
 data class ShippingQuery(
     /** Unique query identifier */
     @SerialName("id") val id: String,

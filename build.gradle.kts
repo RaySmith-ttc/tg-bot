@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "1.0.0-alpha.15"
+version = "1.0.0-alpha.17"
 
 repositories {
     mavenCentral()
@@ -74,7 +74,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
     testImplementation("org.mockito:mockito-core:4.8.0")
-    
+    testImplementation("com.lemonappdev:konsist:0.12.1")
+
     
     val ktorVersion = "2.2.1"
     testImplementation("io.ktor:ktor-server-core-jvm:$ktorVersion")

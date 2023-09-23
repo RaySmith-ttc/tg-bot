@@ -10,8 +10,8 @@ data class ChatInviteLinkResponse(
     @SerialName("result") val result: ChatInviteLink
 )
 
-@Serializable
 /** Represents an invite link for a chat. */
+@Serializable
 data class ChatInviteLink(
     /**
      * The invite link. If the link was created by another chat administrator,

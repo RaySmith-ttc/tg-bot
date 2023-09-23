@@ -16,8 +16,8 @@ import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.network.TelegramService
 
-@Serializable
 /** This object represents a message. */
+@Serializable
 data class Message(
 
     /** Unique message identifier inside this chat */
@@ -231,6 +231,11 @@ data class Message(
     @SerialName("connected_website") val connectedWebsite: String? = null,
 
     /** Service message: the user allowed the bot added to the attachment menu to write messages */
+    /**
+     * Service message: the user allowed the bot to write messages after adding it to the attachment or side menu,
+     * launching a Web App from a link, or accepting an explicit request from
+     * a Web App sent by the method requestWriteAccess
+     * */
     @SerialName("write_access_allowed") val writeAccessAllowed: WriteAccessAllowed? = null,
     // TODO [passport support] add passport_data field (https://core.telegram.org/bots/api#message)
 

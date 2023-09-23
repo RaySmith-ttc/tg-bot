@@ -9,8 +9,8 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.PhotoSize
 
-@Serializable
 /** This object represents a Telegram user or bot. */
+@Serializable
 data class User(
 
     /** Unique identifier for this user or bot. This number may have more than 32 significant bits and some

@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.Currency
 
-@Serializable
 /** This object contains basic information about a successful payment. */
+@Serializable
 data class SuccessfulPayment(
 
     /** Three-letter ISO 4217 [currency](https://core.telegram.org/bots/payments#supported-currencies) code */

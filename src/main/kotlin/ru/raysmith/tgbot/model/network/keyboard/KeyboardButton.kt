@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.model.network.message.Message
 
-@Serializable
 /**
  * This object represents one button of the reply keyboard. For simple text buttons String can be used instead of
  * this object to specify text of the button. Optional fields *[request_contact][KeyboardButton.requestContact]*,
  * *[request_location][KeyboardButton.requestLocation]*, and *request_poll*
  * are mutually exclusive.
  * */
+@Serializable
 data class KeyboardButton(
     /**
      * Text of the button. If none of the optional fields are used,

@@ -18,21 +18,21 @@ data class WebhookInfo(
     @SerialName("pending_update_count") val pendingUpdateCount: Int,
 
     /** Currently used webhook IP address */
-    @SerialName("ip_address") val ipAddress: String?,
+    @SerialName("ip_address") val ipAddress: String? = null,
 
     /** Unix time for the most recent error that happened when trying to deliver an update via webhook */
-    @SerialName("last_error_date") val lastErrorDate: Int?,
+    @SerialName("last_error_date") val lastErrorDate: Int? = null,
 
     /** Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook */
-    @SerialName("last_error_message") val lastErrorMessage: String?,
+    @SerialName("last_error_message") val lastErrorMessage: String? = null,
 
     /** Unix time of the most recent error that happened when trying to synchronize available updates with Telegram datacenters */
-    @SerialName("last_synchronization_error_date") val lastSynchronizationErrorDate: Int?,
+    @SerialName("last_synchronization_error_date") val lastSynchronizationErrorDate: Int? = null,
 
     /** The maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery */
-    @SerialName("max_connections") val maxConnections: Int?,
+    @SerialName("max_connections") val maxConnections: Int? = null,
 
     /** A list of update types the bot is subscribed to. Defaults to all update types except [UpdateType.CHAT_MEMBER] */
-    @SerialName("allowed_updates") val allowedUpdates: List<UpdateType>?,
+    @SerialName("allowed_updates") val allowedUpdates: List<UpdateType>? = null,
 
 )

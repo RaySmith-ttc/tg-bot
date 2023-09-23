@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** Represents a chat member that has some additional privileges. */
+@Serializable
 data class ChatMemberAdministrator(
     /** The member's status in the chat, always “administrator” */
     override val status: String,
@@ -18,7 +18,7 @@ data class ChatMemberAdministrator(
     @SerialName("is_anonymous") val isAnonymous: Boolean,
 
     /**
-     * True, if the administrator can access the chat event log, chat statistics, message statistics in channels,
+     * True, if the administrator can access the chat event log, chat statistics, boost list in channels, message statistics in channels,
      * see channel members, see anonymous administrators in supergroups and ignore slow mode.
      * Implied by any other administrator privilege
      * */
@@ -46,7 +46,7 @@ data class ChatMemberAdministrator(
     /** *True*, if the user is allowed to invite new users to the chat */
     @SerialName("can_invite_users") val canInviteUsers: Boolean,
 
-    /** *True*, if the administrator can post in the channel; channels only */
+    /** *True*, if the administrator can post messages in the channel; channels only */
     @SerialName("can_post_messages") val canPostMessages: Boolean? = null,
 
     /** *True*, if the administrator can edit messages of other users and can pin messages; channels only */
@@ -54,6 +54,15 @@ data class ChatMemberAdministrator(
 
     /** *True*, if the user is allowed to pin messages; groups and supergroups only */
     @SerialName("can_pin_messages") val canPinMessages: Boolean? = null,
+
+    /** *True*, if the administrator can post stories in the channel; channels only */
+    @SerialName("can_post_stories") val canPostStories: Boolean? = null,
+
+    /** *True*, if the administrator can edit stories posted by other users; channels only */
+    @SerialName("can_edit_stories") val canEditStories: Boolean? = null,
+
+    /** *True*, if the administrator can delete stories posted by other users; channels only */
+    @SerialName("can_delete_stories") val canDeleteStories: Boolean? = null,
 
     /** *True*, if the user is allowed to create, rename, close, and reopen forum topics; supergroups only */
     @SerialName("can_manage_topics") val canManageTopics: Boolean? = null,

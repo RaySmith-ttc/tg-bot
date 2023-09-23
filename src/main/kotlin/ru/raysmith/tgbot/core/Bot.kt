@@ -117,7 +117,7 @@ class Bot(
         return this
     }
 
-    private val queue = mutableMapOf<Any, Job>()
+    private val queue = Collections.synchronizedMap(mutableMapOf<Any, Job>())
 
     private fun Update.withBlockingObject(action: (Any) -> Unit) {
         blockingSelector?.invoke(this)?.apply(action)
@@ -139,6 +139,7 @@ class Bot(
                     blockingTime = measureTimeMillis {
                         logger.debug("Wait end blocking for {}...", it)
                         job.join()
+                        logger.debug("Release blocking for {} after {} ms.", it, blockingTime)
                     }
                 }
             }
@@ -175,6 +176,7 @@ class Bot(
                     safeOnError(e)
                 } finally {
                     update.withBlockingObject {
+                        logger.debug("Release blocking for {} after {} ms.", it, blockingTime)
                         queue.remove(it)
                     }
 

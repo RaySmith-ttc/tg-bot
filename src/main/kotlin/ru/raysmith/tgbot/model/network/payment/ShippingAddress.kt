@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network.payment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 /** This object represents a shipping address. */
+@Serializable
 data class ShippingAddress(
     /** ISO 3166-1 alpha-2 country code */
     @SerialName("name") val name: String,

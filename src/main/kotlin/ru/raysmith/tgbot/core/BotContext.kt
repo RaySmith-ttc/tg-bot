@@ -225,6 +225,9 @@ interface BotContext<T : EventHandler> : ISender {
             canPostMessages = administratorRights.canPostMessages,
             canEditMessages = administratorRights.canEditMessages,
             canDeleteMessages = administratorRights.canDeleteMessages,
+            canPostStories = administratorRights.canPostStories,
+            canEditStories = administratorRights.canEditStories,
+            canDeleteStories = administratorRights.canDeleteStories,
             canManageVideoChats = administratorRights.canManageVideoChats,
             canRestrictMembers = administratorRights.canRestrictMembers,
             canPromoteMembers = administratorRights.canPromoteMembers,
@@ -517,6 +520,7 @@ interface BotContext<T : EventHandler> : ISender {
         return service.leaveChat(chatId).execute().body()?.result ?: errorBody()
     }
 
+    // TODO docs
     /**
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
@@ -524,9 +528,7 @@ interface BotContext<T : EventHandler> : ISender {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChat(chatId: ChatId = getChatIdOrThrow()): Chat {
-        return service.getChat(chatId).execute().body()?.result ?: errorBody()
-    }
+    fun getChat() = getChat(getChatIdOrThrow())
 
     /**
      * Use this method to get a list of administrators in a chat, which aren't bots.
@@ -1093,15 +1095,6 @@ interface BotContext<T : EventHandler> : ISender {
     @Suppress("KDocUnresolvedReference")
     fun createInvoiceLink(buildAction: InvoiceCreateLinkSender.() -> Unit): String {
         return InvoiceCreateLinkSender(service, fileService).apply(buildAction).send().result
-    }
-
-    fun hasPermission(permission: Permission, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        val chat = getChat(chatId)
-        return when (permission) {
-            is ChatPermission -> chat.permissions?.check(permission) ?: false
-            is ChatAdministratorRight -> TODO()
-            else -> error("Unknown permission type")
-        }
     }
 }
 

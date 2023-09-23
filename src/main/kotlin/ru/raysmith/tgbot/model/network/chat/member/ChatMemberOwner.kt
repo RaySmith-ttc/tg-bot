@@ -4,8 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
 /** Represents a chat member that owns the chat and has all administrator privileges. */
+@Serializable
 data class ChatMemberOwner(
     /** The member's status in the chat, always “creator” */
     override val status: String,

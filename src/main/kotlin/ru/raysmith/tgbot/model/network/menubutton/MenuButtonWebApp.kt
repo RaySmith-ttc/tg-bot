@@ -1,6 +1,9 @@
 package ru.raysmith.tgbot.model.network.menubutton
 
-import kotlinx.serialization.*
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -9,12 +12,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.utils.*
-import ru.raysmith.tgbot.utils.errorBody
-import ru.raysmith.tgbot.utils.fieldNotFound
+import ru.raysmith.tgbot.utils.getJsonObject
 import ru.raysmith.tgbot.utils.getPrimitive
 
 /** Represents a menu button, which launches a [Web App](https://core.telegram.org/bots/webapps). */
@@ -45,7 +43,7 @@ data class MenuButtonWebApp(
 data class WebAppInfo(
 
     /** An HTTPS URL of a Web App to be opened with additional data as specified in
-     * [Initializing Web Apps](https://core.telegram.org/bots/webapps#initializing-web-apps) */
+     * [Initializing Web Apps](https://core.telegram.org/bots/webapps#initializing-mini-apps) */
     @SerialName("url") val url: String
 )
 

@@ -1,10 +1,10 @@
 package ru.raysmith.tgbot.model.network.chat
 
-import ru.raysmith.tgbot.model.network.Location
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.network.Location
 
-@Serializable
 /** Represents a location to which a chat is connected. */
+@Serializable
 data class ChatLocation(
 
     /** The location to which the supergroup is connected. Can't be a live location. */
