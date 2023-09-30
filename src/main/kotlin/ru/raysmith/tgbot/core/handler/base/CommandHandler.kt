@@ -14,7 +14,7 @@ import ru.raysmith.tgbot.utils.BotContextDsl
 open class CommandHandler(
     val command: BotCommand, val message: Message,
     override val service: TelegramService, override val fileService: TelegramFileService,
-    val handler: CommandHandler.() -> Unit = { }
+    val handler: suspend CommandHandler.() -> Unit = { }
 ) : EventHandler, BotContext<CommandHandler> {
 
     override fun getChatId() = message.chat.id
@@ -30,7 +30,7 @@ open class CommandHandler(
     }
 }
 
-inline fun CommandHandler.isCommand(value: String, equalHandler: CommandHandler.(argsString: String?) -> Unit) {
+suspend inline fun CommandHandler.isCommand(value: String, crossinline equalHandler: suspend CommandHandler.(argsString: String?) -> Unit) {
     if (command.body == value) {
         equalHandler(command.argsString)
     }

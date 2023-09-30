@@ -16,7 +16,7 @@ import ru.raysmith.tgbot.model.network.message.Message
  * NOTE: After the user presses a callback button, Telegram clients will display a progress bar until you call answerCallbackQuery.
  * It is, therefore, necessary to react by calling answerCallbackQuery even if no notification to the user is needed (e.g., without specifying any of the optional parameters).
  *
- * @see <a href="https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating">inline keyboard</a>
+ * @see <a href="https://core.telegram.org/bots/features#inline-keyboards">inline keyboard</a>
  * @see <a href="https://core.telegram.org/bots/api#inline-mode">inline mode</a>
  * @see <a href="https://core.telegram.org/bots/api#answercallbackquery">answerCallbackQuery</a> TODO link to answer method
  *

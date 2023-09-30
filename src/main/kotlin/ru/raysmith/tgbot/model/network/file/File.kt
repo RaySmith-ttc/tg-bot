@@ -24,4 +24,8 @@ data class File(
 
     /** File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. */
     @SerialName("file_path") val path: String? = null
-)
+) {
+
+    // TODO
+//    fun download()
+}

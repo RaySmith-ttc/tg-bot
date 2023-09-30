@@ -43,6 +43,7 @@ open class CreateNewStickerInStickerSet(
     var needsRepainting: Boolean? = null
 
     private val stickers = mutableListOf<InputSticker>()
+
     fun sticker(sticker: InputFile, emojiList: List<String>, maskPosition: MaskPosition? = null, keywords: List<String>? = null) {
         stickers.add(InputSticker(sticker, emojiList, maskPosition, keywords))
     }

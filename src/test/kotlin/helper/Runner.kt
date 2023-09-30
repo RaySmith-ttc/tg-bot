@@ -1,5 +1,6 @@
 package helper
 
+import io.ktor.client.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -45,6 +46,8 @@ import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.sticker.StickerType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApi2
+import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
@@ -59,10 +62,14 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
-val locations = true
+val locations = false
 inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
 
 var loc: String = "menu"
+
+val newApi = object : TelegramService2 {
+    override val client: HttpClient = TelegramApi2.defaultClient()
+}
 
 val datePicker = DatePicker("sys").apply {
 //    locale = Locale.forLanguageTag("us")
@@ -1388,6 +1395,26 @@ class Runner {
                                 }
                             }
                         }
+                    }
+
+                    isCommand("newApi") {
+                        println(getChatIdOrThrow())
+//                        newApi.sendPhoto(
+//                            getChatIdOrThrow(),
+//                            photo = "files/image1.png".asResources().asTgFile()
+//                        )
+//                        newApi.sendPhoto(
+//                            getChatIdOrThrow(),
+//                            photo = "files/image1.png".asResources().readBytes().asTgFile("image1.png", "image/png")
+//                        )
+//                        newApi.sendPhoto(
+//                            getChatIdOrThrow(),
+//                            photo = "AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()
+//                        )
+//                        newApi.sendPhoto(
+//                            getChatIdOrThrow(),
+//                            photo = "https://i.ibb.co/ZS7TT09/image.png".asTgFile()
+//                        )
                     }
                 }
 

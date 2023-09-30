@@ -28,6 +28,7 @@ import ru.raysmith.tgbot.utils.BotContextDsl
 import ru.raysmith.tgbot.utils.errorBody
 import java.time.ZonedDateTime
 
+// TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */
 interface BotContext<T : EventHandler> : ISender {
 
@@ -47,7 +48,7 @@ interface BotContext<T : EventHandler> : ISender {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param chatId Unique identifier for the target chat or username of the target channel
@@ -110,7 +111,7 @@ interface BotContext<T : EventHandler> : ISender {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
@@ -869,8 +870,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param entities A JSON-serialized list of special entities that appear in message text,
      * which can be specified instead of parseMode
      * @param disableWebPagePreview Disables link previews for links in this message
-     * @param replyMarkup A JSON-serialized object for an
-     * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     fun editMessageText(
         messageId: Int? = null,
@@ -900,8 +900,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param captionEntities A JSON-serialized list of special entities that appear in the caption,
      * which can be specified instead of parseMode
      * @param disableWebPagePreview Disables link previews for links in this message
-     * @param replyMarkup A JSON-serialized object for an
-     * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     fun editMessageCaption(
         messageId: Int? = null,
@@ -931,7 +930,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param media A JSON-serialized object for a new media content of the message
-     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     fun editMessageMedia(
         messageId: Int? = null,
@@ -953,7 +952,7 @@ interface BotContext<T : EventHandler> : ISender {
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
-     * @param replyMarkup A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating)
+     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     fun editMessageReplyMarkup(
         messageId: Int? = null,
@@ -1047,8 +1046,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to
      * message is not found
-     * @param replyMarkup A JSON-serialized object for an
-     * [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating).
+     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
     @Suppress("KDocUnresolvedReference")

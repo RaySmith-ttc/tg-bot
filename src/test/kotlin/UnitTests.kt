@@ -1,4 +1,4 @@
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
@@ -7,7 +7,6 @@ import ru.raysmith.tgbot.utils.buildMarkdownString
 import ru.raysmith.tgbot.utils.buildMarkdownV2String
 
 class UnitTests {
-    
     
     @Test
     fun formatHtmlString() {

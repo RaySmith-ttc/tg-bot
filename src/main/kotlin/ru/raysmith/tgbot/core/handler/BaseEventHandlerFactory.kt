@@ -20,7 +20,7 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
     private var messageHandler: (MessageHandler.() -> Unit)? = null
-    private var commandHandler: (CommandHandler.() -> Unit)? = null
+    private var commandHandler: (suspend CommandHandler.() -> Unit)? = null
     private var editedMessageHandler: (EditedMessageHandler.() -> Unit)? = null
     private var channelPostHandler: (ChannelPostHandler.() -> Unit)? = null
     private var editedChannelPostHandler: (EditedChannelPostHandler.() -> Unit)? = null
@@ -114,7 +114,7 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     }
 
     @HandlerDsl
-    fun handleCommand(handler: CommandHandler.() -> Unit) {
+    fun handleCommand(handler: suspend CommandHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         commandHandler = handler
     }

@@ -15,8 +15,10 @@ import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
+import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
@@ -80,6 +82,23 @@ interface ApiCaller {
         maxConnections?.toString()?.toRequestBody(), allowedUpdates?.toRequestBody(),
         dropPendingUpdates?.toString()?.toRequestBody(), secretToken?.toRequestBody()
     ).execute().body()?.result ?: errorBody()
+
+    fun sendPhoto(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        photo: String,
+        caption: String? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        parseMode: ParseMode? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null
+    ) = service.sendPhoto(
+        chatId, photo = photo
+    )
 
     // TODO link to getUpdates
     /**

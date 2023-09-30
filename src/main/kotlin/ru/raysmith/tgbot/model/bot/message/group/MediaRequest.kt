@@ -7,9 +7,15 @@ import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import java.nio.file.Files
 
+internal data class MultipartPartData(
+    val inputFile: InputFile, val name: String, val filename: String, val mimeType: String
+)
+
 abstract class MediaRequest {
 
+    internal val inputFiles = mutableListOf<InputFile>()
     protected val multipartBodyParts = mutableListOf<MultipartBody.Part>()
+
     private fun append(byteArray: ByteArray, name: String, filename: String, mimeType: String): String {
         val requestBody = byteArray.toRequestBody(mimeType.toMediaType())
         multipartBodyParts.add(MultipartBody.Part.createFormData(name, filename, requestBody))
@@ -25,6 +31,8 @@ abstract class MediaRequest {
             media.file.nameWithoutExtension,
             Files.probeContentType(media.file.toPath())
         )
+    }.also {
+        inputFiles.add(media)
     }
 
     protected fun getMedia(media: NotReusableInputFile, name: String? = null) = when (media) {
@@ -37,5 +45,7 @@ abstract class MediaRequest {
         )
 
         else -> error("ReusableMedia can be only a file or byte array")
+    }.also {
+        inputFiles.add(media as InputFile)
     }
 }

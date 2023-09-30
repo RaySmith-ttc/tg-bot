@@ -53,6 +53,7 @@ dependencies {
     // Logging
 //    implementation(libs.log4j.core)
     implementation("org.apache.logging.log4j:log4j:2.19.0")
+    implementation("io.ktor:ktor-client-logging-jvm:2.3.4")
 
     // Network
     val kotlinxSerializationVersion = "1.5.1"

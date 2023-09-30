@@ -47,13 +47,13 @@ interface TelegramService {
     @Multipart
     @POST("setWebhook")
     fun setWebhook(
-        @Part("url") url: RequestBody,
+        @Query("url") url: RequestBody,
         @Part certificate: MultipartBody.Part? = null,
-        @Part("ip_address") ipAddress: RequestBody? = null,
-        @Part("max_connections") maxConnections: RequestBody? = null,
-        @Part("allowed_updates") allowedUpdates: RequestBody? = null,
-        @Part("drop_pending_updates") dropPendingUpdates: RequestBody? = null,
-        @Part("secret_token") secretToken: RequestBody? = null,
+        @Query("ip_address") ipAddress: RequestBody? = null,
+        @Query("max_connections") maxConnections: RequestBody? = null,
+        @Query("allowed_updates") allowedUpdates: RequestBody? = null,
+        @Query("drop_pending_updates") dropPendingUpdates: RequestBody? = null,
+        @Query("secret_token") secretToken: RequestBody? = null,
     ): Call<NetworkResponse<Boolean>>
 
     @POST("deleteWebhook")
@@ -103,7 +103,7 @@ interface TelegramService {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * */
     @POST("sendMessage")
@@ -156,7 +156,7 @@ interface TelegramService {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param replyMarkup Additional interface options. A JSON-serialized object for an [inline keyboard](https://core.telegram.org/bots#inline-keyboards-and-on-the-fly-updating),
+     * @param replyMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * */
     @POST("copyMessage")
@@ -175,6 +175,23 @@ interface TelegramService {
         @Query("reply_markup") replyMarkup: KeyboardMarkup? = null
     ): Call<MessageIdResponse>
 
+    @Multipart
+    @POST("sendPhoto")
+    fun sendPhoto(
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
+        @Part photo: MultipartBody.Part,
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("has_spoiler") hasSpoiler: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
+    ): Call<MessageResponse>
+
     @POST("sendPhoto")
     fun sendPhoto(
         @Query("chat_id") chatId: ChatId,
@@ -189,23 +206,6 @@ interface TelegramService {
         @Query("reply_to_message_id") replyToMessageId: Int? = null,
         @Query("allow_sending_without_reply") allowSendingWithoutReply: Boolean? = null,
         @Query("reply_markup") keyboardMarkup: KeyboardMarkup? = null
-    ): Call<MessageResponse>
-
-    @Multipart
-    @POST("sendPhoto")
-    fun sendPhoto(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
-        @Part photo: MultipartBody.Part,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendAudio")
@@ -229,21 +229,21 @@ interface TelegramService {
     @Multipart
     @POST("sendAudio")
     fun sendAudio(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part audio: MultipartBody.Part,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("performer") performer: RequestBody? = null,
-        @Part("title") title: RequestBody? = null,
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("duration") duration: RequestBody? = null,
+        @Query("performer") performer: RequestBody? = null,
+        @Query("title") title: RequestBody? = null,
         @Part thumbnail: MultipartBody.Part? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendDocument")
@@ -265,19 +265,19 @@ interface TelegramService {
     @Multipart
     @POST("sendDocument")
     fun sendDocument(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part document: MultipartBody.Part,
         @Part thumbnail: MultipartBody.Part? = null,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("disable_content_type_detection") disableContentTypeDetection: RequestBody? = null, // TODO not using
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("disable_content_type_detection") disableContentTypeDetection: RequestBody? = null, // TODO not using
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendVideo")
@@ -303,45 +303,45 @@ interface TelegramService {
     @Multipart
     @POST("sendVideo")
     fun sendVideo(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part video: MultipartBody.Part,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("width") width: RequestBody? = null,
-        @Part("height") height: RequestBody? = null,
+        @Query("duration") duration: RequestBody? = null,
+        @Query("width") width: RequestBody? = null,
+        @Query("height") height: RequestBody? = null,
         @Part thumbnail: MultipartBody.Part? = null,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
-        @Part("supports_streaming") supportsStreaming: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("has_spoiler") hasSpoiler: RequestBody? = null,
+        @Query("supports_streaming") supportsStreaming: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @Multipart
     @POST("sendVideo")
     fun sendVideo(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
-        @Part("video") video: RequestBody,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("width") width: RequestBody? = null,
-        @Part("height") height: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("video") video: RequestBody,
+        @Query("duration") duration: RequestBody? = null,
+        @Query("width") width: RequestBody? = null,
+        @Query("height") height: RequestBody? = null,
         @Part thumbnail: MultipartBody.Part? = null,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
-        @Part("supports_streaming") supportsStreaming: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("has_spoiler") hasSpoiler: RequestBody? = null,
+        @Query("supports_streaming") supportsStreaming: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendAnimation")
@@ -367,22 +367,22 @@ interface TelegramService {
     @Multipart
     @POST("sendAnimation")
     fun sendAnimation(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part animation: MultipartBody.Part,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("width") width: RequestBody? = null,
-        @Part("height") height: RequestBody? = null,
+        @Query("duration") duration: RequestBody? = null,
+        @Query("width") width: RequestBody? = null,
+        @Query("height") height: RequestBody? = null,
         @Part thumbnail: MultipartBody.Part? = null,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("has_spoiler") hasSpoiler: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("has_spoiler") hasSpoiler: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendVoice")
@@ -404,18 +404,18 @@ interface TelegramService {
     @Multipart
     @POST("sendVoice")
     fun sendVoice(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part voice: MultipartBody.Part,
-        @Part("caption") caption: RequestBody? = null,
-        @Part("parse_mode") parseMode: RequestBody? = null,
-        @Part("caption_entities") captionEntities: RequestBody? = null,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("caption") caption: RequestBody? = null,
+        @Query("parse_mode") parseMode: RequestBody? = null,
+        @Query("caption_entities") captionEntities: RequestBody? = null,
+        @Query("duration") duration: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("sendVideoNote")
@@ -435,16 +435,16 @@ interface TelegramService {
     @Multipart
     @POST("sendVideoNote")
     fun sendVideoNote(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part videoNote: MultipartBody.Part,
-        @Part("duration") duration: RequestBody? = null,
-        @Part("length") length: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("duration") duration: RequestBody? = null,
+        @Query("length") length: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     /**
@@ -742,7 +742,7 @@ interface TelegramService {
     @Multipart
     @POST("setChatPhoto")
     fun setChatPhoto(
-        @Part("chat_id") chatId: RequestBody,
+        @Query("chat_id") chatId: RequestBody,
         @Part photo: MultipartBody.Part
     ): Call<NetworkResponse<Boolean>>
 
@@ -1045,15 +1045,15 @@ interface TelegramService {
     @Multipart
     @POST("sendSticker")
     fun sendSticker(
-        @Part("chat_id") chatId: RequestBody,
-        @Part("message_thread_id") messageThreadId: RequestBody? = null,
+        @Query("chat_id") chatId: RequestBody,
+        @Query("message_thread_id") messageThreadId: RequestBody? = null,
         @Part sticker: MultipartBody.Part,
-        @Part("emoji") emoji: RequestBody? = null,
-        @Part("disable_notification") disableNotification: RequestBody? = null,
-        @Part("protect_content") protectContent: RequestBody? = null,
-        @Part("reply_to_message_id") replyToMessageId: RequestBody? = null,
-        @Part("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
-        @Part("reply_markup") keyboardMarkup: RequestBody? = null
+        @Query("emoji") emoji: RequestBody? = null,
+        @Query("disable_notification") disableNotification: RequestBody? = null,
+        @Query("protect_content") protectContent: RequestBody? = null,
+        @Query("reply_to_message_id") replyToMessageId: RequestBody? = null,
+        @Query("allow_sending_without_reply") allowSendingWithoutReply: RequestBody? = null,
+        @Query("reply_markup") keyboardMarkup: RequestBody? = null
     ): Call<MessageResponse>
 
     @POST("getStickerSet")

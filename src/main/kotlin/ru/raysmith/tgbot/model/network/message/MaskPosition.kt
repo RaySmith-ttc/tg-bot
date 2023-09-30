@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// TODO duplicate class
 /** This object describes the position on faces where a mask should be placed by default. */
 @Serializable
 data class MaskPosition(
