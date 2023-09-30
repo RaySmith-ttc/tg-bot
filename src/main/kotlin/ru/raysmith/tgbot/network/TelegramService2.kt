@@ -2154,7 +2154,7 @@ interface TelegramService2 {
         sendPhoneNumberToProvider: Boolean? = null,
         sendEmailToProvider: Boolean? = null,
         isFlexible: Boolean? = null,
-    ) = request<String> {
+    ) = request<NetworkResponse<String>> {
         client.post("createInvoiceLink") {
             parameter("title", title)
             parameter("description", description)
@@ -2177,7 +2177,7 @@ interface TelegramService2 {
             parameter("send_email_to_provider", sendEmailToProvider)
             parameter("is_flexible", isFlexible)
         }
-    }
+    }.result
 
     private inline fun <reified T> HttpRequestBuilder.parameter(key: String, value: T?) {
         when {
