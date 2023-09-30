@@ -62,6 +62,7 @@ interface TelegramService2 {
                 T::class == String::class -> response.bodyAsText() as T
                 T::class == InputStream::class -> response.bodyAsChannel().toInputStream() as T
                 T::class == LiveLocationResponse::class -> response.body<T>()
+                T::class == NetworkResponse::class -> response.body<T>()
                 else -> response.body<NetworkResponse<T>>().result
             }
         } else if (response.status == HttpStatusCode.Unauthorized) {
@@ -1096,11 +1097,11 @@ interface TelegramService2 {
      * */
     suspend fun exportChatInviteLink(
         chatId: ChatId,
-    ) = request<String> {
+    ) = request<NetworkResponse<String>> {
         client.post("exportChatInviteLink") {
             parameter("chat_id", chatId)
         }
-    }
+    }.result
 
     /**
      * Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat
@@ -2185,8 +2186,11 @@ interface TelegramService2 {
             T::class == Long::class -> value?.also { url.parameters.append(key, it.toString()) }
             T::class == Boolean::class -> value?.also { url.parameters.append(key, it.toString()) }
             T::class == Duration::class -> value?.also { url.parameters.append(key, (it as Duration).inWholeSeconds.toString()) }
+            T::class.java.isEnum -> value?.let {
+                url.parameters.append(key, TelegramApi.json.encodeToString<T>(it).drop(1).dropLast(1))
+            }
             else -> {
-                value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) } ?: Unit
+                value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) }
             }
         }
     }
