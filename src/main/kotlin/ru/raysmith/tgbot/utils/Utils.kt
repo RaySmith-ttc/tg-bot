@@ -1,19 +1,17 @@
 package ru.raysmith.tgbot.utils
 
+import io.ktor.client.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.network.*
 
 // should never be called
 internal fun errorBody(): Nothing = throw NullPointerException("The method did not return a body")
@@ -24,10 +22,9 @@ internal fun KSerializer<*>.getPrimitive(element: JsonObject, field: String) =
 internal fun KSerializer<*>.getJsonObject(element: JsonObject, field: String) =
     element.jsonObject[field]?.jsonObject ?: fieldNotFound(field)
 
-fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.service, bot.fileService, withChatId)
-fun botContext(token: String, withChatId: ChatId? = null) = createBotContext(
-    TelegramApi.serviceWithToken(token), TelegramApi.fileServiceWithToken(token), withChatId
-)
+fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.client, withChatId)
+fun botContext(token: String, withChatId: ChatId? = null) =
+    createBotContext(TelegramApi2.defaultClient(token), withChatId)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -37,7 +34,7 @@ fun botContext(token: String, withChatId: ChatId? = null) = createBotContext(
  * */
 @BotContextDsl
 inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
-    botContext(bot.service, bot.fileService, withChatId, block)
+    botContext(bot.client, withChatId, block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -47,7 +44,7 @@ inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContex
  * */
 @BotContextDsl
 inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
-    botContext(TelegramApi.serviceWithToken(token), TelegramApi.fileServiceWithToken(token), withChatId, block)
+    botContext(TelegramApi2.defaultClient(token), withChatId, block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -57,21 +54,21 @@ inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotC
  * */
 @BotContextDsl
 inline fun <T> botContext(
-    service: TelegramService = TelegramApi.service, fileService: TelegramFileService = TelegramApi.fileService,
+    client: HttpClient = TelegramApi2.defaultClientInstance,
     withChatId: ChatId? = null,
     block: BotContext<UnknownEventHandler>.() -> T
-) = createBotContext(service, fileService, withChatId).let(block)
+) = createBotContext(client, withChatId).let(block)
 
 fun createBotContext(
-    service: TelegramService = TelegramApi.service, fileService: TelegramFileService = TelegramApi.fileService,
+    client: HttpClient = TelegramApi2.defaultClientInstance,
     withChatId: ChatId? = null,
 ) = object : BotContext<UnknownEventHandler> {
-    override val service: TelegramService = service
-    override val fileService: TelegramFileService = fileService
+    override val client: HttpClient
+        get() = TODO("Not yet implemented")
 
     override fun getChatId(): ChatId? = withChatId
-    override fun <R> withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> R): R {
-        return UnknownEventHandler(Update(-1), bot.service, bot.fileService).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
+        return UnknownEventHandler(Update(-1), client).block()
     }
 }
 
@@ -81,7 +78,10 @@ annotation class BotContextDsl
 internal fun noimpl(): Nothing = throw NotImplementedError()
 
 /**
- * Calls [getMe][ApiCaller.getMe] method for current bot in context and
- * returns sticker name with base [name] appended with `_by_<bot_username>`
+ * Returns sticker name with base [name] appended with `_by_<bot_username>`
+ *
+ * @param bot current bot for getting [Bot.me]. If it is null then [getMe][TelegramService2.getMe] was called
  * */
-fun <T : EventHandler> BotContext<T>.stickerSetName(name: String) = "${name}_by_${getMe().username}"
+// TODO can move me to the context?
+suspend fun <T : EventHandler> BotContext<T>.stickerSetName(name: String, bot: Bot? = null) =
+    "${name}_by_${bot?.me?.username ?: getMe().username}"

@@ -1,10 +1,7 @@
 package ru.raysmith.tgbot.core
 
-import kotlinx.serialization.encodeToString
+import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
-import ru.raysmith.tgbot.model.bot.BotDescription
-import ru.raysmith.tgbot.model.bot.BotName
-import ru.raysmith.tgbot.model.bot.BotShortDescription
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
@@ -14,18 +11,14 @@ import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
 import ru.raysmith.tgbot.model.network.chat.forum.IconColor
 import ru.raysmith.tgbot.model.network.chat.member.ChatMember
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.media.input.toRequestBody
+import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.sticker.Sticker
-import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.BotContextDsl
-import ru.raysmith.tgbot.utils.errorBody
 import java.time.ZonedDateTime
 
 // TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
@@ -34,7 +27,7 @@ interface BotContext<T : EventHandler> : ISender {
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl
-    fun <R> withBot(bot: Bot, block: BotContext<T>.() -> R): R
+    suspend fun <R> withBot(bot: Bot, block: suspend BotContext<T>.() -> R): R
 
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
@@ -53,7 +46,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun sendMessage(
+    suspend fun sendMessage(
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
@@ -66,10 +59,10 @@ interface BotContext<T : EventHandler> : ISender {
         messageThreadId: Int? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
-        return service.sendMessage(
+        return sendMessage(
             chatId, messageThreadId, text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
             replyToMessageId, allowSendingWithoutReply, keyboardMarkup
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -83,7 +76,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target channel
      *
      *  */
-    fun forwardMessage(
+    suspend fun forwardMessage(
         fromChatId: ChatId,
         messageThreadId: Int? = null,
         disableNotification: Boolean? = null,
@@ -91,8 +84,8 @@ interface BotContext<T : EventHandler> : ISender {
         messageId: Int,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
-        return service.forwardMessage(chatId, messageThreadId, fromChatId, disableNotification, protectContent, messageId)
-            .execute().body()?.result ?: errorBody()
+        return forwardMessage(chatId, messageThreadId, fromChatId, disableNotification, protectContent, messageId)
+
     }
 
     /**
@@ -115,8 +108,8 @@ interface BotContext<T : EventHandler> : ISender {
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-// TODO tests
-    fun copyMessage(
+
+    suspend fun copyMessage(
         fromChatId: ChatId,
         messageId: Int,
         messageThreadId: Int? = null,
@@ -129,12 +122,10 @@ interface BotContext<T : EventHandler> : ISender {
         allowSendingWithoutReply: Boolean? = null,
         keyboardMarkup: KeyboardMarkup? = null,
         chatId: ChatId = getChatIdOrThrow()
-    ): MessageId {
-        return service.copyMessage(
-            chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply, keyboardMarkup
-        ).execute().body()?.result ?: errorBody()
-    }
+    ) = copyMessage(
+        chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
+        replyToMessageId, allowSendingWithoutReply, keyboardMarkup
+    )
 
     /**
      * Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels,
@@ -151,14 +142,13 @@ interface BotContext<T : EventHandler> : ISender {
      * Always True for supergroups and channels.
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
-    fun banChatMember(
+    suspend fun banChatMember(
         userId: ChatId.ID,
-        untilDate: ZonedDateTime? = null,
+        untilDate: Until? = null,
         revokeMessages: Boolean? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.banChatMember(chatId, userId, untilDate?.toUnix(), revokeMessages).execute().body()?.result
-            ?: errorBody()
+        return banChatMember(chatId, userId, untilDate, revokeMessages)
     }
 
 
@@ -173,8 +163,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
      * */
-    fun unbanChatMember(userId: ChatId.ID, onlyIfBanned: Boolean, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unbanChatMember(chatId, userId, onlyIfBanned).execute().body()?.result ?: errorBody()
+    suspend fun unbanChatMember(userId: ChatId.ID, onlyIfBanned: Boolean, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return unbanChatMember(chatId, userId, onlyIfBanned)
     }
 
     /**
@@ -185,24 +175,23 @@ interface BotContext<T : EventHandler> : ISender {
      * @param userId Unique identifier of the target user
      * @param permissions New user permissions
      * @param useIndependentChatPermissions Pass *True* if chat permissions are set independently.
-     * Otherwise, the [ChatPermission.CAN_SEND_OTHER_MESSAGES] and [ChatPermission.CAN_ADD_WEB_PAGE_PREVIEWS]
-     * permissions will imply the [ChatPermission.CAN_SEND_MESSAGES], [ChatPermission.CAN_SEND_AUDIOS],
-     * [ChatPermission.CAN_SEND_DOCUMENTS], [ChatPermission.CAN_SEND_PHOTOS], [ChatPermission.CAN_SEND_VIDEOS],
-     * [ChatPermission.CAN_SEND_VIDEO_NOTES], and [ChatPermission.CAN_SEND_VOICE_NOTES] permissions;
-     * the [ChatPermission.CAN_SEND_POLLS] permission will imply the [ChatPermission.CAN_SEND_MESSAGES] permission.
+     * Otherwise, the [ChatPermissions.canSendOtherMessages] and [ChatPermissions.canAddWebPagePreviews]
+     * permissions will imply the [ChatPermissions.canSendMessages], [ChatPermissions.canSendAudios],
+     * [ChatPermissions.canSendDocuments], [ChatPermissions.canSendPhotos], [ChatPermissions.canSendVideos],
+     * [ChatPermissions.canSendVideoNotes], and [ChatPermissions.canSendVoiceNotes] permissions;
+     * the [ChatPermissions.canSendPolls] permission will imply the [ChatPermissions.canSendMessages] permission.
      * @param untilDate Date when restrictions will be lifted for the user. If user is restricted for more than
      * 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun restrictChatMember(
+    suspend fun restrictChatMember(
         userId: ChatId.ID,
         permissions: ChatPermissions,
         useIndependentChatPermissions: Boolean? = null,
-        untilDate: ZonedDateTime? = null,
+        untilDate: Until? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.restrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate?.toUnix()).execute().body()?.result
-            ?: errorBody()
+        return restrictChatMember(chatId, userId, permissions, useIndependentChatPermissions, untilDate)
     }
 
     /**
@@ -214,12 +203,12 @@ interface BotContext<T : EventHandler> : ISender {
      * @param administratorRights New administrator rights
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun promoteChatMember(
+    suspend fun promoteChatMember(
         userId: ChatId.ID,
         administratorRights: ChatAdministratorRights,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.promoteChatMember(
+        return promoteChatMember(
             chatId, userId,
             isAnonymous = administratorRights.isAnonymous,
             canManageChat = administratorRights.canManageChat,
@@ -236,7 +225,7 @@ interface BotContext<T : EventHandler> : ISender {
             canInviteUsers = administratorRights.canInviteUsers,
             canPinMessages = administratorRights.canPinMessages,
             canManageTopics = administratorRights.canManageTopics
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -247,13 +236,12 @@ interface BotContext<T : EventHandler> : ISender {
      * @param customTitle Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun setChatAdministratorCustomTitle(
+    suspend fun setChatAdministratorCustomTitle(
         userId: ChatId.ID,
         customTitle: String,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.setChatAdministratorCustomTitle(chatId, userId, customTitle).execute().body()?.result
-            ?: errorBody()
+        return setChatAdministratorCustomTitle(chatId, userId, customTitle)
     }
 
     /**
@@ -265,11 +253,11 @@ interface BotContext<T : EventHandler> : ISender {
      * @param senderChatId    Unique identifier of the target sender chat
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun banChatSenderChat(
+    suspend fun banChatSenderChat(
         senderChatId: ChatId.ID,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.banChatSenderChat(chatId, senderChatId).execute().body()?.result ?: errorBody()
+        return banChatSenderChat(chatId, senderChatId)
     }
 
     /**
@@ -280,11 +268,11 @@ interface BotContext<T : EventHandler> : ISender {
      * @param senderChatId Unique identifier of the target sender chat
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unbanChatSenderChat(
+    suspend fun unbanChatSenderChat(
         senderChatId: ChatId.ID,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.unbanChatSenderChat(chatId, senderChatId).execute().body()?.result ?: errorBody()
+        return unbanChatSenderChat(chatId, senderChatId)
     }
 
     /**
@@ -295,18 +283,18 @@ interface BotContext<T : EventHandler> : ISender {
      * @param permissions New default chat permissions
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * @param useIndependentChatPermissions Pass *True* if chat permissions are set independently.
-     * Otherwise, the [ChatPermission.CAN_SEND_OTHER_MESSAGES] and [ChatPermission.CAN_ADD_WEB_PAGE_PREVIEWS]
-     * permissions will imply the [ChatPermission.CAN_SEND_MESSAGES], [ChatPermission.CAN_SEND_AUDIOS],
-     * [ChatPermission.CAN_SEND_DOCUMENTS], [ChatPermission.CAN_SEND_PHOTOS], [ChatPermission.CAN_SEND_VIDEOS],
-     * [ChatPermission.CAN_SEND_VIDEO_NOTES], and [ChatPermission.CAN_SEND_VOICE_NOTES] permissions;
-     * the [ChatPermission.CAN_SEND_POLLS] permission will imply the [ChatPermission.CAN_SEND_MESSAGES] permission.
+     * Otherwise, the [ChatPermissions.canSendOtherMessages] and [ChatPermissions.canAddWebPagePreviews]
+     * permissions will imply the [ChatPermissions.canSendMessages], [ChatPermissions.canSendAudios],
+     * [ChatPermissions.canSendDocuments], [ChatPermissions.canSendPhotos], [ChatPermissions.canSendVideos],
+     * [ChatPermissions.canSendVideoNotes], and [ChatPermissions.canSendVoiceNotes] permissions;
+     * the [ChatPermissions.canSendPolls] permission will imply the [ChatPermissions.canSendMessages] permission.
      * */
-    fun setChatPermissions(
+    suspend fun setChatPermissions(
         permissions: ChatPermissions,
         chatId: ChatId = getChatIdOrThrow(),
         useIndependentChatPermissions: Boolean? = null
     ): Boolean {
-        return service.setChatPermissions(chatId, permissions, useIndependentChatPermissions).execute().body()?.result ?: errorBody()
+        return setChatPermissions(chatId, permissions, useIndependentChatPermissions)
     }
 
     /**
@@ -314,17 +302,13 @@ interface BotContext<T : EventHandler> : ISender {
      * is revoked. The bot must be an administrator in the chat for this to work and must have the appropriate
      * administrator rights. Returns the new invite link as String on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
-     *
      * > Note: Each administrator in a chat generates their own invite links. Bots can't use invite links generated
      * by other administrators. If you want your bot to work with invite links, it will need to generate its own link
      * using [exportChatInviteLink] or by calling the [getChat] method. If your bot needs to generate a new primary
      * invite link replacing its previous one, use [exportChatInviteLink] again.
      * */
-    fun exportChatInviteLink(
-        chatId: ChatId = getChatIdOrThrow()
-    ): String {
-        return service.exportChatInviteLink(chatId).execute().body()?.result ?: errorBody()
+    suspend fun exportChatInviteLink(): String {
+        return exportChatInviteLink(getChatIdOrThrow())
     }
 
     /**
@@ -340,15 +324,14 @@ interface BotContext<T : EventHandler> : ISender {
      * administrators. If *True*, _member_limit_ can't be specified
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun createChatInviteLink(
+    suspend fun createChatInviteLink(
         name: String? = null,
         expireDate: ZonedDateTime? = null,
         memberLimit: Int? = null,
         createsJoinRequest: Boolean? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): ChatInviteLink {
-        return service.createChatInviteLink(chatId, name, expireDate?.toUnix(), memberLimit, createsJoinRequest)
-            .execute().body()?.result ?: errorBody()
+        return createChatInviteLink(chatId, name, expireDate, memberLimit, createsJoinRequest)
     }
 
     /**
@@ -365,7 +348,7 @@ interface BotContext<T : EventHandler> : ISender {
      * administrators. If *True*, _member_limit_ can't be specified
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun editChatInviteLink(
+    suspend fun editChatInviteLink(
         inviteLink: String,
         name: String? = null,
         expireDate: ZonedDateTime? = null,
@@ -373,14 +356,7 @@ interface BotContext<T : EventHandler> : ISender {
         createsJoinRequest: Boolean? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): ChatInviteLink {
-        return service.editChatInviteLink(
-            chatId,
-            inviteLink,
-            name,
-            expireDate?.toUnix(),
-            memberLimit,
-            createsJoinRequest
-        ).execute().body()?.result ?: errorBody()
+        return editChatInviteLink(chatId, inviteLink, name, expireDate, memberLimit, createsJoinRequest)
     }
 
     /**
@@ -391,8 +367,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param inviteLink The invite link to revoke
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun revokeChatInviteLink(inviteLink: String, chatId: ChatId = getChatIdOrThrow()): ChatInviteLink {
-        return service.revokeChatInviteLink(chatId, inviteLink).execute().body()?.result ?: errorBody()
+    suspend fun revokeChatInviteLink(inviteLink: String, chatId: ChatId = getChatIdOrThrow()): ChatInviteLink {
+        return revokeChatInviteLink(chatId, inviteLink)
     }
 
     /**
@@ -402,8 +378,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun approveChatJoinRequest(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.approveChatJoinRequest(chatId, userId).execute().body()?.result ?: errorBody()
+    suspend fun approveChatJoinRequest(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return approveChatJoinRequest(chatId, userId)
     }
 
     /**
@@ -413,8 +389,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun declineChatJoinRequest(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.declineChatJoinRequest(chatId, userId).execute().body()?.result ?: errorBody()
+    suspend fun declineChatJoinRequest(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return declineChatJoinRequest(chatId, userId)
     }
 
     /**
@@ -425,23 +401,17 @@ interface BotContext<T : EventHandler> : ISender {
      * @param photo New chat photo
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatPhoto(photo: InputFile, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return when (photo) {
-            is InputFile.FileIdOrUrl -> error("setChatPhoto method supports only File and ByteArray of InputFile")
-            else -> service.setChatPhoto(chatId.toRequestBody(), photo.toRequestBody("photo")).execute().body()?.result
-                ?: errorBody()
-        }
+    suspend fun setChatPhoto(photo: NotReusableInputFile, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return setChatPhoto(chatId, photo)
     }
 
     /**
      * Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an
      * administrator in the chat for this to work and must have the appropriate administrator rights.
      * Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun deleteChatPhoto(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.deleteChatPhoto(chatId).execute().body()?.result ?: errorBody()
+    suspend fun deleteChatPhoto(): Boolean {
+        return deleteChatPhoto(getChatIdOrThrow())
     }
 
     /**
@@ -452,8 +422,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param title New chat title, 1-255 characters
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatTitle(title: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.setChatTitle(chatId, title).execute().body()?.result ?: errorBody()
+    suspend fun setChatTitle(title: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return setChatTitle(chatId, title)
     }
 
     /**
@@ -464,8 +434,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param description New chat description, 0-255 characters
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatDescription(description: String?, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.setChatDescription(chatId, description).execute().body()?.result ?: errorBody()
+    suspend fun setChatDescription(description: String?, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return setChatDescription(chatId, description)
     }
 
     /**
@@ -478,12 +448,12 @@ interface BotContext<T : EventHandler> : ISender {
      * about the new pinned message. Notifications are always disabled in channels and private chats.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun pinChatMessage(
+    suspend fun pinChatMessage(
         messageId: Int,
         disableNotification: Boolean? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.pinChatMessage(chatId, messageId, disableNotification).execute().body()?.result ?: errorBody()
+        return pinChatMessage(chatId, messageId, disableNotification)
     }
 
     /**
@@ -496,8 +466,8 @@ interface BotContext<T : EventHandler> : ISender {
      * If not specified, the most recent pinned message (by sending date) will be unpinned.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unpinChatMessage(messageId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unpinChatMessage(chatId, messageId).execute().body()?.result ?: errorBody()
+    suspend fun unpinChatMessage(messageId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return unpinChatMessage(chatId, messageId)
     }
 
     /**
@@ -508,17 +478,15 @@ interface BotContext<T : EventHandler> : ISender {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unpinAllChatMessages(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unpinAllChatMessages(chatId).execute().body()?.result ?: errorBody()
+    suspend fun unpinAllChatMessages(): Boolean {
+        return unpinAllChatMessages(getChatIdOrThrow())
     }
 
     /**
      * Use this method for your bot to leave a group, supergroup or channel. Returns *True* on success.
-     *
-     * @param chatId identifier for the target chat or username of the target channel
      * */
-    fun leaveChat(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.leaveChat(chatId).execute().body()?.result ?: errorBody()
+    suspend fun leaveChat(): Boolean {
+        return leaveChat(getChatIdOrThrow())
     }
 
     // TODO docs
@@ -526,28 +494,22 @@ interface BotContext<T : EventHandler> : ISender {
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
      * Returns a [Chat] object on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChat() = getChat(getChatIdOrThrow())
+    suspend fun getChat() = getChat(getChatIdOrThrow())
 
     /**
      * Use this method to get a list of administrators in a chat, which aren't bots.
      * Returns an Array of [ChatMember] objects.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatAdministrators(chatId: ChatId = getChatIdOrThrow()): List<ChatMember> {
-        return service.getChatAdministrators(chatId).execute().body()?.result ?: errorBody()
+    suspend fun getChatAdministrators(): List<ChatMember> {
+        return getChatAdministrators(getChatIdOrThrow())
     }
 
     /**
      * Use this method to get the number of members in a chat. Returns _Int_ on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatMemberCount(chatId: ChatId = getChatIdOrThrow()): Int {
-        return service.getChatMemberCount(chatId).execute().body()?.result ?: errorBody()
+    suspend fun getChatMemberCount(): Int {
+        return getChatMemberCount(getChatIdOrThrow())
     }
 
     /**
@@ -556,8 +518,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatMember(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): ChatMember {
-        return service.getChatMember(chatId, userId).execute().body()?.result ?: errorBody()
+    suspend fun getChatMember(userId: ChatId.ID, chatId: ChatId = getChatIdOrThrow()): ChatMember {
+        return getChatMember(chatId, userId)
     }
 
     /**
@@ -569,8 +531,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param stickerSetName Name of the sticker set to be set as the group sticker set
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatStickerSet(stickerSetName: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.setChatStickerSet(chatId, stickerSetName).execute().body()?.result ?: errorBody()
+    suspend fun setChatStickerSet(stickerSetName: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return setChatStickerSet(chatId, stickerSetName)
     }
 
     /**
@@ -578,16 +540,9 @@ interface BotContext<T : EventHandler> : ISender {
      * in the chat for this to work and must have the appropriate administrator rights.
      * Use the field [*canSetStickerSet*][Chat.canSetStickerSet] optionally returned in [getChat] requests to check
      * if the bot can use this method. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun deleteChatStickerSet(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.deleteChatStickerSet(chatId).execute().body()?.result ?: errorBody()
-    }
-
-    /** Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user. */
-    fun getForumTopicIconStickers(): List<Sticker> {
-        return service.getForumTopicIconStickers().execute().body()?.result ?: errorBody()
+    suspend fun deleteChatStickerSet(): Boolean {
+        return deleteChatStickerSet(getChatIdOrThrow())
     }
 
     /**
@@ -602,12 +557,11 @@ interface BotContext<T : EventHandler> : ISender {
      * @param iconCustomEmojiId Unique identifier of the custom emoji shown as the topic icon.
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * */
-    fun createForumTopic(
+    suspend fun createForumTopic(
         name: String, iconColor: IconColor? = null, iconCustomEmojiId: String? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): ForumTopic {
-        return service.createForumTopic(chatId, name, iconColor, iconCustomEmojiId).execute().body()?.result
-            ?: errorBody()
+        return createForumTopic(chatId, name, iconColor, iconCustomEmojiId)
     }
 
     /**
@@ -624,12 +578,11 @@ interface BotContext<T : EventHandler> : ISender {
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * ass an empty string to remove the icon. If not specified, the current icon will be kept
      * */
-    fun editForumTopic(
+    suspend fun editForumTopic(
         messageThreadId: Int, name: String? = null, iconCustomEmojiId: String? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return service.editForumTopic(chatId, messageThreadId, name, iconCustomEmojiId).execute().body()?.result
-            ?: errorBody()
+        return editForumTopic(chatId, messageThreadId, name, iconCustomEmojiId)
     }
 
     /**
@@ -641,9 +594,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun closeForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.closeForumTopic(chatId, messageThreadId).execute().body()?.result
-            ?: errorBody()
+    suspend fun closeForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return closeForumTopic(chatId, messageThreadId)
     }
 
     /**
@@ -655,9 +607,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun reopenForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.reopenForumTopic(chatId, messageThreadId).execute().body()?.result
-            ?: errorBody()
+    suspend fun reopenForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return reopenForumTopic(chatId, messageThreadId)
     }
 
     /**
@@ -668,9 +619,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun deleteForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.deleteForumTopic(chatId, messageThreadId).execute().body()?.result
-            ?: errorBody()
+    suspend fun deleteForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return deleteForumTopic(chatId, messageThreadId)
     }
 
     /**
@@ -682,9 +632,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun unpinAllForumTopicMessages(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unpinAllForumTopicMessages(chatId, messageThreadId).execute().body()?.result
-            ?: errorBody()
+    suspend fun unpinAllForumTopicMessages(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return unpinAllForumTopicMessages(chatId, messageThreadId)
     }
 
     /**
@@ -695,21 +644,18 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param name New topic name, 1-128 characters
      * */
-    fun editGeneralForumTopic(name: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.editGeneralForumTopic(chatId, name).execute().body()?.result
-            ?: errorBody()
+    suspend fun editGeneralForumTopic(name: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return editGeneralForumTopic(chatId, name)
     }
 
     /**
      * Use this method to close an open 'General' topic in a forum supergroup chat.
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
+
      * */
-    fun closeGeneralForumTopic(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.closeGeneralForumTopic(chatId).execute().body()?.result
-            ?: errorBody()
+    suspend fun closeGeneralForumTopic(): Boolean {
+        return closeGeneralForumTopic(getChatIdOrThrow())
     }
 
     /**
@@ -717,12 +663,10 @@ interface BotContext<T : EventHandler> : ISender {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights.
      * The topic will be automatically unhidden if it was hidden. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
+
      * */
-    fun reopenGeneralForumTopic(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.reopenGeneralForumTopic(chatId).execute().body()?.result
-            ?: errorBody()
+    suspend fun reopenGeneralForumTopic(): Boolean {
+        return reopenGeneralForumTopic(getChatIdOrThrow())
     }
 
     /**
@@ -730,12 +674,9 @@ interface BotContext<T : EventHandler> : ISender {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights.
      * The topic will be automatically closed if it was open. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun hideGeneralForumTopic(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.hideGeneralForumTopic(chatId).execute().body()?.result
-            ?: errorBody()
+    suspend fun hideGeneralForumTopic(): Boolean {
+        return hideGeneralForumTopic(getChatIdOrThrow())
     }
 
     /**
@@ -743,12 +684,9 @@ interface BotContext<T : EventHandler> : ISender {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights.
      * The topic will be automatically closed if it was open. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun unhideGeneralForumTopic(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unhideGeneralForumTopic(chatId).execute().body()?.result
-            ?: errorBody()
+    suspend fun unhideGeneralForumTopic(): Boolean {
+        return unhideGeneralForumTopic(getChatIdOrThrow())
     }
 
     /**
@@ -756,81 +694,9 @@ interface BotContext<T : EventHandler> : ISender {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights.
      * The topic will be automatically closed if it was open. Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun unpinAllGeneralForumTopicMessages(chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.unpinAllGeneralForumTopicMessages(chatId).execute().body()?.result
-            ?: errorBody()
-    }
-
-    // TODO missed answerCallbackQuery
-
-    /**
-     * Use this method to change the bot's name. Returns *True* on success.
-     *
-     * @param name New bot name; 0-64 characters.
-     * Pass an empty string to remove the dedicated name for the given language.
-     * @param languageCode A two-letter ISO 639-1 language code. If empty, the name will be shown to all
-     * users for whose language there is no dedicated name.
-     * */
-    fun setMyName(name: String?, languageCode: String?): Boolean {
-        return service.setMyName(name, languageCode).execute().body()?.result ?: errorBody()
-    }
-
-    /**
-     * Use this method to get the current bot name for the given user language. Returns [BotName] on success.
-     *
-     * @param languageCode A two-letter ISO 639-1 language code or an empty string
-     * */
-    fun getMyName(languageCode: String?): BotName {
-        return service.getMyName(languageCode).execute().body()?.result ?: errorBody()
-    }
-
-    /**
-     * Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty.
-     * Returns *True* on success.
-     *
-     * @param description New bot description; 0-512 characters.
-     * Pass an empty string to remove the dedicated description for the given language.
-     * @param languageCode A two-letter ISO 639-1 language code.
-     * If empty, the description will be applied to all users for whose language there is no dedicated description.
-     * */
-    fun setMyDescription(description: String?, languageCode: String?): Boolean {
-        return service.setMyDescription(description, languageCode).execute().body()?.result ?: errorBody()
-    }
-
-    /**
-     * Use this method to get the current bot description for the given user language.
-     * Returns [BotDescription] on success.
-     *
-     * @param languageCode A two-letter ISO 639-1 language code or an empty string
-     * */
-    fun getMyDescription(languageCode: String?): BotDescription {
-        return service.getMyDescription(languageCode).execute().body()?.result ?: errorBody()
-    }
-
-    /**
-     * Use this method to change the bot's short description, which is shown on the bot's profile page and is sent
-     * together with the link when users share the bot. Returns *True* on success.
-     *
-     * @param shortDescription New short description for the bot; 0-120 characters.
-     * Pass an empty string to remove the dedicated short description for the given language.
-     * @param languageCode A two-letter ISO 639-1 language code. If empty,
-     * the short description will be applied to all users for whose language there is no dedicated short description.
-     * */
-    fun setMyShortDescription(shortDescription: String?, languageCode: String?): Boolean {
-        return service.setMyShortDescription(shortDescription, languageCode).execute().body()?.result ?: errorBody()
-    }
-
-    /**
-     * UUse this method to get the current bot short description for the given user language.
-     * Returns [BotShortDescription] on success.
-     *
-     * @param languageCode A two-letter ISO 639-1 language code or an empty string
-     * */
-    fun getMyShortDescription(languageCode: String?): BotShortDescription {
-        return service.getMyShortDescription(languageCode).execute().body()?.result ?: errorBody()
+    suspend fun unpinAllGeneralForumTopicMessages(): Boolean {
+        return unpinAllGeneralForumTopicMessages(getChatIdOrThrow())
     }
 
     /**
@@ -841,20 +707,8 @@ interface BotContext<T : EventHandler> : ISender {
      * If not specified, default bot's menu button will be changed
      * @param menuButton [MenuButton] object for the bot's new menu button. Defaults to [MenuButtonDefault]
      * */
-    fun setChatMenuButton(menuButton: MenuButton? = null, chatId: ChatId? = null): Boolean {
-        return service.setChatMenuButton(chatId, TelegramApi.json.encodeToString(menuButton)).execute().body()?.result
-            ?: errorBody()
-    }
-
-    /**
-     * Use this method to change the bot's menu button in a private chat, or the default menu button.
-     * Returns *True* on Success.
-     *
-     * @param chatId Unique identifier for the target private chat.
-     * If not specified, default bot's menu button will be returned
-     * */
-    fun getChatMenuButton(chatId: ChatId? = null): MenuButton {
-        return service.getChatMenuButton(chatId).execute().body()?.result ?: errorBody()
+    suspend fun setChatMenuButton(menuButton: MenuButton? = null, chatId: ChatId? = null): Boolean {
+        return setChatMenuButton(chatId, menuButton)
     }
 
     /**
@@ -872,7 +726,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param disableWebPagePreview Disables link previews for links in this message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageText(
+    suspend fun editMessageText(
         messageId: Int? = null,
         inlineMessageId: String? = null,
         text: String,
@@ -882,9 +736,9 @@ interface BotContext<T : EventHandler> : ISender {
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId? = getChatIdOrThrow()
     ): Message {
-        return service.editMessageText(
+        return editMessageText(
             chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview, replyMarkup
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -902,7 +756,7 @@ interface BotContext<T : EventHandler> : ISender {
      * @param disableWebPagePreview Disables link previews for links in this message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageCaption(
+    suspend fun editMessageCaption(
         messageId: Int? = null,
         inlineMessageId: String? = null,
         caption: String,
@@ -912,9 +766,9 @@ interface BotContext<T : EventHandler> : ISender {
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
-        return service.editMessageCaption(
+        return editMessageCaption(
             chatId, messageId, inlineMessageId, caption, parseMode, captionEntities, replyMarkup
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -932,16 +786,16 @@ interface BotContext<T : EventHandler> : ISender {
      * @param media A JSON-serialized object for a new media content of the message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageMedia(
+    suspend fun editMessageMedia(
         messageId: Int? = null,
         inlineMessageId: String? = null,
         media: InputMedia,
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
-        return service.editMessageMedia(
+        return editMessageMedia(
             chatId, messageId, inlineMessageId, media, replyMarkup
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -954,15 +808,15 @@ interface BotContext<T : EventHandler> : ISender {
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageReplyMarkup(
+    suspend fun editMessageReplyMarkup(
         messageId: Int? = null,
         inlineMessageId: String? = null,
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
-        return service.editMessageReplyMarkup(
+        return editMessageReplyMarkup(
             chatId, messageId, inlineMessageId, replyMarkup
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 
     /**
@@ -972,13 +826,13 @@ interface BotContext<T : EventHandler> : ISender {
      * @param messageId Identifier of the original message with the poll
      * @param keyboard [MessageInlineKeyboard] builder for a new message inline keyboard.
      * */
-    fun stopPoll(
+    suspend fun stopPoll(
         messageId: Int,
         chatId: ChatId = getChatIdOrThrow(),
         keyboard: MessageInlineKeyboard.() -> Unit
     ): Poll {
         val replyMarkup = buildInlineKeyboard(keyboard).toMarkup()
-        return service.stopPoll(chatId, messageId, replyMarkup).execute().body()?.result ?: errorBody()
+        return stopPoll(chatId, messageId, replyMarkup)
     }
 
     /**
@@ -997,8 +851,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageId Identifier of the message to delete
      * */
-    fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.deleteMessage(chatId, messageId).execute().body()?.result ?: errorBody()
+    suspend fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return deleteMessage(chatId, messageId)
     }
 
     /**
@@ -1050,8 +904,8 @@ interface BotContext<T : EventHandler> : ISender {
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
     @Suppress("KDocUnresolvedReference")
-    fun sendInvoice(chatId: ChatId = this.getChatIdOrThrow(), buildAction: InvoiceSender.() -> Unit): Message {
-        return InvoiceSender(service, fileService).apply(buildAction).send(chatId).result
+    suspend fun sendInvoice(chatId: ChatId = getChatIdOrThrow(), buildAction: InvoiceSender.() -> Unit): Message {
+        return InvoiceSender(client).apply(buildAction).send(chatId)
     }
 
     /**
@@ -1091,8 +945,8 @@ interface BotContext<T : EventHandler> : ISender {
      * @param isFlexible Pass *True*, if the final price depends on the shipping method
      * */
     @Suppress("KDocUnresolvedReference")
-    fun createInvoiceLink(buildAction: InvoiceCreateLinkSender.() -> Unit): String {
-        return InvoiceCreateLinkSender(service, fileService).apply(buildAction).send().result
+    suspend fun createInvoiceLink(buildAction: InvoiceCreateLinkSender.() -> Unit): String {
+        return InvoiceCreateLinkSender(client).apply(buildAction).send()
     }
 }
 

@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
@@ -11,8 +12,8 @@ import ru.raysmith.tgbot.network.TelegramService
 @HandlerDsl
 class UnknownEventHandler(
     val update: Update,
-    override val service: TelegramService, override val fileService: TelegramFileService,
-    val handler: UnknownEventHandler.() -> Unit = {}
+    override val client: HttpClient,
+    val handler: suspend UnknownEventHandler.() -> Unit = {}
 ) : EventHandler, BotContext<UnknownEventHandler> {
     override suspend fun handle() = handler()
     override fun getChatId() = update.findChatId()
@@ -20,7 +21,7 @@ class UnknownEventHandler(
     override var messageId = update.message?.messageId
     override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
-    override fun <R> withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> R): R {
-        return UnknownEventHandler(update, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
+        return UnknownEventHandler(update, client, handler).block()
     }
 }

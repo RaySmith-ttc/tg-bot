@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
 interface ICallbackHandler {
 
     /** Call [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) method without additional parameters */
-    fun answer() = answer {  }
+    suspend fun answer() = answer {  }
 
     /** Call [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) with build parameters */
-    fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean
+    suspend fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean
 }

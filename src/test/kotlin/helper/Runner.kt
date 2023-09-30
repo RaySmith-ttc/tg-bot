@@ -43,7 +43,6 @@ import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
-import ru.raysmith.tgbot.model.network.sticker.StickerType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApi2
@@ -59,11 +58,10 @@ import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
 import java.time.LocalDate
-import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 val locations = false
-inline fun <reified T> T.toJson() = Json(Json) { prettyPrint = true }.encodeToString(this)
+inline fun <reified T> T.toJson() = Json(TelegramApi2.json) { prettyPrint = true }.encodeToString(this)
 
 var loc: String = "menu"
 
@@ -106,7 +104,7 @@ val datePicker = DatePicker("sys").apply {
     additionalRowsVisibleOnStates = setOf(DatePickerState.DAY, DatePickerState.YEAR)
 }
 
-fun MessageText.setupTestMessage(message: Message) {
+suspend fun MessageText.setupTestMessage(message: Message) {
     text("text").n()
     underline("Hello").n()
     bold("Phone: ").phoneNumber("+79876543210").n()
@@ -133,7 +131,7 @@ class Runner {
 
     val CALLBACK_PREFIX = "cb_"
 
-    fun ISender.sendMain() {
+    suspend fun ISender.sendMain() {
 
         send {
             text = "main"
@@ -153,7 +151,7 @@ class Runner {
 
     }
 
-    fun CallbackQueryHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
+    suspend fun CallbackQueryHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
 
         val keyboard = buildInlineKeyboard {
             row {
@@ -198,7 +196,7 @@ class Runner {
                         println("${it.type}: ${it.toJson()}")
                     }
                 }.config {
-                    this.locale = Locale.JAPAN
+//                    this.locale = Locale.JAPAN
                 }
                 .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
@@ -226,183 +224,184 @@ class Runner {
                     updateLocation {
                         loc = it.name
                     }
-                    
+
                     filter { true }
-                    
+
+                    // compiler bug; fixed in 2.0-beta1
                     global {
-                        handleMyChatMember {
-                            send(update.findChatId()!!) {
-                                text = update.findChatId()!!.toString()
-                            }
-                        }
-                        handleCommand {
-                            isCommand(ru.raysmith.tgbot.model.bot.BotCommand.START) {
-                                send {
-                                    text = "test"
-                                    inlineKeyboard {
-                                        row("asd", "asd")
-                                    }
-                                }
-                            }
-                            isCommand("menu") {
-                                toLocation("menu")
-                            }
-                            isCommand("other") {
-                                toLocation("other")
-                            }
-                            isCommand("poll") {
-                                toLocation("poll")
-                            }
-
-                            val me = withBot(bot) {
-                                getMe()
-                            }
-                        }
-
-                        handleEditedMessage {
-                            println("Message was edit")
-                        }
-
-                        handleChannelPost {
-                            println(channelPost)
-                        }
-
-                        handleEditedChannelPost {
-                            println(channelPost)
-                        }
-
-                        handleCallbackQuery(alwaysAnswer = true) {
-                            println("handleCallbackQuery [global]")
-                        }
-                        
-                        handleMessage {
-                            send {
-                                text = "test"
-                                inlineKeyboard {
-                                    row("asd", "asd")
-                                }
-                            }
-                        }
-                    }
-                    
-                    location("menu") {
-                        onEnter {
-                            send {
-                                text = "in menu"
-                                inlineKeyboard {
-                                    row("dont do anything", "fv932mdcl")
-                                }
-                            }
-                        }
-                        
-                        handle {
-                            handleCommand {
-                                isCommand("menu") {
-                                    send("menu")
-                                }
-                                
-                                isCommand("toother") {
-                                    foo = "changed"
-                                    toLocation("other")
-                                }
-                            }
-                            
-                            handleMessage {
-                                send("handled in $name")
-                            }
-
-                            handleCallbackQuery(alwaysAnswer = false) {
-                                println("handleCallbackQuery [menu]")
-                            }
-                            
-                            handleUnknown {
-                                send("unknown")
-                            }
-                        }
-                        
-                    }
-                    
-                    location("other") {
-                        onEnter {
-                            send("in other\nfoo:${foo}")
-                        }
-                        
-                        handle {
-                            handleCommand {
-                                isCommand("repeat") {
-                                    toLocation("other")
-                                }
-                                isCommand("other") {
-                                    send("other")
-                                }
-                                isCommand("tomenu") {
-                                    toLocation("menu")
-                                }
-                                isCommand("dp") {
-                                    send {
-                                        text = "dp"
-                                        inlineKeyboard {
-                                            createDatePicker(datePicker)
-                                        }
-                                    }
-                                }
-                            }
-
-                            handleEditedMessage {
-                                println("Message was edit in other")
-                            }
-                            
-                            handleMessage {
-                                send("handled in $name")
-
-                                messageText()
-                                    .verify { it.contains(".") }
-                                    .convert { it.toFloatOrNull() }
-                                    .verify { it > 0.0 }
-                                    .use {
-                                        send("value: $it")
-                                    } ?: send("incorrect")
-                            }
-
-//                        handleCallbackQuery {
-//                            datePickerResult(datePicker) {
-//                                send("result: $it")
+//                        handleMyChatMember {
+//                            send(update.findChatId()!!) {
+//                                text = update.findChatId()!!.toString()
 //                            }
 //                        }
-                        }
+//                        handleCommand {
+//                            isCommand(ru.raysmith.tgbot.model.bot.BotCommand.START) {
+//                                send {
+//                                    text = "test"
+//                                    inlineKeyboard {
+//                                        row("asd", "asd")
+//                                    }
+//                                }
+//                            }
+//                            isCommand("menu") {
+//                                toLocation("menu")
+//                            }
+//                            isCommand("other") {
+//                                toLocation("other")
+//                            }
+//                            isCommand("poll") {
+//                                toLocation("poll")
+//                            }
+//
+//                            val me = withBot(bot) {
+//                                getMe()
+//                            }
+//                        }
+//
+//                        handleEditedMessage {
+//                            println("Message was edit")
+//                        }
+//
+//                        handleChannelPost {
+//                            println(channelPost)
+//                        }
+//
+//                        handleEditedChannelPost {
+//                            println(channelPost)
+//                        }
+//
+//                        handleCallbackQuery(alwaysAnswer = true) {
+//                            println("handleCallbackQuery [global]")
+//                        }
+//
+//                        handleMessage {
+//                            send {
+//                                text = "test"
+//                                inlineKeyboard {
+//                                    row("asd", "asd")
+//                                }
+//                            }
+//                        }
                     }
-
-                    location("poll") {
-                        onEnter {
-                            val poll = sendPoll("Question", listOf("1", "2", "3")) {
-                                isAnonymous = false
-                                type = PollType.QUIZ
-                                correctOptionId = 0
-                                explanationWithEntities {
-                                    bold("Expl: ").text("Wrong answer")
-                                }
-                                openPeriod = 10
-                                inlineKeyboard {
-                                    row("Button", "btn")
-                                }
-                            }
-
-                            runBlocking { delay(5000) }
-                            stopPoll(poll.messageId) {
-                                row("New button", "btn")
-                            }
-                        }
-
-                        handle {
-                            handlePoll {
-                                println("Receive poll #${poll.id}")
-                            }
-
-                            handlePollAnswer {
-                                println("Receive poll answer: ${pollAnswer.optionIds}")
-                            }
-                        }
-                    }
+//
+//                    location("menu") {
+//                        onEnter {
+//                            send {
+//                                text = "in menu"
+//                                inlineKeyboard {
+//                                    row("dont do anything", "fv932mdcl")
+//                                }
+//                            }
+//                        }
+//
+//                        handle {
+//                            handleCommand {
+//                                isCommand("menu") {
+//                                    send("menu")
+//                                }
+//
+//                                isCommand("toother") {
+//                                    foo = "changed"
+//                                    toLocation("other")
+//                                }
+//                            }
+//
+//                            handleMessage {
+//                                send("handled in $name")
+//                            }
+//
+//                            handleCallbackQuery(alwaysAnswer = false) {
+//                                println("handleCallbackQuery [menu]")
+//                            }
+//
+//                            handleUnknown {
+//                                send("unknown")
+//                            }
+//                        }
+//
+//                    }
+//
+//                    location("other") {
+//                        onEnter {
+//                            send("in other\nfoo:${foo}")
+//                        }
+//
+//                        handle {
+//                            handleCommand {
+//                                isCommand("repeat") {
+//                                    toLocation("other")
+//                                }
+//                                isCommand("other") {
+//                                    send("other")
+//                                }
+//                                isCommand("tomenu") {
+//                                    toLocation("menu")
+//                                }
+//                                isCommand("dp") {
+//                                    send {
+//                                        text = "dp"
+//                                        inlineKeyboard {
+//                                            createDatePicker(datePicker)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//
+//                            handleEditedMessage {
+//                                println("Message was edit in other")
+//                            }
+//
+//                            handleMessage {
+//                                send("handled in $name")
+//
+//                                messageText()
+//                                    .verify { it.contains(".") }
+//                                    .convert { it.toFloatOrNull() }
+//                                    .verify { it > 0.0 }
+//                                    .use {
+//                                        send("value: $it")
+//                                    } ?: send("incorrect")
+//                            }
+//
+////                        handleCallbackQuery {
+////                            datePickerResult(datePicker) {
+////                                send("result: $it")
+////                            }
+////                        }
+//                        }
+//                    }
+//
+//                    location("poll") {
+//                        onEnter {
+//                            val poll = sendPoll("Question", listOf("1", "2", "3")) {
+//                                isAnonymous = false
+//                                type = PollType.QUIZ
+//                                correctOptionId = 0
+//                                explanationWithEntities {
+//                                    bold("Expl: ").text("Wrong answer")
+//                                }
+//                                openPeriod = 10
+//                                inlineKeyboard {
+//                                    row("Button", "btn")
+//                                }
+//                            }
+//
+//                            runBlocking { delay(5000) }
+//                            stopPoll(poll.messageId) {
+//                                row("New button", "btn")
+//                            }
+//                        }
+//
+//                        handle {
+//                            handlePoll {
+//                                println("Receive poll #${poll.id}")
+//                            }
+//
+//                            handlePollAnswer {
+//                                println("Receive poll answer: ${pollAnswer.optionIds}")
+//                            }
+//                        }
+//                    }
                 }
             }
             
@@ -528,17 +527,17 @@ class Runner {
                 handleCommand {
                     if (!command.mentionIsCurrentBot(bot.me)) return@handleCommand
 
-                    fun getChatIdFromCommandsCommand(args: String?) =
+                    suspend fun getChatIdFromCommandsCommand(args: String?) =
                         (args?.split("\n")?.find { it.startsWith("chat_id") }?.split("=")?.last()?.toLongOrNull() ?: message.chat.id.value).toChatId()
 
-                    fun collectCommandsFromArgs(args: String) = args
+                    suspend fun collectCommandsFromArgs(args: String) = args
                         .split("\n")
                         .filterNot { it.startsWith("chat_id") }
                         .filter { it.matches("^[a-z0-9_]+\\s-\\s.+$".toRegex()) }
                         .associate { arg -> arg.split(" - ").let { it.first() to it.last() } }
                         .map { BotCommand(it.key, it.value) }
 
-                    fun updateCommands(commands: List<BotCommand>, chatId: ChatId?) {
+                    suspend fun updateCommands(commands: List<BotCommand>, chatId: ChatId?) {
                         setMyCommands(commands, chatId?.let { BotCommandScopeChat(it) } ?: BotCommandScopeDefault())
                         send(buildString {
                             if (chatId != null) {
@@ -578,9 +577,10 @@ class Runner {
                         setChatPhoto("files/image1.png".asResources().asTgFile())
                     }
 
-                    isCommand("setChatPhoto2") {
-                        setChatPhoto("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile())
-                    }
+                    // TODO is it work?
+//                    isCommand("setChatPhoto2") {
+//                        setChatPhoto("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile())
+//                    }
 
                     isCommand("deleteChatPhoto") {
                         deleteChatPhoto()
@@ -1036,7 +1036,6 @@ class Runner {
 
                     isCommand("forwardMe") {
                         forwardMessage(
-                            chatId = getChatIdOrThrow(),
                             fromChatId = getChatIdOrThrow(),
                             messageId = message.messageId
                         )
@@ -1268,10 +1267,10 @@ class Runner {
                             return@isCommand
                         }
                         val (name, title) = args.split(" ")
-                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, StickerFormat.STATIC) {
-                            stickerType = StickerType.REGULAR
-                            sticker("files/logo.png".asResources().asTgFile(), listOf("\uD83D\uDE0E"))
-                        }
+//                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, StickerFormat.STATIC) {
+//                            stickerType = StickerType.REGULAR
+//                            sticker("files/logo.png".asResources().asTgFile(), listOf("\uD83D\uDE0E"))
+//                        }
                     }
 
                     isCommand("getStickerSet") {
@@ -1515,7 +1514,7 @@ fun generateString(length: Int): String {
     return generateSequence("") { symbols.random().toString() }.take(length).joinToString("")
 }
 
-fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
+suspend fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
     text = "Choose variant"
     inlineKeyboard {
         row("No answer", "no_answer")
@@ -1523,7 +1522,7 @@ fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
     }
 }
 
-fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageAction.EDIT) = message(action) {
+suspend fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Choose item"
     inlineKeyboard {
         pagination(pagesData, "pagination", page, setup = {
@@ -1535,7 +1534,7 @@ fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageActio
     }
 }
 
-fun EventHandler.sendPagination2(page: Long, prefixCallback: String, action: MessageAction = MessageAction.EDIT) = message(action) {
+suspend fun EventHandler.sendPagination2(page: Long, prefixCallback: String, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Data: ${System.currentTimeMillis()}"
     inlineKeyboard {
         when(page) {

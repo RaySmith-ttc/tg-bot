@@ -1,11 +1,10 @@
 package ru.raysmith.tgbot.model.bot.message
 
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
-import ru.raysmith.tgbot.model.network.response.MessageRes
+import ru.raysmith.tgbot.network.TelegramService2
 
-interface IMessage<T : MessageRes> : ApiCaller {
+interface IMessage<T> : TelegramService2 {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
         const val MAX_CAPTION_LENGTH = 1024
@@ -31,8 +30,8 @@ interface IMessage<T : MessageRes> : ApiCaller {
     var protectContent: Boolean?
 
     /** Send message to [chat] */
-    fun send(chat: Chat): T = send(chat.id)
+    suspend fun send(chat: Chat): T = send(chat.id)
 
     /** Send message to chat with [chatId] */
-    fun send(chatId: ChatId): T
+    suspend fun send(chatId: ChatId): T
 }

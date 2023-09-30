@@ -11,7 +11,7 @@ sealed class LiveLocationResponse
 object LiveLocationResponseSerializer : JsonContentPolymorphicSerializer<LiveLocationResponse>(LiveLocationResponse::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out LiveLocationResponse> {
         return when(element.jsonObject["result"]) {
-            is JsonObject -> MessageResponse.serializer()
+            is JsonObject ->  MessageResponse.serializer()
             is JsonPrimitive -> BooleanResponse.serializer()
             else -> error("Unexpected LiveLocationResponse result")
         }

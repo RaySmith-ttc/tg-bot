@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.bot.message
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -13,7 +14,7 @@ import ru.raysmith.tgbot.utils.withSafeLength
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
 @TextMessageDsl
-class TextMessage(override val service: TelegramService, override val fileService: TelegramFileService) :
+class TextMessage(override val client: HttpClient) :
     MessageWithReplyMarkup {
 
     /** Full text of message with entities */
@@ -40,9 +41,9 @@ class TextMessage(override val service: TelegramService, override val fileServic
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
-    fun textWithEntities(setText: MessageText.() -> Unit) {
+    suspend fun textWithEntities(setText: suspend MessageText.() -> Unit) {
         messageText = MessageText(MessageTextType.TEXT)
-        messageText!!.apply(setText)
+        messageText!!.apply { setText() }
     }
 
     /** Returns the raw text with safe length for sending the message, empty string if not set */
@@ -54,36 +55,32 @@ class TextMessage(override val service: TelegramService, override val fileServic
     /** Returns the [parseMode] if entities were not used, null otherwise */
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override fun send(chatId: ChatId): MessageResponse {
-        return service.sendMessage(
-            chatId = chatId,
-            messageThreadId = messageThreadId,
-            text = getMessageText(),
-            parseMode = getParseModeIfNeed(),
-            entities = messageText?.getEntitiesString(),
-            disableWebPagePreview = disableWebPagePreview,
-            disableNotification = disableNotification,
-            protectContent = protectContent,
-            replyToMessageId = replyToMessageId,
-            allowSendingWithoutReply = allowSendingWithoutReply,
-            keyboardMarkup = keyboardMarkup?.toMarkup()
-        ).execute().body() ?: errorBody()
-    }
+    override suspend fun send(chatId: ChatId) = sendMessage(
+        chatId = chatId,
+        messageThreadId = messageThreadId,
+        text = getMessageText(),
+        parseMode = getParseModeIfNeed(),
+        entities = messageText?.getEntitiesString(),
+        disableWebPagePreview = disableWebPagePreview,
+        disableNotification = disableNotification,
+        protectContent = protectContent,
+        replyToMessageId = replyToMessageId,
+        allowSendingWithoutReply = allowSendingWithoutReply,
+        keyboardMarkup = keyboardMarkup?.toMarkup()
+    )
 
-    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) : MessageResponse {
-        return service.editMessageText(
-            chatId = chatId,
-            messageId = messageId,
-            inlineMessageId = inlineMessageId,
-            text = getMessageText(),
-            parseMode = getParseModeIfNeed(),
-            entities = messageText?.getEntitiesString(),
-            replyMarkup = keyboardMarkup?.toMarkup(),
-            disableWebPagePreview = disableWebPagePreview
-        ).execute().body() ?: errorBody()
-    }
+    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
+        chatId = chatId,
+        messageId = messageId,
+        inlineMessageId = inlineMessageId,
+        text = getMessageText(),
+        parseMode = getParseModeIfNeed(),
+        entities = messageText?.getEntitiesString(),
+        replyMarkup = keyboardMarkup?.toMarkup(),
+        disableWebPagePreview = disableWebPagePreview
+    )
 
-    fun datePicker(datePicker: DatePicker, data: String? = null) {
+    suspend fun datePicker(datePicker: DatePicker, data: String? = null) {
         textWithEntities { datePickerMessageText(datePicker, data) }
         inlineKeyboard { createDatePicker(datePicker, data) }
     }

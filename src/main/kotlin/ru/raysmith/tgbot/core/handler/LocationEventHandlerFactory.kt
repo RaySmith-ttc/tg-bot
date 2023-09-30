@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core.handler
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
@@ -7,8 +8,6 @@ import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
@@ -37,114 +36,114 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     private val chatMemberHandler: MutableMap<String, LocationChatMemberHandlerData<T>> = mutableMapOf()
     private val chatJoinRequestHandler: MutableMap<String, LocationChatJoinRequestHandlerData<T>> = mutableMapOf()
 
-    private var unknownHandler: UnknownEventHandler.() -> Unit = { }
+    private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
     
     override fun getHandler(
-        update: Update, service: TelegramService, fileService: TelegramFileService
+        update: Update, client: HttpClient
     ): EventHandler = when(update.type) {
         UpdateType.MESSAGE -> when(update.message!!.type) {
-            MessageType.COMMAND -> LocationCommandHandler(update, service, fileService, commandHandler, locationsWrapper)
-            MessageType.TEXT -> LocationMessageHandler(update, service, fileService, messageHandler, locationsWrapper)
+            MessageType.COMMAND -> LocationCommandHandler(update, client, commandHandler, locationsWrapper)
+            MessageType.TEXT -> LocationMessageHandler(update, client, messageHandler, locationsWrapper)
         }
 
-        UpdateType.EDITED_MESSAGE ->LocationEditedMessageHandler(
-            update, service, fileService, editedMessageHandler, locationsWrapper
+        UpdateType.EDITED_MESSAGE -> LocationEditedMessageHandler(
+            update, client, editedMessageHandler, locationsWrapper
         )
 
         UpdateType.CHANNEL_POST -> LocationChannelPostHandler(
-                update, service, fileService, channelPostHandler, locationsWrapper
+                update, client, channelPostHandler, locationsWrapper
         )
 
         UpdateType.EDITED_CHANNEL_POST -> LocationEditedChannelPostHandler(
-                update, service, fileService, editedChannelPost, locationsWrapper
+                update, client, editedChannelPost, locationsWrapper
         )
 
         UpdateType.INLINE_QUERY -> LocationInlineQueryHandler(
-            update, service, fileService, inlineQueryHandler, locationsWrapper
+            update, client, inlineQueryHandler, locationsWrapper
         )
 
         UpdateType.CHOSEN_INLINE_RESULT -> LocationChosenInlineQueryHandler(
-            update, service, fileService, chosenInlineQueryHandler, locationsWrapper
+            update, client, chosenInlineQueryHandler, locationsWrapper
         )
 
         UpdateType.CALLBACK_QUERY -> LocationCallbackQueryHandler(
-            update, service, fileService, callbackQueryHandler, locationsWrapper
+            update, client, callbackQueryHandler, locationsWrapper
         )
 
         UpdateType.SHIPPING_QUERY -> LocationShippingQueryHandler(
-            update, service, fileService, shippingQueryHandler, locationsWrapper
+            update, client, shippingQueryHandler, locationsWrapper
         )
 
         UpdateType.PRE_CHECKOUT_QUERY -> LocationPreCheckoutQueryHandler(
-            update, service, fileService, preCheckoutQueryHandler, locationsWrapper
+            update, client, preCheckoutQueryHandler, locationsWrapper
         )
 
         UpdateType.POLL -> LocationPollHandler(
-            update, service, fileService, pollHandler, locationsWrapper
+            update, client, pollHandler, locationsWrapper
         )
 
         UpdateType.POLL_ANSWER -> LocationPollAnswerHandler(
-            update, service, fileService, pollAnswerHandler, locationsWrapper
+            update, client, pollAnswerHandler, locationsWrapper
         )
 
         UpdateType.MY_CHAT_MEMBER -> LocationChatMemberHandler(
-                update, service, fileService, myChatMemberHandler, locationsWrapper
+                update, client, myChatMemberHandler, locationsWrapper
         )
 
         UpdateType.CHAT_MEMBER -> LocationChatMemberHandler(
-                update, service, fileService, chatMemberHandler, locationsWrapper
+                update, client, chatMemberHandler, locationsWrapper
         )
 
         UpdateType.CHAT_JOIN_REQUEST -> LocationChatJoinRequestHandler(
-                update, service, fileService, chatJoinRequestHandler, locationsWrapper
+                update, client, chatJoinRequestHandler, locationsWrapper
         )
         
-        null -> UnknownEventHandler(update, service, fileService, unknownHandler)
+        null -> UnknownEventHandler(update, client, unknownHandler)
     }
-    
-    fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
+
+    fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
     }
 
 
     @HandlerDsl
-    fun handleMessage(handlerId: String = defaultHandlerId, handler: (context(T) LocationMessageHandler<T>.() -> Unit)) {
+    fun handleMessage(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationMessageHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.MESSAGE)
         messageHandler[handlerId] = LocationMessageHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleCommand(handlerId: String = defaultHandlerId, handler: (context(T) LocationCommandHandler<T>.() -> Unit)) {
+    fun handleCommand(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationCommandHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.MESSAGE)
         commandHandler[handlerId] = LocationCommandHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleEditedMessage(handlerId: String = defaultHandlerId, handler: (context(T) LocationEditedMessageHandler<T>.() -> Unit)) {
+    fun handleEditedMessage(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationEditedMessageHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.EDITED_MESSAGE)
         editedMessageHandler[handlerId] = LocationEditMessageHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleChannelPost(handlerId: String = defaultHandlerId, handler: (context(T) LocationChannelPostHandler<T>.() -> Unit)) {
+    fun handleChannelPost(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationChannelPostHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHANNEL_POST)
         channelPostHandler[handlerId] = LocationChannelPostHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleEditedChannelPost(handlerId: String = defaultHandlerId, handler: (context(T) LocationEditedChannelPostHandler<T>.() -> Unit)) {
+    fun handleEditedChannelPost(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationEditedChannelPostHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
         editedChannelPost[handlerId] = LocationEditedChannelPostHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleInlineQuery(handlerId: String = defaultHandlerId, handler: (context(T) LocationInlineQueryHandler<T>.() -> Unit)) {
+    fun handleInlineQuery(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationInlineQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.INLINE_QUERY)
         inlineQueryHandler[handlerId] = LocationInlineQueryHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleChosenInlineQuery(handlerId: String = defaultHandlerId, handler: (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)) {
+    fun handleChosenInlineQuery(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHOSEN_INLINE_RESULT)
         chosenInlineQueryHandler[handlerId] = LocationChosenInlineQueryHandlerData(handler)
     }
@@ -154,7 +153,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
         alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
         datePicker: DatePicker? = null,
-        handler: (context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
+        handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) return
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
@@ -162,7 +161,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
         callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, datePicker, alwaysAnswer)
     }
 
-    internal fun withHandlerId(handlerId: String, block: LocationEventHandlerFactory<T>.() -> Unit) {
+    internal suspend fun withHandlerId(handlerId: String, block: suspend LocationEventHandlerFactory<T>.() -> Unit) {
         val defaultHandlerIdBck = defaultHandlerId
         defaultHandlerId = handlerId
         block()
@@ -170,43 +169,43 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     }
 
     @HandlerDsl
-    fun handleShippingQuery(handlerId: String = defaultHandlerId, handler: (context(T) LocationShippingQueryHandler<T>.() -> Unit)) {
+    fun handleShippingQuery(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationShippingQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.SHIPPING_QUERY)
         shippingQueryHandler[handlerId] = LocationShippingQueryHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handlePreCheckoutQuery(handlerId: String = defaultHandlerId, handler: (context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)) {
+    fun handlePreCheckoutQuery(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.PRE_CHECKOUT_QUERY)
         preCheckoutQueryHandler[handlerId] = LocationPreCheckoutQueryHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handlePoll(handlerId: String = defaultHandlerId, handler: (context(T) LocationPollHandler<T>.() -> Unit)) {
+    fun handlePoll(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationPollHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.POLL)
         pollHandler[handlerId] = LocationPollHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handlePollAnswer(handlerId: String = defaultHandlerId, handler: (context(T) LocationPollAnswerHandler<T>.() -> Unit)) {
+    fun handlePollAnswer(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationPollAnswerHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.POLL_ANSWER)
         pollAnswerHandler[handlerId] = LocationPollAnswerHandlerData(handler)
     }
     
     @HandlerDsl
-    fun handleMyChatMember(handlerId: String = defaultHandlerId, handler: (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
+    fun handleMyChatMember(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationChatMemberHandler<T>.() -> Unit)? = null) {
         allowedUpdates.add(UpdateType.MY_CHAT_MEMBER)
         myChatMemberHandler[handlerId] = LocationChatMemberHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleChatMember(handlerId: String = defaultHandlerId, handler: (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
+    fun handleChatMember(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationChatMemberHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHAT_MEMBER)
         chatMemberHandler[handlerId] = LocationChatMemberHandlerData(handler)
     }
 
     @HandlerDsl
-    fun handleChatJoinRequest(handlerId: String = defaultHandlerId, handler: (context(T) LocationChatJoinRequestHandler<T>.() -> Unit)) {
+    fun handleChatJoinRequest(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationChatJoinRequestHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler[handlerId] = LocationChatJoinRequestHandlerData(handler)
     }

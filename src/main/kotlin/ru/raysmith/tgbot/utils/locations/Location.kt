@@ -6,7 +6,7 @@ import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 
 @LocationsDSL
-fun <T : LocationConfig> createLocation(name: String, wrapper: LocationsWrapper<T>, setup: LocationEventHandlerFactory<T>.(location: Location<T>) -> Unit): Location<T> {
+suspend fun <T : LocationConfig> createLocation(name: String, wrapper: LocationsWrapper<T>, setup: suspend LocationEventHandlerFactory<T>.(location: Location<T>) -> Unit): Location<T> {
     val factory = LocationEventHandlerFactory(wrapper)
     val location = Location(name, factory)
     factory.setup(location)
@@ -17,16 +17,16 @@ fun <T : LocationConfig> createLocation(name: String, wrapper: LocationsWrapper<
 class Location<T : LocationConfig>(val name: String, internal val handlerFactory: LocationEventHandlerFactory<T>) {
     internal lateinit var update: Update
     
-    var onEnter: context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }
+    var onEnter: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }
         private set
     
     @LocationsDSL
-    fun onEnter(block: context(T, BotContext<*>) LocationHandler<T>.() -> Unit) {
+    fun onEnter(block: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit) {
         this.onEnter = block
     }
     
     @LocationsDSL
-    fun handle(block: LocationEventHandlerFactory<T>.() -> Unit) {
+    suspend fun handle(block: suspend LocationEventHandlerFactory<T>.() -> Unit) {
         block(handlerFactory)
     }
 }

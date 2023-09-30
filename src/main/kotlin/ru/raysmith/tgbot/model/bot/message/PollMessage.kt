@@ -1,23 +1,21 @@
 package ru.raysmith.tgbot.model.bot.message
 
+import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.PollType
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.withSafeLength
 
+@Suppress("MemberVisibilityCanBePrivate")
 class PollMessage(
     val question: String, val options: List<String>,
-    override val service: TelegramService,
-    override val fileService: TelegramFileService
-) : IMessage<MessageResponse>, KeyboardCreator {
+    override val client: HttpClient
+) : IMessage<Message>, KeyboardCreator {
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
@@ -54,30 +52,29 @@ class PollMessage(
     }
 
     fun getExplanationText(): String? =
-        _explanation?.getTextString()
-            ?: explanation?.let { if (safeTextLength) it.withSafeLength(MessageTextType.POLL_EXPLANATION) else it }
+        _explanation?.getTextString() ?: explanation?.let {
+            if (safeTextLength) it.withSafeLength(MessageTextType.POLL_EXPLANATION) else it
+        }
 
-    override fun send(chatId: ChatId): MessageResponse {
-        return service.sendPoll(
-            chatId = chatId,
-            messageThreadId = messageThreadId,
-            question = question,
-            options = Json.encodeToString(options),
-            isAnonymous = isAnonymous,
-            type = type,
-            allowsMultipleAnswers = allowsMultipleAnswers,
-            correctOptionId = correctOptionId,
-            explanation = getExplanationText(),
-            explanationParseMode = explanationParseMode,
-            explanationEntities = _explanation?.getEntitiesString(),
-            openPeriod = openPeriod,
-            closeDate = closeDate,
-            isClosed = isClosed,
-            disableNotification = disableNotification,
-            protectContent = protectContent,
-            replyToMessageId = replyToMessageId,
-            allowSendingWithoutReply = allowSendingWithoutReply,
-            keyboardMarkup = keyboardMarkup?.toMarkup()
-        ).execute().body() ?: errorBody()
-    }
+    override suspend fun send(chatId: ChatId) = sendPoll(
+        chatId = chatId,
+        messageThreadId = messageThreadId,
+        question = question,
+        options = Json.encodeToString(options),
+        isAnonymous = isAnonymous,
+        type = type,
+        allowsMultipleAnswers = allowsMultipleAnswers,
+        correctOptionId = correctOptionId,
+        explanation = getExplanationText(),
+        explanationParseMode = explanationParseMode,
+        explanationEntities = _explanation?.getEntitiesString(),
+        openPeriod = openPeriod,
+        closeDate = closeDate,
+        isClosed = isClosed,
+        disableNotification = disableNotification,
+        protectContent = protectContent,
+        replyToMessageId = replyToMessageId,
+        allowSendingWithoutReply = allowSendingWithoutReply,
+        keyboardMarkup = keyboardMarkup?.toMarkup()
+    )
 }

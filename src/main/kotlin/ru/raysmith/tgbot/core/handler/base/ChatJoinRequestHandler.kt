@@ -1,18 +1,17 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
-import ru.raysmith.tgbot.model.network.chat.*
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 
 @HandlerDsl
 open class ChatJoinRequestHandler(
     val chatJoinRequest: ChatJoinRequest,
-    override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ChatJoinRequestHandler.() -> Unit = { }
+    override val client: HttpClient,
+    private val handler: suspend ChatJoinRequestHandler.() -> Unit = { }
 ) : EventHandler, BotContext<ChatJoinRequestHandler> {
 
     override fun getChatId() = chatJoinRequest.chat.id
@@ -22,10 +21,10 @@ open class ChatJoinRequestHandler(
     override suspend fun handle() = handler()
 
 
-    fun approve() = approveChatJoinRequest(chatJoinRequest.userChatId)
-    fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)
+    suspend fun approve() = approveChatJoinRequest(chatJoinRequest.userChatId)
+    suspend fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)
 
-    override fun <R> withBot(bot: Bot, block: BotContext<ChatJoinRequestHandler>.() -> R): R {
-        return ChatJoinRequestHandler(chatJoinRequest, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatJoinRequestHandler>.() -> R): R {
+        return ChatJoinRequestHandler(chatJoinRequest, client, handler).block()
     }
 }

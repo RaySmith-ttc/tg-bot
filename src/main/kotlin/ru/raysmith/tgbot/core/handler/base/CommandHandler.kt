@@ -1,19 +1,18 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.BotContextDsl
 
 @HandlerDsl
 open class CommandHandler(
     val command: BotCommand, val message: Message,
-    override val service: TelegramService, override val fileService: TelegramFileService,
+    override val client: HttpClient,
     val handler: suspend CommandHandler.() -> Unit = { }
 ) : EventHandler, BotContext<CommandHandler> {
 
@@ -25,8 +24,8 @@ open class CommandHandler(
     override suspend fun handle() = handler()
 
     @BotContextDsl
-    override fun <R> withBot(bot: Bot, block: BotContext<CommandHandler>.() -> R): R {
-        return CommandHandler(command, message, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
+        return CommandHandler(command, message, client, handler).block()
     }
 }
 

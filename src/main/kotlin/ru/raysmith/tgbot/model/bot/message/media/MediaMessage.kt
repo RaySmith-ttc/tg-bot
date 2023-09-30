@@ -7,11 +7,11 @@ import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.response.MessageResponse
+import ru.raysmith.tgbot.model.network.message.Message
 import java.nio.file.Files
 
 // TODO add auto ChatAction + global config
-abstract class MediaMessage : IMessage<MessageResponse>, KeyboardCreator {
+abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
 
     protected var media: InputFile? = null
     protected abstract val mediaName: String

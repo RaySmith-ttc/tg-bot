@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
+import io.ktor.client.*
 import okhttp3.MultipartBody
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.CaptionableMessage
 import ru.raysmith.tgbot.model.bot.message.IMessage
@@ -10,29 +10,26 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.noimpl
 
-abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageResponse>, KeyboardCreator {
+abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>, KeyboardCreator {
 
     companion object {
         internal fun instance(
-            apiCaller: ApiCaller, mediaName: String = "",
-            send: (chatId: ChatId) -> MessageResponse = { noimpl() }
+            service: TelegramService2, mediaName: String = "",
+            send: (chatId: ChatId) -> Message = { noimpl() }
         ): CaptionableMediaMessage {
             return object : CaptionableMediaMessage() {
                 override val mediaName: String = mediaName
-                override val service: TelegramService = apiCaller.service
-                override val fileService: TelegramFileService = apiCaller.fileService
-                override fun send(chatId: ChatId) = send(chatId)
+                override val client: HttpClient = service.client
+                override suspend fun send(chatId: ChatId) = send(chatId)
 
-                override fun editReplyMarkup(
+                override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
-                ): MessageResponse = noimpl()
+                ): Message = noimpl()
             }
         }
     }
@@ -58,26 +55,26 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<MessageR
         return media?.toRequestBody(mediaName) ?: error("media is not set")
     }
 
-    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse {
-        return service.editMessageCaption(
+    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+        return editMessageCaption(
             chatId, messageId, inlineMessageId, getCaptionText() ?: "", parseMode = null,
             _caption?.getEntitiesString(), keyboardMarkup?.toMarkup()
-        ).execute().body() ?: errorBody()
+        )
     }
 
-    fun <T : InputMedia> editMedia(chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): MessageResponse {
-        return service.editMessageMedia(
+    suspend fun <T : InputMedia> editMedia(chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): Message {
+        return editMessageMedia(
             chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
-        ).execute().body() ?: errorBody()
+        )
     }
 
-    override fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): MessageResponse {
-        return service.editMessageReplyMarkup(
+    override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+        return editMessageReplyMarkup(
             chatId = chatId,
             messageId = messageId,
             inlineMessageId = inlineMessageId,
             replyMarkup = keyboardMarkup?.toMarkup()
-        ).execute().body() ?: errorBody()
+        )
     }
 }
 

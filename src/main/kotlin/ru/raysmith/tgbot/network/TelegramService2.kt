@@ -29,26 +29,30 @@ import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
+import ru.raysmith.tgbot.model.network.media.input.InputMediaGroup
+import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
 import java.io.InputStream
 import java.nio.file.Files
-import java.time.Duration
 import java.time.ZonedDateTime
+import kotlin.time.Duration
 
 //class TelegramService2(val client: HttpClient = TelegramApi2.defaultClient(), val token: String = Bot.config.token) {
 interface TelegramService2 {
     val client: HttpClient
-
 
     private suspend inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T {
         val response = block()
@@ -57,6 +61,7 @@ interface TelegramService2 {
             return when {
                 T::class == String::class -> response.bodyAsText() as T
                 T::class == InputStream::class -> response.bodyAsChannel().toInputStream() as T
+                T::class == LiveLocationResponse::class -> response.body<T>()
                 else -> response.body<NetworkResponse<T>>().result
             }
         } else if (response.status == HttpStatusCode.Unauthorized) {
@@ -125,7 +130,7 @@ interface TelegramService2 {
         }
     }
 
-    suspend fun sendPhoto2(
+    suspend fun sendPhoto(
         chatId: ChatId,
         messageThreadId: Int? = null,
         photo: InputFile,
@@ -754,6 +759,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun sendMessage(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
@@ -763,8 +770,6 @@ interface TelegramService2 {
         replyToMessageId: Int? = null,
         allowSendingWithoutReply: Boolean? = null,
         keyboardMarkup: KeyboardMarkup? = null,
-        messageThreadId: Int? = null,
-        chatId: ChatId,
     ) = request<Message> {
         client.post("sendMessage") {
             parameter("chat_id", chatId)
@@ -793,12 +798,12 @@ interface TelegramService2 {
      *
      * */
     suspend fun forwardMessage(
-        fromChatId: ChatId,
+        chatId: ChatId,
         messageThreadId: Int? = null,
+        fromChatId: ChatId,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         messageId: Int,
-        chatId: ChatId,
     ) = request<Message> {
         client.post("forwardMessage") {
             parameter("chat_id", chatId)
@@ -831,9 +836,10 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun copyMessage(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
         fromChatId: ChatId,
         messageId: Int,
-        messageThreadId: Int? = null,
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
@@ -842,7 +848,6 @@ interface TelegramService2 {
         replyToMessageId: Int? = null,
         allowSendingWithoutReply: Boolean? = null,
         replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId,
     ) = request<MessageId> {
         client.post("copyMessage") {
             parameter("chat_id", chatId)
@@ -876,10 +881,10 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
     suspend fun banChatMember(
-        userId: ChatId.ID,
-        untilDate: ZonedDateTime? = null,
-        revokeMessages: Boolean? = null,
         chatId: ChatId,
+        userId: ChatId.ID,
+        untilDate: Until? = null,
+        revokeMessages: Boolean? = null,
     ) = request<Boolean> {
         client.post("banChatMember") {
             parameter("chat_id", chatId)
@@ -901,9 +906,9 @@ interface TelegramService2 {
      * @param onlyIfBanned Do nothing if the user is not banned
      * */
     suspend fun unbanChatMember(
+        chatId: ChatId,
         userId: ChatId.ID,
         onlyIfBanned: Boolean,
-        chatId: ChatId,
     ) = request<Boolean> {
         client.post("unbanChatMember") {
             parameter("chat_id", chatId)
@@ -930,11 +935,11 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun restrictChatMember(
+        chatId: ChatId,
         userId: ChatId.ID,
         permissions: ChatPermissions,
         useIndependentChatPermissions: Boolean? = null,
-        untilDate: ZonedDateTime? = null,
-        chatId: ChatId,
+        untilDate: Until? = null,
     ) = request<Boolean> {
         client.post("restrictChatMember") {
             parameter("chat_id", chatId)
@@ -955,6 +960,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun promoteChatMember( // TODO docs
+        chatId: ChatId,
         userId: ChatId.ID,
         isAnonymous: Boolean? = null,
         canManageChat: Boolean? = null,
@@ -971,7 +977,6 @@ interface TelegramService2 {
         canInviteUsers: Boolean? = null,
         canPinMessages: Boolean? = null,
         canManageTopics: Boolean? = null,
-        chatId: ChatId,
     ) = request<Boolean> {
         client.post("promoteChatMember") {
             parameter("chat_id", chatId)
@@ -1003,9 +1008,9 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun setChatAdministratorCustomTitle(
+        chatId: ChatId,
         userId: ChatId.ID,
         customTitle: String,
-        chatId: ChatId,
     ) = request<Boolean> {
         client.post("setChatAdministratorCustomTitle") {
             parameter("chat_id", chatId)
@@ -1024,8 +1029,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun banChatSenderChat(
-        senderChatId: ChatId.ID,
         chatId: ChatId,
+        senderChatId: ChatId.ID,
     ) = request<Boolean> {
         client.post("banChatSenderChat") {
             parameter("chat_id", chatId)
@@ -1042,8 +1047,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun unbanChatSenderChat(
-        senderChatId: ChatId.ID,
         chatId: ChatId,
+        senderChatId: ChatId.ID,
     ) = request<Boolean> {
         client.post("unbanChatSenderChat") {
             parameter("chat_id", chatId)
@@ -1059,15 +1064,15 @@ interface TelegramService2 {
      * @param permissions New default chat permissions
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * @param useIndependentChatPermissions Pass *True* if chat permissions are set independently.
-     * Otherwise, the [ChatPermission.CAN_SEND_OTHER_MESSAGES] and [ChatPermission.CAN_ADD_WEB_PAGE_PREVIEWS]
-     * permissions will imply the [ChatPermission.CAN_SEND_MESSAGES], [ChatPermission.CAN_SEND_AUDIOS],
-     * [ChatPermission.CAN_SEND_DOCUMENTS], [ChatPermission.CAN_SEND_PHOTOS], [ChatPermission.CAN_SEND_VIDEOS],
-     * [ChatPermission.CAN_SEND_VIDEO_NOTES], and [ChatPermission.CAN_SEND_VOICE_NOTES] permissions;
-     * the [ChatPermission.CAN_SEND_POLLS] permission will imply the [ChatPermission.CAN_SEND_MESSAGES] permission.
+     * Otherwise, the [ChatPermissions.canSendOtherMessages] and [ChatPermissions.canAddWebPagePreviews]
+     * permissions will imply the [ChatPermissions.canSendMessages], [ChatPermissions.canSendAudios],
+     * [ChatPermissions.canSendDocuments], [ChatPermissions.canSendPhotos], [ChatPermissions.canSendVideos],
+     * [ChatPermissions.canSendVideoNotes], and [ChatPermissions.canSendVoiceNotes] permissions;
+     * the [ChatPermissions.canSendPolls] permission will imply the [ChatPermissions.canSendMessages] permission.
      * */
     suspend fun setChatPermissions(
-        permissions: ChatPermissions,
         chatId: ChatId,
+        permissions: ChatPermissions,
         useIndependentChatPermissions: Boolean? = null,
     ) = request<Boolean> {
         client.post("setChatPermissions") {
@@ -1111,16 +1116,16 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun createChatInviteLink(
+        chatId: ChatId,
         name: String? = null,
         expireDate: ZonedDateTime? = null,
         memberLimit: Int? = null,
         createsJoinRequest: Boolean? = null,
-        chatId: ChatId,
     ) = request<ChatInviteLink> {
         client.post("createChatInviteLink") {
             parameter("chat_id", chatId)
             parameter("name", name)
-            parameter("expire_date", expireDate)
+            parameter("expire_date", expireDate?.toEpochSecond())
             parameter("member_limit", memberLimit)
             parameter("creates_join_request", createsJoinRequest)
         }
@@ -1141,18 +1146,18 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun editChatInviteLink(
+        chatId: ChatId,
         inviteLink: String,
         name: String? = null,
         expireDate: ZonedDateTime? = null,
         memberLimit: Int? = null,
         createsJoinRequest: Boolean? = null,
-        chatId: ChatId,
     ) = request<ChatInviteLink> {
         client.post("editChatInviteLink") {
             parameter("chat_id", chatId)
             parameter("invite_link", inviteLink)
             parameter("name", name)
-            parameter("expire_date", expireDate)
+            parameter("expire_date", expireDate?.toEpochSecond())
             parameter("member_limit", memberLimit)
             parameter("creates_join_request", createsJoinRequest)
         }
@@ -1167,8 +1172,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun revokeChatInviteLink(
-        inviteLink: String,
         chatId: ChatId,
+        inviteLink: String,
     ) = request<ChatInviteLink> {
         client.post("revokeChatInviteLink") {
             parameter("chat_id", chatId)
@@ -1184,8 +1189,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun approveChatJoinRequest(
-        userId: ChatId.ID,
         chatId: ChatId,
+        userId: ChatId.ID,
     ) = request<Boolean> {
         client.post("approveChatJoinRequest") {
             parameter("chat_id", chatId)
@@ -1201,8 +1206,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun declineChatJoinRequest(
-        userId: ChatId.ID,
         chatId: ChatId,
+        userId: ChatId.ID,
     ) = request<Boolean> {
         client.post("declineChatJoinRequest") {
             parameter("chat_id", chatId)
@@ -1219,13 +1224,13 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun setChatPhoto(
-        photo: InputFile,
         chatId: ChatId,
+        photo: NotReusableInputFile,
     ) = request<Boolean> {
         client.post("setChatPhoto") {
             parameter("chat_id", chatId)
             setMultiPartFormDataBody(
-                "photo" to photo,
+                "photo" to photo as InputFile,
             )
         }
     }
@@ -1254,8 +1259,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun setChatTitle(
-        title: String,
         chatId: ChatId,
+        title: String,
     ) = request<Boolean> {
         client.post("setChatTitle") {
             parameter("chat_id", chatId)
@@ -1272,8 +1277,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun setChatDescription(
-        description: String?,
         chatId: ChatId,
+        description: String?,
     ) = request<Boolean> {
         client.post("setChatDescription") {
             parameter("chat_id", chatId)
@@ -1292,9 +1297,9 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun pinChatMessage(
+        chatId: ChatId,
         messageId: Int,
         disableNotification: Boolean? = null,
-        chatId: ChatId,
     ) = request<Boolean> {
         client.post("pinChatMessage") {
             parameter("chat_id", chatId)
@@ -1314,8 +1319,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun unpinChatMessage(
-        messageId: Int? = null,
         chatId: ChatId,
+        messageId: Int? = null,
     ) = request<Boolean> {
         client.post("unpinChatMessage") {
             parameter("chat_id", chatId)
@@ -1401,8 +1406,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun getChatMember(
-        userId: ChatId.ID,
         chatId: ChatId,
+        userId: ChatId.ID,
     ) = request<ChatMember> {
         client.post("getChatMember") {
             parameter("chat_id", chatId)
@@ -1420,8 +1425,8 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun setChatStickerSet(
-        stickerSetName: String,
         chatId: ChatId,
+        stickerSetName: String,
     ) = request<Boolean> {
         client.post("setChatStickerSet") {
             parameter("chat_id", chatId)
@@ -1468,10 +1473,10 @@ interface TelegramService2 {
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * */
     suspend fun createForumTopic(
+        chatId: ChatId,
         name: String,
         iconColor: IconColor? = null,
         iconCustomEmojiId: String? = null,
-        chatId: ChatId,
     ) = request<ForumTopic> {
         client.post("createForumTopic") {
             parameter("chat_id", chatId)
@@ -1496,10 +1501,10 @@ interface TelegramService2 {
      * ass an empty string to remove the icon. If not specified, the current icon will be kept
      * */
     suspend fun editForumTopic(
+        chatId: ChatId,
         messageThreadId: Int,
         name: String? = null,
         iconCustomEmojiId: String? = null,
-        chatId: ChatId,
     ) = request<Boolean> {
         client.post("editForumTopic") {
             parameter("chat_id", chatId)
@@ -1519,8 +1524,8 @@ interface TelegramService2 {
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
     suspend fun closeForumTopic(
-        messageThreadId: Int,
         chatId: ChatId,
+        messageThreadId: Int,
     ) = request<Boolean> {
         client.post("closeForumTopic") {
             parameter("chat_id", chatId)
@@ -1538,8 +1543,8 @@ interface TelegramService2 {
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
     suspend fun reopenForumTopic(
-        messageThreadId: Int,
         chatId: ChatId,
+        messageThreadId: Int,
     ) = request<Boolean> {
         client.post("reopenForumTopic") {
             parameter("chat_id", chatId)
@@ -1556,8 +1561,8 @@ interface TelegramService2 {
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
     suspend fun deleteForumTopic(
-        messageThreadId: Int,
         chatId: ChatId,
+        messageThreadId: Int,
     ) = request<Boolean> {
         client.post("deleteForumTopic") {
             parameter("chat_id", chatId)
@@ -1575,8 +1580,8 @@ interface TelegramService2 {
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
     suspend fun unpinAllForumTopicMessages(
-        messageThreadId: Int,
         chatId: ChatId,
+        messageThreadId: Int,
     ) = request<Boolean> {
         client.post("unpinAllForumTopicMessages") {
             parameter("chat_id", chatId)
@@ -1593,8 +1598,8 @@ interface TelegramService2 {
      * @param name New topic name, 1-128 characters
      * */
     suspend fun editGeneralForumTopic(
-        name: String,
         chatId: ChatId,
+        name: String,
     ) = request<Boolean> {
         client.post("editGeneralForumTopic") {
             parameter("chat_id", chatId)
@@ -1946,8 +1951,8 @@ interface TelegramService2 {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun stopPoll(
-        messageId: Int,
         chatId: ChatId,
+        messageId: Int,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Poll> {
         client.post("stopPoll") {
@@ -1974,8 +1979,8 @@ interface TelegramService2 {
      * @param messageId Identifier of the message to delete
      * */
     suspend fun deleteMessage(
-        messageId: Int,
         chatId: ChatId,
+        messageId: Int,
     ) = request<Boolean> {
         client.post("deleteMessage") {
             parameter("chat_id", chatId)
@@ -2031,40 +2036,65 @@ interface TelegramService2 {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
-//    suspend fun sendInvoice(
-//        chatId: ChatId = this.getChatIdOrThrow(),
-//        buildAction: InvoiceSender.() -> Unit,
-//    ) = request<Message> {
-//        client.post("sendInvoice") {
-//            parameter("chat_id", chatId)
-//            parameter("message_thread_id", messageThreadId)
-//            parameter("title", title)
-//            parameter("description", description)
-//            parameter("payload", payload)
-//            parameter("provider_token", providerToken)
-//            parameter("currency", currency)
-//            parameter("prices", prices)
-//            parameter("max_tip_amount", maxTipAmount)
-//            parameter("suggested_tip_amounts", suggestedTipAmounts)
-//            parameter("start_parameter", startParameter)
-//            parameter("provider_data", providerData)
-//            parameter("photo_url", photoUrl)
-//            parameter("photo_size", photoSize)
-//            parameter("photo_width", photoWidth)
-//            parameter("photo_height", photoHeight)
-//            parameter("need_name", needName)
-//            parameter("need_phone_number", needPhoneNumber)
-//            parameter("need_email", needEmail)
-//            parameter("need_shipping_address", needShippingAddress)
-//            parameter("send_phone_number_to_provider", sendPhoneNumberToProvider)
-//            parameter("send_email_to_provider", sendEmailToProvider)
-//            parameter("is_flexible", isFlexible)
-//            parameter("disable_notification", disableNotification)
-//            parameter("reply_to_message_id", replyToMessageId)
-//            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-//            parameter("reply_markup", replyMarkup)
-//        }
-//    }
+    suspend fun sendInvoice(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        title: String,
+        description: String,
+        payload: String,
+        providerToken: String,
+        currency: String,
+        prices: String,
+        maxTipAmount: Int? = null,
+        suggestedTipAmounts: String? = null,
+        startParameter: String? = null,
+        providerData: String? = null,
+        photoUrl: String? = null,
+        photoSize: Int? = null,
+        photoWidth: Int? = null,
+        photoHeight: Int? = null,
+        needName: Boolean? = null,
+        needPhoneNumber: Boolean? = null,
+        needEmail: Boolean? = null,
+        needShippingAddress: Boolean? = null,
+        sendPhoneNumberToProvider: Boolean? = null,
+        sendEmailToProvider: Boolean? = null,
+        isFlexible: Boolean? = null,
+        disableNotification: Boolean? = null,
+        replyToMessageId: Long? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        replyMarkup: InlineKeyboardMarkup? = null
+    ) = request<Message> {
+        client.post("sendInvoice") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("title", title)
+            parameter("description", description)
+            parameter("payload", payload)
+            parameter("provider_token", providerToken)
+            parameter("currency", currency)
+            parameter("prices", prices)
+            parameter("max_tip_amount", maxTipAmount)
+            parameter("suggested_tip_amounts", suggestedTipAmounts)
+            parameter("start_parameter", startParameter)
+            parameter("provider_data", providerData)
+            parameter("photo_url", photoUrl)
+            parameter("photo_size", photoSize)
+            parameter("photo_width", photoWidth)
+            parameter("photo_height", photoHeight)
+            parameter("need_name", needName)
+            parameter("need_phone_number", needPhoneNumber)
+            parameter("need_email", needEmail)
+            parameter("need_shipping_address", needShippingAddress)
+            parameter("send_phone_number_to_provider", sendPhoneNumberToProvider)
+            parameter("send_email_to_provider", sendEmailToProvider)
+            parameter("is_flexible", isFlexible)
+            parameter("disable_notification", disableNotification)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", replyMarkup)
+        }
+    }
 
     /**
      * Use this method to create a link for an invoice. Returns the created invoice link as String on success.
@@ -2102,38 +2132,62 @@ interface TelegramService2 {
      * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
      * @param isFlexible Pass *True*, if the final price depends on the shipping method
      * */
-//    suspend fun createInvoiceLink(
-//        buildAction: InvoiceCreateLinkSender.() -> Unit,
-//    ) = request<String> {
-//        client.post("createInvoiceLink") {
-//            parameter("title", title)
-//            parameter("description", description)
-//            parameter("payload", payload)
-//            parameter("provider_token", providerToken)
-//            parameter("currency", currency)
-//            parameter("prices", prices)
-//            parameter("max_tip_amount", maxTipAmount)
-//            parameter("suggested_tip_amounts", suggestedTipAmounts)
-//            parameter("provider_data", providerData)
-//            parameter("photo_url", photoUrl)
-//            parameter("photo_size", photoSize)
-//            parameter("photo_width", photoWidth)
-//            parameter("photo_height", photoHeight)
-//            parameter("need_name", needName)
-//            parameter("need_phone_number", needPhoneNumber)
-//            parameter("need_email", needEmail)
-//            parameter("need_shipping_address", needShippingAddress)
-//            parameter("send_phone_number_to_provider", sendPhoneNumberToProvider)
-//            parameter("send_email_to_provider", sendEmailToProvider)
-//            parameter("is_flexible", isFlexible)
-//        }
-//    }
+    suspend fun createInvoiceLink(
+        title: String,
+        description: String,
+        payload: String,
+        providerToken: String,
+        currency: String,
+        prices: String,
+        maxTipAmount: Int? = null,
+        suggestedTipAmounts: String? = null,
+        providerData: String? = null,
+        photoUrl: String? = null,
+        photoSize: Int? = null,
+        photoWidth: Int? = null,
+        photoHeight: Int? = null,
+        needName: Boolean? = null,
+        needPhoneNumber: Boolean? = null,
+        needEmail: Boolean? = null,
+        needShippingAddress: Boolean? = null,
+        sendPhoneNumberToProvider: Boolean? = null,
+        sendEmailToProvider: Boolean? = null,
+        isFlexible: Boolean? = null,
+    ) = request<String> {
+        client.post("createInvoiceLink") {
+            parameter("title", title)
+            parameter("description", description)
+            parameter("payload", payload)
+            parameter("provider_token", providerToken)
+            parameter("currency", currency)
+            parameter("prices", prices)
+            parameter("max_tip_amount", maxTipAmount)
+            parameter("suggested_tip_amounts", suggestedTipAmounts)
+            parameter("provider_data", providerData)
+            parameter("photo_url", photoUrl)
+            parameter("photo_size", photoSize)
+            parameter("photo_width", photoWidth)
+            parameter("photo_height", photoHeight)
+            parameter("need_name", needName)
+            parameter("need_phone_number", needPhoneNumber)
+            parameter("need_email", needEmail)
+            parameter("need_shipping_address", needShippingAddress)
+            parameter("send_phone_number_to_provider", sendPhoneNumberToProvider)
+            parameter("send_email_to_provider", sendEmailToProvider)
+            parameter("is_flexible", isFlexible)
+        }
+    }
 
     private inline fun <reified T> HttpRequestBuilder.parameter(key: String, value: T?) {
-        if (T::class == String::class) {
-            value?.also { url.parameters.append(key, it as String) }
-        } else {
-            value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) } ?: Unit
+        when {
+            T::class == String::class -> value?.also { url.parameters.append(key, it as String) }
+            T::class == Int::class -> value?.also { url.parameters.append(key, it.toString()) }
+            T::class == Long::class -> value?.also { url.parameters.append(key, it.toString()) }
+            T::class == Boolean::class -> value?.also { url.parameters.append(key, it.toString()) }
+            T::class == Duration::class -> value?.also { url.parameters.append(key, (it as Duration).inWholeSeconds.toString()) }
+            else -> {
+                value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) } ?: Unit
+            }
         }
     }
 
@@ -2167,4 +2221,562 @@ interface TelegramService2 {
             }
         ))
     }
+
+    // missed ----------------------------------------------------------------------------------------------------------
+
+    suspend fun getUpdates(
+        offset: Int? = null,
+        limit: Int? = null,
+        timeout: Int? = null,
+        allowedUpdates: String? = null,
+    ) = request<List<Update>> {
+        client.post("getUpdates") {
+            parameter("offset", offset)
+            parameter("limit", limit)
+            parameter("timeout", timeout)
+            parameter("allowed_updates", allowedUpdates)
+        }
+    }
+
+    suspend fun sendAudio(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        audio: InputFile,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        duration: Int? = null,
+        performer: String? = null,
+        title: String? = null,
+        thumbnail: InputFile? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendAudio") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("duration", duration)
+            parameter("performer", performer)
+            parameter("title", title)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "audio" to audio,
+                "thumbnail" to thumbnail
+            )
+        }
+    }
+
+    suspend fun sendDocument(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        document: InputFile,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        disableContentTypeDetection: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendDocument") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("document", document)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("disable_content_type_detection", disableContentTypeDetection)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "document" to document
+            )
+        }
+    }
+
+    suspend fun sendVideo(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        video: InputFile,
+        duration: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        supportsStreaming: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVideo") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("video", video)
+            parameter("duration", duration)
+            parameter("width", width)
+            parameter("height", height)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("has_spoiler", hasSpoiler)
+            parameter("supports_streaming", supportsStreaming)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "video" to video
+            )
+        }
+    }
+
+    suspend fun sendAnimation(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        animation: InputFile,
+        duration: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+        thumbnail: String? = null,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendAnimation") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("duration", duration)
+            parameter("width", width)
+            parameter("height", height)
+            parameter("thumbnail", thumbnail)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("has_spoiler", hasSpoiler)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "animation" to animation
+            )
+        }
+    }
+
+    suspend fun sendVoice(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        voice: InputFile,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        duration: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVoice") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("duration", duration)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "voice" to voice
+            )
+        }
+    }
+
+    suspend fun sendVideoNote(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        videoNote: InputFile,
+        duration: Int? = null,
+        length: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVideoNote") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("duration", duration)
+            parameter("length", length)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "video_note" to videoNote
+            )
+        }
+    }
+
+    /**
+     * Use this method to send a group of photos, videos, documents or audios as an album.
+     * Documents and audio filescan be only grouped in an album with messages of the same type.
+     * On success, an array of Messages that were sent is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
+     * */
+    suspend fun sendMediaGroup( // TODO work?
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        media: List<InputMediaGroup>,
+        disableNotification: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        inputFiles: List<InputFile>? = null // docs
+    ) = request<List<Message>> {
+        client.post("sendMediaGroup") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("media", TelegramApi2.json.encodeToString(media))
+            parameter("disable_notification", disableNotification)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            if (inputFiles != null) {
+                setMultiPartFormDataBody(
+                    *media.mapIndexed { index, inputMedia ->
+                        inputMedia.media to inputFiles[index]
+                    }.toTypedArray()
+                )
+            }
+        }
+    }
+
+    suspend fun sendLocation(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        latitude: Double,
+        longitude: Double,
+        horizontalAccuracy: Double? = null,
+        livePeriod: Int? = null,
+        heading: Int? = null,
+        proximityAlertRadius: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("horizontal_accuracy", horizontalAccuracy)
+            parameter("live_period", livePeriod)
+            parameter("heading", heading)
+            parameter("proximity_alert_radius", proximityAlertRadius)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun editMessageLiveLocation(
+        chatId: ChatId? = null,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        latitude: Double,
+        longitude: Double,
+        horizontalAccuracy: Double? = null,
+        heading: Int? = null,
+        proximityAlertRadius: Int? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<LiveLocationResponse> {
+        client.post("editMessageLiveLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_id", messageId)
+            parameter("inline_message_id", inlineMessageId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("horizontal_accuracy", horizontalAccuracy)
+            parameter("heading", heading)
+            parameter("proximity_alert_radius", proximityAlertRadius)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun stopMessageLiveLocation(
+        chatId: ChatId? = null,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<LiveLocationResponse> {
+        client.post("stopMessageLiveLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_id", messageId)
+            parameter("inline_message_id", inlineMessageId)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun sendVenue(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        latitude: Double,
+        longitude: Double,
+        title: String,
+        address: String,
+        foursquareId: String? = null,
+        foursquareType: String? = null,
+        googlePlaceId: String? = null,
+        googlePlaceType: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVenue") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("title", title)
+            parameter("address", address)
+            parameter("foursquare_id", foursquareId)
+            parameter("foursquare_type", foursquareType)
+            parameter("google_place_id", googlePlaceId)
+            parameter("google_place_type", googlePlaceType)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun sendContact(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        phoneNumber: String,
+        firstName: String,
+        lastName: String? = null,
+        vcard: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendContact") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("phone_number", phoneNumber)
+            parameter("first_name", firstName)
+            parameter("last_name", lastName)
+            parameter("vcard", vcard)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun sendPoll(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        question: String,
+        options: String,
+        isAnonymous: Boolean? = null,
+        type: PollType? = null,
+        allowsMultipleAnswers: Boolean? = null,
+        correctOptionId: Int? = null,
+        explanation: String? = null,
+        explanationParseMode: String? = null,
+        explanationEntities: String? = null,
+        openPeriod: Int? = null,
+        closeDate: Int? = null,
+        isClosed: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendPoll") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("question", question)
+            parameter("options", options)
+            parameter("is_anonymous", isAnonymous)
+            parameter("type", type)
+            parameter("allows_multiple_answers", allowsMultipleAnswers)
+            parameter("correct_option_id", correctOptionId)
+            parameter("explanation", explanation)
+            parameter("explanation_parse_mode", explanationParseMode)
+            parameter("explanation_entities", explanationEntities)
+            parameter("open_period", openPeriod)
+            parameter("close_date", closeDate)
+            parameter("is_closed", isClosed)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun sendDice(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        emoji: String,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendDice") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("emoji", emoji)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    suspend fun sendChatAction(
+        chatId: ChatId,
+        action: ChatAction,
+        messageThreadId: Int? = null,
+    ) = request<Boolean> {
+        client.post("sendChatAction") {
+            parameter("chat_id", chatId)
+            parameter("action", action)
+            parameter("message_thread_id", messageThreadId)
+        }
+    }
+
+    suspend fun sendSticker(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        sticker: InputFile,
+        emoji: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendSticker") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("emoji", emoji)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "sticker" to sticker
+            )
+        }
+    }
+
+    /**
+     * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
+     * will send an [Update][Update] with a *shipping_query* field to the bot.
+     * Use this method to reply to shipping queries. On success, True is returned.
+     *
+     * @param shippingQueryId Unique identifier for the query to be answered
+     * @param ok Specify True if delivery to the specified address is possible and False if there are any problems
+     * (for example, if delivery to the specified address is not possible)
+     * @param shippingOptions Required if *ok* is True. A JSON-serialized array of available shipping options.
+     * @param errorMessage Required if *ok* is False. Error message in human readable form that explains why it is
+     * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
+     * Telegram will display this message to the user.
+     * */
+    suspend fun answerShippingQuery(
+        shippingQueryId: String,
+        ok: Boolean,
+        shippingOptions: String? = null,
+        errorMessage: String? = null,
+    ) = request<Boolean> {
+        client.post("answerShippingQuery") {
+            parameter("shipping_query_id", shippingQueryId)
+            parameter("ok", ok)
+            parameter("shipping_options", shippingOptions)
+            parameter("error_message", errorMessage)
+        }
+    }
+
+    /**
+     * Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation
+     * in the form of an [Update][Update] with the field *pre_checkout_query*.
+     * Use this method to respond to such pre-checkout queries.
+     * On success, True is returned. **Note:** The Bot API must receive an answer within 10 seconds after
+     * the pre-checkout query was sent.
+     *
+     * @param preCheckoutQueryId Unique identifier for the query to be answered
+     * @param ok Specify *True* if everything is alright (goods are available, etc.) and the bot is ready to proceed
+     * with the order. Use *False* if there are any problems.
+     * @param errorMessage Required if *ok* is *False*. Error message in human readable form that explains the reason
+     * for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black
+     * T-shirts while you were busy filling out your payment details. Please choose a different color or garment!").
+     * Telegram will display this message to the user.
+     * */
+    suspend fun answerPreCheckoutQuery(
+        preCheckoutQueryId: String,
+        ok: Boolean,
+        errorMessage: String? = null,
+    ) = request<Boolean> {
+        client.post("answerPreCheckoutQuery") {
+            parameter("pre_checkout_query_id", preCheckoutQueryId)
+            parameter("ok", ok)
+            parameter("error_message", errorMessage)
+        }
+    }
+
 }

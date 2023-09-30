@@ -1,18 +1,17 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.PollAnswer
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
 open class PollAnswerHandler(
     val pollAnswer: PollAnswer,
-    override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: PollAnswerHandler.() -> Unit = {}
+    override val client: HttpClient,
+    private val handler: suspend PollAnswerHandler.() -> Unit = {}
 ) : EventHandler, BotContext<PollAnswerHandler> {
 
     override fun getChatId() = null
@@ -21,7 +20,7 @@ open class PollAnswerHandler(
 
     override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<PollAnswerHandler>.() -> R): R {
-        return PollAnswerHandler(pollAnswer, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PollAnswerHandler>.() -> R): R {
+        return PollAnswerHandler(pollAnswer, client, handler).block()
     }
 }

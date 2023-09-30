@@ -1,20 +1,17 @@
 package ru.raysmith.tgbot.core
 
+import io.ktor.client.*
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import retrofit2.Call
 import ru.raysmith.tgbot.core.handler.BaseEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.EventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.network.*
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.errorBody
@@ -48,7 +45,7 @@ class Bot(
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     private var lastUpdateId: Int? = null, // TODO can be negative, reverse mode?
-) : ApiCaller {
+) : TelegramService2 {
 
     init {
         check(timeout >= 0) { "timeout should be positive" }
@@ -65,8 +62,7 @@ class Bot(
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
-    override val service = token?.let { TelegramApi.serviceWithToken(it) } ?: TelegramApi.service
-    override val fileService = token?.let { TelegramApi.fileServiceWithToken(it) } ?: TelegramApi.fileService
+    override val client: HttpClient = token?.let { TelegramApi2.defaultClient(it) } ?: TelegramApi2.defaultClient()
 
     // states
     var isActive = false
@@ -79,9 +75,15 @@ class Bot(
         @Deprecated("This constant returns the bot for a default service instance. Use the getMe() method from bot context", ReplaceWith("botContext { getMe() }"))
         val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
 
-        internal var properties = setProperties()
-        internal fun setProperties(): Properties? {
-            return PropertiesFactory.fromOrNull("tgbot.properties") ?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
+        internal var properties = getProperties()
+        @JvmName("getPropertiesFromFile")
+        internal fun getProperties(): Properties? {
+            return PropertiesFactory.fromOrNull("tgbot.properties")?.also {
+                ClassLoader.getSystemClassLoader().getResource("tgbot.properties")?.let {
+                    println(it.path)
+                }
+                println("calendar_locale: " + it.getProperty("calendar_locale"))
+            } ?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
         
         internal var config = BotConfig()
@@ -101,7 +103,10 @@ class Bot(
     
     /** Reloads config from properties file */
     fun reloadConfig() {
-        properties = setProperties()
+        properties = getProperties()
+        config = BotConfig().also {
+            println("new Conf: ${it.locale}")
+        }
         needRefreshMe = true
     }
     
@@ -128,7 +133,7 @@ class Bot(
 
     fun Map<Any, Pair<UUID, Job>>?.data(key: Any) = this?.get(key).let { it?.first to it?.second }
 
-    fun newUpdate(update: Update, service: TelegramService) = safeNetwork {
+    suspend fun newUpdate(update: Update) = safeNetwork {
         val start = System.currentTimeMillis()
 
         var blockingTime = 0L
@@ -155,9 +160,9 @@ class Bot(
                             additionalEventHandlers.forEach {
                                 apply(it)
                             }
-                        }.getHandler(update, service, fileService)
+                        }.getHandler(update, client)
                     } else {
-                        eventHandlerFactory.getHandler(update, service, fileService)
+                        eventHandlerFactory.getHandler(update, client)
                     }
                     
                     with(handler) {
@@ -208,7 +213,7 @@ class Bot(
         lastUpdateId = (lastUpdateId ?: 0) + 1
     }
 
-    private fun safeNetwork(action: () -> Unit) {
+    private suspend fun safeNetwork(action: suspend () -> Unit) {
         try {
             action()
         } catch (e: BotException) {
@@ -235,7 +240,7 @@ class Bot(
         }
     }
 
-    private var updateRequest: Call<NetworkResponse<List<Update>>>? = null
+    private val updateScope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private suspend fun startBot() {
         additionalEventHandlers.forEach {
             eventHandlerFactory.apply(it)
@@ -255,21 +260,25 @@ class Bot(
 
             while (isActive) {
                 safeNetwork {
-                    updateRequest = service.getUpdates(
-                        offset = lastUpdateId?.plus(1),
-                        timeout = timeout,
-                        allowedUpdates = allowedUpdates
-                    )
-
-                    val updates = updateRequest!!.execute()
-
-                    if (updates.isSuccessful && updates.body()?.result?.isNotEmpty() == true) {
-                        onUpdate(updates.body()!!.result)
-                        updates.body()!!.result.forEach { update ->
-                            newUpdate(update, service)
+                    withContext(updateScope.coroutineContext) {
+                        val updates = try {
+                            getUpdates(
+                                offset = lastUpdateId?.plus(1),
+                                timeout = timeout,
+                                allowedUpdates = allowedUpdates
+                            )
+                        } catch (e: Exception) {
+                            return@withContext
                         }
 
-                        lastUpdateId = updates.body()!!.result.last().updateId
+                        if (updates.isNotEmpty()) {
+                            onUpdate(updates)
+                            updates.forEach { update ->
+                                newUpdate(update)
+                            }
+
+                            lastUpdateId = updates.last().updateId
+                        }
                     }
                 }
             }
@@ -299,8 +308,8 @@ class Bot(
     private var isLocationsMode = false
     private var locationsWrapper: LocationsWrapper<*>? = null
     @LocationsDSL
-    suspend fun <T : LocationConfig> locations(setup: LocationsWrapper<T>.() -> Unit) {
-        locationsWrapper = LocationsWrapper<T>().apply(setup)
+    suspend fun <T : LocationConfig> locations(setup: suspend LocationsWrapper<T>.() -> Unit) {
+        locationsWrapper = LocationsWrapper<T>().apply { setup() }
         eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)
         isLocationsMode = true
         startBot()
@@ -357,7 +366,7 @@ class Bot(
 
     suspend fun stop(handler: CommandHandler? = null) {
         isActive = false
-        updateRequest?.cancel()
+        updateScope.cancel()
         onStop(this, handler)
         logger.info("Waiting all processing updates...")
         scope.coroutineContext[Job]!!.children.forEach {

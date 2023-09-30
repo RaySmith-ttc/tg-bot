@@ -10,6 +10,7 @@ import ru.raysmith.utils.letIf
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 interface BotFeature {
     fun handler(h: (eventHandlerFactory: EventHandlerFactory) -> Unit)
@@ -41,7 +42,8 @@ class DatePicker(val callbackQueryPrefix: String) {
     var additionalRowsVisibleOnStates = DatePickerState.entries.toSet()
 
     var timeZone = ZoneId.systemDefault()
-    var locale = Bot.config.locale
+    var locale: Locale? = null
+    private val _locale get() = locale ?: Bot.config.locale
 
     private val now get() = LocalDate.now(timeZone)
 
@@ -86,7 +88,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    fun handle(handler: CallbackQueryHandler) {
+    suspend fun handle(handler: CallbackQueryHandler) {
         handler.apply {
             isDataStartWith(callbackQueryPrefix) { data ->
                 val datePickerData = DatePickerData.from(data)
@@ -126,7 +128,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    private fun Month.localized(style: TextStyle = TextStyle.FULL_STANDALONE) = getDisplayName(style, locale)
+    private fun Month.localized(style: TextStyle = TextStyle.FULL_STANDALONE) = getDisplayName(style, _locale)
     private fun Number.toIso() = if (this.toInt() < 10) "0$this" else this.toString()
     private fun Number.toIso(isYear: Boolean = false) = this.toString().padStart(if (isYear) 4 else 2, '0')
     private fun getMonthsDiff(year: Int, month: Int, date: LocalDate = now): Long {
@@ -313,7 +315,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
 
         val dayOfWeekSequence = generateSequence(DayOfWeek.of(1)) { it + 1}
-        fun DayOfWeek.localized() = getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+        fun DayOfWeek.localized() = getDisplayName(TextStyle.SHORT_STANDALONE, _locale)
 
         // Day of week headers
         row {

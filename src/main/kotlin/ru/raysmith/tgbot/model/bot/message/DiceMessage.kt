@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
 
-class ContactMessage(
-    val phoneNumber: String, val firstName: String,
+class DiceMessage(
+    val emoji: String,
     override val client: HttpClient
 ) : IMessage<Message>, KeyboardCreator {
 
@@ -18,16 +18,10 @@ class ContactMessage(
     override var protectContent: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    var lastName: String? = null
-    var vcard: String? = null
-
-    override suspend fun send(chatId: ChatId) = sendContact(
+    override suspend fun send(chatId: ChatId) = sendDice(
         chatId = chatId,
         messageThreadId = messageThreadId,
-        phoneNumber = phoneNumber,
-        firstName = firstName,
-        lastName = lastName,
-        vcard = vcard,
+        emoji = emoji,
         disableNotification = disableNotification,
         protectContent = protectContent,
         replyToMessageId = replyToMessageId,
@@ -35,4 +29,3 @@ class ContactMessage(
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }
-

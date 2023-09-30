@@ -17,8 +17,8 @@ abstract class CaptionableMessage : EditableMessage {
     /**
      * Sets a caption as [MessageText] object
      * */
-    fun captionWithEntities(setText: MessageText.() -> Unit) {
-        _caption = MessageText(MessageTextType.CAPTION).apply(setText)
+    suspend fun captionWithEntities(setText: suspend MessageText.() -> Unit) {
+        _caption = MessageText(MessageTextType.CAPTION).apply { setText() }
     }
 
     fun getCaptionText(): String? =

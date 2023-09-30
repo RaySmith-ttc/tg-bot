@@ -1,18 +1,17 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
 open class ChannelPostHandler(
     val channelPost: Message,
-    override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ChannelPostHandler.() -> Unit = {}
+    override val client: HttpClient,
+    private val handler: suspend ChannelPostHandler.() -> Unit = {}
 ) : EventHandler, BotContext<ChannelPostHandler> {
     override fun getChatId() = channelPost.chat.id
     override fun getChatIdOrThrow() = channelPost.chat.id
@@ -21,8 +20,8 @@ open class ChannelPostHandler(
     
     override suspend fun handle() = handler()
     
-    override fun <R> withBot(bot: Bot, block: BotContext<ChannelPostHandler>.() -> R): R {
-        return ChannelPostHandler(channelPost, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChannelPostHandler>.() -> R): R {
+        return ChannelPostHandler(channelPost, client, handler).block()
     }
 }
 

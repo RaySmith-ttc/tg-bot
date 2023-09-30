@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
@@ -15,8 +16,8 @@ import ru.raysmith.tgbot.utils.errorBody
 @HandlerDsl
 open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
-    override val service: TelegramService, override val fileService: TelegramFileService,
-    private val handler: ShippingQueryHandler.() -> Unit = {}
+    override val client: HttpClient,
+    private val handler: suspend ShippingQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<ShippingQueryHandler> {
 
     override fun getChatId() = shippingQuery.from.id
@@ -26,13 +27,13 @@ open class ShippingQueryHandler(
 
     override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<ShippingQueryHandler>.() -> R): R {
-        return ShippingQueryHandler(shippingQuery, bot.service, bot.fileService, handler).block()
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ShippingQueryHandler>.() -> R): R {
+        return ShippingQueryHandler(shippingQuery, client, handler).block()
     }
 
-    fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {
-        return service.answerShippingQuery(
+    suspend fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {
+        return answerShippingQuery(
             shippingQuery.id, ok, Json.encodeToString(shippingOptions), errorMessage
-        ).execute().body()?.result ?: errorBody()
+        )
     }
 }

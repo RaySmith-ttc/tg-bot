@@ -2,8 +2,6 @@ package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
@@ -12,9 +10,9 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
-import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.utils.botContext
 
 /** This object represents a message. */
 @Serializable
@@ -278,7 +276,7 @@ data class Message(
     /** Inline keyboard attached to the message. `login_url` buttons are represented as ordinary `url` buttons. */
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null
 
-)  : ChatIdHolder {
+) : ChatIdHolder {
 
     /** [Type][MessageType] of the message. It can be text, command or inline data */
     val type = when {
@@ -328,14 +326,11 @@ data class Message(
      *
      * Returns *True* on Success.
      * */
-    fun delete(context: BotContext<*>) = delete(context.service)
-    fun delete(service: TelegramService) = service.deleteMessage(chat.id, messageId).execute().body()?.result ?: false
-    fun delete(bot: Bot) = delete(bot.service)
-    fun delete(token: String) = delete(TelegramApi.serviceWithToken(token))
+    suspend fun delete(context: TelegramService2) = context.deleteMessage(chat.id, messageId)
+    suspend fun delete(token: String) = delete(botContext(token))
 
-    /** A safe version of the [delete] method that does not throw a [TelegramApiException]. Return true if message success deleted */
-    fun safeDelete(service: TelegramService) = try { delete(service) } catch (e: TelegramApiException) { false }
-    fun safeDelete(bot: Bot) = safeDelete(bot.service)
-    fun safeDelete(token: String) = safeDelete(TelegramApi.serviceWithToken(token))
-    fun safeDelete(context: BotContext<*>) = safeDelete(context.service)
+    /** A safe version of the [delete] method that swallows a [TelegramApiException]. Return true if message success deleted */
+    suspend fun safeDelete(context: TelegramService2) = try { delete(context) } catch (e: TelegramApiException) { false }
+    suspend fun safeDelete(token: String) = safeDelete(botContext(token))
+
 }

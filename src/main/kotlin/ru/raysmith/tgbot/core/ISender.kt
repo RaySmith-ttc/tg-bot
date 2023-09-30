@@ -7,101 +7,188 @@ import ru.raysmith.tgbot.model.bot.message.media.*
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
-import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.toChatId
 
 // TODO add docs for methods
 /** Represent an object that can send messages */
-interface ISender : ChatIdHolder, ApiCaller {
+interface ISender : ChatIdHolder, TelegramService2 {
 
     // TODO change agts to chatId, messageThreadId = Int? = null
-    fun send(chatId: Long, message: TextMessage.() -> Unit): Message = send(chatId.toChatId(), message)
-    fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
-        return TextMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun send(chatId: Long, message: suspend TextMessage.() -> Unit): Message = send(chatId.toChatId(), message)
+    suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
+        return TextMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendPhoto(chatId: Long, message: PhotoMessage.() -> Unit): Message = sendPhoto(chatId.toChatId(), message)
-    fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: PhotoMessage.() -> Unit): Message {
-        return PhotoMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendPhoto(chatId: Long, message: suspend PhotoMessage.() -> Unit): Message =
+        sendPhoto(chatId.toChatId(), message)
+
+    suspend fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: suspend PhotoMessage.() -> Unit): Message {
+        return PhotoMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendAudio(chatId: Long, message: AudioMessage.() -> Unit): Message = sendAudio(chatId.toChatId(), message)
-    fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: AudioMessage.() -> Unit): Message {
-        return AudioMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendAudio(chatId: Long, message: suspend AudioMessage.() -> Unit): Message =
+        sendAudio(chatId.toChatId(), message)
+
+    suspend fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: suspend AudioMessage.() -> Unit): Message {
+        return AudioMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendDocument(chatId: Long, message: DocumentMessage.() -> Unit): Message = sendDocument(chatId.toChatId(), message)
-    fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: DocumentMessage.() -> Unit): Message {
-        return DocumentMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendDocument(chatId: Long, message: suspend DocumentMessage.() -> Unit): Message =
+        sendDocument(chatId.toChatId(), message)
+
+    suspend fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: suspend DocumentMessage.() -> Unit): Message {
+        return DocumentMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVideo(chatId: Long, message: VideoMessage.() -> Unit): Message = sendVideo(chatId.toChatId(), message)
-    fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: VideoMessage.() -> Unit): Message {
-        return VideoMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendVideo(chatId: Long, message: suspend VideoMessage.() -> Unit): Message =
+        sendVideo(chatId.toChatId(), message)
+
+    suspend fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoMessage.() -> Unit): Message {
+        return VideoMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendAnimation(chatId: Long, message: AnimationMessage.() -> Unit): Message = sendAnimation(chatId.toChatId(), message)
-    fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: AnimationMessage.() -> Unit): Message {
-        return AnimationMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendAnimation(chatId: Long, message: suspend AnimationMessage.() -> Unit): Message =
+        sendAnimation(chatId.toChatId(), message)
+
+    suspend fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: suspend AnimationMessage.() -> Unit): Message {
+        return AnimationMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVoice(chatId: Long, message: VoiceMessage.() -> Unit): Message = sendVoice(chatId.toChatId(), message)
-    fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: VoiceMessage.() -> Unit): Message {
-        return VoiceMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendVoice(chatId: Long, message: suspend VoiceMessage.() -> Unit): Message =
+        sendVoice(chatId.toChatId(), message)
+
+    suspend fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: suspend VoiceMessage.() -> Unit): Message {
+        return VoiceMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVideoNote(chatId: Long, message: VideoNoteMessage.() -> Unit): Message = sendVideoNote(chatId.toChatId(), message)
-    fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: VideoNoteMessage.() -> Unit): Message {
-        return VideoNoteMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendVideoNote(chatId: Long, message: suspend VideoNoteMessage.() -> Unit): Message =
+        sendVideoNote(chatId.toChatId(), message)
+
+    suspend fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoNoteMessage.() -> Unit): Message {
+        return VideoNoteMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendLocation(chatId: Long, latitude: Double, longitude: Double, message: LocationMessage.() -> Unit): Message = sendLocation(latitude, longitude, chatId.toChatId(), message)
-    fun sendLocation(latitude: Double, longitude: Double, chatId: ChatId = getChatIdOrThrow(), message: LocationMessage.() -> Unit): Message {
-        return LocationMessage(latitude, longitude, service, fileService).apply(message).send(chatId).result
+    suspend fun sendLocation(
+        chatId: Long,
+        latitude: Double,
+        longitude: Double,
+        message: suspend LocationMessage.() -> Unit
+    ): Message = sendLocation(latitude, longitude, chatId.toChatId(), message)
+
+    suspend fun sendLocation(
+        latitude: Double,
+        longitude: Double,
+        chatId: ChatId = getChatIdOrThrow(),
+        message: suspend LocationMessage.() -> Unit
+    ): Message {
+        return LocationMessage(latitude, longitude, client).apply { message() }.send(chatId)
     }
 
-    fun editMessageLiveLocation(chatId: Long, latitude: Double, longitude: Double, messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit) = editMessageLiveLocation(latitude, longitude, chatId.toChatId(), messageId, inlineMessageId, message)
-    fun editMessageLiveLocation(latitude: Double, longitude: Double, chatId: ChatId? = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse {
-        return LocationMessage(latitude, longitude, service, fileService).apply(message).edit(chatId, messageId, inlineMessageId)
+    suspend fun editMessageLiveLocation(
+        chatId: Long,
+        latitude: Double,
+        longitude: Double,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        message: suspend LocationMessage.() -> Unit
+    ) = editMessageLiveLocation(latitude, longitude, chatId.toChatId(), messageId, inlineMessageId, message)
+
+    suspend fun editMessageLiveLocation(
+        latitude: Double,
+        longitude: Double,
+        chatId: ChatId? = getChatIdOrThrow(),
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        message: suspend LocationMessage.() -> Unit
+    ): LiveLocationResponse {
+        return LocationMessage(latitude, longitude, client).apply { message() }
+            .edit(chatId, messageId, inlineMessageId)
     }
 
-    fun stopMessageLiveLocation(chatId: Long, messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse = stopMessageLiveLocation(chatId.toChatId(), messageId, inlineMessageId, message)
-    fun stopMessageLiveLocation(chatId: ChatId = getChatIdOrThrow(), messageId: Int? = null, inlineMessageId: String? = null, message: LocationMessage.() -> Unit): LiveLocationResponse {
-        return LocationMessage(0.0, 0.0, service, fileService).apply(message).stop(chatId, messageId, inlineMessageId)
+    suspend fun stopMessageLiveLocation(
+        chatId: Long,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        message: suspend LocationMessage.() -> Unit
+    ): LiveLocationResponse = stopMessageLiveLocation(chatId.toChatId(), messageId, inlineMessageId, message)
+
+    suspend fun stopMessageLiveLocation(
+        chatId: ChatId = getChatIdOrThrow(),
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        message: suspend LocationMessage.() -> Unit
+    ): LiveLocationResponse {
+        return LocationMessage(0.0, 0.0, client).apply { message() }.stop(chatId, messageId, inlineMessageId)
     }
 
-    fun sendVenue(chatId: Long, latitude: Double, longitude: Double, title: String, address: String, message: VenueMessage.() -> Unit): Message = sendVenue(latitude, longitude, title, address, chatId.toChatId(), message)
-    fun sendVenue(latitude: Double, longitude: Double, title: String, address: String, chatId: ChatId = getChatIdOrThrow(), message: VenueMessage.() -> Unit): Message {
-        return VenueMessage(latitude, longitude, title, address, service, fileService).apply(message).send(chatId).result
+    suspend fun sendVenue(
+        chatId: Long,
+        latitude: Double,
+        longitude: Double,
+        title: String,
+        address: String,
+        message: suspend VenueMessage.() -> Unit
+    ): Message = sendVenue(latitude, longitude, title, address, chatId.toChatId(), message)
+
+    suspend fun sendVenue(
+        latitude: Double,
+        longitude: Double,
+        title: String,
+        address: String,
+        chatId: ChatId = getChatIdOrThrow(),
+        message: suspend VenueMessage.() -> Unit
+    ): Message {
+        return VenueMessage(latitude, longitude, title, address, client).apply { message() }.send(chatId)
     }
 
-    fun sendContact(chatId: Long, phoneNumber: String, firstName: String, message: ContactMessage.() -> Unit): Message = sendContact(phoneNumber, firstName, chatId.toChatId(), message)
-    fun sendContact(phoneNumber: String, firstName: String, chatId: ChatId = getChatIdOrThrow(), message: ContactMessage.() -> Unit): Message {
-        return ContactMessage(phoneNumber, firstName, service, fileService).apply(message).send(chatId).result
+    suspend fun sendContact(chatId: Long, phoneNumber: String, firstName: String, message: suspend ContactMessage.() -> Unit): Message =
+        sendContact(phoneNumber, firstName, chatId.toChatId(), message)
+
+    suspend fun sendContact(
+        phoneNumber: String,
+        firstName: String,
+        chatId: ChatId = getChatIdOrThrow(),
+        message: suspend ContactMessage.() -> Unit
+    ): Message {
+        return ContactMessage(phoneNumber, firstName, client).apply { message() }.send(chatId)
     }
 
-    fun sendPoll(chatId: Long, question: String, options: List<String>, message: PollMessage.() -> Unit): Message = sendPoll(question, options, chatId.toChatId(), message)
-    fun sendPoll(question: String, options: List<String>, chatId: ChatId = getChatIdOrThrow(), message: PollMessage.() -> Unit): Message {
-        return PollMessage(question, options, service, fileService).apply(message).send(chatId).result
+    suspend fun sendPoll(chatId: Long, question: String, options: List<String>, message: suspend PollMessage.() -> Unit): Message =
+        sendPoll(question, options, chatId.toChatId(), message)
+
+    suspend fun sendPoll(
+        question: String,
+        options: List<String>,
+        chatId: ChatId = getChatIdOrThrow(),
+        message: suspend PollMessage.() -> Unit
+    ): Message {
+        return PollMessage(question, options, client).apply { message() }.send(chatId)
     }
 
-    fun sendDice(chatId: Long, emoji: String, message: DiceMessage.() -> Unit): Message = sendDice(emoji, chatId.toChatId(), message)
-    fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
-        return DiceMessage(emoji, service, fileService).apply(message).send(chatId).result
+    suspend fun sendDice(chatId: Long, emoji: String, message: suspend DiceMessage.() -> Unit): Message =
+        sendDice(emoji, chatId.toChatId(), message)
+
+    suspend fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {
+        return DiceMessage(emoji, client).apply { message() }.send(chatId)
     }
 
-    fun sendChatAction(chatId: Long, messageThreadId: Int? = null, action: ChatAction): Boolean = sendChatAction(action, messageThreadId, chatId.toChatId())
-    fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return service.sendChatAction(chatId, action, messageThreadId).execute().body()?.result ?: errorBody()
+    suspend fun sendChatAction(chatId: Long, messageThreadId: Int? = null, action: ChatAction): Boolean =
+        sendChatAction(action, messageThreadId, chatId.toChatId())
+
+    suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return sendChatAction(chatId, action, messageThreadId)
     }
 
-    fun sendMediaGroup(chatId: Long, message: MediaGroupMessage.() -> Unit): List<Message> = sendMediaGroup(chatId.toChatId(), message)
-    fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
-        return MediaGroupMessage(service, fileService).apply(message).send(chatId).results
+    suspend fun sendMediaGroup(chatId: Long, message: suspend MediaGroupMessage.() -> Unit): List<Message> =
+        sendMediaGroup(chatId.toChatId(), message)
+
+    suspend fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: suspend MediaGroupMessage.() -> Unit): List<Message> {
+        return MediaGroupMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendSticker(chatId: Long, message: StickerMessage.() -> Unit): Message = sendSticker(chatId.toChatId(), message)
-    fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
-        return StickerMessage(service, fileService).apply(message).send(chatId).result
+    suspend fun sendSticker(chatId: Long, message: suspend StickerMessage.() -> Unit): Message = sendSticker(chatId.toChatId(), message)
+    suspend fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: suspend StickerMessage.() -> Unit): Message {
+        return StickerMessage(client).apply { message() }.send(chatId)
     }
 }

@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core
 
+import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -9,14 +10,10 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.model.network.response.StringResponse
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.network.TelegramService2
 
 /** Builder of [sendInvoice][BotContext.sendInvoice] request */
-class InvoiceSender(override val service: TelegramService, override val fileService: TelegramFileService) : InlineKeyboardCreator, ApiCaller {
+class InvoiceSender(override val client: HttpClient) : InlineKeyboardCreator, TelegramService2 {
 
     var messageThreadId: Int? = null
     var title: String? = null
@@ -45,41 +42,39 @@ class InvoiceSender(override val service: TelegramService, override val fileServ
     var allowSendingWithoutReply: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    fun send(chatId: ChatId): MessageResponse {
-        return service.sendInvoice(
-            chatId = chatId,
-            messageThreadId = messageThreadId,
-            title = title ?: "",
-            description = description ?: "",
-            payload = payload ?: "",
-            providerToken = providerToken ?: "",
-            currency = currency?.code ?: "",
-            prices = prices?.let { Json.encodeToString(it) } ?: "",
-            maxTipAmount = maxTipAmount,
-            suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
-            startParameter = startParameter,
-            providerData = providerData?.let { Json.encodeToString(it) },
-            photoUrl = photoUrl,
-            photoSize = photoSize,
-            photoWidth = photoWidth,
-            photoHeight = photoHeight,
-            needName = needName,
-            needPhoneNumber = needPhoneNumber,
-            needEmail = needEmail,
-            needShippingAddress = needShippingAddress,
-            sendPhoneNumberToProvider = sendPhoneNumberToProvider,
-            sendEmailToProvider = sendEmailToProvider,
-            isFlexible = isFlexible,
-            disableNotification = disableNotification,
-            replyToMessageId = replyToMessageId,
-            allowSendingWithoutReply = allowSendingWithoutReply,
-            replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
-        ).execute().body() ?: errorBody()
-    }
+    suspend fun send(chatId: ChatId) = sendInvoice(
+        chatId = chatId,
+        messageThreadId = messageThreadId,
+        title = title ?: "",
+        description = description ?: "",
+        payload = payload ?: "",
+        providerToken = providerToken ?: "",
+        currency = currency?.code ?: "",
+        prices = prices?.let { Json.encodeToString(it) } ?: "",
+        maxTipAmount = maxTipAmount,
+        suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
+        startParameter = startParameter,
+        providerData = providerData?.let { Json.encodeToString(it) },
+        photoUrl = photoUrl,
+        photoSize = photoSize,
+        photoWidth = photoWidth,
+        photoHeight = photoHeight,
+        needName = needName,
+        needPhoneNumber = needPhoneNumber,
+        needEmail = needEmail,
+        needShippingAddress = needShippingAddress,
+        sendPhoneNumberToProvider = sendPhoneNumberToProvider,
+        sendEmailToProvider = sendEmailToProvider,
+        isFlexible = isFlexible,
+        disableNotification = disableNotification,
+        replyToMessageId = replyToMessageId,
+        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
+    )
 }
 
 /** Builder of [sendInvoice][BotContext.createInvoiceLink] request */
-class InvoiceCreateLinkSender(override val service: TelegramService, override val fileService: TelegramFileService) : ApiCaller {
+class InvoiceCreateLinkSender(override val client: HttpClient) : TelegramService2 {
 
     var title: String? = null
     var description: String? = null
@@ -102,28 +97,26 @@ class InvoiceCreateLinkSender(override val service: TelegramService, override va
     var sendEmailToProvider: Boolean? = null
     var isFlexible: Boolean? = null
 
-    fun send(): StringResponse {
-        return service.createInvoiceLink(
-            title = title ?: "",
-            description = description ?: "",
-            payload = payload ?: "",
-            providerToken = providerToken ?: "",
-            currency = currency?.code ?: "",
-            prices = prices?.let { Json.encodeToString(it) } ?: "",
-            maxTipAmount = maxTipAmount,
-            suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
-            providerData = providerData?.let { Json.encodeToString(it) },
-            photoUrl = photoUrl,
-            photoSize = photoSize,
-            photoWidth = photoWidth,
-            photoHeight = photoHeight,
-            needName = needName,
-            needPhoneNumber = needPhoneNumber,
-            needEmail = needEmail,
-            needShippingAddress = needShippingAddress,
-            sendPhoneNumberToProvider = sendPhoneNumberToProvider,
-            sendEmailToProvider = sendEmailToProvider,
-            isFlexible = isFlexible
-        ).execute().body() ?: errorBody()
-    }
+    suspend fun send() = createInvoiceLink(
+        title = title ?: "",
+        description = description ?: "",
+        payload = payload ?: "",
+        providerToken = providerToken ?: "",
+        currency = currency?.code ?: "",
+        prices = prices?.let { Json.encodeToString(it) } ?: "",
+        maxTipAmount = maxTipAmount,
+        suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
+        providerData = providerData?.let { Json.encodeToString(it) },
+        photoUrl = photoUrl,
+        photoSize = photoSize,
+        photoWidth = photoWidth,
+        photoHeight = photoHeight,
+        needName = needName,
+        needPhoneNumber = needPhoneNumber,
+        needEmail = needEmail,
+        needShippingAddress = needShippingAddress,
+        sendPhoneNumberToProvider = sendPhoneNumberToProvider,
+        sendEmailToProvider = sendEmailToProvider,
+        isFlexible = isFlexible
+    )
 }

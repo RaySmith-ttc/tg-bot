@@ -1340,6 +1340,25 @@ interface TelegramService {
         @Query("error_message") errorMessage: String? = null
     ): Call<NetworkResponse<Boolean>>
 
+//    abstract fun sendVideo(
+//        chatId: ChatId,
+//        messageThreadId: Int?,
+//        video: InputFile,
+//        caption: String?,
+//        parseMode: ParseMode?,
+//        captionEntities: String?,
+//        hasSpoiler: Boolean?,
+//        duration: Int?,
+//        width: Int?,
+//        height: Int?,
+//        supportsStreaming: Boolean?,
+//        disableNotification: Boolean?,
+//        protectContent: Boolean?,
+//        replyToMessageId: Int?,
+//        allowSendingWithoutReply: Boolean?,
+//        keyboardMarkup: KeyboardMarkup?
+//    ): Message
+
     // TODO [passport] setPassportDataErrors
 
     // TODO [games] sendGame

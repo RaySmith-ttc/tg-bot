@@ -1,13 +1,11 @@
 package ru.raysmith.tgbot.core.handler.utils
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.handler.base.BaseCallbackHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 
 data class DataCallbackQueryHandler(
     override val query: CallbackQuery,
     val data: String,
-    override val service: TelegramService,
-    override val fileService: TelegramFileService
-) : BaseCallbackHandler(query, service, fileService)
+    override val client: HttpClient
+) : BaseCallbackHandler(query, client)

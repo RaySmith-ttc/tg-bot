@@ -12,14 +12,7 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 @Serializable
 data class InputMediaDocument(
 
-    /**
-     * File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended),
-     * pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>”
-     * to upload a new one using multipart/form-data under <file_attach_name> name.
-     *
-     * @see <a href="https://core.telegram.org/bots/api#sending-files">More info on Sending Files »</a>
-     * */
-    @SerialName("media") val media: String,
+    @SerialName("media") override val media: String,
 
     /**
      * Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
@@ -46,7 +39,7 @@ data class InputMediaDocument(
      * Always True, if the document is sent as part of an album.
      * */
     @SerialName("disable_content_type_detection") val disableContentTypeDetection: Boolean? = null,
-) : InputMedia() {
+) : InputMediaGroup() {
 
     /** Type of the result */
     @Required

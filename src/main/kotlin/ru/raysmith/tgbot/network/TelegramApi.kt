@@ -70,6 +70,8 @@ object TelegramApi2 {
     val logger: Logger = LoggerFactory.getLogger("tg-api")
     const val BASE_URL = "https://api.telegram.org"
 
+    val defaultClientInstance by lazy { defaultClient() }
+
     val json = Json {
         isLenient = true
         ignoreUnknownKeys = true

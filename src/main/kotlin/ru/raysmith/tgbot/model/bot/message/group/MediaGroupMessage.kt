@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.model.bot.message.group
 
-import kotlinx.serialization.encodeToString
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.IMessage
@@ -8,17 +8,13 @@ import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.media.input.*
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.response.MessageResponseArray
-import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.withSafeLength
 
-class MediaGroupMessage(override val service: TelegramService, override val fileService: TelegramFileService) :
-    MediaRequest(), IMessage<MessageResponseArray> {
+class MediaGroupMessage(override val client: HttpClient) :
+    MediaRequest(), IMessage<List<Message>> {
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
@@ -29,7 +25,7 @@ class MediaGroupMessage(override val service: TelegramService, override val file
     /** send [ChatAction.UPLOAD_PHOTO] action while upload files to telegram server */
     var sendAction = true
 
-    private val inputMedia = mutableListOf<InputMedia>()
+    private val inputMedia = mutableListOf<InputMediaGroup>()
 
     private fun getCaption(caption: String?, safeTextLength: Boolean, parseMode: ParseMode?) = when {
         safeTextLength && parseMode == null -> caption?.withSafeLength(MessageTextType.CAPTION)
@@ -50,20 +46,20 @@ class MediaGroupMessage(override val service: TelegramService, override val file
             }
             .apply(caption).getEntities()
 
-    override fun send(chatId: ChatId): MessageResponseArray {
+    override suspend fun send(chatId: ChatId): List<Message> {
         return if (multipartBodyParts.isEmpty()) {
-            service.sendMediaGroup(
+            sendMediaGroup(
                 chatId = chatId,
                 messageThreadId = messageThreadId,
-                media = TelegramApi.json.encodeToString(inputMedia.toList()),
+                media = inputMedia,
                 disableNotification = disableNotification,
                 replyToMessageId = replyToMessageId,
                 allowSendingWithoutReply = allowSendingWithoutReply,
-            ).execute().body() ?: errorBody()
+            )
         } else {
             if (sendAction) {
                 val action = when {
-                    inputMedia.all { it is InputMediaVideo || it is InputMediaAnimation } -> ChatAction.UPLOAD_VIDEO
+                    inputMedia.all { it is InputMediaVideo } -> ChatAction.UPLOAD_VIDEO
                     inputMedia.all { it is InputMediaPhoto } -> ChatAction.UPLOAD_PHOTO
                     inputMedia.all { it is InputMediaDocument } -> ChatAction.UPLOAD_DOCUMENT
                     inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
@@ -71,28 +67,19 @@ class MediaGroupMessage(override val service: TelegramService, override val file
                 }
 
                 if (action != null) {
-                    service.sendChatAction(chatId, action, messageThreadId).execute()
+                    sendChatAction(chatId, action, messageThreadId)
                 }
             }
 
-            service.sendMediaGroup(
+            sendMediaGroup(
                 chatId = chatId,
                 messageThreadId = messageThreadId,
-                media = TelegramApi.json.encodeToString(inputMedia.toList()),
-                mediaPart1 = multipartBodyParts[0],
-                mediaPart2 = multipartBodyParts.getOrNull(1),
-                mediaPart3 = multipartBodyParts.getOrNull(2),
-                mediaPart4 = multipartBodyParts.getOrNull(3),
-                mediaPart5 = multipartBodyParts.getOrNull(4),
-                mediaPart6 = multipartBodyParts.getOrNull(5),
-                mediaPart7 = multipartBodyParts.getOrNull(6),
-                mediaPart8 = multipartBodyParts.getOrNull(7),
-                mediaPart9 = multipartBodyParts.getOrNull(8),
-                mediaPart10 = multipartBodyParts.getOrNull(9),
+                media = inputMedia,
                 disableNotification = disableNotification,
                 replyToMessageId = replyToMessageId,
                 allowSendingWithoutReply = allowSendingWithoutReply,
-            ).execute().body() ?: errorBody()
+                inputFiles = inputFiles
+            )
         }
     }
 

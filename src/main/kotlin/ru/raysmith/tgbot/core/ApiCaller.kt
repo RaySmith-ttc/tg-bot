@@ -29,6 +29,7 @@ import ru.raysmith.tgbot.utils.errorBody
 import java.io.InputStream
 import kotlin.time.Duration
 
+@Deprecated("")
 interface ApiCaller {
     val service: TelegramService
     val fileService: TelegramFileService

@@ -10,6 +10,7 @@ import retrofit2.http.Part
 import retrofit2.http.Query
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.network.TelegramService2
 
 class KonsistTests {
 
@@ -41,66 +42,87 @@ class KonsistTests {
             .first { it.name == TelegramService::class.simpleName }
             .functions()
 
-        scope.interfaces()
+        val service2Functions = scope.interfaces()
+            .first { it.name == TelegramService2::class.simpleName }
+            .functions()
+            .map { it.name }
+
+        val botContextFunctions = scope.interfaces()
             .first { it.name == BotContext::class.simpleName }
             .functions()
-            .filter { it.name !in listOf("withBot") }
+            .map { it.name }
+
+        serviceFunctions
+            .filter { it.name !in service2Functions }
+            .filter { it.name !in listOf("createInvoiceLink", "sendInvoice", "createNewStickerSet") }
             .forEach {
-                val docs = it.kDoc?.text?.let { text ->
-                    buildString {
-                        append("/**\n* ")
-                        append(text.split("\n").joinToString("\n* "))
-                        append("\n* */")
+
+//        scope.interfaces()
+//            .first { it.name == BotContext::class.simpleName }
+//            .functions()
+//            .filter { it.name !in listOf("withBot") }
+//            .forEach {
+            val docs = it.kDoc?.text?.let { text ->
+                buildString {
+                    append("/**\n* ")
+                    append(text.split("\n").joinToString("\n* "))
+                    append("\n* */")
+                }
+            }
+
+            val funDef = buildString {
+                append("suspend fun ").append(it.name).append("(\n")
+                it.parameters.forEach { param ->
+                    append("\t").append(param.name).append(": ").append(param.type.text)
+                        .append(param.defaultValue?.let { " = $it" } ?: "").append(",\n")
+                }
+
+                val serviceFunction = serviceFunctions.first { sf ->
+                    when (it.name) {
+                        "downloadFile" -> "getFile"
+                        else -> it.name
+                    } == sf.name
+                }
+                val returnType = (it.returnType ?: serviceFunction.returnType!!).text
+                    .replace("NetworkResponse<", "")
+                    .let { if (it.contains("Call<")) it.drop(5).dropLast(2) else it }
+                    .replace("MessageResponse", "Message>")
+
+
+                append("\n)").append(" = request<").append(returnType).append(">").append(" {\n")
+                    .append("\tclient.post(\"")
+                    .append(serviceFunction.annotations.first { it.name == "POST" }.arguments.first().value)
+                    .append("\") {\n")
+
+                serviceFunction.parameters.forEach { sfParam ->
+                    sfParam.annotations.find { a -> a.name == Query::class.simpleName }?.let { query ->
+                        append("\t\tparameter(\"").append(query.arguments.first().value).append("\", ")
+                            .append(sfParam.name).append(")\n")
                     }
                 }
 
-                val funDef = buildString {
-                    append("suspend fun ").append(it.name).append("(\n")
-                    it.parameters.forEach { param ->
-                        append("\t").append(param.text).append(",\n")
-                    }
-
-                    val serviceFunction = serviceFunctions.first { sf ->
-                        when(it.name) {
-                            "downloadFile" -> "getFile"
-                            else -> it.name
-                        } == sf.name
-                    }
-                    val returnType = (it.returnType ?: serviceFunction.returnType!!).text
-                        .replace("NetworkResponse<", "")
-                        .let { if (it.contains("Call<")) it.drop(5).dropLast(1) else it }
-
-
-                    append("\n)").append(" = request<").append(returnType).append(">").append(" {\n")
-                        .append("\tclient.post(\"").append(serviceFunction.annotations.first { it.name == "POST" }.arguments.first().value).append("\") {\n")
-
+                if (serviceFunction.annotations.find { a -> a.name == Multipart::class.simpleName } != null) {
+                    append("\t\tsetMultiPartFormDataBody(\n")
                     serviceFunction.parameters.forEach { sfParam ->
-                        sfParam.annotations.find { a -> a.name == Query::class.simpleName }?.let { query ->
-                            append("\t\tparameter(\"").append(query.arguments.first().value).append("\", ").append(sfParam.name).append(")\n")
-                        }
+                        sfParam.annotations.find { a -> a.name == Part::class.simpleName }?.let { part ->
+                            append("\t\t\t\"").append(part.arguments.firstOrNull()?.value ?: sfParam.name)
+                                .append("\" to ").append(sfParam.name).append(",\n")
+                        } ?: sfParam.annotations.find { a -> a.name == Query::class.simpleName }?.let { query ->
+                            // do nothing
+                        } ?: error("Unknown annotation")
                     }
+                    append("\t\t)\n")
+                }
 
-                    if (serviceFunction.annotations.find { a -> a.name == Multipart::class.simpleName } != null) {
-                        append("\t\tsetMultiPartFormDataBody(\n")
-                        serviceFunction.parameters.forEach { sfParam ->
-                            sfParam.annotations.find { a -> a.name == Part::class.simpleName }?.let { part ->
-                                append("\t\t\t\"").append(part.arguments.firstOrNull()?.value ?: sfParam.name).append("\" to ").append(sfParam.name).append(",\n")
-                            } ?: sfParam.annotations.find { a -> a.name == Query::class.simpleName }?.let { query ->
-                                // do nothing
-                            } ?: error("Unknown annotation")
-                        }
-                        append("\t\t)\n")
-                    }
+                append("\t}\n")
+                append("}")
+            }.replace(",\n\n", ",\n")
 
-                    append("\t}\n")
-                    append("}")
-                }.replace(",\n\n", ",\n")
-
-                println(buildString {
-                    append(docs).append("\n")
-                    append(funDef)
-                })
-                println()
-            }
+            println(buildString {
+                append(docs).append("\n")
+                append(funDef)
+            })
+            println()
+        }
     }
 }

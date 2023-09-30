@@ -1,33 +1,30 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.handler.ICallbackHandler
 import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
+import ru.raysmith.tgbot.network.TelegramService2
 
 /** Base implementation of query callback handler */
-abstract class BaseCallbackHandler(open val query: CallbackQuery, open val service: TelegramService, open val fileService: TelegramFileService) :
-    ICallbackHandler {
+abstract class BaseCallbackHandler(open val query: CallbackQuery, override val client: HttpClient) :
+    ICallbackHandler, TelegramService2 {
     var isAnswered = false
 
-    fun answer(text: String) = answer { this.text = text }
-    fun alert(text: String) = answer { this.text = text; showAlert = true }
+    suspend fun answer(text: String) = answer { this.text = text }
+    suspend fun alert(text: String) = answer { this.text = text; showAlert = true }
 
-    override fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean {
+    override suspend fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean {
         return AnswerCallbackQuery().apply(init).let {
-            service.answerCallbackQuery(
+            answerCallbackQuery(
                 callbackQueryId = query.id,
                 text = it.text,
                 showAlert = it.showAlert,
                 url = it.url,
                 cacheTime = it.cacheTime
-            ).execute().also { response ->
-                if (response.isSuccessful && response.body()?.result == true) {
-                    isAnswered = true
-                }
+            ).also {
+                isAnswered = true
             }
-        }.body()?.result ?: errorBody()
+        }
     }
 }

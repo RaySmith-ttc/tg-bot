@@ -44,23 +44,23 @@ class LocationsWrapper<L : LocationConfig> {
         locations[location.name] = location
     }
     
-    private val additionalEventHandlers: MutableMap<String, LocationEventHandlerFactory<L>.(L) -> Unit> = mutableMapOf()
+    private val additionalEventHandlers: MutableMap<String, suspend LocationEventHandlerFactory<L>.(L) -> Unit> = mutableMapOf()
     @LocationsDSLConfig
-    fun global(
+    suspend fun global(
         handlersId: String = CallbackQueryHandler.GLOBAL_HANDLER_ID,
-        setup: LocationEventHandlerFactory<L>.(config: L) -> Unit
+        setup: suspend LocationEventHandlerFactory<L>.(config: L) -> Unit
     ) {
         additionalEventHandlers[handlersId] = setup
     }
     
     @LocationsDSL
-    fun location(name: String, @LocationsDSL newLocation: Location<L>.() -> Unit) {
+    suspend fun location(name: String, @LocationsDSL newLocation: suspend Location<L>.() -> Unit) {
         add(createLocation(name, this) {
             newLocation(it)
         })
     }
-    
-    fun allowedUpdates(): Set<UpdateType> {
+
+    suspend fun allowedUpdates(): Set<UpdateType> {
         val config = configCreator(Update(0))
         val locationUpdates = locations.map { it.value.handlerFactory.allowedUpdates }.flatten()
         val location = Location("", LocationEventHandlerFactory<L>(LocationsWrapper()))
@@ -74,8 +74,8 @@ class LocationsWrapper<L : LocationConfig> {
         
         return (locationUpdates + globalUpdates).toSet()
     }
-    
-    fun LocationEventHandlerFactory<L>.withAdditionalHandlers(config: L): LocationEventHandlerFactory<L> {
+
+    suspend fun LocationEventHandlerFactory<L>.withAdditionalHandlers(config: L): LocationEventHandlerFactory<L> {
         additionalEventHandlers.forEach { (handlerId, handler) ->
             withHandlerId(handlerId) {
                 handler(config)
@@ -85,7 +85,7 @@ class LocationsWrapper<L : LocationConfig> {
         return this
     }
     
-    internal fun getHandlerFactory(update: Update): LocationEventHandlerFactory<L> {
+    internal suspend fun getHandlerFactory(update: Update): LocationEventHandlerFactory<L> {
         val config = configCreator(update)
         if (!filter.invoke(config, update)) {
             Bot.logger.debug("Update #${update.updateId} skipped by locations filter")
