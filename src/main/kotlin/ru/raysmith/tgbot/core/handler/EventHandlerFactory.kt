@@ -15,4 +15,6 @@ interface EventHandlerFactory {
     val allowedUpdates: Set<UpdateType>
     
     fun getHandler(update: Update, client: HttpClient): EventHandler
+
+    fun clear()
 }

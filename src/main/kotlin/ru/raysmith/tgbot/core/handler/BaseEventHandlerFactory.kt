@@ -36,6 +36,26 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
 
     private var unknownHandler: UnknownEventHandler.() -> Unit = { }
 
+    override fun clear() {
+        allowedUpdates.clear()
+        messageHandler = null
+        commandHandler = null
+        editedMessageHandler = null
+        channelPostHandler = null
+        editedChannelPostHandler = null
+        inlineQueryHandler = null
+        chosenInlineQueryHandler = null
+        callbackQueryHandler.clear()
+        shippingQueryHandler = null
+        preCheckoutQueryHandler = null
+        pollHandler = null
+        pollAnswerHandler = null
+        myChatMemberHandler = null
+        chatMemberHandler = null
+        chatJoinRequestHandler = null
+        unknownHandler = { }
+    }
+
     override fun getHandler(update: Update, client: HttpClient): EventHandler {
         fun unknown() = UnknownEventHandler(update, client, unknownHandler)
 

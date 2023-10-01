@@ -28,6 +28,6 @@ class LocationPollHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PollHandler>.() -> R): R {
-        return LocationPollHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationPollHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

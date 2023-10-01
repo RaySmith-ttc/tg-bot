@@ -28,7 +28,7 @@ open class LocationMessageHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<MessageHandler>.() -> R): R {
-        return LocationMessageHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationMessageHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }
 

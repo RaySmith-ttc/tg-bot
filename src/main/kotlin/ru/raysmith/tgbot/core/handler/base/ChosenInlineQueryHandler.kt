@@ -21,6 +21,6 @@ open class ChosenInlineQueryHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChosenInlineQueryHandler>.() -> R): R {
-        return ChosenInlineQueryHandler(inlineResult, client, handler).block()
+        return ChosenInlineQueryHandler(inlineResult, bot.client, handler).block()
     }
 }

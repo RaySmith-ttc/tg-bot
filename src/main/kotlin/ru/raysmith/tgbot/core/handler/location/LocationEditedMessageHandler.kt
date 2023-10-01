@@ -28,6 +28,6 @@ class LocationEditedMessageHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedMessageHandler>.() -> R): R {
-        return LocationEditedMessageHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationEditedMessageHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

@@ -78,12 +78,7 @@ class Bot(
         internal var properties = getProperties()
         @JvmName("getPropertiesFromFile")
         internal fun getProperties(): Properties? {
-            return PropertiesFactory.fromOrNull("tgbot.properties")?.also {
-                ClassLoader.getSystemClassLoader().getResource("tgbot.properties")?.let {
-                    println(it.path)
-                }
-                println("calendar_locale: " + it.getProperty("calendar_locale"))
-            } ?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
+            return PropertiesFactory.fromOrNull("tgbot.properties")?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
         
         internal var config = BotConfig()
@@ -128,6 +123,7 @@ class Bot(
         blockingSelector?.invoke(this)?.apply(action)
     }
 
+    private lateinit var eventHandlerBuilder: () -> Unit
     private lateinit var eventHandlerFactory: EventHandlerFactory
     private var additionalEventHandlers: MutableList<(eventHandlerFactory: EventHandlerFactory) -> Unit> = mutableListOf()
 
@@ -213,6 +209,7 @@ class Bot(
         lastUpdateId = (lastUpdateId ?: 0) + 1
     }
 
+    // TODO redundant?
     private suspend fun safeNetwork(action: suspend () -> Unit) {
         try {
             action()
@@ -242,6 +239,7 @@ class Bot(
 
     private val updateScope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private suspend fun startBot() {
+        eventHandlerBuilder()
         additionalEventHandlers.forEach {
             eventHandlerFactory.apply(it)
         }
@@ -260,7 +258,7 @@ class Bot(
 
             while (isActive) {
                 safeNetwork {
-                    withContext(updateScope.coroutineContext) {
+                    updateScope.async {
                         val updates = try {
                             getUpdates(
                                 offset = lastUpdateId?.plus(1),
@@ -268,7 +266,7 @@ class Bot(
                                 allowedUpdates = allowedUpdates
                             )
                         } catch (e: Exception) {
-                            return@withContext
+                            return@async
                         }
 
                         if (updates.isNotEmpty()) {
@@ -279,7 +277,7 @@ class Bot(
 
                             lastUpdateId = updates.last().updateId
                         }
-                    }
+                    }.await()
                 }
             }
         } finally {
@@ -300,8 +298,11 @@ class Bot(
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
     suspend fun start(updateHandler: BaseEventHandlerFactory.(bot: Bot) -> Unit) {
-        eventHandlerFactory = BaseEventHandlerFactory()
-        (eventHandlerFactory as BaseEventHandlerFactory).updateHandler(this)
+        eventHandlerBuilder = {
+            eventHandlerFactory = BaseEventHandlerFactory()
+            (eventHandlerFactory as BaseEventHandlerFactory).updateHandler(this)
+        }
+
         startBot()
     }
     
@@ -364,9 +365,12 @@ class Bot(
         return this
     }
 
+    // TODO add force param
     suspend fun stop(handler: CommandHandler? = null) {
         isActive = false
-        updateScope.cancel()
+        updateScope.coroutineContext[Job]!!.children.forEach {
+            it.cancelAndJoin()
+        }
         onStop(this, handler)
         logger.info("Waiting all processing updates...")
         scope.coroutineContext[Job]!!.children.forEach {

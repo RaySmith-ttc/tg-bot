@@ -28,6 +28,6 @@ open class LocationChannelPostHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChannelPostHandler>.() -> R): R {
-        return LocationChannelPostHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationChannelPostHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

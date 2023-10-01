@@ -25,6 +25,6 @@ open class ChatJoinRequestHandler(
     suspend fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatJoinRequestHandler>.() -> R): R {
-        return ChatJoinRequestHandler(chatJoinRequest, client, handler).block()
+        return ChatJoinRequestHandler(chatJoinRequest, bot.client, handler).block()
     }
 }

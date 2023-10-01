@@ -18,6 +18,7 @@ class DocumentMessage(override val client: HttpClient) : MediaMessageWithThumb()
         document = media ?: error("$mediaName is required"),
         caption = getCaptionText(),
         parseMode = parseMode,
+        thumbnail = thumbnail,
         captionEntities = _caption?.getEntitiesString(),
         disableNotification = disableNotification,
         protectContent = protectContent,

@@ -28,7 +28,7 @@ class LocationChosenInlineQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChosenInlineQueryHandler>.() -> R): R {
-        return LocationChosenInlineQueryHandler(update, client, handlerData, locationsWrapper).let {
+        return LocationChosenInlineQueryHandler(update, bot.client, handlerData, locationsWrapper).let {
             this.block()
         }
     }

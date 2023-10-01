@@ -18,14 +18,14 @@ open class CommandHandler(
 
     override fun getChatId() = message.chat.id
     override fun getChatIdOrThrow() = message.chat.id
-    override var messageId: Int? = null
+    override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 
     override suspend fun handle() = handler()
 
     @BotContextDsl
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
-        return CommandHandler(command, message, client, handler).block()
+        return CommandHandler(command, message, bot.client, handler).block()
     }
 }
 

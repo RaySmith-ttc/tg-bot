@@ -27,6 +27,7 @@ class AudioMessage(override val client: HttpClient) : MediaMessageWithThumb() {
         duration = duration,
         performer = performer,
         title = title,
+        thumbnail = thumbnail,
         disableNotification = disableNotification,
         protectContent = protectContent,
         replyToMessageId = replyToMessageId,

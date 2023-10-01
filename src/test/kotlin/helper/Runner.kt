@@ -44,7 +44,6 @@ import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApi2
 import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.*
@@ -61,13 +60,28 @@ import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
 val locations = false
-inline fun <reified T> T.toJson() = Json(TelegramApi2.json) { prettyPrint = true }.encodeToString(this)
+val prettyPrintJson = Json(TelegramApi2.json) {
+    prettyPrint = true
+    prettyPrintIndent = " "
+}
+
+inline fun <reified T> T.toJson() = prettyPrintJson.encodeToString(this)
+
+suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
+    textWithEntities {
+        println(value)
+        println(value.toJson())
+        pre(value.toJson(), "json")
+    }
+}
 
 var loc: String = "menu"
 
 val newApi = object : TelegramService2 {
     override val client: HttpClient = TelegramApi2.defaultClient()
 }
+
+var lookPollAnswers = false
 
 val datePicker = DatePicker("sys").apply {
 //    locale = Locale.forLanguageTag("us")
@@ -206,7 +220,12 @@ class Runner {
                 .onStop {
                     println("Bot stopped by command: ${it?.command}")
                 }
-    
+
+//            launch {
+//                delay(5000)
+//                bot.restart()
+//            }
+
             class LocationConfigImpl(override val update: Update) : LocationConfig {
                 val userId by lazy { update.findFrom()?.id?.value ?: -1 }
                 var foo = "bar"
@@ -414,6 +433,12 @@ class Runner {
                     })
                 }
 
+                if (lookPollAnswers) {
+                    handlePollAnswer {
+                        println("answer")
+                    }
+                }
+
                 handleChatJoinRequest {
                     println(chatJoinRequest)
                     approve()
@@ -424,8 +449,8 @@ class Runner {
                         repeat(1000) {
                             add(
                                 InlineQueryResultArticle(
-                                "iq_photo_$it", "test $it", InputTextMessageContent("Message text $it")
-                            )
+                                    "iq_photo_$it", "test $it", InputTextMessageContent("Message text $it")
+                                )
                             )
                         }
                     }
@@ -561,26 +586,25 @@ class Runner {
                         }
                     }
 
+                    isCommand("lookPollAnswers") {
+                        lookPollAnswers = true
+                    }
+
                     isCommand("reloadConfig") {
                         bot.reloadConfig()
                     }
 
                     isCommand("exportChatInviteLink") {
-                        send(exportChatInviteLink())
+                        sendAsJson(exportChatInviteLink((-4073352030).toChatId()))
                     }
 
                     isCommand("createChatInviteLink") {
-                        send(createChatInviteLink().toString())
+                        sendAsJson(createChatInviteLink((-4073352030).toChatId()))
                     }
 
                     isCommand("setChatPhoto1") {
                         setChatPhoto("files/image1.png".asResources().asTgFile())
                     }
-
-                    // TODO is it work?
-//                    isCommand("setChatPhoto2") {
-//                        setChatPhoto("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile())
-//                    }
 
                     isCommand("deleteChatPhoto") {
                         deleteChatPhoto()
@@ -590,31 +614,8 @@ class Runner {
                         setChatStickerSet("thinking")
                     }
 
-                    isCommand("testItalic") {
-                        val a = buildMarkdownV2String {
-                            text("Новое сообщение от врача пациенту ").let {
-                                textLink("Неизвестный", "https://google.com")
-                            }.text(":").n()
-                            n()
-                            italic("some text")
-
-                            n()
-                            italic("[Go to google page(https://google.com)]")
-                        }
-                        println(a)
-                        send {
-                            textWithEntities {
-                                italic("123").italic("321")
-                            }
-                        }
-                    }
-
                     isCommand("getChatAdministrators") {
-                        send(buildString {
-                            getChatAdministrators().forEach {
-                                append(it.toString())
-                            }
-                        })
+                        sendAsJson(getChatAdministrators())
                     }
 
                     isCommand("exception") {
@@ -944,14 +945,15 @@ class Runner {
                         }
                     }
 
+                    // TODO failed
                     isCommand("serialize") {
                         val string = buildInlineKeyboard {
                             row("title", "query")
-                        }.let { TelegramApi.json.encodeToString(it) }
+                        }.let { TelegramApi2.json.encodeToString(it) }
 
                         send {
                             text = string
-                            keyboardMarkup = TelegramApi.json.decodeFromString(string)
+                            keyboardMarkup = TelegramApi2.json.decodeFromString(string)
                         }
                     }
 
@@ -997,8 +999,8 @@ class Runner {
 
                     isCommand("document") {
                         sendDocument {
-                            document = "files/image1.png".asResources().asTgFile()
-                            thumbnail = "files/image1.png".asResources().asTgFile()
+                            document = "files/sample.pdf".asResources().asTgFile()
+                            thumbnail = "files/image2.jpg".asResources().asTgFile()
                             captionWithEntities {
                                 bold("Title").n()
                                 n()
@@ -1009,12 +1011,19 @@ class Runner {
 
                     isCommand("document_group") {
                         sendMediaGroup {
-                            document("files/image1.png".asResources().asTgFile(), "files/image1.png".asResources().asTgFile()) {
+                            document("files/sample.pdf".asResources().asTgFile(), "files/image1.png".asResources().asTgFile()) {
                                 text("1")
                             }
-                            document("files/image2.jpg".asResources().asTgFile(), "files/image2.jpg".asResources().asTgFile()) {
+                            document("BQACAgIAAxkDAAJNKmUZPvampKPYTSeooUMPeofckLWfAAJlMQACbm3ISGVRMziukbaTMAQ".asTgFile(), "files/image2.jpg".asResources().asTgFile()) {
                                 text("2")
                             }
+                        }
+                    }
+
+                    isCommand("audio") {
+                        sendAudio {
+                            audio = "audio2.mp3".asResources().asTgFile()
+                            thumbnail = "files/size.small.jpg".asResources().asTgFile()
                         }
                     }
 
@@ -1042,7 +1051,7 @@ class Runner {
                     }
 
                     isCommand("copyMe") {
-//                            copyMessage(getChatIdOrThrow())
+                        copyMessage(getChatIdOrThrow(), messageId!!)
                     }
 
                     isCommand("answertest") {
@@ -1243,6 +1252,13 @@ class Runner {
                                 bold("Expl: ").text("Wrong answer")
                             }
                             openPeriod = 5
+                        }
+                    }
+
+                    isCommand("pollForAnswer") {
+                        sendPoll("Question", listOf("1", "2", "3")) {
+                            type = PollType.REGULAR
+                            isAnonymous = false
                         }
                     }
 

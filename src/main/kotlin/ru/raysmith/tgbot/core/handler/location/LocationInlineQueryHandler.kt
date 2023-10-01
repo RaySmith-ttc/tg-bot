@@ -28,6 +28,6 @@ class LocationInlineQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<InlineQueryHandler>.() -> R): R {
-        return LocationInlineQueryHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationInlineQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

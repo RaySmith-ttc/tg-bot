@@ -32,7 +32,7 @@ open class InlineQueryHandler(
     ) = answerInlineQuery(id, results, cacheTime, isPersonal, nextOffset, button)
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<InlineQueryHandler>.() -> R): R {
-        return InlineQueryHandler(inlineQuery, client, handler).block()
+        return InlineQueryHandler(inlineQuery, bot.client, handler).block()
     }
 }
 

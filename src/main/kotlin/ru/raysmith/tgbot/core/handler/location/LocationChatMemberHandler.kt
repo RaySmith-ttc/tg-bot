@@ -34,6 +34,6 @@ class LocationChatMemberHandler<T : LocationConfig>(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
-        return LocationChatMemberHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationChatMemberHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

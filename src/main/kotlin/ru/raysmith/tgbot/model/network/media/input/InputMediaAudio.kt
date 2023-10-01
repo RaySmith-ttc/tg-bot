@@ -22,17 +22,7 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 data class InputMediaAudio(
 
     @SerialName("media") override val media: String,
-
-    /**
-     * Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side.
-     * The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height
-     * should not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-     * Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>”
-     * if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
-     *
-     * @see <a href="https://core.telegram.org/bots/api#sending-files">More info on Sending Files »</a>
-     * */
-    @SerialName("thumbnail") val thumbnail: String? = null,
+    @SerialName("thumbnail") override val thumbnail: String? = null,
 
     /** Caption of the photo to be sent, 0-1024 characters after entities parsing */
     @SerialName("caption") val caption: String? = null,
@@ -51,7 +41,7 @@ data class InputMediaAudio(
 
     /** Title of the audio */
     @SerialName("title") val title: String? = null,
-) : InputMediaGroup() {
+) : InputMediaGroupWithThumbnail() {
 
     /** Type of the result */
     @Required

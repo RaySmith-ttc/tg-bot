@@ -28,6 +28,6 @@ class LocationPreCheckoutQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PreCheckoutQueryHandler>.() -> R): R {
-        return LocationPreCheckoutQueryHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationPreCheckoutQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

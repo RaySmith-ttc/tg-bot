@@ -28,6 +28,6 @@ class LocationShippingQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ShippingQueryHandler>.() -> R): R {
-        return LocationShippingQueryHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationShippingQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

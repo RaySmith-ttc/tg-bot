@@ -31,10 +31,7 @@ import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.media.input.InputMediaGroup
-import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
+import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
@@ -50,7 +47,6 @@ import java.nio.file.Files
 import java.time.ZonedDateTime
 import kotlin.time.Duration
 
-//class TelegramService2(val client: HttpClient = TelegramApi2.defaultClient(), val token: String = Bot.config.token) {
 interface TelegramService2 {
     val client: HttpClient
 
@@ -2252,7 +2248,7 @@ interface TelegramService2 {
         duration: Int? = null,
         performer: String? = null,
         title: String? = null,
-        thumbnail: InputFile? = null,
+        thumbnail: NotReusableInputFile? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyToMessageId: Int? = null,
@@ -2275,7 +2271,7 @@ interface TelegramService2 {
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "audio" to audio,
-                "thumbnail" to thumbnail
+                "thumbnail" to thumbnail as InputFile
             )
         }
     }
@@ -2284,6 +2280,7 @@ interface TelegramService2 {
         chatId: ChatId,
         messageThreadId: Int? = null,
         document: InputFile,
+        thumbnail: NotReusableInputFile?,
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
@@ -2297,7 +2294,6 @@ interface TelegramService2 {
         client.post("sendDocument") {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
-            parameter("document", document)
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
@@ -2308,7 +2304,8 @@ interface TelegramService2 {
             parameter("allow_sending_without_reply", allowSendingWithoutReply)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
-                "document" to document
+                "document" to document,
+                "thumbnail" to thumbnail as InputFile,
             )
         }
     }
@@ -2482,9 +2479,39 @@ interface TelegramService2 {
             parameter("reply_to_message_id", replyToMessageId)
             parameter("allow_sending_without_reply", allowSendingWithoutReply)
             if (inputFiles != null) {
+                var lastInputFilesIndex = 0
+
+                println(
+                    buildList {
+                        media.map { inputMedia ->
+                            when(inputMedia) {
+                                is InputMediaGroupWithThumbnail -> {
+                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+                                    if (inputMedia.thumbnail != null) {
+                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
+                                    } else {}
+                                }
+                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+                            }
+                        }
+                    }
+                )
+
+                lastInputFilesIndex = 0
+
                 setMultiPartFormDataBody(
-                    *media.mapIndexed { index, inputMedia ->
-                        inputMedia.media to inputFiles[index]
+                    *buildList {
+                        media.map { inputMedia ->
+                            when(inputMedia) {
+                                is InputMediaGroupWithThumbnail -> {
+                                    add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                                    if (inputMedia.thumbnail != null) {
+                                        add(inputMedia.thumbnail!!.drop(9) to inputFiles[lastInputFilesIndex++])
+                                    } else {}
+                                }
+                                else -> add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                            }
+                        }
                     }.toTypedArray()
                 )
             }

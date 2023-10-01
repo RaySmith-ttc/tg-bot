@@ -42,6 +42,6 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
-        return LocationCallbackQueryHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationCallbackQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

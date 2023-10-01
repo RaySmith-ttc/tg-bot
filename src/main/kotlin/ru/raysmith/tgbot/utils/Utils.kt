@@ -68,7 +68,7 @@ fun createBotContext(
 
     override fun getChatId(): ChatId? = withChatId
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
-        return UnknownEventHandler(Update(-1), client).block()
+        return UnknownEventHandler(Update(-1), bot.client).block()
     }
 }
 

@@ -38,7 +38,7 @@ class LocationCommandHandler<T : LocationConfig>(
     }
     
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
-        return LocationCommandHandler(update, client, handlerData, locationsWrapper).let {
+        return LocationCommandHandler(update, bot.client, handlerData, locationsWrapper).let {
             this.block()
         }
     }

@@ -129,6 +129,6 @@ open class CallbackQueryHandler(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
-        return CallbackQueryHandler(query, handlerData, client).block()
+        return CallbackQueryHandler(query, handlerData, bot.client).block()
     }
 }

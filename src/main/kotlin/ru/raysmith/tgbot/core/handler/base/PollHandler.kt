@@ -21,7 +21,7 @@ open class PollHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PollHandler>.() -> R): R {
-        return PollHandler(poll, client, handler).block()
+        return PollHandler(poll, bot.client, handler).block()
     }
 }
 

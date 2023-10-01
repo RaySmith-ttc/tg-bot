@@ -21,6 +21,6 @@ open class EditedChannelPostHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedChannelPostHandler>.() -> R): R {
-        return EditedChannelPostHandler(channelPost, client, handler).block()
+        return EditedChannelPostHandler(channelPost, bot.client, handler).block()
     }
 }

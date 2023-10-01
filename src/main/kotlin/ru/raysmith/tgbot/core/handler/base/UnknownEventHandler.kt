@@ -6,8 +6,6 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
 
 @HandlerDsl
 class UnknownEventHandler(
@@ -22,6 +20,6 @@ class UnknownEventHandler(
     override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
-        return UnknownEventHandler(update, client, handler).block()
+        return UnknownEventHandler(update, bot.client, handler).block()
     }
 }

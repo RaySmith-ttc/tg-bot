@@ -9,9 +9,6 @@ import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.payment.ShippingOption
 import ru.raysmith.tgbot.model.network.payment.ShippingQuery
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 
 @HandlerDsl
 open class ShippingQueryHandler(
@@ -28,7 +25,7 @@ open class ShippingQueryHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ShippingQueryHandler>.() -> R): R {
-        return ShippingQueryHandler(shippingQuery, client, handler).block()
+        return ShippingQueryHandler(shippingQuery, bot.client, handler).block()
     }
 
     suspend fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {

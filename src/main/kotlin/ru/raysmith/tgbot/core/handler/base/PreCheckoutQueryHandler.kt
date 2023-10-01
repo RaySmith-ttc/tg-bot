@@ -21,7 +21,7 @@ open class PreCheckoutQueryHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PreCheckoutQueryHandler>.() -> R): R {
-        return PreCheckoutQueryHandler(preCheckoutQuery, client, handler).let {
+        return PreCheckoutQueryHandler(preCheckoutQuery, bot.client, handler).let {
             this.block()
         }
     }

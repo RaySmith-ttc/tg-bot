@@ -21,7 +21,7 @@ open class ChannelPostHandler(
     override suspend fun handle() = handler()
     
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChannelPostHandler>.() -> R): R {
-        return ChannelPostHandler(channelPost, client, handler).block()
+        return ChannelPostHandler(channelPost, bot.client, handler).block()
     }
 }
 

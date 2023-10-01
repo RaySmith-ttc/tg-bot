@@ -7,19 +7,17 @@ import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import java.nio.file.Files
 
-internal data class MultipartPartData(
-    val inputFile: InputFile, val name: String, val filename: String, val mimeType: String
-)
-
 abstract class MediaRequest {
 
     internal val inputFiles = mutableListOf<InputFile>()
+
+    @Deprecated("retrofit")
     protected val multipartBodyParts = mutableListOf<MultipartBody.Part>()
 
     private fun append(byteArray: ByteArray, name: String, filename: String, mimeType: String): String {
         val requestBody = byteArray.toRequestBody(mimeType.toMediaType())
         multipartBodyParts.add(MultipartBody.Part.createFormData(name, filename, requestBody))
-        return "attach://$filename"
+        return "attach://file${inputFiles.size + 1}"
     }
 
     protected fun getMedia(media: InputFile, name: String? = null) = when (media) {
@@ -27,8 +25,8 @@ abstract class MediaRequest {
         is InputFile.ByteArray -> append(media.byteArray, name ?: media.filename, media.filename, media.mimeType)
         is InputFile.File -> append(
             media.file.readBytes(),
-            name ?: media.file.nameWithoutExtension,
-            media.file.nameWithoutExtension,
+            name ?: media.file.name,
+            media.file.name,
             Files.probeContentType(media.file.toPath())
         )
     }.also {
@@ -39,8 +37,8 @@ abstract class MediaRequest {
         is InputFile.ByteArray -> append(media.byteArray, name ?: media.filename, media.filename, media.mimeType)
         is InputFile.File -> append(
             media.file.readBytes(),
-            name ?: media.file.nameWithoutExtension,
-            media.file.nameWithoutExtension,
+            name ?: media.file.name,
+            media.file.name,
             Files.probeContentType(media.file.toPath())
         )
 

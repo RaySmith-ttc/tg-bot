@@ -47,7 +47,7 @@ class MediaGroupMessage(override val client: HttpClient) :
             .apply(caption).getEntities()
 
     override suspend fun send(chatId: ChatId): List<Message> {
-        return if (multipartBodyParts.isEmpty()) {
+        return if (inputFiles.isEmpty()) {
             sendMediaGroup(
                 chatId = chatId,
                 messageThreadId = messageThreadId,
@@ -83,6 +83,7 @@ class MediaGroupMessage(override val client: HttpClient) :
         }
     }
 
+    // TODO dont user filename for attach://...
     // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
     fun photo(
         photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,

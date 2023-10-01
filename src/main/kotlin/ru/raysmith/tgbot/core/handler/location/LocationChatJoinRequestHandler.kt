@@ -28,6 +28,6 @@ class LocationChatJoinRequestHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatJoinRequestHandler>.() -> R): R {
-        return LocationChatJoinRequestHandler(update, client, handlerData, locationsWrapper).block()
+        return LocationChatJoinRequestHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

@@ -4,6 +4,8 @@ import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.utils.properties.getOrNull
 import java.util.*
 
+// TODO add global disable links preview
+
 /** Contains customizable bot options */
 class BotConfig {
     var safeTextLength = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()

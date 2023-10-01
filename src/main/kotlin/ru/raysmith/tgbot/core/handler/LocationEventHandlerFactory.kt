@@ -24,7 +24,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     private val commandHandler: MutableMap<String, LocationCommandHandlerData<T>> = mutableMapOf()
     private val editedMessageHandler: MutableMap<String, LocationEditMessageHandlerData<T>> = mutableMapOf()
     private val channelPostHandler: MutableMap<String, LocationChannelPostHandlerData<T>> = mutableMapOf()
-    private val editedChannelPost: MutableMap<String, LocationEditedChannelPostHandlerData<T>> = mutableMapOf()
+    private val editedChannelPostHandler: MutableMap<String, LocationEditedChannelPostHandlerData<T>> = mutableMapOf()
     private val inlineQueryHandler: MutableMap<String, LocationInlineQueryHandlerData<T>> = mutableMapOf()
     private val chosenInlineQueryHandler: MutableMap<String, LocationChosenInlineQueryHandlerData<T>> = mutableMapOf()
     private val callbackQueryHandler: MutableMap<String, LocationCallbackQueryHandlerData<T>> = mutableMapOf()
@@ -37,6 +37,26 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     private val chatJoinRequestHandler: MutableMap<String, LocationChatJoinRequestHandlerData<T>> = mutableMapOf()
 
     private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
+
+    override fun clear() {
+        allowedUpdates.clear()
+        messageHandler.clear()
+        commandHandler.clear()
+        editedMessageHandler.clear()
+        channelPostHandler.clear()
+        editedChannelPostHandler.clear()
+        inlineQueryHandler.clear()
+        chosenInlineQueryHandler.clear()
+        callbackQueryHandler.clear()
+        shippingQueryHandler.clear()
+        preCheckoutQueryHandler.clear()
+        pollHandler.clear()
+        pollAnswerHandler.clear()
+        myChatMemberHandler.clear()
+        chatMemberHandler.clear()
+        chatJoinRequestHandler.clear()
+        unknownHandler = { }
+    }
     
     override fun getHandler(
         update: Update, client: HttpClient
@@ -55,7 +75,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
         )
 
         UpdateType.EDITED_CHANNEL_POST -> LocationEditedChannelPostHandler(
-                update, client, editedChannelPost, locationsWrapper
+                update, client, editedChannelPostHandler, locationsWrapper
         )
 
         UpdateType.INLINE_QUERY -> LocationInlineQueryHandler(
@@ -133,7 +153,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     @HandlerDsl
     fun handleEditedChannelPost(handlerId: String = defaultHandlerId, handler: (suspend context(T) LocationEditedChannelPostHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
-        editedChannelPost[handlerId] = LocationEditedChannelPostHandlerData(handler)
+        editedChannelPostHandler[handlerId] = LocationEditedChannelPostHandlerData(handler)
     }
 
     @HandlerDsl

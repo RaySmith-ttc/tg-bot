@@ -23,6 +23,6 @@ open class EditedMessageHandler(
     override suspend fun handle() = handler()
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedMessageHandler>.() -> R): R {
-        return EditedMessageHandler(message, client, handler).block()
+        return EditedMessageHandler(message, bot.client, handler).block()
     }
 }

@@ -131,7 +131,6 @@ object TelegramApi2 {
 
             headers {
                 contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
             }
         }
 
