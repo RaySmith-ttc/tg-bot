@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.core.handler.base.isCommand
 import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.asChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
@@ -514,7 +515,7 @@ class Runner {
                             }
                             return@handleMessage
                         } else if (message.text == "send other id") {
-                            send(1) {
+                            send(1.asChatId()) {
                                 text = "this is not sent"
                             }
                         } else if (message.text == "text") {
@@ -1180,7 +1181,7 @@ class Runner {
                                 n()
                                 text("Body")
                             }
-                            video("files/video2.webm".asResources().asTgFile(), hasSpoiler = true)
+                            video("files/video1.mp4".asResources().asTgFile(), hasSpoiler = true)
                         }
                     }
 
@@ -1221,10 +1222,10 @@ class Runner {
                             editMessageLiveLocation(lat, 60.596065, messageId = message.messageId) {
                                 this.heading = heading
                                 inlineKeyboard {
-                                    row("Test", " ")
+                                    row("Test", CallbackQuery.EMPTY_CALLBACK_DATA)
                                 }
                             }
-                            Thread.sleep(2000)
+                            Thread.sleep(5000)
                         }
                     }
 
@@ -1264,8 +1265,9 @@ class Runner {
 
                     isCommand("sendstiker") {
                         sendSticker {
-//                                sticker = "https://www.gstatic.com/webp/gallery/1.webp".asTgFile()
-                            sticker = "files/image1.png".asResources().asTgFile()
+                            sticker = "BQACAgIAAxUHZRldlNqmhN8w1gHFbVBmGQupp7MAAs8yAAJubchIuSn03p5b2EQwBA".asTgFile()
+//                            sticker = "https://www.gstatic.com/webp/gallery/1.webp".asTgFile()
+//                            sticker = "files/image1.png".asResources().asTgFile()
                         }
                     }
 

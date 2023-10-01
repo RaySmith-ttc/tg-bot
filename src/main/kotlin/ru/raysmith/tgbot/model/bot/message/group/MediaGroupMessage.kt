@@ -82,8 +82,7 @@ class MediaGroupMessage(override val client: HttpClient) :
             )
         }
     }
-
-    // TODO dont user filename for attach://...
+    
     // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
     fun photo(
         photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,

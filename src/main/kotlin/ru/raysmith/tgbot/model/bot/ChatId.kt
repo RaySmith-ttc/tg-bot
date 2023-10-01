@@ -71,3 +71,5 @@ sealed class ChatId {
         }
     }
 }
+
+fun Any.asChatId() = ChatId.of(this)

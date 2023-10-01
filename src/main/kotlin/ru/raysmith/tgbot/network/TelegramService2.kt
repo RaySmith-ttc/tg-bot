@@ -403,8 +403,10 @@ interface TelegramService2 {
     ) = request<File> {
         client.post("uploadStickerFile") {
             parameter("user_id", userId)
-            parameter("sticker", sticker)
             parameter("sticker_format", stickerFormat)
+            setMultiPartFormDataBody(
+                "sticker" to sticker
+            )
         }
     }
 
@@ -2331,7 +2333,6 @@ interface TelegramService2 {
         client.post("sendVideo") {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
-            parameter("video", video)
             parameter("duration", duration)
             parameter("width", width)
             parameter("height", height)
@@ -2474,7 +2475,7 @@ interface TelegramService2 {
         client.post("sendMediaGroup") {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
-            parameter("media", TelegramApi2.json.encodeToString(media))
+            parameter("media", media)
             parameter("disable_notification", disableNotification)
             parameter("reply_to_message_id", replyToMessageId)
             parameter("allow_sending_without_reply", allowSendingWithoutReply)
@@ -2809,5 +2810,4 @@ interface TelegramService2 {
             parameter("error_message", errorMessage)
         }
     }
-
 }
