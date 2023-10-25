@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlinx.serialization)
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.10"
     id("maven-publish")
 }
 
 group = "ru.raysmith"
-version = "1.0.0-alpha.17"
+version = "1.0.0-alpha.18"
 
 repositories {
     mavenCentral()
