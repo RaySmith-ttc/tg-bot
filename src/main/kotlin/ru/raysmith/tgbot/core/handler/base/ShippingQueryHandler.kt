@@ -14,7 +14,7 @@ import ru.raysmith.tgbot.model.network.payment.ShippingQuery
 open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
     override val client: HttpClient,
-    private val handler: suspend ShippingQueryHandler.() -> Unit = {}
+    private val handler: ShippingQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<ShippingQueryHandler> {
 
     override fun getChatId() = shippingQuery.from.id
@@ -22,13 +22,13 @@ open class ShippingQueryHandler(
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    override suspend fun handle() = handler()
+    override fun handle() = handler()
 
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ShippingQueryHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<ShippingQueryHandler>.() -> R): R {
         return ShippingQueryHandler(shippingQuery, bot.client, handler).block()
     }
 
-    suspend fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {
+    fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {
         return answerShippingQuery(
             shippingQuery.id, ok, Json.encodeToString(shippingOptions), errorMessage
         )

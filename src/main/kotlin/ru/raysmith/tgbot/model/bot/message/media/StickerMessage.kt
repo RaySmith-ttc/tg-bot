@@ -1,13 +1,8 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 
 class StickerMessage(override val client: HttpClient) : MediaMessage() {
 
@@ -21,7 +16,7 @@ class StickerMessage(override val client: HttpClient) : MediaMessage() {
 
     override val mediaName: String = "sticker"
 
-    override suspend fun send(chatId: ChatId) = sendSticker(
+    override fun send(chatId: ChatId) = sendSticker(
         chatId = chatId,
         messageThreadId = messageThreadId,
         sticker = media ?: error("$mediaName is required"),

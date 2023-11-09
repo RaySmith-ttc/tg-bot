@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationCommandHandlerData<T : LocationConfig>(
-    val handler: (suspend context(T) LocationCommandHandler<T>.() -> Unit)? = null
+    val handler: (context(T) LocationCommandHandler<T>.() -> Unit)? = null
 )
 
 @HandlerDsl
@@ -23,7 +23,7 @@ class LocationCommandHandler<T : LocationConfig>(
 ) : CommandHandler(BotCommand(update.message!!.text!!), update.message, client), LocationHandler<T> {
     
     override val config by lazy { config() }
-    override suspend fun handle() {
+    override fun handle() {
         handlerData.forEach {
             it.value.handler?.let { it1 ->
                 it1(config, this)
@@ -31,13 +31,13 @@ class LocationCommandHandler<T : LocationConfig>(
         }
     }
 
-    suspend fun isCommand(value: String, equalHandler: suspend LocationCommandHandler<T>.(argsString: String?) -> Unit) {
+    fun isCommand(value: String, equalHandler: LocationCommandHandler<T>.(argsString: String?) -> Unit) {
         if (command.body == value) {
             equalHandler(command.argsString)
         }
     }
     
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<CommandHandler>.() -> R): R {
         return LocationCommandHandler(update, bot.client, handlerData, locationsWrapper).let {
             this.block()
         }

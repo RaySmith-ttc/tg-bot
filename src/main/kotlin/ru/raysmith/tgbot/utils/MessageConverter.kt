@@ -23,7 +23,7 @@ import ru.raysmith.tgbot.model.network.message.Dice
 class MessageConverter<T>(private var value: T?) {
 
     /** Verifies the current value. Returns null in [use] block if it returns false */
-    suspend fun verify(block: suspend (T) -> Boolean): MessageConverter<T> {
+    fun verify(block: (T) -> Boolean): MessageConverter<T> {
         if (value?.let { block(it) } == false) {
             value = null
         }
@@ -31,12 +31,12 @@ class MessageConverter<T>(private var value: T?) {
     }
 
     /** Converts type for message object to another */
-    suspend fun <R> convert(block: suspend (T) -> R?): MessageConverter<R> {
+    fun <R> convert(block: (T) -> R?): MessageConverter<R> {
         return value?.let { MessageConverter(block(it)) } ?: MessageConverter(null)
     }
 
     /** Applies [block] to result or returns null */
-    suspend fun use(block: suspend (T) -> Unit): T? {
+    fun use(block: (T) -> Unit): T? {
         if (value != null) {
             block(value!!)
         }
@@ -50,7 +50,7 @@ class MessageConverter<T>(private var value: T?) {
 fun MessageHandler.messageText() = MessageConverter(message.text)
 
 /** Applies a [block] to the message text or returns null if the message doesn't contain text. */
-suspend fun MessageHandler.messageText(block: suspend (String) -> Unit) = message.text?.also { block(it) }
+fun MessageHandler.messageText(block: (String) -> Unit) = message.text?.also { block(it) }
 
 
 // Photo
@@ -58,7 +58,7 @@ suspend fun MessageHandler.messageText(block: suspend (String) -> Unit) = messag
 fun MessageHandler.messagePhoto() = MessageConverter(message.photo?.last())
 
 /** Applies a [block] to the message photo's biggest size or returns null if message doesn't contain photo */
-suspend fun MessageHandler.messagePhoto(block: suspend (PhotoSize) -> Unit) = message.photo?.last()?.also { block(it) }
+fun MessageHandler.messagePhoto(block: (PhotoSize) -> Unit) = message.photo?.last()?.also { block(it) }
 
 
 // Photos
@@ -66,7 +66,7 @@ suspend fun MessageHandler.messagePhoto(block: suspend (PhotoSize) -> Unit) = me
 fun MessageHandler.messagePhotos() = MessageConverter(message.photo)
 
 /** Applies a [block] to the message photos or returns null if message doesn't contain photos */
-suspend fun MessageHandler.messagePhotos(block: suspend (List<PhotoSize>) -> Unit) = message.photo?.also { block(it) }
+fun MessageHandler.messagePhotos(block: (List<PhotoSize>) -> Unit) = message.photo?.also { block(it) }
 
 
 // Document
@@ -74,7 +74,7 @@ suspend fun MessageHandler.messagePhotos(block: suspend (List<PhotoSize>) -> Uni
 fun MessageHandler.messageDocument() = MessageConverter(message.document)
 
 /** Applies a [block] to the message document or returns null if message doesn't contain document */
-suspend fun MessageHandler.messageDocument(block: suspend (Document) -> Unit) = message.document?.also { block(it) }
+fun MessageHandler.messageDocument(block: (Document) -> Unit) = message.document?.also { block(it) }
 
 
 // Image
@@ -82,7 +82,7 @@ suspend fun MessageHandler.messageDocument(block: suspend (Document) -> Unit) = 
 fun MessageHandler.messageImage() = MessageConverter(message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })
 
 /** Applies a [block] to the message image (document or compressed photo) or returns null if message doesn't contain image */
-suspend fun MessageHandler.messageImage(block: suspend (Media) -> Unit) = (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also { block(it) }
+fun MessageHandler.messageImage(block: (Media) -> Unit) = (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also { block(it) }
 
 
 // Audio
@@ -90,7 +90,7 @@ suspend fun MessageHandler.messageImage(block: suspend (Media) -> Unit) = (messa
 fun MessageHandler.messageAudio() = MessageConverter(message.audio)
 
 /** Applies a [block] to the message audio or returns null if message doesn't contain audio */
-suspend fun MessageHandler.messageAudio(block: suspend (Audio) -> Unit) = message.audio?.also { block(it) }
+fun MessageHandler.messageAudio(block: (Audio) -> Unit) = message.audio?.also { block(it) }
 
 
 // Video
@@ -98,7 +98,7 @@ suspend fun MessageHandler.messageAudio(block: suspend (Audio) -> Unit) = messag
 fun MessageHandler.messageVideo() = MessageConverter(message.video)
 
 /** Applies a [block] to the message video or returns null if message doesn't contain video */
-suspend fun MessageHandler.messageVideo(block: suspend (Video) -> Unit) = message.video?.also { block(it) }
+fun MessageHandler.messageVideo(block: (Video) -> Unit) = message.video?.also { block(it) }
 
 
 // Animation
@@ -106,7 +106,7 @@ suspend fun MessageHandler.messageVideo(block: suspend (Video) -> Unit) = messag
 fun MessageHandler.messageAnimation() = MessageConverter(message.animation)
 
 /** Applies a [block] to the message animation or returns null if message doesn't contain animation */
-suspend fun MessageHandler.messageAnimation(block: suspend (Animation) -> Unit) = message.animation?.also { block(it) }
+fun MessageHandler.messageAnimation(block: (Animation) -> Unit) = message.animation?.also { block(it) }
 
 
 // Voice
@@ -114,7 +114,7 @@ suspend fun MessageHandler.messageAnimation(block: suspend (Animation) -> Unit) 
 fun MessageHandler.messageVoice() = MessageConverter(message.voice)
 
 /** Applies a [block] to the message voice or returns null if message doesn't contain voice */
-suspend fun MessageHandler.messageVoice(block: suspend (Voice) -> Unit) = message.voice?.also { block(it) }
+fun MessageHandler.messageVoice(block: (Voice) -> Unit) = message.voice?.also { block(it) }
 
 
 // VideoNote
@@ -122,7 +122,7 @@ suspend fun MessageHandler.messageVoice(block: suspend (Voice) -> Unit) = messag
 fun MessageHandler.messageVideoNote() = MessageConverter(message.videoNote)
 
 /** Applies a [block] to the message video note or returns null if message doesn't contain video note */
-suspend fun MessageHandler.messageVideoNote(block: suspend (VideoNote) -> Unit) = message.videoNote?.also { block(it) }
+fun MessageHandler.messageVideoNote(block: (VideoNote) -> Unit) = message.videoNote?.also { block(it) }
 
 
 // Location
@@ -130,7 +130,7 @@ suspend fun MessageHandler.messageVideoNote(block: suspend (VideoNote) -> Unit) 
 fun MessageHandler.messageLocation() = MessageConverter(message.location)
 
 /** Applies a [block] to the message location or returns null if message doesn't contain location */
-suspend fun MessageHandler.messageLocation(block: suspend (Location) -> Unit) = message.location?.also { block(it) }
+fun MessageHandler.messageLocation(block: (Location) -> Unit) = message.location?.also { block(it) }
 
 
 // Venue
@@ -138,7 +138,7 @@ suspend fun MessageHandler.messageLocation(block: suspend (Location) -> Unit) = 
 fun MessageHandler.messageVenue() = MessageConverter(message.venue)
 
 /** Applies a [block] to the message venue or returns null if message doesn't contain venue */
-suspend fun MessageHandler.messageVenue(block: suspend (Venue) -> Unit) = message.venue?.also { block(it) }
+fun MessageHandler.messageVenue(block: (Venue) -> Unit) = message.venue?.also { block(it) }
 
 
 // Contact
@@ -146,7 +146,7 @@ suspend fun MessageHandler.messageVenue(block: suspend (Venue) -> Unit) = messag
 fun MessageHandler.messageContact() = MessageConverter(message.contact)
 
 /** Applies a [block] to the message contact or returns null if message doesn't contain contact */
-suspend fun MessageHandler.messageContact(block: suspend (Contact) -> Unit) = message.contact?.also { block(it) }
+fun MessageHandler.messageContact(block: (Contact) -> Unit) = message.contact?.also { block(it) }
 
 
 // Poll
@@ -154,7 +154,7 @@ suspend fun MessageHandler.messageContact(block: suspend (Contact) -> Unit) = me
 fun MessageHandler.messagePoll() = MessageConverter(message.poll)
 
 /** Applies a [block] to the message poll or returns null if message doesn't contain poll */
-suspend fun MessageHandler.messagePoll(block: suspend (Poll) -> Unit) = message.poll?.also { block(it) }
+fun MessageHandler.messagePoll(block: (Poll) -> Unit) = message.poll?.also { block(it) }
 
 
 // Dice
@@ -162,7 +162,7 @@ suspend fun MessageHandler.messagePoll(block: suspend (Poll) -> Unit) = message.
 fun MessageHandler.messageDice() = MessageConverter(message.dice)
 
 /** Applies a [block] to the message dice or returns null if message doesn't contain dice */
-suspend fun MessageHandler.messageDice(block: suspend (Dice) -> Unit) = message.dice?.also { block(it) }
+fun MessageHandler.messageDice(block: (Dice) -> Unit) = message.dice?.also { block(it) }
 
 
 // Any media
@@ -170,7 +170,7 @@ suspend fun MessageHandler.messageDice(block: suspend (Dice) -> Unit) = message.
 fun MessageHandler.messageAnyMedia() = MessageConverter(message.getMedia())
 
 /** Applies a [block] to any message media or returns null if message doesn't contain media */
-suspend fun MessageHandler.messageAnyMedia(block: suspend (Media) -> Unit) = (
+fun MessageHandler.messageAnyMedia(block: (Media) -> Unit) = (
         message.photo?.lastOrNull() ?: message.document ?: message.audio ?: message.video ?:  message.animation ?:
         message.voice ?: message.videoNote
 )?.also { block(it) }

@@ -9,13 +9,13 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 interface EventHandler : ChatIdHolder, IEditor, ISender {
-    suspend fun handle()
+    fun handle()
 }
 
 interface LocationHandler<T : LocationConfig> : EventHandler {
     val update: Update
     val locationsWrapper: LocationsWrapper<T>
-    suspend fun BotContext<*>.toLocation(name: String) {
+    fun BotContext<*>.toLocation(name: String) {
         val location = locationsWrapper.onToLocation(config, name)
         location.onEnter(config, this, this@LocationHandler)
     }

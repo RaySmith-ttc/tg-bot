@@ -19,12 +19,12 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
             override var allowSendingWithoutReply: Boolean? = null
             override var protectContent: Boolean? = null
             override var keyboardMarkup: MessageKeyboard? = null
-            override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()
-            override suspend fun send(chatId: ChatId) = noimpl()
+            override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()
+            override fun send(chatId: ChatId) = noimpl()
         }
     }
 
-    override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageReplyMarkup(
             chatId = chatId,
             messageId = messageId,
@@ -37,11 +37,11 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
 interface EditableMessage : IMessage<Message> {
 
     /** Edit message from [chat] with [messageId] or [inlineMessageId] */
-    suspend fun edit(chat: Chat?, messageId: Int?, inlineMessageId: String?): Message =
+    fun edit(chat: Chat?, messageId: Int?, inlineMessageId: String?): Message =
         edit(chat?.id, messageId, inlineMessageId)
 
     /** Edit message from chat with [chatId] and [messageId] or [inlineMessageId] */
-    suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message
+    fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message
 
-    suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message
+    fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message
 }

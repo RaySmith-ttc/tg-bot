@@ -63,11 +63,9 @@ fun createBotContext(
     client: HttpClient = TelegramApi2.defaultClientInstance,
     withChatId: ChatId? = null,
 ) = object : BotContext<UnknownEventHandler> {
-    override val client: HttpClient
-        get() = TODO("Not yet implemented")
-
+    override val client = client
     override fun getChatId(): ChatId? = withChatId
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(Update(-1), bot.client).block()
     }
 }
@@ -83,5 +81,5 @@ internal fun noimpl(): Nothing = throw NotImplementedError()
  * @param bot current bot for getting [Bot.me]. If it is null then [getMe][TelegramService2.getMe] was called
  * */
 // TODO can move me to the context?
-suspend fun <T : EventHandler> BotContext<T>.stickerSetName(name: String, bot: Bot? = null) =
+fun <T : EventHandler> BotContext<T>.stickerSetName(name: String, bot: Bot? = null) =
     "${name}_by_${bot?.me?.username ?: getMe().username}"

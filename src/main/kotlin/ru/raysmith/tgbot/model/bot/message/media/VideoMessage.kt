@@ -1,15 +1,8 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
-import kotlinx.serialization.encodeToString
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 
 class VideoMessage(override val client: HttpClient) : MediaMessageWithThumb(), SpolerableContent {
 
@@ -26,7 +19,7 @@ class VideoMessage(override val client: HttpClient) : MediaMessageWithThumb(), S
     override val mediaName: String = "video"
 
     // TODO test; use same for other sendMedia methods with thumb
-    override suspend fun send(chatId: ChatId) = sendVideo(
+    override fun send(chatId: ChatId) = sendVideo(
         chatId = chatId,
         messageThreadId = messageThreadId,
         video = media ?: error("$mediaName is required"),

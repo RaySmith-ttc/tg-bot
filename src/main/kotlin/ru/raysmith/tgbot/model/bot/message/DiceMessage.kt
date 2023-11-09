@@ -18,7 +18,7 @@ class DiceMessage(
     override var protectContent: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    override suspend fun send(chatId: ChatId) = sendDice(
+    override fun send(chatId: ChatId) = sendDice(
         chatId = chatId,
         messageThreadId = messageThreadId,
         emoji = emoji,

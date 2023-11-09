@@ -25,9 +25,9 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>
             return object : CaptionableMediaMessage() {
                 override val mediaName: String = mediaName
                 override val client: HttpClient = service.client
-                override suspend fun send(chatId: ChatId) = send(chatId)
+                override fun send(chatId: ChatId) = send(chatId)
 
-                override suspend fun editReplyMarkup(
+                override fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
                 ): Message = noimpl()
             }
@@ -55,20 +55,20 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>
         return media?.toRequestBody(mediaName) ?: error("media is not set")
     }
 
-    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageCaption(
             chatId, messageId, inlineMessageId, getCaptionText() ?: "", parseMode = null,
             _caption?.getEntitiesString(), keyboardMarkup?.toMarkup()
         )
     }
 
-    suspend fun <T : InputMedia> editMedia(chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): Message {
+    fun <T : InputMedia> editMedia(chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): Message {
         return editMessageMedia(
             chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
         )
     }
 
-    override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageReplyMarkup(
             chatId = chatId,
             messageId = messageId,

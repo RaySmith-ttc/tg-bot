@@ -5,10 +5,6 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramFileService
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 
 class VenueMessage(
     val latitude: Double, val longitude: Double, val title: String, val address: String,
@@ -26,7 +22,7 @@ class VenueMessage(
     var googlePlaceId: String? = null
     var googlePlaceType: String? = null
 
-    override suspend fun send(chatId: ChatId) = sendVenue(
+    override fun send(chatId: ChatId) = sendVenue(
         chatId = chatId,
         messageThreadId = messageThreadId,
         latitude = latitude,

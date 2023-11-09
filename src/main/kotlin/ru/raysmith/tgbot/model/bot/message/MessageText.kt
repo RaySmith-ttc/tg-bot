@@ -283,7 +283,7 @@ class MessageText(private val type: MessageTextType) {
         return this
     }
 
-    suspend fun entity(type: MessageEntityType, init: suspend MessageEntityBuilder.() -> Unit): MessageEntity {
+    fun entity(type: MessageEntityType, init: MessageEntityBuilder.() -> Unit): MessageEntity {
        return MessageEntityBuilder(type).apply { init() }.toEntity().also {
            entities.add(it)
        }

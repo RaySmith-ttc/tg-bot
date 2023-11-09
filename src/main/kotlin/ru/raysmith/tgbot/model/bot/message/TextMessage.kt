@@ -5,11 +5,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.response.MessageResponse
-import ru.raysmith.tgbot.network.TelegramFileService
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
-import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.withSafeLength
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
@@ -41,7 +38,7 @@ class TextMessage(override val client: HttpClient) :
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
-    suspend fun textWithEntities(setText: suspend MessageText.() -> Unit) {
+    fun textWithEntities(setText: MessageText.() -> Unit) {
         messageText = MessageText(MessageTextType.TEXT)
         messageText!!.apply { setText() }
     }
@@ -55,7 +52,7 @@ class TextMessage(override val client: HttpClient) :
     /** Returns the [parseMode] if entities were not used, null otherwise */
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override suspend fun send(chatId: ChatId) = sendMessage(
+    override fun send(chatId: ChatId) = sendMessage(
         chatId = chatId,
         messageThreadId = messageThreadId,
         text = getMessageText(),
@@ -69,7 +66,7 @@ class TextMessage(override val client: HttpClient) :
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 
-    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
+    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,
@@ -80,7 +77,7 @@ class TextMessage(override val client: HttpClient) :
         disableWebPagePreview = disableWebPagePreview
     )
 
-    suspend fun datePicker(datePicker: DatePicker, data: String? = null) {
+    fun datePicker(datePicker: DatePicker, data: String? = null) {
         textWithEntities { datePickerMessageText(datePicker, data) }
         inlineKeyboard { createDatePicker(datePicker, data) }
     }

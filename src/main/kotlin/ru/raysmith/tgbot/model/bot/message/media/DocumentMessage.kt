@@ -12,7 +12,7 @@ class DocumentMessage(override val client: HttpClient) : MediaMessageWithThumb()
 
     override val mediaName: String = "document"
 
-    override suspend fun send(chatId: ChatId) = sendDocument(
+    override fun send(chatId: ChatId) = sendDocument(
         chatId = chatId,
         messageThreadId = messageThreadId,
         document = media ?: error("$mediaName is required"),

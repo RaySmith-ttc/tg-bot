@@ -30,9 +30,9 @@ interface IMessage<T> : TelegramService2 {
     var protectContent: Boolean?
 
     /** Send message to [chat] */
-    suspend fun send(chat: Chat): T = send(chat.id)
+    fun send(chat: Chat): T = send(chat.id)
 
     // TODO add messageThreadId = Int? = null (?)
     /** Send message to chat with [chatId] */
-    suspend fun send(chatId: ChatId): T
+    fun send(chatId: ChatId): T
 }

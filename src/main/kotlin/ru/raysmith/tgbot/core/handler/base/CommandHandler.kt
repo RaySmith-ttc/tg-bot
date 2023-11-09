@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.utils.BotContextDsl
 open class CommandHandler(
     val command: BotCommand, val message: Message,
     override val client: HttpClient,
-    val handler: suspend CommandHandler.() -> Unit = { }
+    val handler: CommandHandler.() -> Unit = { }
 ) : EventHandler, BotContext<CommandHandler> {
 
     override fun getChatId() = message.chat.id
@@ -21,15 +21,15 @@ open class CommandHandler(
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 
-    override suspend fun handle() = handler()
+    override fun handle() = handler()
 
     @BotContextDsl
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<CommandHandler>.() -> R): R {
         return CommandHandler(command, message, bot.client, handler).block()
     }
 }
 
-suspend inline fun CommandHandler.isCommand(value: String, crossinline equalHandler: suspend CommandHandler.(argsString: String?) -> Unit) {
+inline fun CommandHandler.isCommand(value: String, crossinline equalHandler: CommandHandler.(argsString: String?) -> Unit) {
     if (command.body == value) {
         equalHandler(command.argsString)
     }

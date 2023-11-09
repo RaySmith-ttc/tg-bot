@@ -11,16 +11,16 @@ import ru.raysmith.tgbot.model.network.Poll
 open class PollHandler(
     val poll: Poll,
     override val client: HttpClient,
-    private val handler: suspend PollHandler.() -> Unit = {}
+    private val handler: PollHandler.() -> Unit = {}
 ) : EventHandler, BotContext<PollHandler> {
 
     override fun getChatId() = null
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    override suspend fun handle() = handler()
+    override fun handle() = handler()
 
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PollHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<PollHandler>.() -> R): R {
         return PollHandler(poll, bot.client, handler).block()
     }
 }

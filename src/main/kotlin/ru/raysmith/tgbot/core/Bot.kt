@@ -298,8 +298,8 @@ class Bot(
     // TODO убрать регистрацию обработчиков из EventHandlerFactory,
     //  поместить в этом классе, оставить start() без аргументов
     suspend fun start(updateHandler: BaseEventHandlerFactory.(bot: Bot) -> Unit) {
+        eventHandlerFactory = BaseEventHandlerFactory()
         eventHandlerBuilder = {
-            eventHandlerFactory = BaseEventHandlerFactory()
             (eventHandlerFactory as BaseEventHandlerFactory).updateHandler(this)
         }
 
@@ -312,7 +312,9 @@ class Bot(
     suspend fun <T : LocationConfig> locations(setup: suspend LocationsWrapper<T>.() -> Unit) {
         locationsWrapper = LocationsWrapper<T>().apply { setup() }
         eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)
+        eventHandlerBuilder = {}
         isLocationsMode = true
+
         startBot()
     }
 

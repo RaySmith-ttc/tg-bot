@@ -13,111 +13,111 @@ import ru.raysmith.tgbot.network.TelegramService2
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, TelegramService2 {
 
-    suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
+    fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
         return TextMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: suspend PhotoMessage.() -> Unit): Message {
+    fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: PhotoMessage.() -> Unit): Message {
         return PhotoMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: suspend AudioMessage.() -> Unit): Message {
+    fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: AudioMessage.() -> Unit): Message {
         return AudioMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: suspend DocumentMessage.() -> Unit): Message {
+    fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: DocumentMessage.() -> Unit): Message {
         return DocumentMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoMessage.() -> Unit): Message {
+    fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: VideoMessage.() -> Unit): Message {
         return VideoMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: suspend AnimationMessage.() -> Unit): Message {
+    fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: AnimationMessage.() -> Unit): Message {
         return AnimationMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: suspend VoiceMessage.() -> Unit): Message {
+    fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: VoiceMessage.() -> Unit): Message {
         return VoiceMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoNoteMessage.() -> Unit): Message {
+    fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: VideoNoteMessage.() -> Unit): Message {
         return VideoNoteMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendLocation(
+    fun sendLocation(
         latitude: Double,
         longitude: Double,
         chatId: ChatId = getChatIdOrThrow(),
-        message: suspend LocationMessage.() -> Unit
+        message: LocationMessage.() -> Unit
     ): Message {
         return LocationMessage(latitude, longitude, client).apply { message() }.send(chatId)
     }
 
-    suspend fun editMessageLiveLocation(
+    fun editMessageLiveLocation(
         latitude: Double,
         longitude: Double,
         chatId: ChatId? = getChatIdOrThrow(),
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        message: suspend LocationMessage.() -> Unit
+        message: LocationMessage.() -> Unit
     ): LiveLocationResponse {
         return LocationMessage(latitude, longitude, client).apply { message() }
             .edit(chatId, messageId, inlineMessageId)
     }
 
-    suspend fun stopMessageLiveLocation(
+    fun stopMessageLiveLocation(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        message: suspend LocationMessage.() -> Unit
+        message: LocationMessage.() -> Unit
     ): LiveLocationResponse {
         return LocationMessage(0.0, 0.0, client).apply { message() }.stop(chatId, messageId, inlineMessageId)
     }
 
-    suspend fun sendVenue(
+    fun sendVenue(
         latitude: Double,
         longitude: Double,
         title: String,
         address: String,
         chatId: ChatId = getChatIdOrThrow(),
-        message: suspend VenueMessage.() -> Unit
+        message: VenueMessage.() -> Unit
     ): Message {
         return VenueMessage(latitude, longitude, title, address, client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendContact(
+    fun sendContact(
         phoneNumber: String,
         firstName: String,
         chatId: ChatId = getChatIdOrThrow(),
-        message: suspend ContactMessage.() -> Unit
+        message: ContactMessage.() -> Unit
     ): Message {
         return ContactMessage(phoneNumber, firstName, client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendPoll(
+    fun sendPoll(
         question: String,
         options: List<String>,
         chatId: ChatId = getChatIdOrThrow(),
-        message: suspend PollMessage.() -> Unit
+        message: PollMessage.() -> Unit
     ): Message {
         return PollMessage(question, options, client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {
+    fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
         return DiceMessage(emoji, client).apply { message() }.send(chatId)
     }
 
 
-    suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+    fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return sendChatAction(chatId, action, messageThreadId)
     }
 
-    suspend fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: suspend MediaGroupMessage.() -> Unit): List<Message> {
+    fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
         return MediaGroupMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: suspend StickerMessage.() -> Unit): Message {
+    fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
         return StickerMessage(client).apply { message() }.send(chatId)
     }
 }

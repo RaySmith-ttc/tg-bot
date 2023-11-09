@@ -21,7 +21,7 @@ open class ChatMemberHandler(
     val newChatMember: ChatMember,
     val inviteLink: ChatInviteLink? = null,
     override val client: HttpClient,
-    private val handler: suspend ChatMemberHandler.() -> Unit = { }
+    private val handler: ChatMemberHandler.() -> Unit = { }
 ) : EventHandler, BotContext<ChatMemberHandler> {
 
     override fun getChatId() = chat.id
@@ -29,14 +29,14 @@ open class ChatMemberHandler(
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    constructor(chatMember: ChatMemberUpdated, client: HttpClient, handler: suspend ChatMemberHandler.() -> Unit = { }) : this(
+    constructor(chatMember: ChatMemberUpdated, client: HttpClient, handler: ChatMemberHandler.() -> Unit = { }) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,
         chatMember.inviteLink, client, handler
     )
 
-    override suspend fun handle() = handler()
+    override fun handle() = handler()
 
-    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
+    override fun <R> withBot(bot: Bot, block: BotContext<ChatMemberHandler>.() -> R): R {
         return ChatMemberHandler(
             chat, from, date, oldChatMember, newChatMember, inviteLink, bot.client, handler
         ).block()

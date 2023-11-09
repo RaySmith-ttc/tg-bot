@@ -22,45 +22,45 @@ interface IEditor : ChatIdHolder, TelegramService2 {
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
-    suspend fun editCaption(
+    fun editCaption(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        caption: suspend MessageText.() -> Unit
+        caption: MessageText.() -> Unit
     ): Message {
         return CaptionableMediaMessage.instance(this)
             .apply { captionWithEntities(caption) }
             .edit(chatId, messageId, inlineMessageId)
     }
 
-    suspend fun editReplyMarkup(
+    fun editReplyMarkup(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        keyboard: suspend MessageInlineKeyboard.() -> Unit
+        keyboard: MessageInlineKeyboard.() -> Unit
     ): Message {
         return MessageWithReplyMarkup.instance(this)
             .apply { inlineKeyboard(keyboard) }
             .editReplyMarkup(chatId, messageId, inlineMessageId)
     }
 
-    suspend fun <T : InputMedia> editMedia(
+    fun <T : InputMedia> editMedia(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
         media: InputMedia,
-        keyboard: suspend MessageInlineKeyboard.() -> Unit
+        keyboard: MessageInlineKeyboard.() -> Unit
     ): Message {
         return CaptionableMediaMessage.instance(this)
             .apply { inlineKeyboard(keyboard) }
             .editMedia<T>(chatId, messageId, inlineMessageId, media)
     }
 
-    suspend fun edit(
+    fun edit(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        message: suspend TextMessage.() -> Unit
+        message: TextMessage.() -> Unit
     ): Message {
         return TextMessage(client).apply { message() }
             .edit(chatId, messageId, inlineMessageId)
