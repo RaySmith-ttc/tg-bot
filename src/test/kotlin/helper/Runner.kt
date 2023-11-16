@@ -352,7 +352,7 @@ class Runner {
                                     .verify { it.contains(".") }
                                     .convert { it.toFloatOrNull() }
                                     .verify { it > 0.0 }
-                                    .use {
+                                    .onResult {
                                         send("value: $it")
                                     } ?: send("incorrect")
                             }
@@ -449,7 +449,7 @@ class Runner {
                     messageContact()
                         .verify { (it.userId?.value ?: 0) > 0 }
                         .convert { it.firstName + " " + it.lastName }
-                        .use {
+                        .onResult {
                             send(it)
                         }
                     
@@ -462,7 +462,7 @@ class Runner {
                     } ?: messagePhoto()
                         .verify { it.height != 9999 }
                         .convert { it.fileName ?: "unknown" }
-                        .use {
+                        .onResult {
 //                            it.inputStream(this).readBytes().size.let {
 //                                send("Bytes: $it")
 //                            }
