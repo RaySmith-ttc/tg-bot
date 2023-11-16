@@ -8,7 +8,7 @@ import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.message.Dice
 
 /**
- * Applies a [use] to the message object after [convert] to another type and [verify] or returns null if [convert] returns null or [verify] returns false
+ * Applies a [onResult] to the message object after [convert] to another type and [verify] or returns null if [convert] returns null or [verify] returns false
  *
  * Example:
  * ```
@@ -20,23 +20,32 @@ import ru.raysmith.tgbot.model.network.message.Dice
  *      } ?: send("incorrect")
  * ```
  * */
-class MessageConverter<T>(private var value: T?) {
+class MessageConverter<T>(private var value: T?, private var hint: String? = null, private var onNull: ((String?) -> Unit)? = null) {
 
-    /** Verifies the current value. Returns null in [use] block if it returns false */
-    fun verify(block: (T) -> Boolean): MessageConverter<T> {
+    /** Verifies the current value. Returns null and [hint] in [onResult] and [hint] in [onNull] blocks if it returns false */
+    fun verify(hint: String? = null, block: (T) -> Boolean): MessageConverter<T> {
         if (value?.let { block(it) } == false) {
-            value = null
+            this.value = null
+            this.hint = hint
         }
         return this
     }
 
-    /** Converts type for message object to another */
-    fun <R> convert(block: (T) -> R?): MessageConverter<R> {
-        return value?.let { MessageConverter(block(it)) } ?: MessageConverter(null)
+    /** Converts type for message object to another. Returns null in [onResult] and [hint] in [onNull] blocks if it returns null*/
+    fun <R> convert(hint: String? = null, block: (T) -> R?): MessageConverter<R> {
+        return value?.let { MessageConverter(block(it), hint, onNull) } ?: MessageConverter(null, hint, onNull)
+    }
+
+    /** Applies [block] if **current** result is null */
+    fun onNull(block: (hint: String?) -> Unit): MessageConverter<T> {
+        if (value == null) {
+            block(hint)
+        }
+        return this
     }
 
     /** Applies [block] to result or returns null */
-    fun use(block: (T) -> Unit): T? {
+    fun onResult(block: (T) -> Unit): T? {
         if (value != null) {
             block(value!!)
         }
