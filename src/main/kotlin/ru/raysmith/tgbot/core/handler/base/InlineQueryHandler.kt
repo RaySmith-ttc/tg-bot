@@ -14,24 +14,24 @@ import kotlin.time.Duration
 open class InlineQueryHandler(
     val inlineQuery: InlineQuery,
     override val client: HttpClient,
-    private val handler: InlineQueryHandler.() -> Unit = {}
+    private val handler: suspend InlineQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<InlineQueryHandler> {
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineQuery.from.id
     override fun getChatIdOrThrow() = inlineQuery.from.id
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
     /**
      * @see answerInlineQuery
      * */
-    fun answer(
+    suspend fun answer(
         id: String, results: List<InlineQueryResult>, cacheTime: Duration? = null, isPersonal: Boolean? = null,
         nextOffset: String? = null, button: InlineQueryResultsButton? = null
     ) = answerInlineQuery(id, results, cacheTime, isPersonal, nextOffset, button)
 
-    override fun <R> withBot(bot: Bot, block: BotContext<InlineQueryHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<InlineQueryHandler>.() -> R): R {
         return InlineQueryHandler(inlineQuery, bot.client, handler).block()
     }
 }

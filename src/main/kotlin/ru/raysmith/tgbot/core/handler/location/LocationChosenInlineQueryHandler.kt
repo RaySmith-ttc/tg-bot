@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationChosenInlineQueryHandlerData<T : LocationConfig>(
-    val handler: (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)? = null
+    val handler: (suspend context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)? = null
 )
 
 @HandlerDsl
@@ -22,12 +22,12 @@ class LocationChosenInlineQueryHandler<T : LocationConfig>(
 ) : ChosenInlineQueryHandler(update.chosenInlineResult!!, client), LocationHandler<T> {
 
     override val config by lazy { config() }
-    override fun handle() {
+    override suspend fun handle() {
         handlerData.forEach {
             it.value.handler?.let { it1 -> it1(config, this) }
         }
     }
-    override fun <R> withBot(bot: Bot, block: BotContext<ChosenInlineQueryHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChosenInlineQueryHandler>.() -> R): R {
         return LocationChosenInlineQueryHandler(update, bot.client, handlerData, locationsWrapper).let {
             this.block()
         }

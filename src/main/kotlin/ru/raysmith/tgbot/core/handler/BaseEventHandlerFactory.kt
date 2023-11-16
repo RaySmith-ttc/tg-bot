@@ -18,23 +18,23 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
-    private var messageHandler: (MessageHandler.() -> Unit)? = null
-    private var commandHandler: (CommandHandler.() -> Unit)? = null
-    private var editedMessageHandler: (EditedMessageHandler.() -> Unit)? = null
-    private var channelPostHandler: (ChannelPostHandler.() -> Unit)? = null
-    private var editedChannelPostHandler: (EditedChannelPostHandler.() -> Unit)? = null
-    private var inlineQueryHandler: (InlineQueryHandler.() -> Unit)? = null
-    private var chosenInlineQueryHandler: (ChosenInlineQueryHandler.() -> Unit)? = null
+    private var messageHandler: (suspend (MessageHandler.() -> Unit))? = null
+    private var commandHandler: (suspend (CommandHandler.() -> Unit))? = null
+    private var editedMessageHandler: (suspend (EditedMessageHandler.() -> Unit))? = null
+    private var channelPostHandler: (suspend (ChannelPostHandler.() -> Unit))? = null
+    private var editedChannelPostHandler: (suspend (EditedChannelPostHandler.() -> Unit))? = null
+    private var inlineQueryHandler: (suspend (InlineQueryHandler.() -> Unit))? = null
+    private var chosenInlineQueryHandler: (suspend (ChosenInlineQueryHandler.() -> Unit))? = null
     private val callbackQueryHandler: MutableMap<String, CallbackQueryHandlerData> = mutableMapOf()
-    private var shippingQueryHandler: (ShippingQueryHandler.() -> Unit)? = null
-    private var preCheckoutQueryHandler: (PreCheckoutQueryHandler.() -> Unit)? = null
-    private var pollHandler: (PollHandler.() -> Unit)? = null
-    private var pollAnswerHandler: (PollAnswerHandler.() -> Unit)? = null
-    private var myChatMemberHandler: (ChatMemberHandler.() -> Unit)? = null
-    private var chatMemberHandler: (ChatMemberHandler.() -> Unit)? = null
-    private var chatJoinRequestHandler: (ChatJoinRequestHandler.() -> Unit)? = null
+    private var shippingQueryHandler: (suspend (ShippingQueryHandler.() -> Unit))? = null
+    private var preCheckoutQueryHandler: (suspend (PreCheckoutQueryHandler.() -> Unit))? = null
+    private var pollHandler: (suspend (PollHandler.() -> Unit))? = null
+    private var pollAnswerHandler: (suspend (PollAnswerHandler.() -> Unit))? = null
+    private var myChatMemberHandler: (suspend (ChatMemberHandler.() -> Unit))? = null
+    private var chatMemberHandler: (suspend (ChatMemberHandler.() -> Unit))? = null
+    private var chatJoinRequestHandler: (suspend (ChatJoinRequestHandler.() -> Unit))? = null
 
-    private var unknownHandler: UnknownEventHandler.() -> Unit = { }
+    private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
 
     override fun clear() {
         allowedUpdates.clear()
@@ -127,43 +127,43 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     }
 
     @HandlerDsl
-    fun handleMessage(handler: MessageHandler.() -> Unit) {
+    fun handleMessage(handler: suspend MessageHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         messageHandler = handler
     }
 
     @HandlerDsl
-    fun handleCommand(handler: CommandHandler.() -> Unit) {
+    fun handleCommand(handler: suspend CommandHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         commandHandler = handler
     }
 
     @HandlerDsl
-    fun handleEditedMessage(handler: EditedMessageHandler.() -> Unit) {
+    fun handleEditedMessage(handler: suspend EditedMessageHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_MESSAGE)
         editedMessageHandler = handler
     }
 
     @HandlerDsl
-    fun handleChannelPost(handler: ChannelPostHandler.() -> Unit) {
+    fun handleChannelPost(handler: suspend ChannelPostHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHANNEL_POST)
         channelPostHandler = handler
     }
 
     @HandlerDsl
-    fun handleEditedChannelPost(handler: EditedChannelPostHandler.() -> Unit) {
+    fun handleEditedChannelPost(handler: suspend EditedChannelPostHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
         editedChannelPostHandler = handler
     }
 
     @HandlerDsl
-    fun handleInlineQuery(handler: InlineQueryHandler.() -> Unit) {
+    fun handleInlineQuery(handler: suspend InlineQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.INLINE_QUERY)
         inlineQueryHandler = handler
     }
 
     @HandlerDsl
-    fun handleChosenInlineQuery(handler: ChosenInlineQueryHandler.() -> Unit) {
+    fun handleChosenInlineQuery(handler: suspend ChosenInlineQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHOSEN_INLINE_RESULT)
         chosenInlineQueryHandler = handler
     }
@@ -173,7 +173,7 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
         alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
         datePicker: DatePicker? = null,
-        handler: (CallbackQueryHandler.() -> Unit)?
+        handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) {
             throw IllegalArgumentException("Callback handler with id '$handlerId' already registered")
@@ -184,49 +184,49 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     }
 
     @HandlerDsl
-    fun handleShippingQuery(handler: ShippingQueryHandler.() -> Unit) {
+    fun handleShippingQuery(handler: suspend ShippingQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.SHIPPING_QUERY)
         shippingQueryHandler = handler
     }
 
     @HandlerDsl
-    fun handlePreCheckoutQuery(handler: PreCheckoutQueryHandler.() -> Unit) {
+    fun handlePreCheckoutQuery(handler: suspend PreCheckoutQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.PRE_CHECKOUT_QUERY)
         preCheckoutQueryHandler = handler
     }
 
     @HandlerDsl
-    fun handlePoll(handler: PollHandler.() -> Unit) {
+    fun handlePoll(handler: suspend PollHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL)
         pollHandler = handler
     }
 
     @HandlerDsl
-    fun handlePollAnswer(handler: PollAnswerHandler.() -> Unit) {
+    fun handlePollAnswer(handler: suspend PollAnswerHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL_ANSWER)
         pollAnswerHandler = handler
     }
 
     @HandlerDsl
-    fun handleMyChatMember(handler: ChatMemberHandler.() -> Unit) {
+    fun handleMyChatMember(handler: suspend ChatMemberHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MY_CHAT_MEMBER)
         myChatMemberHandler = handler
     }
 
     @HandlerDsl
-    fun handleChatMember(handler: ChatMemberHandler.() -> Unit) {
+    fun handleChatMember(handler: suspend ChatMemberHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_MEMBER)
         chatMemberHandler = handler
     }
 
     @HandlerDsl
-    fun handleChatJoinRequest(handler: ChatJoinRequestHandler.() -> Unit) {
+    fun handleChatJoinRequest(handler: suspend ChatJoinRequestHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler = handler
     }
 
     @HandlerDsl
-    fun handleUnknown(handler: UnknownEventHandler.() -> Unit) {
+    fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
     }
 }

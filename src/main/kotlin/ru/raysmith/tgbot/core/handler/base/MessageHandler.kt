@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.message.Message
 open class MessageHandler(
     val message: Message,
     override val client: HttpClient,
-    private val handler: MessageHandler.() -> Unit = { }
+    private val handler: suspend MessageHandler.() -> Unit = { }
 ) : EventHandler, BotContext<MessageHandler> {
 
     override fun getChatId() = message.chat.id
@@ -19,9 +19,9 @@ open class MessageHandler(
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<MessageHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<MessageHandler>.() -> R): R {
         return MessageHandler(message, bot.client, handler).block()
     }
 }

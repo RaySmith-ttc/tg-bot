@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationMessageHandlerData<T : LocationConfig>(
-    val handler: (context(T) LocationMessageHandler<T>.() -> Unit)? = null
+    val handler: (suspend (context(T) LocationMessageHandler<T>.() -> Unit))? = null
 )
 
 @HandlerDsl
@@ -22,12 +22,12 @@ open class LocationMessageHandler<T : LocationConfig>(
 ) : MessageHandler(update.message!!, client), LocationHandler<T> {
     
     override val config by lazy { config() }
-    override fun handle() {
+    override suspend fun handle() {
         handlerData.forEach {
             it.value.handler?.let { it1 -> it1(config, this) }
         }
     }
-    override fun <R> withBot(bot: Bot, block: BotContext<MessageHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<MessageHandler>.() -> R): R {
         return LocationMessageHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

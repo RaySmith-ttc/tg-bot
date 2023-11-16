@@ -13,7 +13,7 @@ class PhotoMessage(override val client: HttpClient) : CaptionableMediaMessage(),
 
     override val mediaName: String = "photo"
 
-    override fun send(chatId: ChatId) = sendPhoto(
+    override suspend fun send(chatId: ChatId) = sendPhoto(
         chatId = chatId,
         messageThreadId = messageThreadId,
         photo = media ?: error("$mediaName is required"),

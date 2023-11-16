@@ -16,7 +16,7 @@ class StickerMessage(override val client: HttpClient) : MediaMessage() {
 
     override val mediaName: String = "sticker"
 
-    override fun send(chatId: ChatId) = sendSticker(
+    override suspend fun send(chatId: ChatId) = sendSticker(
         chatId = chatId,
         messageThreadId = messageThreadId,
         sticker = media ?: error("$mediaName is required"),

@@ -13,39 +13,39 @@ import ru.raysmith.tgbot.network.TelegramService2
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, TelegramService2 {
 
-    fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
+    suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
         return TextMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: PhotoMessage.() -> Unit): Message {
+    suspend fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: PhotoMessage.() -> Unit): Message {
         return PhotoMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: AudioMessage.() -> Unit): Message {
+    suspend fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: AudioMessage.() -> Unit): Message {
         return AudioMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: DocumentMessage.() -> Unit): Message {
+    suspend fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: DocumentMessage.() -> Unit): Message {
         return DocumentMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: VideoMessage.() -> Unit): Message {
+    suspend fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: VideoMessage.() -> Unit): Message {
         return VideoMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: AnimationMessage.() -> Unit): Message {
+    suspend fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: AnimationMessage.() -> Unit): Message {
         return AnimationMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: VoiceMessage.() -> Unit): Message {
+    suspend fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: VoiceMessage.() -> Unit): Message {
         return VoiceMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: VideoNoteMessage.() -> Unit): Message {
+    suspend fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: VideoNoteMessage.() -> Unit): Message {
         return VideoNoteMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendLocation(
+    suspend fun sendLocation(
         latitude: Double,
         longitude: Double,
         chatId: ChatId = getChatIdOrThrow(),
@@ -54,7 +54,7 @@ interface ISender : ChatIdHolder, TelegramService2 {
         return LocationMessage(latitude, longitude, client).apply { message() }.send(chatId)
     }
 
-    fun editMessageLiveLocation(
+    suspend fun editMessageLiveLocation(
         latitude: Double,
         longitude: Double,
         chatId: ChatId? = getChatIdOrThrow(),
@@ -66,7 +66,7 @@ interface ISender : ChatIdHolder, TelegramService2 {
             .edit(chatId, messageId, inlineMessageId)
     }
 
-    fun stopMessageLiveLocation(
+    suspend fun stopMessageLiveLocation(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -75,7 +75,7 @@ interface ISender : ChatIdHolder, TelegramService2 {
         return LocationMessage(0.0, 0.0, client).apply { message() }.stop(chatId, messageId, inlineMessageId)
     }
 
-    fun sendVenue(
+    suspend fun sendVenue(
         latitude: Double,
         longitude: Double,
         title: String,
@@ -86,7 +86,7 @@ interface ISender : ChatIdHolder, TelegramService2 {
         return VenueMessage(latitude, longitude, title, address, client).apply { message() }.send(chatId)
     }
 
-    fun sendContact(
+    suspend fun sendContact(
         phoneNumber: String,
         firstName: String,
         chatId: ChatId = getChatIdOrThrow(),
@@ -95,7 +95,7 @@ interface ISender : ChatIdHolder, TelegramService2 {
         return ContactMessage(phoneNumber, firstName, client).apply { message() }.send(chatId)
     }
 
-    fun sendPoll(
+    suspend fun sendPoll(
         question: String,
         options: List<String>,
         chatId: ChatId = getChatIdOrThrow(),
@@ -104,20 +104,20 @@ interface ISender : ChatIdHolder, TelegramService2 {
         return PollMessage(question, options, client).apply { message() }.send(chatId)
     }
 
-    fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
+    suspend fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
         return DiceMessage(emoji, client).apply { message() }.send(chatId)
     }
 
 
-    fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+    suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return sendChatAction(chatId, action, messageThreadId)
     }
 
-    fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
+    suspend fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
         return MediaGroupMessage(client).apply { message() }.send(chatId)
     }
 
-    fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
+    suspend fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
         return StickerMessage(client).apply { message() }.send(chatId)
     }
 }

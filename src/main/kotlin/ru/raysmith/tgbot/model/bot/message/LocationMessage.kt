@@ -25,7 +25,7 @@ class LocationMessage(
     override var allowSendingWithoutReply: Boolean? = null
     override var protectContent: Boolean? = null
 
-    override fun send(chatId: ChatId) = sendLocation(
+    override suspend fun send(chatId: ChatId) = sendLocation(
         chatId = chatId,
         messageThreadId = messageThreadId,
         latitude = latitude,
@@ -41,7 +41,7 @@ class LocationMessage(
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 
-    fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageLiveLocation(
+    suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageLiveLocation(
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,
@@ -53,7 +53,7 @@ class LocationMessage(
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 
-    fun stop(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = stopMessageLiveLocation(
+    suspend fun stop(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = stopMessageLiveLocation(
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,

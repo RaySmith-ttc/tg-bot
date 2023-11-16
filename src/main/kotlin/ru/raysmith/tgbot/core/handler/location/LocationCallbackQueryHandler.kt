@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationCallbackQueryHandlerData<T : LocationConfig>(
-    val handler: (context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
+    val handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
     val datePicker: DatePicker? = null,
     val alwaysAnswer: Boolean
 )
@@ -26,7 +26,7 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
 ) : CallbackQueryHandler(update.callbackQuery!!, emptyMap(), client), LocationHandler<T> {
     
     override val config by lazy { config() }
-    override fun handle() {
+    override suspend fun handle() {
         if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
 
         for (data in handlerData) {
@@ -41,7 +41,7 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
             answer()
         }
     }
-    override fun <R> withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
         return LocationCallbackQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

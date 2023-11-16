@@ -42,7 +42,7 @@ class InvoiceSender(override val client: HttpClient) : InlineKeyboardCreator, Te
     var allowSendingWithoutReply: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    fun send(chatId: ChatId) = sendInvoice(
+    suspend fun send(chatId: ChatId) = sendInvoice(
         chatId = chatId,
         messageThreadId = messageThreadId,
         title = title ?: "",
@@ -97,7 +97,7 @@ class InvoiceCreateLinkSender(override val client: HttpClient) : TelegramService
     var sendEmailToProvider: Boolean? = null
     var isFlexible: Boolean? = null
 
-    fun send() = createInvoiceLink(
+    suspend fun send() = createInvoiceLink(
         title = title ?: "",
         description = description ?: "",
         payload = payload ?: "",

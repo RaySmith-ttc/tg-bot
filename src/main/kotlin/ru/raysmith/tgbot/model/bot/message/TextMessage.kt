@@ -52,7 +52,7 @@ class TextMessage(override val client: HttpClient) :
     /** Returns the [parseMode] if entities were not used, null otherwise */
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override fun send(chatId: ChatId) = sendMessage(
+    override suspend fun send(chatId: ChatId) = sendMessage(
         chatId = chatId,
         messageThreadId = messageThreadId,
         text = getMessageText(),
@@ -66,7 +66,7 @@ class TextMessage(override val client: HttpClient) :
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 
-    override fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
+    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,

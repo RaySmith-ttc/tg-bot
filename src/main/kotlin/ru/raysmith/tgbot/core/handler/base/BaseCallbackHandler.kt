@@ -11,10 +11,10 @@ abstract class BaseCallbackHandler(open val query: CallbackQuery, override val c
     ICallbackHandler, TelegramService2 {
     var isAnswered = false
 
-    fun answer(text: String) = answer { this.text = text }
-    fun alert(text: String) = answer { this.text = text; showAlert = true }
+    suspend fun answer(text: String) = answer { this.text = text }
+    suspend fun alert(text: String) = answer { this.text = text; showAlert = true }
 
-    override fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean {
+    override suspend fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean {
         return AnswerCallbackQuery().apply(init).let {
             answerCallbackQuery(
                 callbackQueryId = query.id,

@@ -11,20 +11,20 @@ import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 open class ChatJoinRequestHandler(
     val chatJoinRequest: ChatJoinRequest,
     override val client: HttpClient,
-    private val handler: ChatJoinRequestHandler.() -> Unit = { }
+    private val handler: suspend ChatJoinRequestHandler.() -> Unit = { }
 ) : EventHandler, BotContext<ChatJoinRequestHandler> {
 
     override fun getChatId() = chatJoinRequest.chat.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
 
-    fun approve() = approveChatJoinRequest(chatJoinRequest.userChatId)
-    fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)
+    suspend fun approve() = approveChatJoinRequest(chatJoinRequest.userChatId)
+    suspend fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)
 
-    override fun <R> withBot(bot: Bot, block: BotContext<ChatJoinRequestHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatJoinRequestHandler>.() -> R): R {
         return ChatJoinRequestHandler(chatJoinRequest, bot.client, handler).block()
     }
 }

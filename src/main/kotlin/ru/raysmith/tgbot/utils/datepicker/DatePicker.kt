@@ -88,7 +88,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    fun handle(handler: CallbackQueryHandler) {
+    suspend fun handle(handler: CallbackQueryHandler) {
         handler.apply {
             isDataStartWith(callbackQueryPrefix) { data ->
                 val datePickerData = DatePickerData.from(data)

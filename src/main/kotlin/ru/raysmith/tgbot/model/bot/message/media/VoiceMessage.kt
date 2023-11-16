@@ -16,7 +16,7 @@ class VoiceMessage(override val client: HttpClient) : MediaMessageWithThumb() {
 
     override val mediaName: String = "audio"
 
-    override fun send(chatId: ChatId) = sendVoice(
+    override suspend fun send(chatId: ChatId) = sendVoice(
         chatId = chatId,
         messageThreadId = messageThreadId,
         voice = media ?: error("$mediaName is required"),

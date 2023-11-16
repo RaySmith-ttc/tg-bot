@@ -46,7 +46,7 @@ class MediaGroupMessage(override val client: HttpClient) :
             }
             .apply(caption).getEntities()
 
-    override fun send(chatId: ChatId): List<Message> {
+    override suspend fun send(chatId: ChatId): List<Message> {
         return if (inputFiles.isEmpty()) {
             sendMediaGroup(
                 chatId = chatId,

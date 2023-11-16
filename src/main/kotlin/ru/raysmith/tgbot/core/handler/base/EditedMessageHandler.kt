@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.message.Message
 open class EditedMessageHandler(
     val message: Message,
     override val client: HttpClient,
-    private val handler: EditedMessageHandler.() -> Unit = { }
+    private val handler: suspend EditedMessageHandler.() -> Unit = { }
 ) : EventHandler, BotContext<EditedMessageHandler> {
 
     val editDate = message.editDate!!
@@ -20,9 +20,9 @@ open class EditedMessageHandler(
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<EditedMessageHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedMessageHandler>.() -> R): R {
         return EditedMessageHandler(message, bot.client, handler).block()
     }
 }

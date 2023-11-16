@@ -11,22 +11,22 @@ import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
 open class PreCheckoutQueryHandler(
     val preCheckoutQuery: PreCheckoutQuery,
     override val client: HttpClient,
-    private val handler: PreCheckoutQueryHandler.() -> Unit = {}
+    private val handler: suspend PreCheckoutQueryHandler.() -> Unit = {}
 ) : EventHandler, BotContext<PreCheckoutQueryHandler> {
 
     override fun getChatId() = preCheckoutQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<PreCheckoutQueryHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PreCheckoutQueryHandler>.() -> R): R {
         return PreCheckoutQueryHandler(preCheckoutQuery, bot.client, handler).let {
             this.block()
         }
     }
 
-    fun answerPreCheckoutQuery(ok: Boolean, errorMessage: String? = null): Boolean {
+    suspend fun answerPreCheckoutQuery(ok: Boolean, errorMessage: String? = null): Boolean {
         return answerPreCheckoutQuery(preCheckoutQuery.id, ok, errorMessage)
     }
 }

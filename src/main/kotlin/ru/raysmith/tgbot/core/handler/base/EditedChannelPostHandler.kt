@@ -11,16 +11,16 @@ import ru.raysmith.tgbot.model.network.message.Message
 open class EditedChannelPostHandler(
     val channelPost: Message,
     override val client: HttpClient,
-    private val handler: EditedChannelPostHandler.() -> Unit = {}
+    private val handler: suspend EditedChannelPostHandler.() -> Unit = {}
 ) : EventHandler, BotContext<EditedChannelPostHandler> {
     override fun getChatId() = channelPost.chat.id
     override fun getChatIdOrThrow() = channelPost.chat.id
     override var messageId: Int? = channelPost.messageId
     override var inlineMessageId: String? = null
 
-    override fun handle() = handler()
+    override suspend fun handle() = handler()
 
-    override fun <R> withBot(bot: Bot, block: BotContext<EditedChannelPostHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedChannelPostHandler>.() -> R): R {
         return EditedChannelPostHandler(channelPost, bot.client, handler).block()
     }
 }

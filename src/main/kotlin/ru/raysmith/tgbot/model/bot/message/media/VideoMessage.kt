@@ -19,7 +19,7 @@ class VideoMessage(override val client: HttpClient) : MediaMessageWithThumb(), S
     override val mediaName: String = "video"
 
     // TODO test; use same for other sendMedia methods with thumb
-    override fun send(chatId: ChatId) = sendVideo(
+    override suspend fun send(chatId: ChatId) = sendVideo(
         chatId = chatId,
         messageThreadId = messageThreadId,
         video = media ?: error("$mediaName is required"),

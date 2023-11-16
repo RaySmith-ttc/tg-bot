@@ -22,7 +22,7 @@ interface IEditor : ChatIdHolder, TelegramService2 {
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
-    fun editCaption(
+    suspend fun editCaption(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
@@ -33,7 +33,7 @@ interface IEditor : ChatIdHolder, TelegramService2 {
             .edit(chatId, messageId, inlineMessageId)
     }
 
-    fun editReplyMarkup(
+    suspend fun editReplyMarkup(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
@@ -44,7 +44,7 @@ interface IEditor : ChatIdHolder, TelegramService2 {
             .editReplyMarkup(chatId, messageId, inlineMessageId)
     }
 
-    fun <T : InputMedia> editMedia(
+    suspend fun <T : InputMedia> editMedia(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
@@ -56,7 +56,7 @@ interface IEditor : ChatIdHolder, TelegramService2 {
             .editMedia<T>(chatId, messageId, inlineMessageId, media)
     }
 
-    fun edit(
+    suspend fun edit(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,

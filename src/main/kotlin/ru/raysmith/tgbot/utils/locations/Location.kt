@@ -17,11 +17,11 @@ suspend fun <T : LocationConfig> createLocation(name: String, wrapper: Locations
 class Location<T : LocationConfig>(val name: String, internal val handlerFactory: LocationEventHandlerFactory<T>) {
     internal lateinit var update: Update
     
-    var onEnter: context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }
+    var onEnter: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }
         private set
     
     @LocationsDSL
-    fun onEnter(block: context(T, BotContext<*>) LocationHandler<T>.() -> Unit) {
+    fun onEnter(block: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit) {
         this.onEnter = block
     }
     

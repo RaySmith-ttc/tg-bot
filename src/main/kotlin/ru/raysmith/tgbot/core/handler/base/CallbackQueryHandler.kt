@@ -15,7 +15,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import java.time.LocalDate
 
 data class CallbackQueryHandlerData(
-    val handler: (CallbackQueryHandler.() -> Unit)? = null,
+    val handler: (suspend (CallbackQueryHandler.() -> Unit))? = null,
     val datePicker: DatePicker? = null,
     val alwaysAnswer: Boolean
 )
@@ -38,7 +38,7 @@ open class CallbackQueryHandler(
         val logger: Logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
-    override fun handle() {
+    override suspend fun handle() {
         if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
         else {
             for (it in handlerData) {
@@ -55,7 +55,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    fun datePickerResult(datePicker: DatePicker, datePickerHandler: DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
+    suspend fun datePickerResult(datePicker: DatePicker, datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
         if (!isAnswered && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
@@ -64,9 +64,9 @@ open class CallbackQueryHandler(
         }
     }
 
-    fun datePickerResultWithAdditionalData(
+    suspend fun datePickerResultWithAdditionalData(
         datePicker: DatePicker,
-        datePickerHandler: DatePickerCallbackQueryHandler.(date: LocalDate, additionalData: String?) -> Unit
+        datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate, additionalData: String?) -> Unit
     ) {
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
         if (!isAnswered && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
@@ -76,21 +76,21 @@ open class CallbackQueryHandler(
         }
     }
 
-    fun isDataEqual(vararg value: String, equalHandler: DataCallbackQueryHandler.(data: String) -> Unit) {
+    suspend fun isDataEqual(vararg value: String, equalHandler: suspend DataCallbackQueryHandler.(data: String) -> Unit) {
         if (!isAnswered && query.data != null && query.data in value) {
             DataCallbackQueryHandler(query, query.data, client)
                 .apply { equalHandler(query.data!!) }
         }
     }
-    
-    fun isDataRegex(regex: Regex, regexHandler: DataCallbackQueryHandler.(value: String) -> Unit) {
+
+    suspend fun isDataRegex(regex: Regex, regexHandler: suspend DataCallbackQueryHandler.(value: String) -> Unit) {
         if (!isAnswered && query.data?.matches(regex) == true) {
             DataCallbackQueryHandler(query, query.data, client)
                 .apply { regexHandler(query.data!!) }
         }
     }
 
-    fun isPage(paginationCallbackQueryPrefix: String, handler: PaginationCallbackQueryHandler.(page: Long) -> Unit) {
+    suspend fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Long) -> Unit) {
         if (!isAnswered && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
             query.data.substring(paginationCallbackQueryPrefix.length).let {
                 // 1 = Pagination.SYMBOL_PAGE_PREFIX length
@@ -102,9 +102,9 @@ open class CallbackQueryHandler(
         }
     }
 
-    fun isDataStartWith(
+    suspend fun isDataStartWith(
         vararg startWith: String,
-        startWithHandler: ValueDataCallbackQueryHandler.(value: String) -> Unit
+        startWithHandler: suspend ValueDataCallbackQueryHandler.(value: String) -> Unit
     ) {
         startWith.forEach { startWithEntry ->
             if (!isAnswered && query.data != null && query.data.startsWith(startWithEntry)) {
@@ -121,14 +121,14 @@ open class CallbackQueryHandler(
     // TODO скорее всего нужно удалить, т.к. не отображает описанию и не может быть сделан по задумке
     //  Обработчики запускаются друг за другом (default -> datePiker1 -> datePiker2 -> ...) и в каждом есть возможность определить
     @Deprecated("Not work correct. Deleted soon", replaceWith = ReplaceWith(""))
-    fun isUnhandled(unknownHandler: UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
+    suspend fun isUnhandled(unknownHandler: suspend UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
         if (!isAnswered) {
             UnknownQueryHandler(query)
                 .apply { unknownHandler(query) }
         }
     }
 
-    override fun <R> withBot(bot: Bot, block: BotContext<CallbackQueryHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
         return CallbackQueryHandler(query, handlerData, bot.client).block()
     }
 }

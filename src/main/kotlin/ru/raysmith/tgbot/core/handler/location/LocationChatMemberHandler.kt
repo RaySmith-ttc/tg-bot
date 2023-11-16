@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationChatMemberHandlerData<T : LocationConfig>(
-    val handler: (context(T) LocationChatMemberHandler<T>.() -> Unit)? = null
+    val handler: (suspend context(T) LocationChatMemberHandler<T>.() -> Unit)? = null
 )
 
 @HandlerDsl
@@ -27,13 +27,13 @@ class LocationChatMemberHandler<T : LocationConfig>(
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
     
-    override fun handle() {
+    override suspend fun handle() {
         handlerData.forEach {
             it.value.handler?.let { it1 -> it1(config, this) }
         }
     }
 
-    override fun <R> withBot(bot: Bot, block: BotContext<ChatMemberHandler>.() -> R): R {
+    override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
         return LocationChatMemberHandler(update, bot.client, handlerData, locationsWrapper).block()
     }
 }

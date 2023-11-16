@@ -68,7 +68,7 @@ val prettyPrintJson = Json(TelegramApi2.json) {
 
 inline fun <reified T> T.toJson() = prettyPrintJson.encodeToString(this)
 
-inline fun <reified T> ISender.sendAsJson(value: T) = send {
+suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
     textWithEntities {
         println(value)
         println(value.toJson())
@@ -146,8 +146,7 @@ class Runner {
 
     val CALLBACK_PREFIX = "cb_"
 
-    fun ISender.sendMain() {
-
+    suspend fun ISender.sendMain() {
         send {
             text = "main"
 
@@ -166,7 +165,7 @@ class Runner {
 
     }
 
-    fun CallbackQueryHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
+    suspend fun CallbackQueryHandler.sendHelloMessage(messageText: String, isEdit: Boolean = false) {
 
         val keyboard = buildInlineKeyboard {
             row {
@@ -305,12 +304,13 @@ class Runner {
 //
                     location("menu") {
                         onEnter {
-                            send {
-                                text = "in menu"
-                                inlineKeyboard {
-                                    row("dont do anything", "fv932mdcl")
-                                }
-                            }
+//                            send {
+//                                text = "in menu"
+//                                inlineKeyboard {
+//                                    row("dont do anything", "fv932mdcl")
+//                                }
+//                            }
+                            println("on enter menu")
                         }
 
                         handle {
@@ -342,7 +342,8 @@ class Runner {
 
                     location("other") {
                         onEnter {
-                            send("in other\nfoo:${foo}")
+//                            send("in other\nfoo:${foo}")
+                            println("on enter other")
                         }
 
                         handle {
@@ -367,6 +368,7 @@ class Runner {
                             }
 
                             handleEditedMessage {
+
                                 println("Message was edit in other")
                             }
 
@@ -562,7 +564,7 @@ class Runner {
                         .associate { arg -> arg.split(" - ").let { it.first() to it.last() } }
                         .map { BotCommand(it.key, it.value) }
 
-                    fun updateCommands(commands: List<BotCommand>, chatId: ChatId?) {
+                    suspend fun updateCommands(commands: List<BotCommand>, chatId: ChatId?) {
                         setMyCommands(commands, chatId?.let { BotCommandScopeChat(it) } ?: BotCommandScopeDefault())
                         send(buildString {
                             if (chatId != null) {
@@ -1531,7 +1533,7 @@ fun generateString(length: Int): String {
     return generateSequence("") { symbols.random().toString() }.take(length).joinToString("")
 }
 
-fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
+suspend fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
     text = "Choose variant"
     inlineKeyboard {
         row("No answer", "no_answer")
@@ -1539,7 +1541,7 @@ fun EventHandler.sendAnswerVariants(action: MessageAction) = message(action) {
     }
 }
 
-fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageAction.EDIT) = message(action) {
+suspend fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Choose item"
     inlineKeyboard {
         pagination(pagesData, "pagination", page, setup = {
@@ -1551,7 +1553,7 @@ fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageActio
     }
 }
 
-fun EventHandler.sendPagination2(page: Long, prefixCallback: String, action: MessageAction = MessageAction.EDIT) = message(action) {
+suspend fun EventHandler.sendPagination2(page: Long, prefixCallback: String, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Data: ${System.currentTimeMillis()}"
     inlineKeyboard {
         when(page) {

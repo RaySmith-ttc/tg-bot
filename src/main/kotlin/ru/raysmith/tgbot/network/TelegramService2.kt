@@ -51,11 +51,11 @@ import kotlin.time.Duration
 interface TelegramService2 {
     val client: HttpClient
 
-    private inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T = runBlocking { // TODO (temp) waiting context bug fixing
+    private suspend inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T {
         val response = block()
 
         if (response.status.isSuccess()) {
-            when {
+            return when {
                 T::class == String::class -> response.bodyAsText() as T
                 T::class == InputStream::class -> response.bodyAsChannel().toInputStream() as T
                 T::class == LiveLocationResponse::class -> response.body<T>()
@@ -106,7 +106,7 @@ interface TelegramService2 {
      * request, 1-256 characters. Only characters `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.
      * The header is useful to ensure that the request comes from a webhook set by you.
      * */
-    fun setWebhook(
+    suspend fun setWebhook(
         url: String,
         certificate: InputFile? = null,
         ipAddress: String? = null,
@@ -128,7 +128,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendPhoto(
+    suspend fun sendPhoto(
         chatId: ChatId,
         messageThreadId: Int? = null,
         photo: InputFile,
@@ -165,7 +165,7 @@ interface TelegramService2 {
      *
      * @param dropPendingUpdates Pass *True* to drop all pending updates
      * */
-    fun deleteWebhook(
+    suspend fun deleteWebhook(
         dropPendingUpdates: Boolean? = null,
     ) = request<Boolean> {
         client.post("deleteWebhook") {
@@ -178,7 +178,7 @@ interface TelegramService2 {
      * On success, returns a [WebhookInfo] object. If the bot is using getUpdates,
      * will return an object with the url field empty.
      * */
-    fun getWebhookInfo() = request<WebhookInfo> {
+    suspend fun getWebhookInfo() = request<WebhookInfo> {
         client.post("getWebhookInfo")
     }
 
@@ -187,7 +187,7 @@ interface TelegramService2 {
      *
      * Returns basic information about the bot in form of a [User] object.
      * */
-    fun getMe() = request<User> {
+    suspend fun getMe() = request<User> {
         client.post("getMe")
     }
 
@@ -197,7 +197,7 @@ interface TelegramService2 {
      * receive updates. After a successful call, you can immediately log in on a local server, but will not be able
      * to log in back to the cloud Bot API server for 10 minutes. Returns *True* on success. Requires no parameters.
      * */
-    fun logOut() = request<Boolean> {
+    suspend fun logOut() = request<Boolean> {
         client.post("logOut")
     }
 
@@ -207,7 +207,7 @@ interface TelegramService2 {
      * server restart. The method will return error 429 in the first 10 minutes after the bot is launched.
      * Returns *True* on success. Requires no parameters.
      * */
-    fun close() = request<Boolean> {
+    suspend fun close() = request<Boolean> {
         client.post("close")
     }
 
@@ -217,7 +217,7 @@ interface TelegramService2 {
      * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
      * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
      * */
-    fun getUserProfilePhotos(
+    suspend fun getUserProfilePhotos(
         userId: ChatId.ID,
         offset: Int? = null,
         limit: Int? = null,
@@ -241,7 +241,7 @@ interface TelegramService2 {
      *
      * @param id File identifier to get information about
      * */
-    fun getFile(
+    suspend fun getFile(
         id: String,
     ) = request<File> {
         client.post("getFile") {
@@ -260,7 +260,7 @@ interface TelegramService2 {
      * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all
      * users fromthe given scope, for whose language there are no dedicated commands
      * */
-    fun setMyCommands(
+    suspend fun setMyCommands(
         commands: List<BotCommand>,
         scope: BotCommandScope? = null,
         languageCode: String? = null,
@@ -279,7 +279,7 @@ interface TelegramService2 {
      * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
      * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
      * */
-    fun deleteMyCommands(
+    suspend fun deleteMyCommands(
         scope: BotCommandScope? = null,
         languageCode: String? = null,
     ) = request<Boolean> {
@@ -296,7 +296,7 @@ interface TelegramService2 {
      * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
      * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
      * */
-    fun getMyCommands(
+    suspend fun getMyCommands(
         scope: BotCommandScope? = null,
         languageCode: String? = null,
     ) = request<List<BotCommand>> {
@@ -316,7 +316,7 @@ interface TelegramService2 {
      * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
      * Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
      * */
-    fun setMyDefaultAdministratorRights(
+    suspend fun setMyDefaultAdministratorRights(
         rights: ChatAdministratorRights? = null,
         forChannels: Boolean? = null,
     ) = request<Boolean> {
@@ -333,7 +333,7 @@ interface TelegramService2 {
      * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
      * Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
      * */
-    fun getMyDefaultAdministratorRights(
+    suspend fun getMyDefaultAdministratorRights(
         forChannels: Boolean? = null,
     ) = request<ChatAdministratorRights> {
         client.post("getMyDefaultAdministratorRights") {
@@ -345,7 +345,7 @@ interface TelegramService2 {
      * Use this method to send answers to callback queries sent from [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
      * to the user as a notification at the top of the chat screen or as an alert. On success, *True* is returned.
      * */
-    fun answerCallbackQuery(
+    suspend fun answerCallbackQuery(
         callbackQueryId: String,
         text: String? = null,
         showAlert: Boolean? = null,
@@ -366,7 +366,7 @@ interface TelegramService2 {
      *
      * @param name Name of the sticker set
      * */
-    fun getStickerSet(
+    suspend fun getStickerSet(
         name: String,
     ) = request<StickerSet> {
         client.post("getStickerSet") {
@@ -380,7 +380,7 @@ interface TelegramService2 {
      *
      * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
      * */
-    fun getCustomEmojiStickers(
+    suspend fun getCustomEmojiStickers(
         customEmojiIds: List<String>,
     ) = request<List<Sticker>> {
         client.post("getCustomEmojiStickers") {
@@ -397,7 +397,7 @@ interface TelegramService2 {
      * See [https://core.telegram.org/stickers](https://core.telegram.org/stickers) for technical requirements.
      * @param stickerFormat Format of the sticker
      * */
-    fun uploadStickerFile(
+    suspend fun uploadStickerFile(
         userId: ChatId.ID,
         sticker: InputFile,
         stickerFormat: StickerFormat,
@@ -425,7 +425,7 @@ interface TelegramService2 {
      * @param title Sticker set title, 1-64 characters
      * @param block Sticker set builder
      * */
-//    fun createNewStickerSet(
+//    suspend fun createNewStickerSet(
 //        userId: ChatId.ID,
 //        name: String,
 //        title: String,
@@ -513,7 +513,7 @@ interface TelegramService2 {
      * @param sticker Information about the added sticker.
      * If exactly the same sticker had already been added to the set, then the set isn't changed.
      * */
-    fun addStickerToSet(
+    suspend fun addStickerToSet(
         userId: ChatId.ID,
         name: String,
         sticker: InputSticker,
@@ -531,7 +531,7 @@ interface TelegramService2 {
      * @param sticker File identifier of the sticker
      * @param position New sticker position in the set, zero-based
      * */
-    fun setStickerPositionInSet(
+    suspend fun setStickerPositionInSet(
         sticker: String,
         position: Int,
     ) = request<Boolean> {
@@ -546,7 +546,7 @@ interface TelegramService2 {
      *
      * @param sticker File identifier of the sticker
      * */
-    fun deleteStickerFromSet(
+    suspend fun deleteStickerFromSet(
         sticker: String,
     ) = request<Boolean> {
         client.post("deleteStickerFromSet") {
@@ -561,7 +561,7 @@ interface TelegramService2 {
      * @param sticker File identifier of the sticker
      * @param emojiList 1-20 emoji associated with the sticker
      * */
-    fun setStickerEmojiList(
+    suspend fun setStickerEmojiList(
         sticker: String,
         emojiList: List<String>,
     ) = request<Boolean> {
@@ -578,7 +578,7 @@ interface TelegramService2 {
      * @param sticker File identifier of the sticker
      * @param keywords 0-20 search keywords for the sticker with total length of up to 64 characters
      * */
-    fun setStickerKeywords(
+    suspend fun setStickerKeywords(
         sticker: String,
         keywords: List<String>,
     ) = request<Boolean> {
@@ -595,7 +595,7 @@ interface TelegramService2 {
      * @param sticker File identifier of the sticker
      * @param maskPosition position where the mask should be placed on faces. Omit the parameter to remove the mask position.
      * */
-    fun setStickerMaskPosition(
+    suspend fun setStickerMaskPosition(
         sticker: String,
         maskPosition: MaskPosition?,
     ) = request<Boolean> {
@@ -611,7 +611,7 @@ interface TelegramService2 {
      * @param name Sticker set name
      * @param title Sticker set title, 1-64 characters
      * */
-    fun setStickerSetTitle(
+    suspend fun setStickerSetTitle(
         name: String,
         title: String,
     ) = request<Boolean> {
@@ -637,7 +637,7 @@ interface TelegramService2 {
      * or upload a new one. [More information on Sending Files »](https://core.telegram.org/bots/api#sending-files).
      * Animated sticker set thumbnails can't be uploaded via HTTP URL.
      * */
-    fun setStickerSetThumbnail(
+    suspend fun setStickerSetThumbnail(
         name: String,
         userId: ChatId.ID,
         thumbnail: InputFile,
@@ -657,7 +657,7 @@ interface TelegramService2 {
      * @param name Sticker set name
      * @param customEmojiId Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail.
      * */
-    fun setCustomEmojiStickerSetThumbnail(
+    suspend fun setCustomEmojiStickerSetThumbnail(
         name: String,
         customEmojiId: String?,
     ) = request<Boolean> {
@@ -672,7 +672,7 @@ interface TelegramService2 {
      *
      * @param name Sticker set name
      * */
-    fun deleteStickerSet(
+    suspend fun deleteStickerSet(
         name: String,
     ) = request<Boolean> {
         client.post("deleteStickerSet") {
@@ -695,7 +695,7 @@ interface TelegramService2 {
      * Offset length can't exceed 64 bytes.
      * @param button Button to be shown above inline query results
      * */
-    fun answerInlineQuery(
+    suspend fun answerInlineQuery(
         inlineQueryId: String,
         results: List<InlineQueryResult>,
         cacheTime: Duration?,
@@ -721,7 +721,7 @@ interface TelegramService2 {
      * @param webAppQueryId Unique identifier for the query to be answered
      * @param result Object describing the message to be sent
      * */
-    fun answerWebAppQuery(
+    suspend fun answerWebAppQuery(
         webAppQueryId: String,
         result: InlineQueryResult,
     ) = request<SentWebAppMessage> {
@@ -732,10 +732,10 @@ interface TelegramService2 {
     }
 
     // TODO docs
-    fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
+    suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
 
     // TODO docs
-    fun downloadFile(file: File) = request<InputStream> {
+    suspend fun downloadFile(file: File) = request<InputStream> {
         client.get("${TelegramApi2.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
             unauthenticated()
         }
@@ -758,7 +758,7 @@ interface TelegramService2 {
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun sendMessage(
+    suspend fun sendMessage(
         chatId: ChatId,
         messageThreadId: Int? = null,
         text: String,
@@ -797,7 +797,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      *
      * */
-    fun forwardMessage(
+    suspend fun forwardMessage(
         chatId: ChatId,
         messageThreadId: Int? = null,
         fromChatId: ChatId,
@@ -835,7 +835,7 @@ interface TelegramService2 {
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun copyMessage(
+    suspend fun copyMessage(
         chatId: ChatId,
         messageThreadId: Int? = null,
         fromChatId: ChatId,
@@ -880,7 +880,7 @@ interface TelegramService2 {
      * Always True for supergroups and channels.
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
-    fun banChatMember(
+    suspend fun banChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
         untilDate: Until? = null,
@@ -905,7 +905,7 @@ interface TelegramService2 {
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
      * */
-    fun unbanChatMember(
+    suspend fun unbanChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
         onlyIfBanned: Boolean,
@@ -934,7 +934,7 @@ interface TelegramService2 {
      * 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun restrictChatMember(
+    suspend fun restrictChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
         permissions: ChatPermissions,
@@ -959,7 +959,7 @@ interface TelegramService2 {
      * @param administratorRights New administrator rights
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun promoteChatMember( // TODO docs
+    suspend fun promoteChatMember( // TODO docs
         chatId: ChatId,
         userId: ChatId.ID,
         isAnonymous: Boolean? = null,
@@ -1007,7 +1007,7 @@ interface TelegramService2 {
      * @param customTitle Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun setChatAdministratorCustomTitle(
+    suspend fun setChatAdministratorCustomTitle(
         chatId: ChatId,
         userId: ChatId.ID,
         customTitle: String,
@@ -1028,7 +1028,7 @@ interface TelegramService2 {
      * @param senderChatId    Unique identifier of the target sender chat
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun banChatSenderChat(
+    suspend fun banChatSenderChat(
         chatId: ChatId,
         senderChatId: ChatId.ID,
     ) = request<Boolean> {
@@ -1046,7 +1046,7 @@ interface TelegramService2 {
      * @param senderChatId Unique identifier of the target sender chat
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unbanChatSenderChat(
+    suspend fun unbanChatSenderChat(
         chatId: ChatId,
         senderChatId: ChatId.ID,
     ) = request<Boolean> {
@@ -1070,7 +1070,7 @@ interface TelegramService2 {
      * [ChatPermissions.canSendVideoNotes], and [ChatPermissions.canSendVoiceNotes] permissions;
      * the [ChatPermissions.canSendPolls] permission will imply the [ChatPermissions.canSendMessages] permission.
      * */
-    fun setChatPermissions(
+    suspend fun setChatPermissions(
         chatId: ChatId,
         permissions: ChatPermissions,
         useIndependentChatPermissions: Boolean? = null,
@@ -1094,7 +1094,7 @@ interface TelegramService2 {
      * using [exportChatInviteLink] or by calling the [getChat] method. If your bot needs to generate a new primary
      * invite link replacing its previous one, use [exportChatInviteLink] again.
      * */
-    fun exportChatInviteLink(
+    suspend fun exportChatInviteLink(
         chatId: ChatId,
     ) = request<NetworkResponse<String>> {
         client.post("exportChatInviteLink") {
@@ -1115,7 +1115,7 @@ interface TelegramService2 {
      * administrators. If *True*, _member_limit_ can't be specified
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun createChatInviteLink(
+    suspend fun createChatInviteLink(
         chatId: ChatId,
         name: String? = null,
         expireDate: ZonedDateTime? = null,
@@ -1145,7 +1145,7 @@ interface TelegramService2 {
      * administrators. If *True*, _member_limit_ can't be specified
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun editChatInviteLink(
+    suspend fun editChatInviteLink(
         chatId: ChatId,
         inviteLink: String,
         name: String? = null,
@@ -1171,7 +1171,7 @@ interface TelegramService2 {
      * @param inviteLink The invite link to revoke
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun revokeChatInviteLink(
+    suspend fun revokeChatInviteLink(
         chatId: ChatId,
         inviteLink: String,
     ) = request<ChatInviteLink> {
@@ -1188,7 +1188,7 @@ interface TelegramService2 {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun approveChatJoinRequest(
+    suspend fun approveChatJoinRequest(
         chatId: ChatId,
         userId: ChatId.ID,
     ) = request<Boolean> {
@@ -1205,7 +1205,7 @@ interface TelegramService2 {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun declineChatJoinRequest(
+    suspend fun declineChatJoinRequest(
         chatId: ChatId,
         userId: ChatId.ID,
     ) = request<Boolean> {
@@ -1223,7 +1223,7 @@ interface TelegramService2 {
      * @param photo New chat photo
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatPhoto(
+    suspend fun setChatPhoto(
         chatId: ChatId,
         photo: NotReusableInputFile,
     ) = request<Boolean> {
@@ -1242,7 +1242,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun deleteChatPhoto(
+    suspend fun deleteChatPhoto(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("deleteChatPhoto") {
@@ -1258,7 +1258,7 @@ interface TelegramService2 {
      * @param title New chat title, 1-255 characters
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatTitle(
+    suspend fun setChatTitle(
         chatId: ChatId,
         title: String,
     ) = request<Boolean> {
@@ -1276,7 +1276,7 @@ interface TelegramService2 {
      * @param description New chat description, 0-255 characters
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatDescription(
+    suspend fun setChatDescription(
         chatId: ChatId,
         description: String?,
     ) = request<Boolean> {
@@ -1296,7 +1296,7 @@ interface TelegramService2 {
      * about the new pinned message. Notifications are always disabled in channels and private chats.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun pinChatMessage(
+    suspend fun pinChatMessage(
         chatId: ChatId,
         messageId: Int,
         disableNotification: Boolean? = null,
@@ -1318,7 +1318,7 @@ interface TelegramService2 {
      * If not specified, the most recent pinned message (by sending date) will be unpinned.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unpinChatMessage(
+    suspend fun unpinChatMessage(
         chatId: ChatId,
         messageId: Int? = null,
     ) = request<Boolean> {
@@ -1336,7 +1336,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun unpinAllChatMessages(
+    suspend fun unpinAllChatMessages(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("unpinAllChatMessages") {
@@ -1349,7 +1349,7 @@ interface TelegramService2 {
      *
      * @param chatId identifier for the target chat or username of the target channel
      * */
-    fun leaveChat(
+    suspend fun leaveChat(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("leaveChat") {
@@ -1364,7 +1364,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChat(
+    suspend fun getChat(
         chatId: ChatId
     ) = request<Chat> {
         client.post("getChat") {
@@ -1378,7 +1378,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatAdministrators(
+    suspend fun getChatAdministrators(
         chatId: ChatId,
     ) = request<List<ChatMember>> {
         client.post("getChatAdministrators") {
@@ -1391,7 +1391,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatMemberCount(
+    suspend fun getChatMemberCount(
         chatId: ChatId,
     ) = request<Int> {
         client.post("getChatMemberCount") {
@@ -1405,7 +1405,7 @@ interface TelegramService2 {
      * @param userId Unique identifier of the target user
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun getChatMember(
+    suspend fun getChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
     ) = request<ChatMember> {
@@ -1424,7 +1424,7 @@ interface TelegramService2 {
      * @param stickerSetName Name of the sticker set to be set as the group sticker set
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun setChatStickerSet(
+    suspend fun setChatStickerSet(
         chatId: ChatId,
         stickerSetName: String,
     ) = request<Boolean> {
@@ -1442,7 +1442,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    fun deleteChatStickerSet(
+    suspend fun deleteChatStickerSet(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("deleteChatStickerSet") {
@@ -1453,7 +1453,7 @@ interface TelegramService2 {
     /**
      * Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user.
      * */
-    fun getForumTopicIconStickers(
+    suspend fun getForumTopicIconStickers(
 
     ) = request<List<Sticker>> {
         client.post("getForumTopicIconStickers") {
@@ -1472,7 +1472,7 @@ interface TelegramService2 {
      * @param iconCustomEmojiId Unique identifier of the custom emoji shown as the topic icon.
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * */
-    fun createForumTopic(
+    suspend fun createForumTopic(
         chatId: ChatId,
         name: String,
         iconColor: IconColor? = null,
@@ -1500,7 +1500,7 @@ interface TelegramService2 {
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * ass an empty string to remove the icon. If not specified, the current icon will be kept
      * */
-    fun editForumTopic(
+    suspend fun editForumTopic(
         chatId: ChatId,
         messageThreadId: Int,
         name: String? = null,
@@ -1523,7 +1523,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun closeForumTopic(
+    suspend fun closeForumTopic(
         chatId: ChatId,
         messageThreadId: Int,
     ) = request<Boolean> {
@@ -1542,7 +1542,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun reopenForumTopic(
+    suspend fun reopenForumTopic(
         chatId: ChatId,
         messageThreadId: Int,
     ) = request<Boolean> {
@@ -1560,7 +1560,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun deleteForumTopic(
+    suspend fun deleteForumTopic(
         chatId: ChatId,
         messageThreadId: Int,
     ) = request<Boolean> {
@@ -1579,7 +1579,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * */
-    fun unpinAllForumTopicMessages(
+    suspend fun unpinAllForumTopicMessages(
         chatId: ChatId,
         messageThreadId: Int,
     ) = request<Boolean> {
@@ -1597,7 +1597,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param name New topic name, 1-128 characters
      * */
-    fun editGeneralForumTopic(
+    suspend fun editGeneralForumTopic(
         chatId: ChatId,
         name: String,
     ) = request<Boolean> {
@@ -1614,7 +1614,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun closeGeneralForumTopic(
+    suspend fun closeGeneralForumTopic(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("closeGeneralForumTopic") {
@@ -1630,7 +1630,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun reopenGeneralForumTopic(
+    suspend fun reopenGeneralForumTopic(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("reopenGeneralForumTopic") {
@@ -1646,7 +1646,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun hideGeneralForumTopic(
+    suspend fun hideGeneralForumTopic(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("hideGeneralForumTopic") {
@@ -1662,7 +1662,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun unhideGeneralForumTopic(
+    suspend fun unhideGeneralForumTopic(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("unhideGeneralForumTopic") {
@@ -1678,7 +1678,7 @@ interface TelegramService2 {
      *
      * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
-    fun unpinAllGeneralForumTopicMessages(
+    suspend fun unpinAllGeneralForumTopicMessages(
         chatId: ChatId,
     ) = request<Boolean> {
         client.post("unpinAllGeneralForumTopicMessages") {
@@ -1694,7 +1694,7 @@ interface TelegramService2 {
      * @param languageCode A two-letter ISO 639-1 language code. If empty, the name will be shown to all
      * users for whose language there is no dedicated name.
      * */
-    fun setMyName(
+    suspend fun setMyName(
         name: String?,
         languageCode: String?,
     ) = request<Boolean> {
@@ -1709,7 +1709,7 @@ interface TelegramService2 {
      *
      * @param languageCode A two-letter ISO 639-1 language code or an empty string
      * */
-    fun getMyName(
+    suspend fun getMyName(
         languageCode: String?,
     ) = request<BotName> {
         client.post("getMyName") {
@@ -1726,7 +1726,7 @@ interface TelegramService2 {
      * @param languageCode A two-letter ISO 639-1 language code.
      * If empty, the description will be applied to all users for whose language there is no dedicated description.
      * */
-    fun setMyDescription(
+    suspend fun setMyDescription(
         description: String?,
         languageCode: String?,
     ) = request<Boolean> {
@@ -1742,7 +1742,7 @@ interface TelegramService2 {
      *
      * @param languageCode A two-letter ISO 639-1 language code or an empty string
      * */
-    fun getMyDescription(
+    suspend fun getMyDescription(
         languageCode: String?,
     ) = request<BotDescription> {
         client.post("getMyDescription") {
@@ -1759,7 +1759,7 @@ interface TelegramService2 {
      * @param languageCode A two-letter ISO 639-1 language code. If empty,
      * the short description will be applied to all users for whose language there is no dedicated short description.
      * */
-    fun setMyShortDescription(
+    suspend fun setMyShortDescription(
         shortDescription: String?,
         languageCode: String?,
     ) = request<Boolean> {
@@ -1775,7 +1775,7 @@ interface TelegramService2 {
      *
      * @param languageCode A two-letter ISO 639-1 language code or an empty string
      * */
-    fun getMyShortDescription(
+    suspend fun getMyShortDescription(
         languageCode: String?,
     ) = request<BotShortDescription> {
         client.post("getMyShortDescription") {
@@ -1791,7 +1791,7 @@ interface TelegramService2 {
      * If not specified, default bot's menu button will be changed
      * @param menuButton [MenuButton] object for the bot's new menu button. Defaults to [MenuButtonDefault]
      * */
-    fun setChatMenuButton(
+    suspend fun setChatMenuButton(
         chatId: ChatId? = null,
         menuButton: MenuButton? = null,
     ) = request<Boolean> {
@@ -1808,7 +1808,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target private chat.
      * If not specified, default bot's menu button will be returned
      * */
-    fun getChatMenuButton(
+    suspend fun getChatMenuButton(
         chatId: ChatId? = null,
     ) = request<MenuButton> {
         client.post("getChatMenuButton") {
@@ -1831,7 +1831,7 @@ interface TelegramService2 {
      * @param disableWebPagePreview Disables link previews for links in this message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageText(
+    suspend fun editMessageText(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -1867,7 +1867,7 @@ interface TelegramService2 {
      * which can be specified instead of [parseMode]
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageCaption(
+    suspend fun editMessageCaption(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -1902,7 +1902,7 @@ interface TelegramService2 {
      * @param media New media content of the message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageMedia(
+    suspend fun editMessageMedia(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -1928,7 +1928,7 @@ interface TelegramService2 {
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun editMessageReplyMarkup(
+    suspend fun editMessageReplyMarkup(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -1950,7 +1950,7 @@ interface TelegramService2 {
      * @param messageId Identifier of the original message with the poll
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
-    fun stopPoll(
+    suspend fun stopPoll(
         chatId: ChatId,
         messageId: Int,
         replyMarkup: KeyboardMarkup? = null,
@@ -1978,7 +1978,7 @@ interface TelegramService2 {
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageId Identifier of the message to delete
      * */
-    fun deleteMessage(
+    suspend fun deleteMessage(
         chatId: ChatId,
         messageId: Int,
     ) = request<Boolean> {
@@ -2036,7 +2036,7 @@ interface TelegramService2 {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
-    fun sendInvoice(
+    suspend fun sendInvoice(
         chatId: ChatId,
         messageThreadId: Int? = null,
         title: String,
@@ -2132,7 +2132,7 @@ interface TelegramService2 {
      * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
      * @param isFlexible Pass *True*, if the final price depends on the shipping method
      * */
-    fun createInvoiceLink(
+    suspend fun createInvoiceLink(
         title: String,
         description: String,
         payload: String,
@@ -2227,7 +2227,7 @@ interface TelegramService2 {
 
     // missed ----------------------------------------------------------------------------------------------------------
 
-    fun getUpdates(
+    suspend fun getUpdates(
         offset: Int? = null,
         limit: Int? = null,
         timeout: Int? = null,
@@ -2241,7 +2241,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendAudio(
+    suspend fun sendAudio(
         chatId: ChatId,
         messageThreadId: Int? = null,
         audio: InputFile,
@@ -2279,7 +2279,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendDocument(
+    suspend fun sendDocument(
         chatId: ChatId,
         messageThreadId: Int? = null,
         document: InputFile,
@@ -2313,7 +2313,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendVideo(
+    suspend fun sendVideo(
         chatId: ChatId,
         messageThreadId: Int? = null,
         video: InputFile,
@@ -2353,7 +2353,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendAnimation(
+    suspend fun sendAnimation(
         chatId: ChatId,
         messageThreadId: Int? = null,
         animation: InputFile,
@@ -2393,7 +2393,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendVoice(
+    suspend fun sendVoice(
         chatId: ChatId,
         messageThreadId: Int? = null,
         voice: InputFile,
@@ -2425,7 +2425,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendVideoNote(
+    suspend fun sendVideoNote(
         chatId: ChatId,
         messageThreadId: Int? = null,
         videoNote: InputFile,
@@ -2464,7 +2464,7 @@ interface TelegramService2 {
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
      * */
-    fun sendMediaGroup( // TODO work?
+    suspend fun sendMediaGroup( // TODO work?
         chatId: ChatId,
         messageThreadId: Int? = null,
         media: List<InputMediaGroup>,
@@ -2520,7 +2520,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendLocation(
+    suspend fun sendLocation(
         chatId: ChatId,
         messageThreadId: Int? = null,
         latitude: Double,
@@ -2552,7 +2552,7 @@ interface TelegramService2 {
         }
     }
 
-    fun editMessageLiveLocation(
+    suspend fun editMessageLiveLocation(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2576,7 +2576,7 @@ interface TelegramService2 {
         }
     }
 
-    fun stopMessageLiveLocation(
+    suspend fun stopMessageLiveLocation(
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2590,7 +2590,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendVenue(
+    suspend fun sendVenue(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         latitude: Double,
@@ -2626,7 +2626,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendContact(
+    suspend fun sendContact(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         phoneNumber: String,
@@ -2654,7 +2654,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendPoll(
+    suspend fun sendPoll(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         question: String,
@@ -2698,7 +2698,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendDice(
+    suspend fun sendDice(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         emoji: String,
@@ -2720,7 +2720,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendChatAction(
+    suspend fun sendChatAction(
         chatId: ChatId,
         action: ChatAction,
         messageThreadId: Int? = null,
@@ -2732,7 +2732,7 @@ interface TelegramService2 {
         }
     }
 
-    fun sendSticker(
+    suspend fun sendSticker(
         chatId: ChatId,
         messageThreadId: Int? = null,
         sticker: InputFile,
@@ -2771,7 +2771,7 @@ interface TelegramService2 {
      * impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable').
      * Telegram will display this message to the user.
      * */
-    fun answerShippingQuery(
+    suspend fun answerShippingQuery(
         shippingQueryId: String,
         ok: Boolean,
         shippingOptions: String? = null,
@@ -2800,7 +2800,7 @@ interface TelegramService2 {
      * T-shirts while you were busy filling out your payment details. Please choose a different color or garment!").
      * Telegram will display this message to the user.
      * */
-    fun answerPreCheckoutQuery(
+    suspend fun answerPreCheckoutQuery(
         preCheckoutQueryId: String,
         ok: Boolean,
         errorMessage: String? = null,
