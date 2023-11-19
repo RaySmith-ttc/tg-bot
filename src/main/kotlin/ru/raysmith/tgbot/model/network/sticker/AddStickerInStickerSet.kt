@@ -4,7 +4,7 @@ import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
-import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApi2
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
@@ -30,7 +30,7 @@ open class AddStickerInStickerSet(
 ) : MediaRequest() {
 
     internal fun add(service: TelegramService): Boolean {
-        val stickerJson = TelegramApi.json.encodeToString(sticker.toSerializable { getMedia(it, "sticker") })
+        val stickerJson = TelegramApi2.json.encodeToString(sticker.toSerializable { getMedia(it, "sticker") })
 
         return if (multipartBodyParts.isNotEmpty()) {
             service.addStickerToSet(userId, name, stickerJson, multipartBodyParts.getOrNull(0))

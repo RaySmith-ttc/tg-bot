@@ -32,7 +32,7 @@ class AudioMessage(override val client: HttpClient) : MediaMessageWithThumb() {
         protectContent = protectContent,
         replyToMessageId = replyToMessageId,
         allowSendingWithoutReply = allowSendingWithoutReply,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
+        replyMarkup = keyboardMarkup?.toMarkup()
     )
 }
 

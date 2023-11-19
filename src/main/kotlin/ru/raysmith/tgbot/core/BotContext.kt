@@ -949,9 +949,3 @@ interface BotContext<T : EventHandler> : ISender {
         return InvoiceCreateLinkSender(client).apply(buildAction).send()
     }
 }
-
-private fun ZonedDateTime.toUnix(): Int {
-    val unix = this.toEpochSecond()
-    require(unix <= Int.MAX_VALUE) { "untilDate must be in unixtime range (1970-01-01 — 2038-01-19)" }
-    return unix.toInt()
-}

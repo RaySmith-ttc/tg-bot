@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.model.network.media
 
-import ru.raysmith.tgbot.core.ApiCaller
+import ru.raysmith.tgbot.core.BotContext
 
 /** This interface represents media attachment */
 interface Media {
@@ -18,4 +18,5 @@ interface Media {
     val fileName: String?
 }
 
-fun Media.inputStream(apiCaller: ApiCaller) = apiCaller.downloadFile(fileId)
+context(BotContext<*>)
+suspend fun Media.inputStream() = downloadFile(fileId)

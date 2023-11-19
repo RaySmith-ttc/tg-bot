@@ -552,7 +552,7 @@ class Runner {
                 }
 
                 handleCommand {
-                    if (!command.mentionIsCurrentBot(bot.me)) return@handleCommand
+                    if (command.mention != null && command.mention != bot.me.username) return@handleCommand
 
                     fun getChatIdFromCommandsCommand(args: String?) =
                         (args?.split("\n")?.find { it.startsWith("chat_id") }?.split("=")?.last()?.toLongOrNull() ?: message.chat.id.value).toChatId()

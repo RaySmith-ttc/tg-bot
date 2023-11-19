@@ -6,7 +6,7 @@ import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApi2
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
@@ -45,7 +45,7 @@ class MessageText(private val type: MessageTextType) {
 
     private var entities: MutableList<MessageEntity> = mutableListOf()
 
-    fun getEntitiesString() = TelegramApi.json.encodeToJsonElement(
+    fun getEntitiesString() = TelegramApi2.json.encodeToJsonElement(
         if (safeTextLength) getSafeEntities() else entities.toList()
     ).toString()
 

@@ -1,11 +1,12 @@
 package ru.raysmith.tgbot.model.network.sticker
 
+import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.network.TelegramApi.json
+import ru.raysmith.tgbot.network.TelegramApi2.json
 import ru.raysmith.tgbot.network.TelegramService
 import ru.raysmith.tgbot.utils.errorBody
 
@@ -48,6 +49,7 @@ open class CreateNewStickerInStickerSet(
         stickers.add(InputSticker(sticker, emojiList, maskPosition, keywords))
     }
 
+    // TODO [ktor|stickers]
     internal fun create(service: TelegramService): Boolean {
         return service.createNewStickerSet(
             userId, name, title, json.encodeToString(stickers.map { sticker -> sticker.toSerializable { getMedia(it) } }),

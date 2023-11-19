@@ -2,8 +2,8 @@ package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.model.network.User
+import ru.raysmith.tgbot.network.TelegramService2
 
 /**
  * This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
@@ -41,7 +41,7 @@ data class MessageEntity(
 
     /**
      * For "custom_emoji" only, unique identifier of the custom emoji.
-     * Use [getCustomEmojiStickers][ApiCaller.getCustomEmojiStickers] to get full information about the sticker
+     * Use [getCustomEmojiStickers][TelegramService2.getCustomEmojiStickers] to get full information about the sticker
      * */
     @SerialName("custom_emoji_id") val customEmojiId: String? = null,
 ) {

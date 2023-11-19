@@ -11,7 +11,6 @@ import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApi2
 import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.network.TelegramService2
@@ -90,7 +89,6 @@ class Bot(
     init {
         if (token != null) {
             config.token = token
-            TelegramApi.setToken(token)
         }
     }
     

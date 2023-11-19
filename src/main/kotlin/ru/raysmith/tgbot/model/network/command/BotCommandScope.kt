@@ -2,8 +2,6 @@ package ru.raysmith.tgbot.model.network.command
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import ru.raysmith.tgbot.network.TelegramApi
 
 /**
  * This object represents the scope to which bot commands are applied. Currently, the following 7 scopes are supported:

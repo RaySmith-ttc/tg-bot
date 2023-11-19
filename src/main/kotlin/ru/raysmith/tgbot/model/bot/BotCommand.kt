@@ -1,10 +1,7 @@
 package ru.raysmith.tgbot.model.bot
 
-import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.model.network.User
-
 /**
- * Represents a bot command
+ * Represents a bot command.
  *
  * @param commandText original command text
  * */
@@ -15,15 +12,10 @@ class BotCommand(val commandText: String) {
         if (it.contains("@")) it.substring(0, it.indexOf("@")) else it
     }.trim()
 
-    val botMention = commandText.let {
-        if (it.contains("@")) it.substring(it.indexOf("@") + 1, getArgsStartIndex()) else null
+    /** Bot mention in the command without `@` symbol. For example, for command `@BotFather /start` [mention] would be `BotFather` */
+    val mention = commandText.let {
+        if (it.startsWith("@")) it.substring(1, getArgsStartIndex()) else null
     }
-
-    /** Returns true if the command mentions a bot or is missing */
-    fun mentionIsCurrentBot(bot: Bot) = botMention == null || botMention == bot.me.username
-
-    /** Returns true if mention in command is null or [bot user][botUser] */
-    fun mentionIsCurrentBot(botUser: User) = botMention == null || botMention == botUser.username
 
     /**
      * The rest of the text in message after the command.
@@ -52,6 +44,6 @@ class BotCommand(val commandText: String) {
     private fun getArgsStartIndex() = commandText.indexOfAny(bodyArgsSeparateChars).let { if (it == -1) commandText.length else it + 1 }
 
     override fun toString(): String {
-        return "Command(body=$body, argsString=$argsString, botMention=$botMention)"
+        return "Command(body=$body, argsString=$argsString, botMention=$mention)"
     }
 }

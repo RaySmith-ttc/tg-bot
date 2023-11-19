@@ -2,12 +2,11 @@ package ru.raysmith.tgbot.model.network.chat
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.toChatId
-import ru.raysmith.utils.notNull
 
 /** This object represents a chat. */
 @Serializable
@@ -41,10 +40,7 @@ data class Chat(
      * */
     @SerialName("is_forum") val isForum: Boolean? = null,
 
-    /**
-     * Chat photo. Returned only in getChat.
-     * @see <a href='https://core.telegram.org/bots/api#getchat'>getChat</a> // TODO link all to method
-     * */
+    /** Chat photo. Returned only in [getChat][TelegramService2.getChat]. */
     @SerialName("photo") val photo: ChatPhoto? = null,
 
     /**
@@ -170,29 +166,10 @@ data class Chat(
      * */
     @SerialName("location") val location: ChatLocation? = null,
 ) {
-
-    /**
-     * Return full name of the chat
-     * @param includeUsername If true and there is a first or last name, a nickname will be added in brackets
-     * */
-    fun getFullName(includeUsername: Boolean = false): String = buildString {
-        append(firstName ?: "")
-        if (firstName notNull lastName) {
-            append(" ")
-        }
-        append(lastName ?: "")
-        if (includeUsername && username != null && this.isNotEmpty()) {
-            append(" (")
-            append(username)
-            append(")")
-        }
-    }
-
     // TODO move ban methods to interface, impl update types. It guarantee a context in a group, supergroup or channel
     /**
-     * Ban a user in the group
+     * Ban a user in the group, supergroup or channel
      *
-     * @param context Bot context
      * @param userId Unique identifier of the target user
      * @param untilDate Date when the user will be unbanned, unix time.
      * If user is banned for more than 366 days or less than 30 seconds from the current time they are considered
@@ -201,36 +178,35 @@ data class Chat(
      * If False, the user will be able to see messages in the group that were sent before the user was removed.
      * Always True for supergroups and channels.
      *
+     * @see TelegramService2.banChatMember
      * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
-    fun ban(context: ApiCaller, userId: ChatId.ID, untilDate: Int? = null, revokeMessages: Boolean? = null) {
-        require(type == ChatType.GROUP || type == ChatType.SUPERGROUP || type == ChatType.CHANNEL) {
-            "Chat must be a group, supergroup or channel"
-        }
+    context(BotContext<*>)
+    suspend fun ban(userId: ChatId.ID, untilDate: Until? = null, revokeMessages: Boolean? = null) {
         val id = when(type) {
             ChatType.GROUP -> id
-            else -> username!!.toChatId()
+            ChatType.SUPERGROUP, ChatType.CHANNEL -> username!!.toChatId()
+            else -> error("Chat must be a group, supergroup or channel")
         }
-        context.service.banChatMember(id, userId, untilDate, revokeMessages)
+        banChatMember(id, userId, untilDate, revokeMessages)
     }
 
     /**
-     * Unban a user in the group
+     * Unban a user in the group, supergroup or channel
      *
-     * @param context Bot context
-     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
-     * (in the format @username)
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
+     *
+     * @see TelegramService2.unbanChatMember
+     * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
-    fun unban(context: ApiCaller, userId: ChatId.ID, onlyIfBanned: Boolean? = null) {
-        require(type == ChatType.GROUP || type == ChatType.SUPERGROUP || type == ChatType.CHANNEL) {
-            "Chat must be a group, supergroup or channel"
-        }
+    context(BotContext<*>)
+    suspend fun unban(userId: ChatId.ID, onlyIfBanned: Boolean? = null) {
         val id = when(type) {
             ChatType.GROUP -> id
-            else -> username!!.toChatId()
+            ChatType.SUPERGROUP, ChatType.CHANNEL -> username!!.toChatId()
+            else -> error("Chat must be a group, supergroup or channel")
         }
-        context.service.unbanChatMember(id, userId, onlyIfBanned)
+        unbanChatMember(id, userId, onlyIfBanned)
     }
 }

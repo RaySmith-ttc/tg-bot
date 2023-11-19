@@ -11,8 +11,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.utils.io.streams.*
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
@@ -44,7 +42,6 @@ import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
 import java.io.InputStream
-import java.nio.file.Files
 import java.time.ZonedDateTime
 import kotlin.time.Duration
 
@@ -67,6 +64,24 @@ interface TelegramService2 {
         } else {
             val error = response.body<Error>()
             throw TelegramApiException2(error, response.request)
+        }
+    }
+
+    /**
+     * Use this method to receive incoming updates using long polling
+     * ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
+     * */
+    suspend fun getUpdates(
+        offset: Int? = null,
+        limit: Int? = null,
+        timeout: Int? = null,
+        allowedUpdates: String? = null,
+    ) = request<List<Update>> {
+        client.post("getUpdates") {
+            parameter("offset", offset)
+            parameter("limit", limit)
+            parameter("timeout", timeout)
+            parameter("allowed_updates", allowedUpdates)
         }
     }
 
@@ -128,38 +143,6 @@ interface TelegramService2 {
         }
     }
 
-    suspend fun sendPhoto(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        photo: InputFile,
-        caption: String? = null,
-        captionEntities: String? = null,
-        hasSpoiler: Boolean? = null,
-        parseMode: ParseMode? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendPhoto") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("has_spoiler", hasSpoiler)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "photo" to photo,
-            )
-        }
-    }
-
     /**
      * Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns *True* on success.
      *
@@ -211,536 +194,6 @@ interface TelegramService2 {
         client.post("close")
     }
 
-    /**
-     * Use this method to get a list of profile pictures for a user. Returns a [UserProfilePhotos] object.
-     * @param userId Unique identifier of the target user
-     * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
-     * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
-     * */
-    suspend fun getUserProfilePhotos(
-        userId: ChatId.ID,
-        offset: Int? = null,
-        limit: Int? = null,
-    ) = request<UserProfilePhotos> {
-        client.post("getUserProfilePhotos") {
-            parameter("user_id", userId)
-            parameter("offset", offset)
-            parameter("limit", limit)
-        }
-    }
-
-    /**
-     * Use this method to get basic information about a file and prepare it for downloading.
-     * For the moment, bots can download files of up to 20MB in size. On success, a [File] object is returned.
-     * The file can then be downloaded via the link `https://api.telegram.org/file/bot<token>/<file_path>`,
-     * where `<file_path>` is taken from the response. It is guaranteed that the link will be valid for at least 1 hour.
-     * When the link expires, a new one can be requested by calling [getFile] again.
-     *
-     * **Note:** This function may not preserve the original file name and MIME type.
-     * You should save the file's MIME type and name (if available) when the File object is received.
-     *
-     * @param id File identifier to get information about
-     * */
-    suspend fun getFile(
-        id: String,
-    ) = request<File> {
-        client.post("getFile") {
-            parameter("file_id", id)
-        }
-    }
-
-    /**
-     * Use this method to change the list of the bot's commands.
-     *
-     * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands.
-     * Returns *True* on success
-     *
-     * @param commands list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
-     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
-     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all
-     * users fromthe given scope, for whose language there are no dedicated commands
-     * */
-    suspend fun setMyCommands(
-        commands: List<BotCommand>,
-        scope: BotCommandScope? = null,
-        languageCode: String? = null,
-    ) = request<Boolean> {
-        client.post("setMyCommands") {
-            parameter("commands", commands)
-            parameter("scope", scope)
-            parameter("language_code", languageCode)
-        }
-    }
-
-    /**
-     * Use this method to delete the list of the bot's commands for the given scope and user language.
-     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns *True* on success.
-     *
-     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
-     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
-     * */
-    suspend fun deleteMyCommands(
-        scope: BotCommandScope? = null,
-        languageCode: String? = null,
-    ) = request<Boolean> {
-        client.post("deleteMyCommands") {
-            parameter("scope", scope)
-            parameter("language_code", languageCode)
-        }
-    }
-
-    /**
-     * Use this method to get the current list of the bot's commands for the given scope and user language.
-     * Returns Array of [BotCommand] on success. If commands aren't set, an empty list is returned.
-     *
-     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
-     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
-     * */
-    suspend fun getMyCommands(
-        scope: BotCommandScope? = null,
-        languageCode: String? = null,
-    ) = request<List<BotCommand>> {
-        client.post("getMyCommands") {
-            parameter("scope", scope)
-            parameter("language_code", languageCode)
-        }
-    }
-
-    /**
-     * Use this method to change the default administrator rights requested by the bot when it's added as an
-     * administrator to groups or channels. These rights will be suggested to users, but they are are free to
-     * modify the list before adding the bot. Returns *True* on success.
-     *
-     * @param rights [ChatAdministratorRights] object describing new default administrator rights.
-     * If not specified, the default administrator rights will be cleared.
-     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
-     * Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
-     * */
-    suspend fun setMyDefaultAdministratorRights(
-        rights: ChatAdministratorRights? = null,
-        forChannels: Boolean? = null,
-    ) = request<Boolean> {
-        client.post("setMyDefaultAdministratorRights") {
-            parameter("rights", rights)
-            parameter("for_channels", forChannels)
-        }
-    }
-
-    /**
-     * Use this method to get the current default administrator rights of the bot.
-     * Returns ChatAdministratorRights on success.
-     *
-     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
-     * Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
-     * */
-    suspend fun getMyDefaultAdministratorRights(
-        forChannels: Boolean? = null,
-    ) = request<ChatAdministratorRights> {
-        client.post("getMyDefaultAdministratorRights") {
-            parameter("for_channels", forChannels)
-        }
-    }
-
-    /**
-     * Use this method to send answers to callback queries sent from [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
-     * to the user as a notification at the top of the chat screen or as an alert. On success, *True* is returned.
-     * */
-    suspend fun answerCallbackQuery(
-        callbackQueryId: String,
-        text: String? = null,
-        showAlert: Boolean? = null,
-        url: String? = null,
-        cacheTime: Int? = null,
-    ) = request<Boolean> {
-        client.post("answerCallbackQuery") {
-            parameter("callback_query_id", callbackQueryId)
-            parameter("text", text)
-            parameter("show_alert", showAlert)
-            parameter("url", url)
-            parameter("cache_time", cacheTime)
-        }
-    }
-
-    /**
-     * Use this method to get a sticker set. On success, a [StickerSet] object is returned.
-     *
-     * @param name Name of the sticker set
-     * */
-    suspend fun getStickerSet(
-        name: String,
-    ) = request<StickerSet> {
-        client.post("getStickerSet") {
-            parameter("name", name)
-        }
-    }
-
-    /**
-     * Use this method to get information about custom emoji stickers by their identifiers.
-     * Returns an Array of [Sticker] objects.
-     *
-     * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
-     * */
-    suspend fun getCustomEmojiStickers(
-        customEmojiIds: List<String>,
-    ) = request<List<Sticker>> {
-        client.post("getCustomEmojiStickers") {
-            parameter("custom_emoji_ids", customEmojiIds)
-        }
-    }
-
-    /**
-     * Use this method to upload a .PNG file with a sticker for later use in *[createNewStickerSet]* and
-     * *[addStickerToSet]* methods (can be used multiple times). Returns the uploaded File on success.
-     *
-     * @param userId User identifier of sticker file owner
-     * @param sticker A file with the sticker in .WEBP, .PNG, .TGS, or .WEBM format.
-     * See [https://core.telegram.org/stickers](https://core.telegram.org/stickers) for technical requirements.
-     * @param stickerFormat Format of the sticker
-     * */
-    suspend fun uploadStickerFile(
-        userId: ChatId.ID,
-        sticker: InputFile,
-        stickerFormat: StickerFormat,
-    ) = request<File> {
-        client.post("uploadStickerFile") {
-            parameter("user_id", userId)
-            parameter("sticker_format", stickerFormat)
-            setMultiPartFormDataBody(
-                "sticker" to sticker
-            )
-        }
-    }
-
-    /**
-     * Use this method to create a new sticker set owned by a user.
-     * The bot will be able to edit the sticker set thus created. Returns *True* on success.
-     *
-     * @param userId User identifier of created sticker set owner
-     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
-     * Can contain only English letters, digits and underscores. Must begin with a letter,
-     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
-     * `<bot_username>` is case insensitive. 1-64 characters.
-     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
-     * bot in context
-     * @param title Sticker set title, 1-64 characters
-     * @param block Sticker set builder
-     * */
-//    suspend fun createNewStickerSet(
-//        userId: ChatId.ID,
-//        name: String,
-//        title: String,
-//        stickerFormat: StickerFormat,
-//        block: CreateNewStickerInStickerSet.() -> Unit,
-//    ) = request<Boolean> {
-//        val set = CreateNewStickerInStickerSet(userId, name, title, stickerFormat).apply(block)
-//        client.post("createNewStickerSet") {
-//            parameter("user_id", userId)
-//            parameter("name", name)
-//            parameter("title", title)
-//            parameter("stickers", set.getAddedStickers())
-//            parameter("sticker_format", stickerFormat)
-//            parameter("sticker_type", set.stickerType)
-//            parameter("needs_repainting", set.needsRepainting)
-//            setMultiPartFormDataBody(
-//                "mediaPart1" to mediaPart1,
-//                "mediaPart2" to mediaPart2,
-//                "mediaPart3" to mediaPart3,
-//                "mediaPart4" to mediaPart4,
-//                "mediaPart5" to mediaPart5,
-//                "mediaPart6" to mediaPart6,
-//                "mediaPart7" to mediaPart7,
-//                "mediaPart8" to mediaPart8,
-//                "mediaPart9" to mediaPart9,
-//                "mediaPart10" to mediaPart10,
-//                "mediaPart11" to mediaPart11,
-//                "mediaPart12" to mediaPart12,
-//                "mediaPart13" to mediaPart13,
-//                "mediaPart14" to mediaPart14,
-//                "mediaPart15" to mediaPart15,
-//                "mediaPart16" to mediaPart16,
-//                "mediaPart17" to mediaPart17,
-//                "mediaPart18" to mediaPart18,
-//                "mediaPart19" to mediaPart19,
-//                "mediaPart20" to mediaPart20,
-//                "mediaPart21" to mediaPart21,
-//                "mediaPart22" to mediaPart22,
-//                "mediaPart23" to mediaPart23,
-//                "mediaPart24" to mediaPart24,
-//                "mediaPart25" to mediaPart25,
-//                "mediaPart26" to mediaPart26,
-//                "mediaPart27" to mediaPart27,
-//                "mediaPart28" to mediaPart28,
-//                "mediaPart29" to mediaPart29,
-//                "mediaPart30" to mediaPart30,
-//                "mediaPart31" to mediaPart31,
-//                "mediaPart32" to mediaPart32,
-//                "mediaPart33" to mediaPart33,
-//                "mediaPart34" to mediaPart34,
-//                "mediaPart35" to mediaPart35,
-//                "mediaPart36" to mediaPart36,
-//                "mediaPart37" to mediaPart37,
-//                "mediaPart38" to mediaPart38,
-//                "mediaPart39" to mediaPart39,
-//                "mediaPart40" to mediaPart40,
-//                "mediaPart41" to mediaPart41,
-//                "mediaPart42" to mediaPart42,
-//                "mediaPart43" to mediaPart43,
-//                "mediaPart44" to mediaPart44,
-//                "mediaPart45" to mediaPart45,
-//                "mediaPart46" to mediaPart46,
-//                "mediaPart47" to mediaPart47,
-//                "mediaPart48" to mediaPart48,
-//                "mediaPart49" to mediaPart49,
-//                "mediaPart50" to mediaPart50,
-//            )
-//        }
-//    }
-
-    /**
-     * Use this method to add a new sticker to a set created by the bot.
-     * You must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
-     * Animated stickers can be added to animated sticker sets and only to them.
-     * Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
-     * Returns *True* on success.
-     *
-     * @param userId User identifier of created sticker set owner
-     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
-     * Can contain only English letters, digits and underscores. Must begin with a letter,
-     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
-     * `<bot_username>` is case insensitive. 1-64 characters.
-     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
-     * bot in context
-     * @param sticker Information about the added sticker.
-     * If exactly the same sticker had already been added to the set, then the set isn't changed.
-     * */
-    suspend fun addStickerToSet(
-        userId: ChatId.ID,
-        name: String,
-        sticker: InputSticker,
-    ) = request<Boolean> {
-        client.post("addStickerToSet") {
-            parameter("user_id", userId)
-            parameter("name", name)
-            parameter("sticker", sticker)
-        }
-    }
-
-    /**
-     * Use this method to move a sticker in a set created by the bot to a specific position. Returns *True* on success.
-     *
-     * @param sticker File identifier of the sticker
-     * @param position New sticker position in the set, zero-based
-     * */
-    suspend fun setStickerPositionInSet(
-        sticker: String,
-        position: Int,
-    ) = request<Boolean> {
-        client.post("setStickerPositionInSet") {
-            parameter("sticker", sticker)
-            parameter("position", position)
-        }
-    }
-
-    /**
-     * Use this method to delete a sticker from a set created by the bot. Returns *True* on success.
-     *
-     * @param sticker File identifier of the sticker
-     * */
-    suspend fun deleteStickerFromSet(
-        sticker: String,
-    ) = request<Boolean> {
-        client.post("deleteStickerFromSet") {
-            parameter("sticker", sticker)
-        }
-    }
-
-    /**
-     * Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
-     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
-     *
-     * @param sticker File identifier of the sticker
-     * @param emojiList 1-20 emoji associated with the sticker
-     * */
-    suspend fun setStickerEmojiList(
-        sticker: String,
-        emojiList: List<String>,
-    ) = request<Boolean> {
-        client.post("setStickerEmojiList") {
-            parameter("sticker", sticker)
-            parameter("emoji_list", emojiList)
-        }
-    }
-
-    /**
-     * Use this method to change search keywords assigned to a regular or custom emoji sticker.
-     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
-     *
-     * @param sticker File identifier of the sticker
-     * @param keywords 0-20 search keywords for the sticker with total length of up to 64 characters
-     * */
-    suspend fun setStickerKeywords(
-        sticker: String,
-        keywords: List<String>,
-    ) = request<Boolean> {
-        client.post("setStickerKeywords") {
-            parameter("sticker", sticker)
-            parameter("keywords", keywords)
-        }
-    }
-
-    /**
-     * Use this method to change the [mask position][MaskPosition] of a mask sticker.
-     * The sticker must belong to a sticker set that was created by the bot. Returns *True* on success.
-     *
-     * @param sticker File identifier of the sticker
-     * @param maskPosition position where the mask should be placed on faces. Omit the parameter to remove the mask position.
-     * */
-    suspend fun setStickerMaskPosition(
-        sticker: String,
-        maskPosition: MaskPosition?,
-    ) = request<Boolean> {
-        client.post("setStickerMaskPosition") {
-            parameter("sticker", sticker)
-            parameter("mask_position", maskPosition)
-        }
-    }
-
-    /**
-     * Use this method to set the title of a created sticker set. Returns *True* on success.
-     *
-     * @param name Sticker set name
-     * @param title Sticker set title, 1-64 characters
-     * */
-    suspend fun setStickerSetTitle(
-        name: String,
-        title: String,
-    ) = request<Boolean> {
-        client.post("setStickerSetTitle") {
-            parameter("name", name)
-            parameter("title", title)
-        }
-    }
-
-    /**
-     * Use this method to set the thumbnail of a regular or mask sticker set.
-     * The format of the thumbnail file must match the format of the stickers in the set. Returns *True* on success.
-     *
-     * @param name Sticker set name
-     * @param userId User identifier of the sticker set owner
-     * @param thumbnail A **PNG** image with the thumbnail, must be up to 128 kilobytes in size and have width and height
-     * exactly 100px, or a **TGS** animation with the thumbnail up to 32 kilobytes in size;
-     * see [Animation Requirements](https://core.telegram.org/stickers#animated-sticker-requirements)
-     * for animated sticker technical requirements, or a **WEBM** video with the thumbnail up to 32 kilobytes in size;
-     * see [Video Requirements](https://core.telegram.org/stickers#video-sticker-requirements) for video sticker
-     * technical requirements. Pass a *file_id* as a String to send a file that already exists on the Telegram servers,
-     * pass an HTTP URL as a String for Telegram to get a file from the Internet,
-     * or upload a new one. [More information on Sending Files »](https://core.telegram.org/bots/api#sending-files).
-     * Animated sticker set thumbnails can't be uploaded via HTTP URL.
-     * */
-    suspend fun setStickerSetThumbnail(
-        name: String,
-        userId: ChatId.ID,
-        thumbnail: InputFile,
-    ) = request<Boolean> {
-        client.post("setStickerSetThumbnail") {
-            parameter("name", name)
-            parameter("user_id", userId)
-            setMultiPartFormDataBody(
-                "thumbnail" to thumbnail,
-            )
-        }
-    }
-
-    /**
-     * Use this method to set the thumbnail of a custom emoji sticker set. Returns *True* on success.
-     *
-     * @param name Sticker set name
-     * @param customEmojiId Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail.
-     * */
-    suspend fun setCustomEmojiStickerSetThumbnail(
-        name: String,
-        customEmojiId: String?,
-    ) = request<Boolean> {
-        client.post("setCustomEmojiStickerSetThumbnail") {
-            parameter("name", name)
-            parameter("custom_emoji_id", customEmojiId)
-        }
-    }
-
-    /**
-     * Use this method to delete a sticker set that was created by the bot. Returns *True* on success.
-     *
-     * @param name Sticker set name
-     * */
-    suspend fun deleteStickerSet(
-        name: String,
-    ) = request<Boolean> {
-        client.post("deleteStickerSet") {
-            parameter("name", name)
-        }
-    }
-
-    /**
-     * Use this method to send answers to an inline query. On success, *True* is returned.
-     * No more than 50 results per query are allowed.
-     *
-     * @param inlineQueryId Unique identifier for the answered query
-     * @param results List of results for the inline query
-     * @param cacheTime The maximum amount of time that the result of the inline query may be cached on the server.
-     * Defaults to 300 seconds.
-     * @param isPersonal Pass *True* if results may be cached on the server side only for the user that sent the query.
-     * By default, results may be returned to any user who sends the same query.
-     * @param nextOffset Pass the offset that a client should send in the next query with the same text to receive
-     * more results. Pass an empty string if there are no more results or if you don't support pagination.
-     * Offset length can't exceed 64 bytes.
-     * @param button Button to be shown above inline query results
-     * */
-    suspend fun answerInlineQuery(
-        inlineQueryId: String,
-        results: List<InlineQueryResult>,
-        cacheTime: Duration?,
-        isPersonal: Boolean? = null,
-        nextOffset: String? = null,
-        button: InlineQueryResultsButton? = null,
-    ) = request<Boolean> {
-        client.post("answerInlineQuery") {
-            parameter("inline_query_id", inlineQueryId)
-            parameter("results", results)
-            parameter("cache_time", cacheTime)
-            parameter("is_personal", isPersonal)
-            parameter("next_offset", nextOffset)
-            parameter("button", button)
-        }
-    }
-
-    /**
-     * Use this method to set the result of an interaction with a [Web App](https://core.telegram.org/bots/webapps)
-     * and send a corresponding message on behalf of the user to the chat from which the query originated.
-     * On success, a [SentWebAppMessage] object is returned.
-     *
-     * @param webAppQueryId Unique identifier for the query to be answered
-     * @param result Object describing the message to be sent
-     * */
-    suspend fun answerWebAppQuery(
-        webAppQueryId: String,
-        result: InlineQueryResult,
-    ) = request<SentWebAppMessage> {
-        client.post("answerWebAppQuery") {
-            parameter("web_app_query_id", webAppQueryId)
-            parameter("result", result)
-        }
-    }
-
-    // TODO docs
-    suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
-
-    // TODO docs
-    suspend fun downloadFile(file: File) = request<InputStream> {
-        client.get("${TelegramApi2.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
-            unauthenticated()
-        }
-    }
-    
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
      *
@@ -817,23 +270,29 @@ interface TelegramService2 {
 
     /**
      * Use this method to copy messages of any kind. Service messages and invoice messages can't be copied.
-     * The method is analogous to the method forwardMessage, but the copied message doesn't have a link to the
+     * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
      *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param fromChatId Unique identifier for the chat where the original message was sent
      * @param messageId Message identifier in the chat specified in [fromChatId]
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-     * @param caption New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
+     * @param caption New caption for media, 0-1024 characters after entities parsing.
+     * If not specified, the original caption is kept
      * @param parseMode [ParseMode] for parsing entities in the message caption.
-     * @param captionEntities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
-     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param captionEntities List of special entities that appear in message text,
+     * which can be specified instead of *[parseMode]*
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
      * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param replyMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
-     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
-     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
+     * replied-to message is not found
+     * @param replyMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun copyMessage(
         chatId: ChatId,
@@ -862,6 +321,598 @@ interface TelegramService2 {
             parameter("reply_to_message_id", replyToMessageId)
             parameter("allow_sending_without_reply", allowSendingWithoutReply)
             parameter("reply_markup", replyMarkup)
+        }
+    }
+
+    /**
+     * Use this method to send photos
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param photo Photo to send. Pass an [InputFile.FileIdOrUrl] with file id to send a photo that exists on the
+     * Telegram servers (recommended), pass an [InputFile.FileIdOrUrl] with HTTP URL for Telegram to get a photo from
+     * the Internet, or upload a new photo using [InputFile.File]. The photo must be at most 10 MB in size.
+     * The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20.
+     * [More information on Sending Files »](https://core.telegram.org/bots/api#sending-files)
+     * @param caption Photo caption (may also be used when resending photos by [InputFile.FileIdOrUrl]),
+     * 0-1024 characters after entities parsing
+     * @param parseMode [ParseMode] for parsing entities in the photo caption.
+     * @param captionEntities List of special entities that appear in message text,
+     * which can be specified instead of *[parseMode]*
+     * @param hasSpoiler Pass *True* if the photo needs to be covered with a spoiler animation
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
+     * replied-to message is not found
+     * @param replyMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
+     * */
+    suspend fun sendPhoto(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        photo: InputFile,
+        caption: String? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        parseMode: ParseMode? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        replyMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendPhoto") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("has_spoiler", hasSpoiler)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", replyMarkup)
+            setMultiPartFormDataBody(
+                "photo" to photo,
+            )
+        }
+    }
+
+    /**
+     * Use this method to send audio files, if you want Telegram clients to display them in the music player.
+     * Your audio must be in the .MP3 or .M4A format. On success, the sent Message is returned.
+     * Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param audio Audio file to send
+     * @param caption Audio caption, 0-1024 characters after entities parsing
+     * @param parseMode [ParseMode] for parsing entities in the audio caption.
+     * @param captionEntities List of special entities that appear in message text,
+     * which can be specified instead of *[parseMode]*
+     * @param duration Duration of the audio in seconds
+     * @param performer Performer
+     * @param title Track name
+     * @param thumbnail Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported
+     * server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height
+     * should not exceed 320. Ignored if the file is not uploaded using [InputFile.File].
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
+     * replied-to message is not found
+     * @param replyMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
+     * */
+    suspend fun sendAudio(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        audio: InputFile,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        duration: Int? = null,
+        performer: String? = null,
+        title: String? = null,
+        thumbnail: NotReusableInputFile? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        replyMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendAudio") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("duration", duration)
+            parameter("performer", performer)
+            parameter("title", title)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", replyMarkup)
+            setMultiPartFormDataBody(
+                "audio" to audio,
+                "thumbnail" to thumbnail as InputFile
+            )
+        }
+    }
+
+    // TODO
+    suspend fun sendDocument(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        document: InputFile,
+        thumbnail: NotReusableInputFile?,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        disableContentTypeDetection: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendDocument") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("disable_content_type_detection", disableContentTypeDetection)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "document" to document,
+                "thumbnail" to thumbnail as InputFile,
+            )
+        }
+    }
+
+    // TODO
+    suspend fun sendVideo(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        video: InputFile,
+        duration: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        supportsStreaming: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVideo") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("duration", duration)
+            parameter("width", width)
+            parameter("height", height)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("has_spoiler", hasSpoiler)
+            parameter("supports_streaming", supportsStreaming)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "video" to video
+            )
+        }
+    }
+
+    // TODO
+    suspend fun sendAnimation(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        animation: InputFile,
+        duration: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+        thumbnail: String? = null,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        hasSpoiler: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendAnimation") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("duration", duration)
+            parameter("width", width)
+            parameter("height", height)
+            parameter("thumbnail", thumbnail)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("has_spoiler", hasSpoiler)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "animation" to animation
+            )
+        }
+    }
+
+    // TODO
+    suspend fun sendVoice(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        voice: InputFile,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        duration: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVoice") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("duration", duration)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "voice" to voice
+            )
+        }
+    }
+
+    // TODO
+    suspend fun sendVideoNote(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        videoNote: InputFile,
+        duration: Int? = null,
+        length: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVideoNote") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("duration", duration)
+            parameter("length", length)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "video_note" to videoNote
+            )
+        }
+    }
+
+    /**
+     * Use this method to send a group of photos, videos, documents or audios as an album.
+     * Documents and audio filescan be only grouped in an album with messages of the same type.
+     * On success, an array of Messages that were sent is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
+     * @param replyToMessageId If the message is a reply, ID of the original message
+     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
+     * */
+    suspend fun sendMediaGroup( // TODO work?
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        media: List<InputMediaGroup>,
+        disableNotification: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        inputFiles: List<InputFile>? = null // docs
+    ) = request<List<Message>> {
+        client.post("sendMediaGroup") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("media", media)
+            parameter("disable_notification", disableNotification)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            if (inputFiles != null) {
+                var lastInputFilesIndex = 0
+
+                println(
+                    buildList {
+                        media.map { inputMedia ->
+                            when(inputMedia) {
+                                is InputMediaGroupWithThumbnail -> {
+                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+                                    if (inputMedia.thumbnail != null) {
+                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
+                                    } else {}
+                                }
+                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+                            }
+                        }
+                    }
+                )
+
+                lastInputFilesIndex = 0
+
+                setMultiPartFormDataBody(
+                    *buildList {
+                        media.map { inputMedia ->
+                            when(inputMedia) {
+                                is InputMediaGroupWithThumbnail -> {
+                                    add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                                    if (inputMedia.thumbnail != null) {
+                                        add(inputMedia.thumbnail!!.drop(9) to inputFiles[lastInputFilesIndex++])
+                                    } else {}
+                                }
+                                else -> add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                            }
+                        }
+                    }.toTypedArray()
+                )
+            }
+        }
+    }
+
+    // TODO
+    suspend fun sendLocation(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        latitude: Double,
+        longitude: Double,
+        horizontalAccuracy: Double? = null,
+        livePeriod: Int? = null,
+        heading: Int? = null,
+        proximityAlertRadius: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("horizontal_accuracy", horizontalAccuracy)
+            parameter("live_period", livePeriod)
+            parameter("heading", heading)
+            parameter("proximity_alert_radius", proximityAlertRadius)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun sendVenue(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        latitude: Double,
+        longitude: Double,
+        title: String,
+        address: String,
+        foursquareId: String? = null,
+        foursquareType: String? = null,
+        googlePlaceId: String? = null,
+        googlePlaceType: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendVenue") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("title", title)
+            parameter("address", address)
+            parameter("foursquare_id", foursquareId)
+            parameter("foursquare_type", foursquareType)
+            parameter("google_place_id", googlePlaceId)
+            parameter("google_place_type", googlePlaceType)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun sendContact(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        phoneNumber: String,
+        firstName: String,
+        lastName: String? = null,
+        vcard: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendContact") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("phone_number", phoneNumber)
+            parameter("first_name", firstName)
+            parameter("last_name", lastName)
+            parameter("vcard", vcard)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun sendPoll(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        question: String,
+        options: String,
+        isAnonymous: Boolean? = null,
+        type: PollType? = null,
+        allowsMultipleAnswers: Boolean? = null,
+        correctOptionId: Int? = null,
+        explanation: String? = null,
+        explanationParseMode: String? = null,
+        explanationEntities: String? = null,
+        openPeriod: Int? = null,
+        closeDate: Int? = null,
+        isClosed: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendPoll") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("question", question)
+            parameter("options", options)
+            parameter("is_anonymous", isAnonymous)
+            parameter("type", type)
+            parameter("allows_multiple_answers", allowsMultipleAnswers)
+            parameter("correct_option_id", correctOptionId)
+            parameter("explanation", explanation)
+            parameter("explanation_parse_mode", explanationParseMode)
+            parameter("explanation_entities", explanationEntities)
+            parameter("open_period", openPeriod)
+            parameter("close_date", closeDate)
+            parameter("is_closed", isClosed)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun sendDice(
+        chatId: ChatId? = null,
+        messageThreadId: Int? = null,
+        emoji: String,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendDice") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("emoji", emoji)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun sendChatAction(
+        chatId: ChatId,
+        action: ChatAction,
+        messageThreadId: Int? = null,
+    ) = request<Boolean> {
+        client.post("sendChatAction") {
+            parameter("chat_id", chatId)
+            parameter("action", action)
+            parameter("message_thread_id", messageThreadId)
+        }
+    }
+
+    /**
+     * Use this method to get a list of profile pictures for a user. Returns a [UserProfilePhotos] object.
+     * @param userId Unique identifier of the target user
+     * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
+     * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+     * */
+    suspend fun getUserProfilePhotos(
+        userId: ChatId.ID,
+        offset: Int? = null,
+        limit: Int? = null,
+    ) = request<UserProfilePhotos> {
+        client.post("getUserProfilePhotos") {
+            parameter("user_id", userId)
+            parameter("offset", offset)
+            parameter("limit", limit)
+        }
+    }
+
+    /**
+     * Use this method to get basic information about a file and prepare it for downloading.
+     * For the moment, bots can download files of up to 20MB in size. On success, a [File] object is returned.
+     * The file can then be downloaded via the link `https://api.telegram.org/file/bot<token>/<file_path>`,
+     * where `<file_path>` is taken from the response. It is guaranteed that the link will be valid for at least 1 hour.
+     * When the link expires, a new one can be requested by calling [getFile] again.
+     *
+     * **Note:** This function may not preserve the original file name and MIME type.
+     * You should save the file's MIME type and name (if available) when the File object is received.
+     *
+     * @param id File identifier to get information about
+     * */
+    suspend fun getFile(
+        id: String,
+    ) = request<File> {
+        client.post("getFile") {
+            parameter("file_id", id)
         }
     }
 
@@ -899,7 +950,7 @@ interface TelegramService2 {
      * group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for
      * this to work. By default, this method guarantees that after the call the user is not a member of the chat,
      * but will be able to join it. So if the user is a member of the chat they will also be **removed** from the chat.
-     * If you don't want this, use the parameter _only_if_banned_. Returns *True* on success.
+     * If you don't want this, use the parameter _[onlyIfBanned]_. Returns *True* on success.
      *
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * @param userId Unique identifier of the target user
@@ -908,7 +959,7 @@ interface TelegramService2 {
     suspend fun unbanChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
-        onlyIfBanned: Boolean,
+        onlyIfBanned: Boolean? = null,
     ) = request<Boolean> {
         client.post("unbanChatMember") {
             parameter("chat_id", chatId)
@@ -1687,6 +1738,83 @@ interface TelegramService2 {
     }
 
     /**
+     * Use this method to send answers to callback queries sent from [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
+     * to the user as a notification at the top of the chat screen or as an alert. On success, *True* is returned.
+     * */
+    suspend fun answerCallbackQuery(
+        callbackQueryId: String,
+        text: String? = null,
+        showAlert: Boolean? = null,
+        url: String? = null,
+        cacheTime: Int? = null,
+    ) = request<Boolean> {
+        client.post("answerCallbackQuery") {
+            parameter("callback_query_id", callbackQueryId)
+            parameter("text", text)
+            parameter("show_alert", showAlert)
+            parameter("url", url)
+            parameter("cache_time", cacheTime)
+        }
+    }
+
+    /**
+     * Use this method to change the list of the bot's commands.
+     *
+     * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands.
+     * Returns *True* on success
+     *
+     * @param commands list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
+     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
+     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all
+     * users fromthe given scope, for whose language there are no dedicated commands
+     * */
+    suspend fun setMyCommands(
+        commands: List<BotCommand>,
+        scope: BotCommandScope? = null,
+        languageCode: String? = null,
+    ) = request<Boolean> {
+        client.post("setMyCommands") {
+            parameter("commands", commands)
+            parameter("scope", scope)
+            parameter("language_code", languageCode)
+        }
+    }
+
+    /**
+     * Use this method to delete the list of the bot's commands for the given scope and user language.
+     * After deletion, [higher level commands][BotCommandScope] will be shown to affected users. Returns *True* on success.
+     *
+     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
+     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
+     * */
+    suspend fun deleteMyCommands(
+        scope: BotCommandScope? = null,
+        languageCode: String? = null,
+    ) = request<Boolean> {
+        client.post("deleteMyCommands") {
+            parameter("scope", scope)
+            parameter("language_code", languageCode)
+        }
+    }
+
+    /**
+     * Use this method to get the current list of the bot's commands for the given scope and user language.
+     * Returns Array of [BotCommand] on success. If commands aren't set, an empty list is returned.
+     *
+     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
+     * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands
+     * */
+    suspend fun getMyCommands(
+        scope: BotCommandScope? = null,
+        languageCode: String? = null,
+    ) = request<List<BotCommand>> {
+        client.post("getMyCommands") {
+            parameter("scope", scope)
+            parameter("language_code", languageCode)
+        }
+    }
+
+    /**
      * Use this method to change the bot's name. Returns *True* on success.
      *
      * @param name New bot name; 0-64 characters.
@@ -1817,6 +1945,41 @@ interface TelegramService2 {
     }
 
     /**
+     * Use this method to change the default administrator rights requested by the bot when it's added as an
+     * administrator to groups or channels. These rights will be suggested to users, but they are are free to
+     * modify the list before adding the bot. Returns *True* on success.
+     *
+     * @param rights [ChatAdministratorRights] object describing new default administrator rights.
+     * If not specified, the default administrator rights will be cleared.
+     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
+     * Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
+     * */
+    suspend fun setMyDefaultAdministratorRights(
+        rights: ChatAdministratorRights? = null,
+        forChannels: Boolean? = null,
+    ) = request<Boolean> {
+        client.post("setMyDefaultAdministratorRights") {
+            parameter("rights", rights)
+            parameter("for_channels", forChannels)
+        }
+    }
+
+    /**
+     * Use this method to get the current default administrator rights of the bot.
+     * Returns ChatAdministratorRights on success.
+     *
+     * @param forChannels Pass *True* to change the default administrator rights of the bot in channels.
+     * Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
+     * */
+    suspend fun getMyDefaultAdministratorRights(
+        forChannels: Boolean? = null,
+    ) = request<ChatAdministratorRights> {
+        client.post("getMyDefaultAdministratorRights") {
+            parameter("for_channels", forChannels)
+        }
+    }
+
+    /**
      * Use this method to edit text and game messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
@@ -1918,6 +2081,46 @@ interface TelegramService2 {
         }
     }
 
+    // TODO
+    suspend fun editMessageLiveLocation(
+        chatId: ChatId? = null,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        latitude: Double,
+        longitude: Double,
+        horizontalAccuracy: Double? = null,
+        heading: Int? = null,
+        proximityAlertRadius: Int? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<LiveLocationResponse> {
+        client.post("editMessageLiveLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_id", messageId)
+            parameter("inline_message_id", inlineMessageId)
+            parameter("latitude", latitude)
+            parameter("longitude", longitude)
+            parameter("horizontal_accuracy", horizontalAccuracy)
+            parameter("heading", heading)
+            parameter("proximity_alert_radius", proximityAlertRadius)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
+    // TODO
+    suspend fun stopMessageLiveLocation(
+        chatId: ChatId? = null,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<LiveLocationResponse> {
+        client.post("stopMessageLiveLocation") {
+            parameter("chat_id", chatId)
+            parameter("message_id", messageId)
+            parameter("inline_message_id", inlineMessageId)
+            parameter("reply_markup", keyboardMarkup)
+        }
+    }
+
     /**
      * Use this method to edit only the reply markup of messages. On success,
      * if the edited message is not an inline message, the edited [Message] is returned, otherwise *True* is returned.
@@ -1985,6 +2188,404 @@ interface TelegramService2 {
         client.post("deleteMessage") {
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
+        }
+    }
+
+    // TODO
+    suspend fun sendSticker(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        sticker: InputFile,
+        emoji: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyToMessageId: Int? = null,
+        allowSendingWithoutReply: Boolean? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+    ) = request<Message> {
+        client.post("sendSticker") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("emoji", emoji)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_to_message_id", replyToMessageId)
+            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_markup", keyboardMarkup)
+            setMultiPartFormDataBody(
+                "sticker" to sticker
+            )
+        }
+    }
+
+    /**
+     * Use this method to get a sticker set. On success, a [StickerSet] object is returned.
+     *
+     * @param name Name of the sticker set
+     * */
+    suspend fun getStickerSet(
+        name: String,
+    ) = request<StickerSet> {
+        client.post("getStickerSet") {
+            parameter("name", name)
+        }
+    }
+
+    /**
+     * Use this method to get information about custom emoji stickers by their identifiers.
+     * Returns an Array of [Sticker] objects.
+     *
+     * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
+     * */
+    suspend fun getCustomEmojiStickers(
+        customEmojiIds: List<String>,
+    ) = request<List<Sticker>> {
+        client.post("getCustomEmojiStickers") {
+            parameter("custom_emoji_ids", customEmojiIds)
+        }
+    }
+
+    /**
+     * Use this method to upload a .PNG file with a sticker for later use in *[createNewStickerSet]* and
+     * *[addStickerToSet]* methods (can be used multiple times). Returns the uploaded File on success.
+     *
+     * @param userId User identifier of sticker file owner
+     * @param sticker A file with the sticker in .WEBP, .PNG, .TGS, or .WEBM format.
+     * See [https://core.telegram.org/stickers](https://core.telegram.org/stickers) for technical requirements.
+     * @param stickerFormat Format of the sticker
+     * */
+    suspend fun uploadStickerFile(
+        userId: ChatId.ID,
+        sticker: InputFile,
+        stickerFormat: StickerFormat,
+    ) = request<File> {
+        client.post("uploadStickerFile") {
+            parameter("user_id", userId)
+            parameter("sticker_format", stickerFormat)
+            setMultiPartFormDataBody(
+                "sticker" to sticker
+            )
+        }
+    }
+
+    // TODO
+    /**
+     * Use this method to create a new sticker set owned by a user.
+     * The bot will be able to edit the sticker set thus created. Returns *True* on success.
+     *
+     * @param userId User identifier of created sticker set owner
+     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
+     * Can contain only English letters, digits and underscores. Must begin with a letter,
+     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
+     * `<bot_username>` is case insensitive. 1-64 characters.
+     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
+     * bot in context
+     * @param title Sticker set title, 1-64 characters
+     * @param block Sticker set builder
+     * */
+//    suspend fun createNewStickerSet(
+//        userId: ChatId.ID,
+//        name: String,
+//        title: String,
+//        stickerFormat: StickerFormat,
+//        block: CreateNewStickerInStickerSet.() -> Unit,
+//    ) = request<Boolean> {
+//        val set = CreateNewStickerInStickerSet(userId, name, title, stickerFormat).apply(block)
+//        client.post("createNewStickerSet") {
+//            parameter("user_id", userId)
+//            parameter("name", name)
+//            parameter("title", title)
+//            parameter("stickers", set.getAddedStickers())
+//            parameter("sticker_format", stickerFormat)
+//            parameter("sticker_type", set.stickerType)
+//            parameter("needs_repainting", set.needsRepainting)
+//            setMultiPartFormDataBody(
+//                "mediaPart1" to mediaPart1,
+//                "mediaPart2" to mediaPart2,
+//                "mediaPart3" to mediaPart3,
+//                "mediaPart4" to mediaPart4,
+//                "mediaPart5" to mediaPart5,
+//                "mediaPart6" to mediaPart6,
+//                "mediaPart7" to mediaPart7,
+//                "mediaPart8" to mediaPart8,
+//                "mediaPart9" to mediaPart9,
+//                "mediaPart10" to mediaPart10,
+//                "mediaPart11" to mediaPart11,
+//                "mediaPart12" to mediaPart12,
+//                "mediaPart13" to mediaPart13,
+//                "mediaPart14" to mediaPart14,
+//                "mediaPart15" to mediaPart15,
+//                "mediaPart16" to mediaPart16,
+//                "mediaPart17" to mediaPart17,
+//                "mediaPart18" to mediaPart18,
+//                "mediaPart19" to mediaPart19,
+//                "mediaPart20" to mediaPart20,
+//                "mediaPart21" to mediaPart21,
+//                "mediaPart22" to mediaPart22,
+//                "mediaPart23" to mediaPart23,
+//                "mediaPart24" to mediaPart24,
+//                "mediaPart25" to mediaPart25,
+//                "mediaPart26" to mediaPart26,
+//                "mediaPart27" to mediaPart27,
+//                "mediaPart28" to mediaPart28,
+//                "mediaPart29" to mediaPart29,
+//                "mediaPart30" to mediaPart30,
+//                "mediaPart31" to mediaPart31,
+//                "mediaPart32" to mediaPart32,
+//                "mediaPart33" to mediaPart33,
+//                "mediaPart34" to mediaPart34,
+//                "mediaPart35" to mediaPart35,
+//                "mediaPart36" to mediaPart36,
+//                "mediaPart37" to mediaPart37,
+//                "mediaPart38" to mediaPart38,
+//                "mediaPart39" to mediaPart39,
+//                "mediaPart40" to mediaPart40,
+//                "mediaPart41" to mediaPart41,
+//                "mediaPart42" to mediaPart42,
+//                "mediaPart43" to mediaPart43,
+//                "mediaPart44" to mediaPart44,
+//                "mediaPart45" to mediaPart45,
+//                "mediaPart46" to mediaPart46,
+//                "mediaPart47" to mediaPart47,
+//                "mediaPart48" to mediaPart48,
+//                "mediaPart49" to mediaPart49,
+//                "mediaPart50" to mediaPart50,
+//            )
+//        }
+//    }
+
+    /**
+     * Use this method to add a new sticker to a set created by the bot.
+     * You must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
+     * Animated stickers can be added to animated sticker sets and only to them.
+     * Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
+     * Returns *True* on success.
+     *
+     * @param userId User identifier of created sticker set owner
+     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
+     * Can contain only English letters, digits and underscores. Must begin with a letter,
+     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
+     * `<bot_username>` is case insensitive. 1-64 characters.
+     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
+     * bot in context
+     * @param sticker Information about the added sticker.
+     * If exactly the same sticker had already been added to the set, then the set isn't changed.
+     * */
+    suspend fun addStickerToSet(
+        userId: ChatId.ID,
+        name: String,
+        sticker: InputSticker,
+    ) = request<Boolean> {
+        client.post("addStickerToSet") {
+            parameter("user_id", userId)
+            parameter("name", name)
+            parameter("sticker", sticker)
+        }
+    }
+
+    /**
+     * Use this method to move a sticker in a set created by the bot to a specific position. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param position New sticker position in the set, zero-based
+     * */
+    suspend fun setStickerPositionInSet(
+        sticker: String,
+        position: Int,
+    ) = request<Boolean> {
+        client.post("setStickerPositionInSet") {
+            parameter("sticker", sticker)
+            parameter("position", position)
+        }
+    }
+
+    /**
+     * Use this method to delete a sticker from a set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * */
+    suspend fun deleteStickerFromSet(
+        sticker: String,
+    ) = request<Boolean> {
+        client.post("deleteStickerFromSet") {
+            parameter("sticker", sticker)
+        }
+    }
+
+    /**
+     * Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
+     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param emojiList 1-20 emoji associated with the sticker
+     * */
+    suspend fun setStickerEmojiList(
+        sticker: String,
+        emojiList: List<String>,
+    ) = request<Boolean> {
+        client.post("setStickerEmojiList") {
+            parameter("sticker", sticker)
+            parameter("emoji_list", emojiList)
+        }
+    }
+
+    /**
+     * Use this method to change search keywords assigned to a regular or custom emoji sticker.
+     * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param keywords 0-20 search keywords for the sticker with total length of up to 64 characters
+     * */
+    suspend fun setStickerKeywords(
+        sticker: String,
+        keywords: List<String>,
+    ) = request<Boolean> {
+        client.post("setStickerKeywords") {
+            parameter("sticker", sticker)
+            parameter("keywords", keywords)
+        }
+    }
+
+    /**
+     * Use this method to change the [mask position][MaskPosition] of a mask sticker.
+     * The sticker must belong to a sticker set that was created by the bot. Returns *True* on success.
+     *
+     * @param sticker File identifier of the sticker
+     * @param maskPosition position where the mask should be placed on faces. Omit the parameter to remove the mask position.
+     * */
+    suspend fun setStickerMaskPosition(
+        sticker: String,
+        maskPosition: MaskPosition?,
+    ) = request<Boolean> {
+        client.post("setStickerMaskPosition") {
+            parameter("sticker", sticker)
+            parameter("mask_position", maskPosition)
+        }
+    }
+
+    /**
+     * Use this method to set the title of a created sticker set. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * @param title Sticker set title, 1-64 characters
+     * */
+    suspend fun setStickerSetTitle(
+        name: String,
+        title: String,
+    ) = request<Boolean> {
+        client.post("setStickerSetTitle") {
+            parameter("name", name)
+            parameter("title", title)
+        }
+    }
+
+    /**
+     * Use this method to set the thumbnail of a regular or mask sticker set.
+     * The format of the thumbnail file must match the format of the stickers in the set. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * @param userId User identifier of the sticker set owner
+     * @param thumbnail A **PNG** image with the thumbnail, must be up to 128 kilobytes in size and have width and height
+     * exactly 100px, or a **TGS** animation with the thumbnail up to 32 kilobytes in size;
+     * see [Animation Requirements](https://core.telegram.org/stickers#animated-sticker-requirements)
+     * for animated sticker technical requirements, or a **WEBM** video with the thumbnail up to 32 kilobytes in size;
+     * see [Video Requirements](https://core.telegram.org/stickers#video-sticker-requirements) for video sticker
+     * technical requirements. Pass a *file_id* as a String to send a file that already exists on the Telegram servers,
+     * pass an HTTP URL as a String for Telegram to get a file from the Internet,
+     * or upload a new one. [More information on Sending Files »](https://core.telegram.org/bots/api#sending-files).
+     * Animated sticker set thumbnails can't be uploaded via HTTP URL.
+     * */
+    suspend fun setStickerSetThumbnail(
+        name: String,
+        userId: ChatId.ID,
+        thumbnail: InputFile,
+    ) = request<Boolean> {
+        client.post("setStickerSetThumbnail") {
+            parameter("name", name)
+            parameter("user_id", userId)
+            setMultiPartFormDataBody(
+                "thumbnail" to thumbnail,
+            )
+        }
+    }
+
+    /**
+     * Use this method to set the thumbnail of a custom emoji sticker set. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * @param customEmojiId Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail.
+     * */
+    suspend fun setCustomEmojiStickerSetThumbnail(
+        name: String,
+        customEmojiId: String?,
+    ) = request<Boolean> {
+        client.post("setCustomEmojiStickerSetThumbnail") {
+            parameter("name", name)
+            parameter("custom_emoji_id", customEmojiId)
+        }
+    }
+
+    /**
+     * Use this method to delete a sticker set that was created by the bot. Returns *True* on success.
+     *
+     * @param name Sticker set name
+     * */
+    suspend fun deleteStickerSet(
+        name: String,
+    ) = request<Boolean> {
+        client.post("deleteStickerSet") {
+            parameter("name", name)
+        }
+    }
+
+    /**
+     * Use this method to send answers to an inline query. On success, *True* is returned.
+     * No more than 50 results per query are allowed.
+     *
+     * @param inlineQueryId Unique identifier for the answered query
+     * @param results List of results for the inline query
+     * @param cacheTime The maximum amount of time that the result of the inline query may be cached on the server.
+     * Defaults to 300 seconds.
+     * @param isPersonal Pass *True* if results may be cached on the server side only for the user that sent the query.
+     * By default, results may be returned to any user who sends the same query.
+     * @param nextOffset Pass the offset that a client should send in the next query with the same text to receive
+     * more results. Pass an empty string if there are no more results or if you don't support pagination.
+     * Offset length can't exceed 64 bytes.
+     * @param button Button to be shown above inline query results
+     * */
+    suspend fun answerInlineQuery(
+        inlineQueryId: String,
+        results: List<InlineQueryResult>,
+        cacheTime: Duration?,
+        isPersonal: Boolean? = null,
+        nextOffset: String? = null,
+        button: InlineQueryResultsButton? = null,
+    ) = request<Boolean> {
+        client.post("answerInlineQuery") {
+            parameter("inline_query_id", inlineQueryId)
+            parameter("results", results)
+            parameter("cache_time", cacheTime)
+            parameter("is_personal", isPersonal)
+            parameter("next_offset", nextOffset)
+            parameter("button", button)
+        }
+    }
+
+    /**
+     * Use this method to set the result of an interaction with a [Web App](https://core.telegram.org/bots/webapps)
+     * and send a corresponding message on behalf of the user to the chat from which the query originated.
+     * On success, a [SentWebAppMessage] object is returned.
+     *
+     * @param webAppQueryId Unique identifier for the query to be answered
+     * @param result Object describing the message to be sent
+     * */
+    suspend fun answerWebAppQuery(
+        webAppQueryId: String,
+        result: InlineQueryResult,
+    ) = request<SentWebAppMessage> {
+        client.post("answerWebAppQuery") {
+            parameter("web_app_query_id", webAppQueryId)
+            parameter("result", result)
         }
     }
 
@@ -2178,586 +2779,6 @@ interface TelegramService2 {
         }
     }.result
 
-    private inline fun <reified T> HttpRequestBuilder.parameter(key: String, value: T?) {
-        when {
-            T::class == String::class -> value?.also { url.parameters.append(key, it as String) }
-            T::class == Int::class -> value?.also { url.parameters.append(key, it.toString()) }
-            T::class == Long::class -> value?.also { url.parameters.append(key, it.toString()) }
-            T::class == Boolean::class -> value?.also { url.parameters.append(key, it.toString()) }
-            T::class == Duration::class -> value?.also { url.parameters.append(key, (it as Duration).inWholeSeconds.toString()) }
-            T::class.java.isEnum -> value?.let {
-                url.parameters.append(key, TelegramApi.json.encodeToString<T>(it).drop(1).dropLast(1))
-            }
-            else -> {
-                value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) }
-            }
-        }
-    }
-
-    private fun HttpRequestBuilder.setMultiPartFormDataBody(vararg files: Pair<String, InputFile?>) {
-        @Suppress("UNCHECKED_CAST")
-        val filtered = files.filter { it.second != null } as List<Pair<String, InputFile>>
-        if (filtered.isEmpty()) return
-
-        setBody(MultiPartFormDataContent(
-            formData {
-                filtered.forEach { data ->
-                    val (name, inputFile) = data
-
-                    when (inputFile) {
-                        is InputFile.File -> append(
-                            name,
-                            InputProvider { inputFile.file.inputStream().asInput() },
-                            Headers.build {
-                                append(HttpHeaders.ContentType, Files.probeContentType(inputFile.file.toPath()))
-                                append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.file.name}\"")
-                            })
-
-                        is InputFile.ByteArray -> append(name, inputFile.byteArray, Headers.build {
-                            append(HttpHeaders.ContentType, inputFile.mimeType)
-                            append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.filename}\"")
-                        })
-
-                        is InputFile.FileIdOrUrl -> append(name, inputFile.value)
-                    }
-                }
-            }
-        ))
-    }
-
-    // missed ----------------------------------------------------------------------------------------------------------
-
-    suspend fun getUpdates(
-        offset: Int? = null,
-        limit: Int? = null,
-        timeout: Int? = null,
-        allowedUpdates: String? = null,
-    ) = request<List<Update>> {
-        client.post("getUpdates") {
-            parameter("offset", offset)
-            parameter("limit", limit)
-            parameter("timeout", timeout)
-            parameter("allowed_updates", allowedUpdates)
-        }
-    }
-
-    suspend fun sendAudio(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        audio: InputFile,
-        caption: String? = null,
-        parseMode: ParseMode? = null,
-        captionEntities: String? = null,
-        duration: Int? = null,
-        performer: String? = null,
-        title: String? = null,
-        thumbnail: NotReusableInputFile? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendAudio") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("duration", duration)
-            parameter("performer", performer)
-            parameter("title", title)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "audio" to audio,
-                "thumbnail" to thumbnail as InputFile
-            )
-        }
-    }
-
-    suspend fun sendDocument(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        document: InputFile,
-        thumbnail: NotReusableInputFile?,
-        caption: String? = null,
-        parseMode: ParseMode? = null,
-        captionEntities: String? = null,
-        disableContentTypeDetection: Boolean? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendDocument") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("disable_content_type_detection", disableContentTypeDetection)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "document" to document,
-                "thumbnail" to thumbnail as InputFile,
-            )
-        }
-    }
-
-    suspend fun sendVideo(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        video: InputFile,
-        duration: Int? = null,
-        width: Int? = null,
-        height: Int? = null,
-        caption: String? = null,
-        parseMode: ParseMode? = null,
-        captionEntities: String? = null,
-        hasSpoiler: Boolean? = null,
-        supportsStreaming: Boolean? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendVideo") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("duration", duration)
-            parameter("width", width)
-            parameter("height", height)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("has_spoiler", hasSpoiler)
-            parameter("supports_streaming", supportsStreaming)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "video" to video
-            )
-        }
-    }
-
-    suspend fun sendAnimation(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        animation: InputFile,
-        duration: Int? = null,
-        width: Int? = null,
-        height: Int? = null,
-        thumbnail: String? = null,
-        caption: String? = null,
-        parseMode: ParseMode? = null,
-        captionEntities: String? = null,
-        hasSpoiler: Boolean? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendAnimation") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("duration", duration)
-            parameter("width", width)
-            parameter("height", height)
-            parameter("thumbnail", thumbnail)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("has_spoiler", hasSpoiler)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "animation" to animation
-            )
-        }
-    }
-
-    suspend fun sendVoice(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        voice: InputFile,
-        caption: String? = null,
-        parseMode: ParseMode? = null,
-        captionEntities: String? = null,
-        duration: Int? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendVoice") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("caption", caption)
-            parameter("parse_mode", parseMode)
-            parameter("caption_entities", captionEntities)
-            parameter("duration", duration)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "voice" to voice
-            )
-        }
-    }
-
-    suspend fun sendVideoNote(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        videoNote: InputFile,
-        duration: Int? = null,
-        length: Int? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendVideoNote") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("duration", duration)
-            parameter("length", length)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "video_note" to videoNote
-            )
-        }
-    }
-
-    /**
-     * Use this method to send a group of photos, videos, documents or audios as an album.
-     * Documents and audio filescan be only grouped in an album with messages of the same type.
-     * On success, an array of Messages that were sent is returned.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-     * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
-     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
-     * */
-    suspend fun sendMediaGroup( // TODO work?
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        media: List<InputMediaGroup>,
-        disableNotification: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        inputFiles: List<InputFile>? = null // docs
-    ) = request<List<Message>> {
-        client.post("sendMediaGroup") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("media", media)
-            parameter("disable_notification", disableNotification)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            if (inputFiles != null) {
-                var lastInputFilesIndex = 0
-
-                println(
-                    buildList {
-                        media.map { inputMedia ->
-                            when(inputMedia) {
-                                is InputMediaGroupWithThumbnail -> {
-                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-                                    if (inputMedia.thumbnail != null) {
-                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
-                                    } else {}
-                                }
-                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-                            }
-                        }
-                    }
-                )
-
-                lastInputFilesIndex = 0
-
-                setMultiPartFormDataBody(
-                    *buildList {
-                        media.map { inputMedia ->
-                            when(inputMedia) {
-                                is InputMediaGroupWithThumbnail -> {
-                                    add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
-                                    if (inputMedia.thumbnail != null) {
-                                        add(inputMedia.thumbnail!!.drop(9) to inputFiles[lastInputFilesIndex++])
-                                    } else {}
-                                }
-                                else -> add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
-                            }
-                        }
-                    }.toTypedArray()
-                )
-            }
-        }
-    }
-
-    suspend fun sendLocation(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        latitude: Double,
-        longitude: Double,
-        horizontalAccuracy: Double? = null,
-        livePeriod: Int? = null,
-        heading: Int? = null,
-        proximityAlertRadius: Int? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendLocation") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("latitude", latitude)
-            parameter("longitude", longitude)
-            parameter("horizontal_accuracy", horizontalAccuracy)
-            parameter("live_period", livePeriod)
-            parameter("heading", heading)
-            parameter("proximity_alert_radius", proximityAlertRadius)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun editMessageLiveLocation(
-        chatId: ChatId? = null,
-        messageId: Int? = null,
-        inlineMessageId: String? = null,
-        latitude: Double,
-        longitude: Double,
-        horizontalAccuracy: Double? = null,
-        heading: Int? = null,
-        proximityAlertRadius: Int? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<LiveLocationResponse> {
-        client.post("editMessageLiveLocation") {
-            parameter("chat_id", chatId)
-            parameter("message_id", messageId)
-            parameter("inline_message_id", inlineMessageId)
-            parameter("latitude", latitude)
-            parameter("longitude", longitude)
-            parameter("horizontal_accuracy", horizontalAccuracy)
-            parameter("heading", heading)
-            parameter("proximity_alert_radius", proximityAlertRadius)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun stopMessageLiveLocation(
-        chatId: ChatId? = null,
-        messageId: Int? = null,
-        inlineMessageId: String? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<LiveLocationResponse> {
-        client.post("stopMessageLiveLocation") {
-            parameter("chat_id", chatId)
-            parameter("message_id", messageId)
-            parameter("inline_message_id", inlineMessageId)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun sendVenue(
-        chatId: ChatId? = null,
-        messageThreadId: Int? = null,
-        latitude: Double,
-        longitude: Double,
-        title: String,
-        address: String,
-        foursquareId: String? = null,
-        foursquareType: String? = null,
-        googlePlaceId: String? = null,
-        googlePlaceType: String? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendVenue") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("latitude", latitude)
-            parameter("longitude", longitude)
-            parameter("title", title)
-            parameter("address", address)
-            parameter("foursquare_id", foursquareId)
-            parameter("foursquare_type", foursquareType)
-            parameter("google_place_id", googlePlaceId)
-            parameter("google_place_type", googlePlaceType)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun sendContact(
-        chatId: ChatId? = null,
-        messageThreadId: Int? = null,
-        phoneNumber: String,
-        firstName: String,
-        lastName: String? = null,
-        vcard: String? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendContact") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("phone_number", phoneNumber)
-            parameter("first_name", firstName)
-            parameter("last_name", lastName)
-            parameter("vcard", vcard)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun sendPoll(
-        chatId: ChatId? = null,
-        messageThreadId: Int? = null,
-        question: String,
-        options: String,
-        isAnonymous: Boolean? = null,
-        type: PollType? = null,
-        allowsMultipleAnswers: Boolean? = null,
-        correctOptionId: Int? = null,
-        explanation: String? = null,
-        explanationParseMode: String? = null,
-        explanationEntities: String? = null,
-        openPeriod: Int? = null,
-        closeDate: Int? = null,
-        isClosed: Boolean? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendPoll") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("question", question)
-            parameter("options", options)
-            parameter("is_anonymous", isAnonymous)
-            parameter("type", type)
-            parameter("allows_multiple_answers", allowsMultipleAnswers)
-            parameter("correct_option_id", correctOptionId)
-            parameter("explanation", explanation)
-            parameter("explanation_parse_mode", explanationParseMode)
-            parameter("explanation_entities", explanationEntities)
-            parameter("open_period", openPeriod)
-            parameter("close_date", closeDate)
-            parameter("is_closed", isClosed)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun sendDice(
-        chatId: ChatId? = null,
-        messageThreadId: Int? = null,
-        emoji: String,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendDice") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("emoji", emoji)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-        }
-    }
-
-    suspend fun sendChatAction(
-        chatId: ChatId,
-        action: ChatAction,
-        messageThreadId: Int? = null,
-    ) = request<Boolean> {
-        client.post("sendChatAction") {
-            parameter("chat_id", chatId)
-            parameter("action", action)
-            parameter("message_thread_id", messageThreadId)
-        }
-    }
-
-    suspend fun sendSticker(
-        chatId: ChatId,
-        messageThreadId: Int? = null,
-        sticker: InputFile,
-        emoji: String? = null,
-        disableNotification: Boolean? = null,
-        protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
-        client.post("sendSticker") {
-            parameter("chat_id", chatId)
-            parameter("message_thread_id", messageThreadId)
-            parameter("emoji", emoji)
-            parameter("disable_notification", disableNotification)
-            parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
-            parameter("reply_markup", keyboardMarkup)
-            setMultiPartFormDataBody(
-                "sticker" to sticker
-            )
-        }
-    }
-
     /**
      * If you sent an invoice requesting a shipping address and the parameter *is_flexible* was specified, the Bot API
      * will send an [Update][Update] with a *shipping_query* field to the bot.
@@ -2809,6 +2830,16 @@ interface TelegramService2 {
             parameter("pre_checkout_query_id", preCheckoutQueryId)
             parameter("ok", ok)
             parameter("error_message", errorMessage)
+        }
+    }
+
+    // TODO docs
+    suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
+
+    // TODO docs
+    suspend fun downloadFile(file: File) = request<InputStream> {
+        client.get("${TelegramApi2.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
+            unauthenticated()
         }
     }
 }

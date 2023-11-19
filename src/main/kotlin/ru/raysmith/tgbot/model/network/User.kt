@@ -4,10 +4,10 @@ package ru.raysmith.tgbot.model.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.core.ApiCaller
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.PhotoSize
+import ru.raysmith.tgbot.network.TelegramService2
 
 /** This object represents a Telegram user or bot. */
 @Serializable
@@ -31,11 +31,7 @@ data class User(
     /** User's or bot's username */
     @SerialName("username") val username: String? = null,
 
-    /**
-     * IETF language tag of the user's language
-     *
-     * @see <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a>
-     * */
+    /** [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag) of the user's language */
     @SerialName("language_code") val languageCode: String? = null,
 
     /** *True*, if this user is a Telegram Premium user */
@@ -56,25 +52,51 @@ data class User(
 
     /**
      * Use this method to get a list of profile pictures for a user. Returns a list of list of [PhotoSize] object.
-     * @param context bot context
+     *
      * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
      * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+     *
+     * @see TelegramService2.getUserProfilePhotos
      * */
-    fun getProfilePhotos(context: ApiCaller, offset: Int? = null, limit: Int? = null): List<List<PhotoSize>> {
-        return context.getUserProfilePhotos(id, offset, limit).photos
+    context(BotContext<*>)
+    suspend fun getProfilePhotos(offset: Int? = null, limit: Int? = null): List<List<PhotoSize>> {
+        return getUserProfilePhotos(id, offset, limit).photos
     }
 
     /**
      * Returns list of list of [PhotoSize] of all profile pictures for a user.
-     * @param context bot context
+     *
+     * @see TelegramService2.getUserProfilePhotos
      * */
-    fun getAllProfilePhotos(context: ApiCaller): List<List<PhotoSize>> = buildList {
+    context(BotContext<*>)
+    suspend fun getAllProfilePhotos(): List<List<PhotoSize>> = buildList {
         var offset = 0
         do {
-            val res = context.getUserProfilePhotos(id, offset)
+            val res = getUserProfilePhotos(id, offset)
             addAll(res.photos)
             offset += 100
         } while (size < res.totalCount)
+    }
+
+    /**
+     * Return full name of the user.
+     *
+     * @param includeUsername If true the nickname will be added in brackets
+     * */
+    fun fullname(includeUsername: Boolean = false): String = buildString {
+        append(firstName)
+        if (lastName != null) {
+            append(" ")
+        }
+        append(lastName ?: "")
+        if (includeUsername && username != null) {
+            if (this.isNotEmpty()) {
+                append(" ")
+            }
+            append("(")
+            append(username)
+            append(")")
+        }
     }
 
 }
