@@ -1,67 +1,60 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
-import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.*
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
-@Serializable
 class MessageReplyKeyboard : MessageKeyboard {
     var isPersistent: Boolean? = null
     var resizeKeyboard: Boolean? = true
     var oneTimeKeyboard: Boolean? = null
     var inputFieldPlaceholder: String? = null
     var selective: Boolean? = null
-    private val rows: MutableList<MessageReplyKeyboardRow> = mutableListOf()
+    private val rows: MutableList<Row> = mutableListOf()
 
     fun row(text: String) = row { button(text) }
-
-    fun row(setRow: MessageReplyKeyboardRow.() -> Unit) {
-        rows.add(
-            MessageReplyKeyboardRow()
-                .apply(setRow)
-        )
+    fun row(setRow: Row.() -> Unit) {
+        rows.add(Row().apply(setRow))
     }
 
     override fun toMarkup(): ReplyKeyboardMarkup {
-        return ReplyKeyboardMarkup(rows.map { it.getRow() }, isPersistent, resizeKeyboard, oneTimeKeyboard, inputFieldPlaceholder, selective).also {
-            println(it)
-        }
+        return ReplyKeyboardMarkup(
+            rows.map { it.buttons.map { b -> b.toKeyboardButton() } }, isPersistent, resizeKeyboard, oneTimeKeyboard,
+            inputFieldPlaceholder, selective
+        )
     }
 
-    @Serializable
-    class MessageReplyKeyboardRow {
-        private val row: MutableList<KeyboardButton> = mutableListOf()
+    class Row : MessageKeyboardRow<Button> {
+        private val _buttons: MutableList<Button> = mutableListOf()
+        override val buttons: List<Button> = _buttons
 
+        override fun button(button: Button) {
+            _buttons.add(button)
+        }
         fun button(text: String) {
-            row.add(
-                MessageReplyKeyboardButton()
-                    .apply { this.text = text }
-                    .toKeyboardButton()
+            _buttons.add(
+                Button().apply {
+                    this.text = text
+                }
             )
         }
-        fun button(setButton: MessageReplyKeyboardButton.() -> Unit) {
-            row.add(
-                MessageReplyKeyboardButton()
-                    .apply(setButton)
-                    .toKeyboardButton()
-            )
+        fun button(setButton: Button.() -> Unit) {
+            _buttons.add(Button().apply(setButton))
         }
 
-        internal fun getRow(): List<KeyboardButton> = row
+        override fun iterator() = buttons.iterator()
+    }
 
-        inner class MessageReplyKeyboardButton {
-            var text: String = ""
-            var requestUser: KeyboardButtonRequestUser? = null
-            var requestChat:  KeyboardButtonRequestChat? = null
-            var requestContact: Boolean? = null
-            var requestLocation: Boolean? = null
-            var requestPoll: KeyboardButtonPollType? = null
-            var webApp: WebAppInfo? = null
+    class Button : MessageKeyboardButton {
+        var text: String = ""
+        var requestUser: KeyboardButtonRequestUser? = null
+        var requestChat:  KeyboardButtonRequestChat? = null
+        var requestContact: Boolean? = null
+        var requestLocation: Boolean? = null
+        var requestPoll: KeyboardButtonPollType? = null
+        var webApp: WebAppInfo? = null
 
-            internal fun toKeyboardButton(): KeyboardButton {
-                require(text.isNotEmpty()) { "Button text must be is not empty" }
-                return KeyboardButton(text, requestUser, requestChat, requestContact, requestLocation, requestPoll, webApp)
-            }
+        override fun toKeyboardButton(): KeyboardButton {
+            return KeyboardButton(text, requestUser, requestChat, requestContact, requestLocation, requestPoll, webApp)
         }
     }
 }

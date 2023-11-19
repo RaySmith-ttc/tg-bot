@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
-import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -8,13 +7,12 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.utils.Pagination
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
-// TODO remove serializable & row & button; move inner classes
-@Serializable
-class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardRow> = mutableListOf()) : MessageKeyboard, Iterable<MessageInlineKeyboard.MessageInlineKeyboardRow> {
-    fun getRows(): List<MessageInlineKeyboardRow> = rows
+class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Row> {
+    private val _rows: MutableList<Row> = mutableListOf()
+    val rows: List<Row> = _rows
 
     override fun toMarkup(): KeyboardMarkup {
-        return InlineKeyboardMarkup(rows.map { it.getRow().map { b -> b.toKeyboardButton() } })
+        return InlineKeyboardMarkup(_rows.map { it.buttons.map { b -> b.toKeyboardButton() } })
     }
 
     fun <T> pagination(
@@ -22,7 +20,7 @@ class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardR
         callbackQueryPrefix: String,
         page: Long = Pagination.PAGE_FIRST,
         setup: Pagination<T>.() -> Unit = {},
-        createButtons: MessageInlineKeyboardRow.(item: T) -> Unit
+        createButtons: Row.(item: T) -> Unit
     ) {
         Pagination(data, callbackQueryPrefix, createButtons)
             .apply(setup)
@@ -34,58 +32,55 @@ class MessageInlineKeyboard(private val rows: MutableList<MessageInlineKeyboardR
         datePicker.setupMarkup(this, data)
     }
 
-    fun row(row: MessageInlineKeyboardRow) = rows.add(row)
+    fun row(row: Row) = _rows.add(row)
     fun row(text: String, callbackData: String) = row { button(text, callbackData) }
-    fun row(setRow: MessageInlineKeyboardRow.() -> Unit) {
-        rows.add(
-            MessageInlineKeyboardRow()
+    fun row(setRow: Row.() -> Unit) {
+        _rows.add(
+            Row()
                 .apply(setRow)
         )
     }
 
-    @Serializable
-    class MessageInlineKeyboardRow : MessageKeyboardRow<MessageInlineKeyboardRow.MessageInlineKeyboardButton> {
-        private val row: MutableList<MessageInlineKeyboardButton> = mutableListOf()
+    class Row : MessageKeyboardRow<Button> {
+        private val _buttons: MutableList<Button> = mutableListOf()
+        override val buttons: List<Button> = _buttons
 
-        override fun getRow(): List<MessageInlineKeyboardButton> = row
-
-        override fun button(button: MessageInlineKeyboardButton) {
-            row.add(button)
+        override fun button(button: Button) {
+            _buttons.add(button)
         }
         fun button(text: String, callbackData: String) {
-            row.add(
-                MessageInlineKeyboardButton().apply {
-                    this.text = text;
+            _buttons.add(
+                Button().apply {
+                    this.text = text
                     this.callbackData = callbackData
                 }
             )
         }
-        fun button(setButton: MessageInlineKeyboardButton.() -> Unit) {
-            row.add(MessageInlineKeyboardButton().apply(setButton))
+        fun button(setButton: Button.() -> Unit) {
+            _buttons.add(Button().apply(setButton))
         }
 
-        override fun iterator(): Iterator<MessageInlineKeyboardButton> = row.iterator()
+        override fun iterator(): Iterator<Button> = buttons.iterator()
+    }
 
-        @Serializable
-        class MessageInlineKeyboardButton : MessageKeyboardButton {
-            var text: String = ""
-            var url: String? = null
-            var loginUrl: String? = null
-            var callbackData: String? = null
-            var webApp: WebAppInfo? = null
-            var switchInlineQuery: String? = null
-            var switchInlineQueryCurrentChat: String? = null
-            var switchInlineQueryChosenChat: String? = null
-            var pay: Boolean? = null
+    class Button : MessageKeyboardButton {
+        var text: String = ""
+        var url: String? = null
+        var loginUrl: String? = null
+        var callbackData: String? = null
+        var webApp: WebAppInfo? = null
+        var switchInlineQuery: String? = null
+        var switchInlineQueryCurrentChat: String? = null
+        var switchInlineQueryChosenChat: String? = null
+        var pay: Boolean? = null
 
-            override fun toKeyboardButton(): InlineKeyboardButton {
-                return InlineKeyboardButton(
-                    text, url, callbackData, webApp, loginUrl, switchInlineQuery, switchInlineQueryCurrentChat,
-                    switchInlineQueryChosenChat, pay
-                )
-            }
+        override fun toKeyboardButton(): InlineKeyboardButton {
+            return InlineKeyboardButton(
+                text, url, callbackData, webApp, loginUrl, switchInlineQuery, switchInlineQueryCurrentChat,
+                switchInlineQueryChosenChat, pay
+            )
         }
     }
 
-    override fun iterator(): Iterator<MessageInlineKeyboardRow> = rows.iterator()
+    override fun iterator(): Iterator<Row> = _rows.iterator()
 }

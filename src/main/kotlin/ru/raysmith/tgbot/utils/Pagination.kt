@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.CallbackQuery
 class Pagination<T>(
     private val data: Iterable<T>,
     private val callbackQueryPrefix: String,
-    private val createButtons: MessageInlineKeyboard.MessageInlineKeyboardRow.(item: T) -> Unit
+    private val createButtons: MessageInlineKeyboard.Row.(item: T) -> Unit
 ) {
 
     companion object {
@@ -58,27 +58,27 @@ class Pagination<T>(
         keyboard.addRows(startPage, createButtons)
     }
 
-    private fun MessageInlineKeyboard.addRows(pageN: Long, createButtons: MessageInlineKeyboard.MessageInlineKeyboardRow.(item: T) -> Unit) {
+    private fun MessageInlineKeyboard.addRows(pageN: Long, createButtons: MessageInlineKeyboard.Row.(item: T) -> Unit) {
         val dataCount = if (data is SizedIterable) data.count() else data.count().toLong()
         if (dataCount == 0L) return
-        val totalPages = ((dataCount / (rows * columns)) + if (dataCount % (rows * columns) != 0L) 1 else 0)
+        val totalPages = ((dataCount / (this@Pagination.rows * columns)) + if (dataCount % (this@Pagination.rows * columns) != 0L) 1 else 0)
         val page: Long = when (pageN) {
             PAGE_FIRST -> 1L
             PAGE_LAST -> totalPages
             else -> if (totalPages < pageN) totalPages else if (pageN < 1) 1 else pageN
         }
 
-        val offset = (page - 1) * rows * columns
+        val offset = (page - 1) * this@Pagination.rows * columns
         val dataList = this@Pagination.data.let {
             if (it is SizedIterable) {
-                it.limit(rows * columns, offset).toList()
+                it.limit(this@Pagination.rows * columns, offset).toList()
             } else it.toList()
         }
 
-        val lastIndex = (offset + rows * columns) - 1
+        val lastIndex = (offset + this@Pagination.rows * columns) - 1
         val isLastPage = lastIndex > dataCount - 1
         val range = if (data is SizedIterable) {
-            LongRange(0, (rows * columns).toLong())
+            LongRange(0, (this@Pagination.rows * columns).toLong())
         } else {
             LongRange(offset, if (isLastPage) dataCount - 1L else lastIndex)
         }

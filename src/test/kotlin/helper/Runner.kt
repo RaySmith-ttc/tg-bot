@@ -16,7 +16,6 @@ import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.asChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
@@ -60,7 +59,7 @@ import java.io.IOException
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
-val locations = true
+val locations = false
 val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
@@ -905,13 +904,13 @@ class Runner {
                     isCommand("keybloard") {
                         send {
                             text = "test"
-                            keyboardMarkup = MessageInlineKeyboard(buildInlineKeyboard {
+                            keyboardMarkup = buildInlineKeyboard {
                                 row("1", "1")
                                 row {
                                     button("2", "2")
                                     button("3", "3")
                                 }
-                            }.filter { it.getRow().size == 1 }.toMutableList())
+                            }
                         }
                     }
 
