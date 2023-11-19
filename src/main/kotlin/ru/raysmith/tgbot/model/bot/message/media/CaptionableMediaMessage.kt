@@ -12,14 +12,14 @@ import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.toRequestBody
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.noimpl
 
 abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>, KeyboardCreator {
 
     companion object {
         internal fun instance(
-            service: TelegramService2, mediaName: String = "",
+            service: API, mediaName: String = "",
             send: (chatId: ChatId) -> Message = { noimpl() }
         ): CaptionableMediaMessage {
             return object : CaptionableMediaMessage() {

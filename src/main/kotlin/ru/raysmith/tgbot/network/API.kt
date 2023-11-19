@@ -45,7 +45,7 @@ import java.io.InputStream
 import java.time.ZonedDateTime
 import kotlin.time.Duration
 
-interface TelegramService2 {
+interface API {
     val client: HttpClient
 
     private suspend inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T {
@@ -63,7 +63,7 @@ interface TelegramService2 {
             throw BotException("Bot is unauthorized with token")
         } else {
             val error = response.body<Error>()
-            throw TelegramApiException2(error, response.request)
+            throw TelegramApiException(error, response.request)
         }
     }
 
@@ -452,7 +452,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendDocument(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -487,7 +486,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendVideo(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -528,7 +526,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendAnimation(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -569,7 +566,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendVoice(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -602,7 +598,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendVideoNote(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -698,7 +693,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendLocation(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -731,7 +725,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendVenue(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
@@ -768,7 +761,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendContact(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
@@ -797,7 +789,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendPoll(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
@@ -842,7 +833,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendDice(
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
@@ -865,7 +855,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendChatAction(
         chatId: ChatId,
         action: ChatAction,
@@ -2081,7 +2070,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun editMessageLiveLocation(
         chatId: ChatId? = null,
         messageId: Int? = null,
@@ -2106,7 +2094,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun stopMessageLiveLocation(
         chatId: ChatId? = null,
         messageId: Int? = null,
@@ -2191,7 +2178,6 @@ interface TelegramService2 {
         }
     }
 
-    // TODO
     suspend fun sendSticker(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -2833,12 +2819,10 @@ interface TelegramService2 {
         }
     }
 
-    // TODO docs
     suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
 
-    // TODO docs
     suspend fun downloadFile(file: File) = request<InputStream> {
-        client.get("${TelegramApi2.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
+        client.get("${TelegramApi.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
             unauthenticated()
         }
     }

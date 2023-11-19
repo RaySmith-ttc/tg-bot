@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.toChatId
 
 /** This object represents a chat. */
@@ -40,7 +40,7 @@ data class Chat(
      * */
     @SerialName("is_forum") val isForum: Boolean? = null,
 
-    /** Chat photo. Returned only in [getChat][TelegramService2.getChat]. */
+    /** Chat photo. Returned only in [getChat][API.getChat]. */
     @SerialName("photo") val photo: ChatPhoto? = null,
 
     /**
@@ -178,7 +178,7 @@ data class Chat(
      * If False, the user will be able to see messages in the group that were sent before the user was removed.
      * Always True for supergroups and channels.
      *
-     * @see TelegramService2.banChatMember
+     * @see API.banChatMember
      * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
     context(BotContext<*>)
@@ -197,7 +197,7 @@ data class Chat(
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
      *
-     * @see TelegramService2.unbanChatMember
+     * @see API.unbanChatMember
      * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
     context(BotContext<*>)

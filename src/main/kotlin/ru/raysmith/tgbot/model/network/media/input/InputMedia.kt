@@ -41,6 +41,13 @@ sealed class InputMedia {
 @Serializable
 sealed class InputMediaGroup : InputMedia()
 
+/**
+ * This object represents the content of a media message with thumbnail to be sent. It should be one of
+ *
+ * - [InputMediaDocument]
+ * - [InputMediaAudio]
+ * - [InputMediaVideo]
+ * */
 @Polymorphic
 @Serializable
 sealed class InputMediaGroupWithThumbnail : InputMediaGroup() {

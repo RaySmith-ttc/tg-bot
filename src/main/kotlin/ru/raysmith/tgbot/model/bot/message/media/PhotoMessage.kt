@@ -25,6 +25,6 @@ class PhotoMessage(override val client: HttpClient) : CaptionableMediaMessage(),
         protectContent = protectContent,
         replyToMessageId = replyToMessageId,
         allowSendingWithoutReply = allowSendingWithoutReply,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
+        replyMarkup = keyboardMarkup?.toMarkup()
     )
 }

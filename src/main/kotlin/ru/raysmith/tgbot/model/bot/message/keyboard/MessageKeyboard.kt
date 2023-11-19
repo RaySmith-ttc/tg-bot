@@ -5,12 +5,12 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
-import ru.raysmith.tgbot.network.TelegramApi2
+import ru.raysmith.tgbot.network.TelegramApi
 
 @KeyboardDsl
 interface MessageKeyboard {
     fun toMarkup(): KeyboardMarkup?
-    fun toJson() = TelegramApi2.json.encodeToString(toMarkup())
+    fun toJson() = TelegramApi.json.encodeToString(toMarkup())
 
     companion object {
         fun of(keyboardMarkup: KeyboardMarkup) = when(keyboardMarkup) {

@@ -45,8 +45,8 @@ import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi2
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
+import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
@@ -61,7 +61,7 @@ import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
 val locations = true
-val prettyPrintJson = Json(TelegramApi2.json) {
+val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
 }
@@ -78,8 +78,8 @@ suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
 
 var loc: String = "menu"
 
-val newApi = object : TelegramService2 {
-    override val client: HttpClient = TelegramApi2.defaultClient()
+val newApi = object : API {
+    override val client: HttpClient = TelegramApi.defaultClient()
 }
 
 var lookPollAnswers = false
@@ -951,11 +951,11 @@ class Runner {
                     isCommand("serialize") {
                         val string = buildInlineKeyboard {
                             row("title", "query")
-                        }.let { TelegramApi2.json.encodeToString(it) }
+                        }.let { TelegramApi.json.encodeToString(it) }
 
                         send {
                             text = string
-                            keyboardMarkup = TelegramApi2.json.decodeFromString(string)
+                            keyboardMarkup = TelegramApi.json.decodeFromString(string)
                         }
                     }
 

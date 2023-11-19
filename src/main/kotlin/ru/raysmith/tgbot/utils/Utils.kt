@@ -24,7 +24,7 @@ internal fun KSerializer<*>.getJsonObject(element: JsonObject, field: String) =
 
 fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.client, withChatId)
 fun botContext(token: String, withChatId: ChatId? = null) =
-    createBotContext(TelegramApi2.defaultClient(token), withChatId)
+    createBotContext(TelegramApi.defaultClient(token), withChatId)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -44,7 +44,7 @@ inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContex
  * */
 @BotContextDsl
 inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
-    botContext(TelegramApi2.defaultClient(token), withChatId, block)
+    botContext(TelegramApi.defaultClient(token), withChatId, block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -54,13 +54,13 @@ inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotC
  * */
 @BotContextDsl
 inline fun <T> botContext(
-    client: HttpClient = TelegramApi2.defaultClientInstance,
+    client: HttpClient = TelegramApi.defaultClientInstance,
     withChatId: ChatId? = null,
     block: BotContext<UnknownEventHandler>.() -> T
 ) = createBotContext(client, withChatId).let(block)
 
 fun createBotContext(
-    client: HttpClient = TelegramApi2.defaultClientInstance,
+    client: HttpClient = TelegramApi.defaultClientInstance,
     withChatId: ChatId? = null,
 ) = object : BotContext<UnknownEventHandler> {
     override val client = client
@@ -78,7 +78,7 @@ internal fun noimpl(): Nothing = throw NotImplementedError()
 /**
  * Returns sticker name with base [name] appended with `_by_<bot_username>`
  *
- * @param bot current bot for getting [Bot.me]. If it is null then [getMe][TelegramService2.getMe] was called
+ * @param bot current bot for getting [Bot.me]. If it is null then [getMe][API.getMe] was called
  * */
 // TODO can move me to the context?
 suspend fun <T : EventHandler> BotContext<T>.stickerSetName(name: String, bot: Bot? = null) =

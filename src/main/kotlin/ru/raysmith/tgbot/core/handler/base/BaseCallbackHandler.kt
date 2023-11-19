@@ -4,11 +4,11 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.handler.ICallbackHandler
 import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
 /** Base implementation of query callback handler */
 abstract class BaseCallbackHandler(open val query: CallbackQuery, override val client: HttpClient) :
-    ICallbackHandler, TelegramService2 {
+    ICallbackHandler, API {
     var isAnswered = false
 
     suspend fun answer(text: String) = answer { this.text = text }

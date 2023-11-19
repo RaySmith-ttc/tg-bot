@@ -7,11 +7,11 @@ import ru.raysmith.tgbot.model.bot.message.media.*
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
 // TODO add docs for methods
 /** Represent an object that can send messages */
-interface ISender : ChatIdHolder, TelegramService2 {
+interface ISender : ChatIdHolder, API {
 
     suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
         return TextMessage(client).apply { message() }.send(chatId)

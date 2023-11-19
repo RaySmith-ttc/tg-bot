@@ -1,12 +1,8 @@
 package ru.raysmith.tgbot.model.network.sticker
 
-import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
-import ru.raysmith.tgbot.network.TelegramApi2
-import ru.raysmith.tgbot.network.TelegramService
-import ru.raysmith.tgbot.utils.errorBody
 
 /** Builder of [addStickerSet][BotContext.addStickerToSet] request */
 open class AddStickerInStickerSet(
@@ -29,13 +25,6 @@ open class AddStickerInStickerSet(
     val sticker: InputSticker
 ) : MediaRequest() {
 
-    internal fun add(service: TelegramService): Boolean {
-        val stickerJson = TelegramApi2.json.encodeToString(sticker.toSerializable { getMedia(it, "sticker") })
-
-        return if (multipartBodyParts.isNotEmpty()) {
-            service.addStickerToSet(userId, name, stickerJson, multipartBodyParts.getOrNull(0))
-        } else {
-            service.addStickerToSet(userId, name, stickerJson)
-        }.execute().body()?.result ?: errorBody()
-    }
+    context(BotContext<*>)
+    internal suspend fun add() = addStickerToSet(userId, name, sticker)
 }

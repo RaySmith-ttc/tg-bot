@@ -24,7 +24,7 @@ internal object NetworkUtils {
     val EnumConverter = Converter<Enum<*>, String> { it.name.lowercase() }
 
     fun <T> jsonConverter(block: () -> KSerializer<T>) =
-        Converter<T, String> { TelegramApi2.json.encodeToString(block(), it) }
+        Converter<T, String> { TelegramApi.json.encodeToString(block(), it) }
 
     private inline fun <reified A : Annotation> Enum<*>.getEnumFieldAnnotation(): A? =
         javaClass.getDeclaredField(name).getAnnotation(A::class.java)

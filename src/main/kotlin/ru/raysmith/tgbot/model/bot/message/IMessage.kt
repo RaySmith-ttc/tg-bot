@@ -2,9 +2,9 @@ package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
-interface IMessage<T> : TelegramService2 {
+interface IMessage<T> : API {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
         const val MAX_CAPTION_LENGTH = 1024

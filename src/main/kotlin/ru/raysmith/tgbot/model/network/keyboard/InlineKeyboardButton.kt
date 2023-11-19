@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
 interface IKeyboardButton
 /** This object represents one button of an inline keyboard. You **must** use exactly one of the optional fields. */
@@ -25,7 +25,7 @@ data class InlineKeyboardButton(
     /**
      * Description of the [Web App](https://core.telegram.org/bots/webapps) that will be launched when the user
      * presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method
-     * [answerWebAppQuery][TelegramService2.answerWebAppQuery].
+     * [answerWebAppQuery][API.answerWebAppQuery].
      * Available only in private chats between a user and the bot.
      * */
     @SerialName("web_app") val webApp: WebAppInfo? = null,

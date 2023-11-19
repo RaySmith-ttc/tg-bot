@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.PhotoSize
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
 /** This object represents a Telegram user or bot. */
 @Serializable
@@ -56,7 +56,7 @@ data class User(
      * @param offset Sequential number of the first photo to be returned. By default, all photos are returned.
      * @param limit Limits the number of photos to be retrieved. Values between 1-100 are accepted. Defaults to 100.
      *
-     * @see TelegramService2.getUserProfilePhotos
+     * @see API.getUserProfilePhotos
      * */
     context(BotContext<*>)
     suspend fun getProfilePhotos(offset: Int? = null, limit: Int? = null): List<List<PhotoSize>> {
@@ -66,7 +66,7 @@ data class User(
     /**
      * Returns list of list of [PhotoSize] of all profile pictures for a user.
      *
-     * @see TelegramService2.getUserProfilePhotos
+     * @see API.getUserProfilePhotos
      * */
     context(BotContext<*>)
     suspend fun getAllProfilePhotos(): List<List<PhotoSize>> = buildList {

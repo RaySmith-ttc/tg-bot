@@ -10,11 +10,11 @@ import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.Pagination
 
 /** Represent an object that can edit messages */
-interface IEditor : ChatIdHolder, TelegramService2 {
+interface IEditor : ChatIdHolder, API {
 
     /** Identifier of the message to be edited */
     var messageId: Int?

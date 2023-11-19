@@ -5,11 +5,11 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramService
+import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 
-/** Represent a simple message with a text to be sent or edit using the [sendMessage][TelegramService.sendMessage] method */
+/** Represent a simple message with a text to be sent or edit using the [sendMessage][API.sendMessage] method */
 @TextMessageDsl
 class TextMessage(override val client: HttpClient) :
     MessageWithReplyMarkup {

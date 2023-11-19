@@ -10,8 +10,8 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
+import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.botContext
 
 /** This object represents a message. */
@@ -326,11 +326,11 @@ data class Message(
      *
      * Returns *True* on Success.
      * */
-    suspend fun delete(context: TelegramService2) = context.deleteMessage(chat.id, messageId)
+    suspend fun delete(context: API) = context.deleteMessage(chat.id, messageId)
     suspend fun delete(token: String) = delete(botContext(token))
 
     /** A safe version of the [delete] method that swallows a [TelegramApiException]. Return true if message success deleted */
-    suspend fun safeDelete(context: TelegramService2) = try { delete(context) } catch (e: TelegramApiException) { false }
+    suspend fun safeDelete(context: API) = try { delete(context) } catch (e: TelegramApiException) { false }
     suspend fun safeDelete(token: String) = safeDelete(botContext(token))
 
 }

@@ -11,9 +11,9 @@ import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.TelegramApi2
+import ru.raysmith.tgbot.network.API
+import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
@@ -46,7 +46,7 @@ class Bot(
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     private var lastUpdateId: Int? = null, // TODO can be negative, reverse mode?
-) : TelegramService2 {
+) : API {
 
     init {
         check(timeout >= 0) { "timeout should be positive" }
@@ -63,7 +63,7 @@ class Bot(
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
-    override val client: HttpClient = token?.let { TelegramApi2.defaultClient(it) } ?: TelegramApi2.defaultClient()
+    override val client: HttpClient = token?.let { TelegramApi.defaultClient(it) } ?: TelegramApi.defaultClient()
 
     // states
     var isActive = false
@@ -82,7 +82,7 @@ class Bot(
     }
     
     private var needRefreshMe = false
-    /** Api call result of [getMe][TelegramService2.getMe] method */
+    /** Api call result of [getMe][API.getMe] method */
     @get:JvmName("getMeProp")
     val me by MeDelegate(needRefreshMe) { needRefreshMe = it }
 

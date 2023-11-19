@@ -5,11 +5,11 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.network.TelegramApi2
+import ru.raysmith.tgbot.network.TelegramApi
 import java.util.*
 
 internal fun List<UpdateType>.asParameter(): String {
-    return TelegramApi2.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
+    return TelegramApi.json.encodeToJsonElement(ListSerializer(UpdateType.serializer()), this).toString()
 }
 
 internal fun Properties?.getOrDefault(key: String, default: String) = this?.getOrDefault(key, default)?.toString() ?: default

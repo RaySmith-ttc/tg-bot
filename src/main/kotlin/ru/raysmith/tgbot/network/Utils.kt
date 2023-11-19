@@ -17,10 +17,10 @@ internal inline fun <reified T> HttpRequestBuilder.parameter(key: String, value:
         T::class == Boolean::class -> value?.also { url.parameters.append(key, it.toString()) }
         T::class == Duration::class -> value?.also { url.parameters.append(key, (it as Duration).inWholeSeconds.toString()) }
         T::class.java.isEnum -> value?.let {
-            url.parameters.append(key, TelegramApi2.json.encodeToString<T>(it).drop(1).dropLast(1))
+            url.parameters.append(key, TelegramApi.json.encodeToString<T>(it).drop(1).dropLast(1))
         }
         else -> {
-            value?.let { url.parameters.append(key, TelegramApi2.json.encodeToString<T>(it)) }
+            value?.let { url.parameters.append(key, TelegramApi.json.encodeToString<T>(it)) }
         }
     }
 }

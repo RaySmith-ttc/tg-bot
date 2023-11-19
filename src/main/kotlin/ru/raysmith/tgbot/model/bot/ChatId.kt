@@ -12,7 +12,6 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
-// TODO docs
 @Polymorphic
 @Serializable(with = ChatIdSerializer::class)
 sealed class ChatId {

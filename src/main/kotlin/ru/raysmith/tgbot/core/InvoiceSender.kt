@@ -10,10 +10,10 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
-import ru.raysmith.tgbot.network.TelegramService2
+import ru.raysmith.tgbot.network.API
 
 /** Builder of [sendInvoice][BotContext.sendInvoice] request */
-class InvoiceSender(override val client: HttpClient) : InlineKeyboardCreator, TelegramService2 {
+class InvoiceSender(override val client: HttpClient) : InlineKeyboardCreator, API {
 
     var messageThreadId: Int? = null
     var title: String? = null
@@ -74,7 +74,7 @@ class InvoiceSender(override val client: HttpClient) : InlineKeyboardCreator, Te
 }
 
 /** Builder of [sendInvoice][BotContext.createInvoiceLink] request */
-class InvoiceCreateLinkSender(override val client: HttpClient) : TelegramService2 {
+class InvoiceCreateLinkSender(override val client: HttpClient) : API {
 
     var title: String? = null
     var description: String? = null
