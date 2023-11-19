@@ -11,10 +11,12 @@ import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.*
+import ru.raysmith.tgbot.network.TelegramApi
+import ru.raysmith.tgbot.network.TelegramApi2
+import ru.raysmith.tgbot.network.TelegramApiException
+import ru.raysmith.tgbot.network.TelegramService2
 import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
-import ru.raysmith.tgbot.utils.errorBody
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsDSL
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
@@ -71,10 +73,6 @@ class Bot(
     companion object {
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
 
-        /** Api call result of [getMe][TelegramService.getMe] method */
-        @Deprecated("This constant returns the bot for a default service instance. Use the getMe() method from bot context", ReplaceWith("botContext { getMe() }"))
-        val ME by lazy { TelegramApi.service.getMe().execute().body()?.result ?: errorBody() }
-
         internal var properties = getProperties()
         @JvmName("getPropertiesFromFile")
         internal fun getProperties(): Properties? {
@@ -85,9 +83,9 @@ class Bot(
     }
     
     private var needRefreshMe = false
+    /** Api call result of [getMe][TelegramService2.getMe] method */
     @get:JvmName("getMeProp")
-    var me by MeDelegate(needRefreshMe)
-        private set
+    val me by MeDelegate(needRefreshMe) { needRefreshMe = it }
 
     init {
         if (token != null) {

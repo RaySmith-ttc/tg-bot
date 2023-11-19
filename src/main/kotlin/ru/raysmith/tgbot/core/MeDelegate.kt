@@ -4,12 +4,13 @@ import kotlinx.coroutines.runBlocking
 import ru.raysmith.tgbot.model.network.User
 import kotlin.reflect.KProperty
 
-internal class MeDelegate(var needRefreshMe: Boolean) {
+internal class MeDelegate(val needRefreshMe: Boolean, val updateNeedRefreshMe: (Boolean) -> Unit) {
     var meCache: User? = null
+
     operator fun getValue(bot: Bot, property: KProperty<*>): User {
         if (needRefreshMe || meCache == null) {
             meCache = runBlocking { bot.getMe() }
-            needRefreshMe = false
+            updateNeedRefreshMe(false)
         }
         
         return meCache!!
