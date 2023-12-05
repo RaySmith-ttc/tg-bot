@@ -55,11 +55,11 @@ class Bot(
     private var stoppingJob: Job? = null
 
     // callbacks
-    private var onError: (e: Exception) -> Unit = { }
-    private var onUpdate: (updates: List<Update>) -> Unit = { }
-    private var onMessageSend: (message: Message) -> Unit = { }
-    private var onStart: Bot.() -> Unit = { }
-    private var onStop: Bot.(handler: CommandHandler?) -> Unit = { }
+    private var onError: suspend (e: Exception) -> Unit = { }
+    private var onUpdate: suspend (updates: List<Update>) -> Unit = { }
+    private var onMessageSend: suspend (message: Message) -> Unit = { }
+    private var onStart: suspend Bot.() -> Unit = { }
+    private var onStop: suspend Bot.(handler: CommandHandler?) -> Unit = { }
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
@@ -225,7 +225,7 @@ class Bot(
         }
     }
 
-    private fun safeOnError(e: Exception) {
+    private suspend fun safeOnError(e: Exception) {
         try {
             onError(e)
         } catch (e: Exception) {
@@ -320,23 +320,23 @@ class Bot(
         return this
     }
 
-    fun onError(onError: (e: Exception) -> Unit): Bot {
+    fun onError(onError: suspend (e: Exception) -> Unit): Bot {
         this.onError = onError
         return this
     }
 
-    fun onStop(onStop: Bot.(handler: CommandHandler?) -> Unit): Bot {
+    fun onStop(onStop: suspend Bot.(handler: CommandHandler?) -> Unit): Bot {
         this.onStop = onStop
         return this
     }
 
 
-    fun onStart(onStart: Bot.() -> Unit): Bot {
+    fun onStart(onStart: suspend Bot.() -> Unit): Bot {
         this.onStart = onStart
         return this
     }
 
-    fun onUpdate(onUpdate: (updates: List<Update>) -> Unit): Bot {
+    fun onUpdate(onUpdate: suspend (updates: List<Update>) -> Unit): Bot {
         this.onUpdate = onUpdate
         return this
     }
@@ -358,7 +358,7 @@ class Bot(
         return this
     }
 
-    fun onMessageSend(onMessageSend: (message: Message) -> Unit): Bot {
+    fun onMessageSend(onMessageSend: suspend (message: Message) -> Unit): Bot {
         this.onMessageSend = onMessageSend
         return this
     }

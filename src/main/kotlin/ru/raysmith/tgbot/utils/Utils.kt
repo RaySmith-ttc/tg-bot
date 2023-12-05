@@ -11,7 +11,8 @@ import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.*
+import ru.raysmith.tgbot.network.API
+import ru.raysmith.tgbot.network.TelegramApi
 
 // should never be called
 internal fun errorBody(): Nothing = throw NullPointerException("The method did not return a body")
@@ -33,7 +34,7 @@ fun botContext(token: String, withChatId: ChatId? = null) =
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
 @BotContextDsl
-inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
+suspend inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, crossinline block: suspend BotContext<UnknownEventHandler>.() -> T) =
     botContext(bot.client, withChatId, block)
 
 /**
@@ -43,21 +44,20 @@ inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, block: BotContex
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
 @BotContextDsl
-inline fun <T> botContext(token: String, withChatId: ChatId? = null, block: BotContext<UnknownEventHandler>.() -> T) =
+suspend inline fun <T> botContext(token: String, withChatId: ChatId? = null, crossinline block: suspend BotContext<UnknownEventHandler>.() -> T) =
     botContext(TelegramApi.defaultClient(token), withChatId, block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
  *
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
- * @param service Telegram service with a bot token
  * */
 @BotContextDsl
-inline fun <T> botContext(
+suspend inline fun <T> botContext(
     client: HttpClient = TelegramApi.defaultClientInstance,
     withChatId: ChatId? = null,
-    block: BotContext<UnknownEventHandler>.() -> T
-) = createBotContext(client, withChatId).let(block)
+    crossinline block: suspend BotContext<UnknownEventHandler>.() -> T
+) = block(createBotContext(client, withChatId))
 
 fun createBotContext(
     client: HttpClient = TelegramApi.defaultClientInstance,

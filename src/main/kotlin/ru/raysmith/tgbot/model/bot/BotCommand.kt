@@ -7,12 +7,12 @@ package ru.raysmith.tgbot.model.bot
  * */
 class BotCommand(val commandText: String) {
 
-    /** Command text without mention. For example, /start */
+    /** Command text without mention. For example, for command `/start` the [body] would be `start` */
     val body: String = commandText.substring(1, getArgsStartIndex()).let {
         if (it.contains("@")) it.substring(0, it.indexOf("@")) else it
     }.trim()
 
-    /** Bot mention in the command without `@` symbol. For example, for command `@BotFather /start` [mention] would be `BotFather` */
+    /** Bot mention in the command without `@` symbol. For example, for command `@BotFather /start` the [mention] would be `BotFather` */
     val mention = commandText.let {
         if (it.startsWith("@")) it.substring(1, getArgsStartIndex()) else null
     }

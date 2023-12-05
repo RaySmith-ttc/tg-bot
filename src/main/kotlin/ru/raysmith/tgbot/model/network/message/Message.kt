@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.message
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
@@ -10,9 +11,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
-import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.utils.botContext
 
 /** This object represents a message. */
 @Serializable
@@ -326,11 +325,11 @@ data class Message(
      *
      * Returns *True* on Success.
      * */
-    suspend fun delete(context: API) = context.deleteMessage(chat.id, messageId)
-    suspend fun delete(token: String) = delete(botContext(token))
+    context(BotContext<*>)
+    suspend fun delete() = deleteMessage(chat.id, messageId)
 
     /** A safe version of the [delete] method that swallows a [TelegramApiException]. Return true if message success deleted */
-    suspend fun safeDelete(context: API) = try { delete(context) } catch (e: TelegramApiException) { false }
-    suspend fun safeDelete(token: String) = safeDelete(botContext(token))
+    context(BotContext<*>)
+    suspend fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }
 
 }
