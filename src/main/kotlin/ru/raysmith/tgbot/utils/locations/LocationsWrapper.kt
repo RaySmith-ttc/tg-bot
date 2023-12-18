@@ -60,6 +60,7 @@ class LocationsWrapper<L : LocationConfig> {
         })
     }
     
+    // TODO remove creating config; calling handler
     fun allowedUpdates(): Set<UpdateType> {
         val config = configCreator(Update(0))
         val locationUpdates = locations.map { it.value.handlerFactory.allowedUpdates }.flatten()

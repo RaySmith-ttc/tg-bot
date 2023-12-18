@@ -139,8 +139,8 @@ class Bot(
                     blockingTime = measureTimeMillis {
                         logger.debug("Wait end blocking for {}...", it)
                         job.join()
-                        logger.debug("Release blocking for {} after {} ms.", it, blockingTime)
                     }
+                    logger.debug("Release blocking for {} after {} ms.", it, blockingTime)
                 }
             }
         }
@@ -159,7 +159,7 @@ class Bot(
                     } else {
                         eventHandlerFactory.getHandler(update, service, fileService)
                     }
-                    
+
                     with(handler) {
                         if (this is CommandHandler && command.body == shutdownCommand) {
                             val chatId = update.message?.chat?.id?.value
@@ -169,7 +169,7 @@ class Bot(
                             stop(this)
                             return@with
                         }
-    
+
                         handle()
                     }
                 } catch (e: Exception) {

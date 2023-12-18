@@ -7,7 +7,7 @@ kotlinx-datetime = "0.4.0"
 
 ktor = "2.3.4"
 
-exposed = "0.41.1"
+exposed = "0.45.0"
 
 utils = "2.1.0"
 
