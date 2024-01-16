@@ -38,7 +38,7 @@ class DatePicker(val callbackQueryPrefix: String) {
     var messageText: MessageText.(data: String?, state: DatePickerState) -> Unit = { _, _ -> text("Pick the date") }
 
     var additionalRowsPosition: AdditionalRowsPosition = AdditionalRowsPosition.BOTTOM
-    var additionalRows: MessageInlineKeyboard.(data: String?) -> Unit = { }
+    var additionalRows: suspend MessageInlineKeyboard.(data: String?) -> Unit = { }
     var additionalRowsVisibleOnStates = DatePickerState.entries.toSet()
 
     var timeZone = ZoneId.systemDefault()
@@ -66,7 +66,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         require(callbackQueryPrefix.length <= 52) { "Callback query prefix for date picker is too long" }
     }
 
-    fun setupMarkup(messageInlineKeyboard: MessageInlineKeyboard, data: String?) {
+    suspend fun setupMarkup(messageInlineKeyboard: MessageInlineKeyboard, data: String?) {
         val date = initDate
         messageInlineKeyboard.setupMarkup(startWithState, data) {
             when(startWithState) {
@@ -77,7 +77,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    private fun MessageInlineKeyboard.setupMarkup(state: DatePickerState, data: String?, setup: MessageInlineKeyboard.() -> Unit) {
+    private suspend fun MessageInlineKeyboard.setupMarkup(state: DatePickerState, data: String?, setup: suspend MessageInlineKeyboard.() -> Unit) {
         val isAllowedState = state in additionalRowsVisibleOnStates
         if (isAllowedState && additionalRowsPosition == AdditionalRowsPosition.TOP) {
             additionalRows(data)
@@ -144,7 +144,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         .withYear(if (monthLimitForward == -1) datesRange.endInclusive.year else now.year + (monthLimitForward / 12) + if (now.monthValue + monthLimitForward > 12) 1 else 0)
         .withMonth(if (monthLimitForward == -1) datesRange.endInclusive.monthValue else (now.monthValue + (monthLimitForward % 12)) % 12)
 
-    private fun MessageInlineKeyboard.setupYearsMarkup(fromYear: Int, data: String?) {
+    private suspend fun MessageInlineKeyboard.setupYearsMarkup(fromYear: Int, data: String?) {
         val datesRange = dates(data)
         val firstYear = getFirstDate(datesRange).year
         val lastYear = getLastDate(datesRange).year
@@ -196,7 +196,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    private fun MessageInlineKeyboard.setupMonthsMarkup(year: Int, data: String?) {
+    private suspend fun MessageInlineKeyboard.setupMonthsMarkup(year: Int, data: String?) {
         val datesRange = dates(data)
         val firstDate = getFirstDate(datesRange)
         val lastDate = getLastDate(datesRange)
@@ -228,7 +228,7 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    private fun MessageInlineKeyboard.setupDaysMarkup(callbackYear: Int, callbackMonth: Int, data: String?) {
+    private suspend fun MessageInlineKeyboard.setupDaysMarkup(callbackYear: Int, callbackMonth: Int, data: String?) {
         val datesRange = dates(data)
 
         val year = when {

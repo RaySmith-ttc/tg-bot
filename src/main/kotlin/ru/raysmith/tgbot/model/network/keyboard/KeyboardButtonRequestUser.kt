@@ -29,4 +29,9 @@ data class KeyboardButtonRequestUser(
      * If not specified, no additional restrictions are applied.
      * */
     @SerialName("user_is_premium") val userIsPremium: Boolean? = null,
+
+    /**
+     * The maximum number of users to be selected; 1-10. Defaults to 1.
+     * */
+    @SerialName("max_quantity") val maxQuantity: Int? = null,
 )

@@ -15,30 +15,27 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         return InlineKeyboardMarkup(_rows.map { it.buttons.map { b -> b.toKeyboardButton() } })
     }
 
-    fun <T> pagination(
+    suspend fun <T> pagination(pagination: Pagination<T>) = pagination.setupMarkup(this)
+
+    suspend fun <T> pagination(
         data: Iterable<T>,
         callbackQueryPrefix: String,
         page: Long = Pagination.PAGE_FIRST,
-        setup: Pagination<T>.() -> Unit = {},
-        createButtons: Row.(item: T) -> Unit
+        setup: suspend Pagination<T>.() -> Unit = {},
+        createButtons: suspend Row.(item: T) -> Unit
     ) {
-        Pagination(data, callbackQueryPrefix, createButtons)
-            .apply(setup)
-            .apply { this.startPage = page }
+        Pagination.create(data, callbackQueryPrefix, page, setup, createButtons)
             .setupMarkup(this)
     }
 
-    fun createDatePicker(datePicker: DatePicker, data: String? = null) {
+    suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) {
         datePicker.setupMarkup(this, data)
     }
 
     fun row(row: Row) = _rows.add(row)
-    fun row(text: String, callbackData: String) = row { button(text, callbackData) }
-    fun row(setRow: Row.() -> Unit) {
-        _rows.add(
-            Row()
-                .apply(setRow)
-        )
+    suspend fun row(text: String, callbackData: String) = row { button(text, callbackData) }
+    suspend fun row(setRow: suspend Row.() -> Unit) {
+        _rows.add(Row().apply { setRow() })
     }
 
     class Row : MessageKeyboardRow<Button> {

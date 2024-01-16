@@ -54,6 +54,7 @@ dependencies {
 //    implementation(libs.log4j.core)
     implementation("org.apache.logging.log4j:log4j:2.19.0")
     implementation("io.ktor:ktor-client-logging-jvm:2.3.4")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.4")
 
     // Network
     val kotlinxSerializationVersion = "1.5.1"
@@ -63,6 +64,7 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.ktor.client.jvm)
+    implementation(libs.ktor.client.okhttp)
 
     // Utils
     implementation(libs.raysmith.utils)

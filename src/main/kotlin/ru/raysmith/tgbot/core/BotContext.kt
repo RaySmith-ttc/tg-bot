@@ -829,7 +829,7 @@ interface BotContext<T : EventHandler> : ISender {
     suspend fun stopPoll(
         messageId: Int,
         chatId: ChatId = getChatIdOrThrow(),
-        keyboard: MessageInlineKeyboard.() -> Unit
+        keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Poll {
         val replyMarkup = buildInlineKeyboard(keyboard).toMarkup()
         return stopPoll(chatId, messageId, replyMarkup)

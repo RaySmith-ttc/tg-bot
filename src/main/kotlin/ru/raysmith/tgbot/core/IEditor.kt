@@ -26,7 +26,7 @@ interface IEditor : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        caption: MessageText.() -> Unit
+        caption: suspend MessageText.() -> Unit
     ): Message {
         return CaptionableMediaMessage.instance(this)
             .apply { captionWithEntities(caption) }
@@ -37,7 +37,7 @@ interface IEditor : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        keyboard: MessageInlineKeyboard.() -> Unit
+        keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return MessageWithReplyMarkup.instance(this)
             .apply { inlineKeyboard(keyboard) }
@@ -49,7 +49,7 @@ interface IEditor : ChatIdHolder, API {
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
         media: InputMedia,
-        keyboard: MessageInlineKeyboard.() -> Unit
+        keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return CaptionableMediaMessage.instance(this)
             .apply { inlineKeyboard(keyboard) }
@@ -60,7 +60,7 @@ interface IEditor : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        message: TextMessage.() -> Unit
+        message: suspend TextMessage.() -> Unit
     ): Message {
         return TextMessage(client).apply { message() }
             .edit(chatId, messageId, inlineMessageId)

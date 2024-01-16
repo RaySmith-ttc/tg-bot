@@ -9,10 +9,10 @@ interface KeyboardCreator : InlineKeyboardCreator, ReplyKeyboardCreator, RemoveK
     override var keyboardMarkup: MessageKeyboard?
 }
 
-inline fun buildReplyKeyboard(init: MessageReplyKeyboard.() -> Unit): MessageKeyboard {
-    return MessageReplyKeyboard().apply(init)
+suspend inline fun buildReplyKeyboard(crossinline init: suspend MessageReplyKeyboard.() -> Unit): MessageKeyboard {
+    return MessageReplyKeyboard().apply { init() }
 }
 
-inline fun buildInlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageInlineKeyboard {
-    return MessageInlineKeyboard().apply(init)
+suspend inline fun buildInlineKeyboard(crossinline init: suspend MessageInlineKeyboard.() -> Unit): MessageInlineKeyboard {
+    return MessageInlineKeyboard().apply { init() }
 }

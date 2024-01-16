@@ -23,9 +23,11 @@ internal fun KSerializer<*>.getPrimitive(element: JsonObject, field: String) =
 internal fun KSerializer<*>.getJsonObject(element: JsonObject, field: String) =
     element.jsonObject[field]?.jsonObject ?: fieldNotFound(field)
 
-fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(bot.client, withChatId)
+fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(withChatId, bot.client)
 fun botContext(token: String, withChatId: ChatId? = null) =
-    createBotContext(TelegramApi.defaultClient(token), withChatId)
+    createBotContext(withChatId, TelegramApi.defaultClient(token))
+
+// TODO [docs] withMessageId and withInlineMessageId
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -34,8 +36,13 @@ fun botContext(token: String, withChatId: ChatId? = null) =
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
 @BotContextDsl
-suspend inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, crossinline block: suspend BotContext<UnknownEventHandler>.() -> T) =
-    botContext(bot.client, withChatId, block)
+suspend inline fun <T> botContext(
+    bot: Bot,
+    withChatId: ChatId? = null,
+    withMessageId: Int? = null,
+    withInlineMessageId: String? = null,
+    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) = botContext(withChatId, withMessageId, withInlineMessageId, bot.client, block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -44,8 +51,14 @@ suspend inline fun <T> botContext(bot: Bot, withChatId: ChatId? = null, crossinl
  * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
  * */
 @BotContextDsl
-suspend inline fun <T> botContext(token: String, withChatId: ChatId? = null, crossinline block: suspend BotContext<UnknownEventHandler>.() -> T) =
-    botContext(TelegramApi.defaultClient(token), withChatId, block)
+suspend inline fun <T> botContext(
+    token: String,
+    withChatId: ChatId? = null,
+    withMessageId: Int? = null,
+    withInlineMessageId: String? = null,
+    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) =
+    botContext(withChatId, withMessageId, withInlineMessageId, TelegramApi.defaultClient(token), block)
 
 /**
  * Creates a bot context and executes a [block] that can call API requests
@@ -54,20 +67,35 @@ suspend inline fun <T> botContext(token: String, withChatId: ChatId? = null, cro
  * */
 @BotContextDsl
 suspend inline fun <T> botContext(
-    client: HttpClient = TelegramApi.defaultClientInstance,
     withChatId: ChatId? = null,
-    crossinline block: suspend BotContext<UnknownEventHandler>.() -> T
-) = block(createBotContext(client, withChatId))
+    withMessageId: Int? = null,
+    withInlineMessageId: String? = null,
+    client: HttpClient = TelegramApi.defaultClientInstance,
+    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) = block(createBotContext(withChatId, client))
 
 fun createBotContext(
-    client: HttpClient = TelegramApi.defaultClientInstance,
     withChatId: ChatId? = null,
+    client: HttpClient = TelegramApi.defaultClientInstance,
 ) = object : BotContext<UnknownEventHandler> {
     override val client = client
     override fun getChatId(): ChatId? = withChatId
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(Update(-1), bot.client).block()
     }
+}
+
+fun createEventHandler(
+    withChatId: ChatId? = null,
+    withMessageId: Int? = null,
+    withInlineMessageId: String? = null,
+    client: HttpClient = TelegramApi.defaultClientInstance,
+) = object : EventHandler {
+    override suspend fun handle() {}
+    override fun getChatId(): ChatId? = withChatId
+    override var messageId: Int? = withMessageId
+    override var inlineMessageId: String? = withInlineMessageId
+    override val client: HttpClient = client
 }
 
 @DslMarker

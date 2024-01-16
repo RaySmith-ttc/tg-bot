@@ -183,3 +183,9 @@ suspend fun MessageHandler.messageAnyMedia(block: suspend (Media) -> Unit) = (
     message.photo?.lastOrNull() ?: message.document ?: message.audio ?: message.video ?:  message.animation ?:
     message.voice ?: message.videoNote
 )?.also { block(it) }
+
+// Users shared
+/** Returns [MessageConverter] instance for shared users */
+fun MessageHandler.messageUsersShared() = MessageConverter(message.userShared)
+
+// TODO missed chat_shared and other

@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.network
 
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -30,6 +30,7 @@ import ru.raysmith.tgbot.model.network.response.BooleanResponse
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.MessageResponse
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 private val UnauthenticatedRequestKey = AttributeKey<Unit>("UnauthenticatedRequestKey")
 
@@ -168,12 +169,17 @@ object TelegramApi {
         }
     }
 
+
     fun defaultClient(
         token: String = Bot.config.token,
-        builder: HttpClientConfig<CIOEngineConfig>.() -> Unit = {}
-    ) = HttpClient(CIO) {
+        builder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
+    ) = HttpClient(OkHttp) {
         engine {
-            requestTimeout = 60.seconds.inWholeMilliseconds
+            config {
+                callTimeout(60.seconds.toJavaDuration())
+                connectTimeout(60.seconds.toJavaDuration())
+                readTimeout(60.seconds.toJavaDuration())
+            }
         }
 
         install(HttpRequestRetry) {

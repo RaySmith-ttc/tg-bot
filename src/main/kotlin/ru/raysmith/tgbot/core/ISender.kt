@@ -13,35 +13,35 @@ import ru.raysmith.tgbot.network.API
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, API {
 
-    suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: TextMessage.() -> Unit): Message {
+    suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
         return TextMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: PhotoMessage.() -> Unit): Message {
+    suspend fun sendPhoto(chatId: ChatId = getChatIdOrThrow(), message: suspend PhotoMessage.() -> Unit): Message {
         return PhotoMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: AudioMessage.() -> Unit): Message {
+    suspend fun sendAudio(chatId: ChatId = getChatIdOrThrow(), message: suspend AudioMessage.() -> Unit): Message {
         return AudioMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: DocumentMessage.() -> Unit): Message {
+    suspend fun sendDocument(chatId: ChatId = getChatIdOrThrow(), message: suspend DocumentMessage.() -> Unit): Message {
         return DocumentMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: VideoMessage.() -> Unit): Message {
+    suspend fun sendVideo(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoMessage.() -> Unit): Message {
         return VideoMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: AnimationMessage.() -> Unit): Message {
+    suspend fun sendAnimation(chatId: ChatId = getChatIdOrThrow(), message: suspend AnimationMessage.() -> Unit): Message {
         return AnimationMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: VoiceMessage.() -> Unit): Message {
+    suspend fun sendVoice(chatId: ChatId = getChatIdOrThrow(), message: suspend VoiceMessage.() -> Unit): Message {
         return VoiceMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: VideoNoteMessage.() -> Unit): Message {
+    suspend fun sendVideoNote(chatId: ChatId = getChatIdOrThrow(), message: suspend VideoNoteMessage.() -> Unit): Message {
         return VideoNoteMessage(client).apply { message() }.send(chatId)
     }
 
@@ -49,7 +49,7 @@ interface ISender : ChatIdHolder, API {
         latitude: Double,
         longitude: Double,
         chatId: ChatId = getChatIdOrThrow(),
-        message: LocationMessage.() -> Unit
+        message: suspend LocationMessage.() -> Unit
     ): Message {
         return LocationMessage(latitude, longitude, client).apply { message() }.send(chatId)
     }
@@ -60,7 +60,7 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId? = getChatIdOrThrow(),
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        message: LocationMessage.() -> Unit
+        message: suspend LocationMessage.() -> Unit
     ): LiveLocationResponse {
         return LocationMessage(latitude, longitude, client).apply { message() }
             .edit(chatId, messageId, inlineMessageId)
@@ -70,7 +70,7 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        message: LocationMessage.() -> Unit
+        message: suspend LocationMessage.() -> Unit
     ): LiveLocationResponse {
         return LocationMessage(0.0, 0.0, client).apply { message() }.stop(chatId, messageId, inlineMessageId)
     }
@@ -81,7 +81,7 @@ interface ISender : ChatIdHolder, API {
         title: String,
         address: String,
         chatId: ChatId = getChatIdOrThrow(),
-        message: VenueMessage.() -> Unit
+        message: suspend VenueMessage.() -> Unit
     ): Message {
         return VenueMessage(latitude, longitude, title, address, client).apply { message() }.send(chatId)
     }
@@ -90,7 +90,7 @@ interface ISender : ChatIdHolder, API {
         phoneNumber: String,
         firstName: String,
         chatId: ChatId = getChatIdOrThrow(),
-        message: ContactMessage.() -> Unit
+        message: suspend ContactMessage.() -> Unit
     ): Message {
         return ContactMessage(phoneNumber, firstName, client).apply { message() }.send(chatId)
     }
@@ -99,12 +99,12 @@ interface ISender : ChatIdHolder, API {
         question: String,
         options: List<String>,
         chatId: ChatId = getChatIdOrThrow(),
-        message: PollMessage.() -> Unit
+        message: suspend PollMessage.() -> Unit
     ): Message {
         return PollMessage(question, options, client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: DiceMessage.() -> Unit): Message {
+    suspend fun sendDice(emoji: String, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {
         return DiceMessage(emoji, client).apply { message() }.send(chatId)
     }
 
@@ -113,11 +113,11 @@ interface ISender : ChatIdHolder, API {
         return sendChatAction(chatId, action, messageThreadId)
     }
 
-    suspend fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: MediaGroupMessage.() -> Unit): List<Message> {
+    suspend fun sendMediaGroup(chatId: ChatId = getChatIdOrThrow(), message: suspend MediaGroupMessage.() -> Unit): List<Message> {
         return MediaGroupMessage(client).apply { message() }.send(chatId)
     }
 
-    suspend fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: StickerMessage.() -> Unit): Message {
+    suspend fun sendSticker(chatId: ChatId = getChatIdOrThrow(), message: suspend StickerMessage.() -> Unit): Message {
         return StickerMessage(client).apply { message() }.send(chatId)
     }
 }

@@ -656,21 +656,21 @@ interface API {
             if (inputFiles != null) {
                 var lastInputFilesIndex = 0
 
-                println(
-                    buildList {
-                        media.map { inputMedia ->
-                            when(inputMedia) {
-                                is InputMediaGroupWithThumbnail -> {
-                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-                                    if (inputMedia.thumbnail != null) {
-                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
-                                    } else {}
-                                }
-                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-                            }
-                        }
-                    }
-                )
+//                println(
+//                    buildList {
+//                        media.map { inputMedia ->
+//                            when(inputMedia) {
+//                                is InputMediaGroupWithThumbnail -> {
+//                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+//                                    if (inputMedia.thumbnail != null) {
+//                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
+//                                    } else {}
+//                                }
+//                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
+//                            }
+//                        }
+//                    }
+//                )
 
                 lastInputFilesIndex = 0
 

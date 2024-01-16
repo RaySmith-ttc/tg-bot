@@ -13,7 +13,7 @@ interface MessageKeyboard {
     fun toJson() = TelegramApi.json.encodeToString(toMarkup())
 
     companion object {
-        fun of(keyboardMarkup: KeyboardMarkup) = when(keyboardMarkup) {
+        suspend fun of(keyboardMarkup: KeyboardMarkup) = when(keyboardMarkup) {
             is InlineKeyboardMarkup -> {
                 buildInlineKeyboard {
                     keyboardMarkup.keyboard.forEach { row ->

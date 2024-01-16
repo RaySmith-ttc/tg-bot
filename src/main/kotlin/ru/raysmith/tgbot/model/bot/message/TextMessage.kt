@@ -38,7 +38,7 @@ class TextMessage(override val client: HttpClient) :
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
-    fun textWithEntities(setText: MessageText.() -> Unit) {
+    suspend fun textWithEntities(setText: suspend MessageText.() -> Unit) {
         messageText = MessageText(MessageTextType.TEXT)
         messageText!!.apply { setText() }
     }
@@ -77,7 +77,7 @@ class TextMessage(override val client: HttpClient) :
         disableWebPagePreview = disableWebPagePreview
     )
 
-    fun datePicker(datePicker: DatePicker, data: String? = null) {
+    suspend fun datePicker(datePicker: DatePicker, data: String? = null) {
         textWithEntities { datePickerMessageText(datePicker, data) }
         inlineKeyboard { createDatePicker(datePicker, data) }
     }

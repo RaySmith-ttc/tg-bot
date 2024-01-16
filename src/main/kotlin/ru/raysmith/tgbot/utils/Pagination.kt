@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.CallbackQuery
 class Pagination<T>(
     private val data: Iterable<T>,
     private val callbackQueryPrefix: String,
-    private val createButtons: MessageInlineKeyboard.Row.(item: T) -> Unit
+    private val createButtons: suspend MessageInlineKeyboard.Row.(item: T) -> Unit
 ) {
 
     companion object {
@@ -27,6 +27,46 @@ class Pagination<T>(
             ?: throw IllegalArgumentException("Property pagination.columns is not Int")
         val firstPageSymbol = Bot.properties.getOrDefault("pagination.firstpagesymbol", "«")
         val lastPageSymbol = Bot.properties.getOrDefault("pagination.lastpagesymbol", "»")
+
+        // TODO use in addRows? [docs]
+        fun <T> itemsFor(pagination: Pagination<T>, page: Long): List<T> {
+            val dataCount = if (pagination.data is SizedIterable) pagination.data.count() else pagination.data.count().toLong()
+            if (dataCount == 0L) return emptyList()
+            val totalPages = ((dataCount / (pagination.rows * pagination.columns)) + if (dataCount % (pagination.rows * pagination.columns) != 0L) 1 else 0)
+            val fixedPages: Long = when (page) {
+                PAGE_FIRST -> 1L
+                PAGE_LAST -> totalPages
+                else -> if (totalPages < page) totalPages else if (page < 1) 1 else page
+            }
+
+            val offset = (fixedPages - 1) * pagination.rows * pagination.columns
+            val dataList = pagination.data.let {
+                if (it is SizedIterable) {
+                    it.limit(pagination.rows * pagination.columns, offset).toList()
+                } else it.toList()
+            }
+
+            val lastIndex = (offset + pagination.rows * pagination.columns) - 1
+            val isLastPage = lastIndex > dataCount - 1
+            val range = if (pagination.data is SizedIterable) {
+                LongRange(0, (pagination.rows * pagination.columns).toLong())
+            } else {
+                LongRange(offset, if (isLastPage) dataCount - 1L else lastIndex)
+            }
+
+            return dataList.filterIndexed { index, _ -> index in range }
+        }
+
+        // TODO [docs]
+        suspend fun <T> create(
+            data: Iterable<T>,
+            callbackQueryPrefix: String,
+            page: Long = PAGE_FIRST,
+            setup: suspend Pagination<T>.() -> Unit = {},
+            createButtons: suspend MessageInlineKeyboard.Row.(item: T) -> Unit
+        ) = Pagination(data, callbackQueryPrefix, createButtons)
+            .apply { setup() }
+            .apply { this.startPage = page }
     }
 
     var rows = defaultRows
@@ -54,11 +94,11 @@ class Pagination<T>(
         return this
     }
 
-    fun setupMarkup(keyboard: MessageInlineKeyboard) {
+    suspend fun setupMarkup(keyboard: MessageInlineKeyboard) {
         keyboard.addRows(startPage, createButtons)
     }
 
-    private fun MessageInlineKeyboard.addRows(pageN: Long, createButtons: MessageInlineKeyboard.Row.(item: T) -> Unit) {
+    private suspend fun MessageInlineKeyboard.addRows(pageN: Long, createButtons: suspend MessageInlineKeyboard.Row.(item: T) -> Unit) {
         val dataCount = if (data is SizedIterable) data.count() else data.count().toLong()
         if (dataCount == 0L) return
         val totalPages = ((dataCount / (this@Pagination.rows * columns)) + if (dataCount % (this@Pagination.rows * columns) != 0L) 1 else 0)

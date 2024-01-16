@@ -4,7 +4,7 @@ interface InlineKeyboardCreator {
     var keyboardMarkup: MessageKeyboard?
 
     @KeyboardDsl
-    fun inlineKeyboard(init: MessageInlineKeyboard.() -> Unit): MessageKeyboard {
+    suspend fun inlineKeyboard(init: suspend MessageInlineKeyboard.() -> Unit): MessageKeyboard {
         keyboardMarkup = MessageInlineKeyboard().apply { init() }
         return keyboardMarkup as MessageKeyboard
     }

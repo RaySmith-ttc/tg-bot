@@ -11,9 +11,9 @@ class MessageReplyKeyboard : MessageKeyboard {
     var selective: Boolean? = null
     private val rows: MutableList<Row> = mutableListOf()
 
-    fun row(text: String) = row { button(text) }
-    fun row(setRow: Row.() -> Unit) {
-        rows.add(Row().apply(setRow))
+    suspend fun row(text: String) = row { button(text) }
+    suspend fun row(setRow: suspend Row.() -> Unit) {
+        rows.add(Row().apply { setRow() })
     }
 
     override fun toMarkup(): ReplyKeyboardMarkup {
