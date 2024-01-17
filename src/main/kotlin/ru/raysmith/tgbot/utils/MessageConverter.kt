@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.utils
 import ru.raysmith.tgbot.core.handler.base.MessageHandler
 import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.Poll
+import ru.raysmith.tgbot.model.network.UserShared
 import ru.raysmith.tgbot.model.network.Venue
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.message.Dice
@@ -183,3 +184,12 @@ fun MessageHandler.messageAnyMedia(block: (Media) -> Unit) = (
         message.photo?.lastOrNull() ?: message.document ?: message.audio ?: message.video ?:  message.animation ?:
         message.voice ?: message.videoNote
 )?.also(block)
+
+// Users shared
+/** Returns [MessageConverter] instance for shared users */
+fun MessageHandler.messageUsersShared() = MessageConverter(message.userShared)
+
+/** Applies a [block] to the shared user or returns null if message doesn't contain dice */
+fun MessageHandler.messageUsersShared(block: (UserShared) -> Unit) = message.userShared?.also(block)
+
+// TODO missed chat_shared and other
