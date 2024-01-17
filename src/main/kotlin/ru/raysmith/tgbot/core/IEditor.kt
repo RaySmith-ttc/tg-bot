@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.API
-import ru.raysmith.tgbot.utils.Pagination
+import ru.raysmith.tgbot.utils.pagination.Pagination
 
 /** Represent an object that can edit messages */
 interface IEditor : ChatIdHolder, API {
@@ -100,7 +100,7 @@ interface IEditor : ChatIdHolder, API {
      * Return the previous page or first page if page not found
      * @param pagePrefix callback query prefix that used for create [pagination][Pagination]
      * */
-    fun IEditor.getPreviousPage(pagePrefix: String? = null): Long {
+    fun IEditor.getPreviousPage(pagePrefix: String? = null): Int {
         return if (this is CallbackQueryHandler) getPreviousPage(pagePrefix)
         else Pagination.PAGE_FIRST
     }
@@ -109,19 +109,19 @@ interface IEditor : ChatIdHolder, API {
      * Return the previous page or null if page not found
      * @param pagePrefix callback query prefix that used for create [pagination][Pagination]
      * */
-    fun IEditor.getPreviousPageOrNull(pagePrefix: String? = null): Long? {
+    fun IEditor.getPreviousPageOrNull(pagePrefix: String? = null): Int? {
         return if (this is CallbackQueryHandler) getPreviousPageOrNull(pagePrefix)
         else null
     }
 
-    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Long  {
+    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Int  {
         return getPreviousPageButton(pagePrefix)?.getPageOrNull() ?: Pagination.PAGE_FIRST
     }
 
-    private fun CallbackQueryHandler.getPreviousPageOrNull(pagePrefix: String? = null): Long? {
+    private fun CallbackQueryHandler.getPreviousPageOrNull(pagePrefix: String? = null): Int? {
         return getPreviousPageButton(pagePrefix)?.getPageOrNull()
     }
 
-    private fun InlineKeyboardButton.getPageOrNull(): Long? =
-        this.text.filterNot { it == Pagination.SYMBOL_CURRENT_PAGE }.toLongOrNull()
+    private fun InlineKeyboardButton.getPageOrNull(): Int? =
+        this.text.filterNot { it == Pagination.SYMBOL_CURRENT_PAGE }.toIntOrNull()
 }

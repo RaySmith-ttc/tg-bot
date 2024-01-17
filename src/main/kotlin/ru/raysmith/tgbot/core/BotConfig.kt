@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.utils.getOrDefault
+import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
+import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
 import ru.raysmith.utils.properties.getOrNull
 import java.util.*
 
@@ -26,4 +28,6 @@ class BotConfig {
     } ?: Locale.getDefault()
 
     var alwaysAnswerCallback: Boolean = false
+
+    var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
 }

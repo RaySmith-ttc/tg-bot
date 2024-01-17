@@ -90,12 +90,12 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Long) -> Unit) {
+    suspend fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Int) -> Unit) {
         if (!isAnswered && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
             query.data.substring(paginationCallbackQueryPrefix.length).let {
                 // 1 = Pagination.SYMBOL_PAGE_PREFIX length
                 if (it.length <= 1) null
-                else it.substring(1).toLongOrNull()?.let { page ->
+                else it.substring(1).toIntOrNull()?.let { page ->
                     PaginationCallbackQueryHandler(query, page, client).apply { handler(page) }
                 }
             } ?: logger.warn("Pagination data incorrect. Are you sure '$paginationCallbackQueryPrefix' prefix should use isPage handler?")

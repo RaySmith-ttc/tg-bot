@@ -4,8 +4,8 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
-import ru.raysmith.tgbot.utils.Pagination
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
+import ru.raysmith.tgbot.utils.pagination.Pagination
 
 class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Row> {
     private val _rows: MutableList<Row> = mutableListOf()
@@ -20,7 +20,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     suspend fun <T> pagination(
         data: Iterable<T>,
         callbackQueryPrefix: String,
-        page: Long = Pagination.PAGE_FIRST,
+        page: Int = Pagination.PAGE_FIRST,
         setup: suspend Pagination<T>.() -> Unit = {},
         createButtons: suspend Row.(item: T) -> Unit
     ) {

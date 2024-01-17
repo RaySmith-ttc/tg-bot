@@ -4,6 +4,7 @@ import io.ktor.client.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.sql.SizedCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
@@ -53,6 +54,9 @@ import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
+import ru.raysmith.tgbot.utils.pagination.Pagination
+import ru.raysmith.tgbot.utils.pagination.PaginationFetcher
+import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
 import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
@@ -210,6 +214,18 @@ class Runner {
                     }
                 }.config {
 //                    this.locale = Locale.JAPAN
+                    paginationFetcherFactory = object : PaginationFetcherFactory {
+                        override fun <T> getFetcher(): PaginationFetcher<T> {
+                            return object : PaginationFetcher<T> {
+                                override fun getCount(data: Iterable<T>): Int {
+                                    return if (data is SizedCollection<T>) data.count().toInt() else data.count()
+                                }
+                                override fun fetchData(data: Iterable<T>, page: Int, offset: Int, count: Int, rows: Int, columns: Int): Iterable<T> {
+                                    return if (data is SizedCollection<T>) data.limit(count, offset.toLong()) else data
+                                }
+                            }
+                        }
+                    }
                 }
                 .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
@@ -1540,7 +1556,7 @@ suspend fun EventHandler.sendAnswerVariants(action: MessageAction) = message(act
     }
 }
 
-suspend fun EventHandler.sendPagination(page: Long, action: MessageAction = MessageAction.EDIT) = message(action) {
+suspend fun EventHandler.sendPagination(page: Int, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Choose item"
     inlineKeyboard {
         pagination(pagesData, "pagination", page, setup = {
