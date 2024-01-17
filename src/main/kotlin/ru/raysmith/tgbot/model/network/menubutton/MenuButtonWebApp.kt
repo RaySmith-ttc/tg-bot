@@ -12,8 +12,8 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonObject
-import ru.raysmith.tgbot.utils.getJsonObject
-import ru.raysmith.tgbot.utils.getPrimitive
+import ru.raysmith.tgbot.network.serializer.getJsonObject
+import ru.raysmith.tgbot.network.serializer.getPrimitive
 
 /** Represents a menu button, which launches a [Web App](https://core.telegram.org/bots/webapps). */
 @Serializable(with = MenuButtonWebAppSerializer::class)

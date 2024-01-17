@@ -3,11 +3,11 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
+import ru.raysmith.tgbot.core.BotContextDsl
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.utils.BotContextDsl
 
 @HandlerDsl
 open class CommandHandler(

@@ -18,8 +18,10 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.utils.BotContextDsl
 import java.time.ZonedDateTime
+
+@DslMarker
+annotation class BotContextDsl
 
 // TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */

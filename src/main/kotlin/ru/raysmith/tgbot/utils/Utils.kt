@@ -1,91 +1,76 @@
 package ru.raysmith.tgbot.utils
 
 import io.ktor.client.*
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
+import ru.raysmith.tgbot.core.BotContextDsl
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
 
-// should never be called
-internal fun errorBody(): Nothing = throw NullPointerException("The method did not return a body")
-internal fun KSerializer<*>.fieldNotFound(filed: String): Nothing =
-    error("The ${descriptor.serialName} json object must contains '$filed'")
-internal fun KSerializer<*>.getPrimitive(element: JsonObject, field: String) =
-    element.jsonObject[field]?.jsonPrimitive?.content ?: fieldNotFound(field)
-internal fun KSerializer<*>.getJsonObject(element: JsonObject, field: String) =
-    element.jsonObject[field]?.jsonObject ?: fieldNotFound(field)
-
-fun botContext(bot: Bot, withChatId: ChatId? = null) = createBotContext(withChatId, bot.client)
-fun botContext(token: String, withChatId: ChatId? = null) =
-    createBotContext(withChatId, TelegramApi.defaultClient(token))
-
-// TODO [docs] withMessageId and withInlineMessageId
-
 /**
- * Creates a bot context and executes a [block] that can call API requests
+ * Creates a bot context and executes a [block] within
  *
- * @param bot Telegram service with a bot token
- * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+ * @param bot bot instance
+ * @param withChatId Unique identifier for the target chat or username of the target channel
+ * (in the format `@channelusername`). Overrides chatId from [update] if not null.
+ * @param update update with which the context should be associated. If null, the update will be empty with an id of -1.
  * */
 @BotContextDsl
-suspend inline fun <T> botContext(
+suspend fun <T> botContext(
     bot: Bot,
     withChatId: ChatId? = null,
-    withMessageId: Int? = null,
-    withInlineMessageId: String? = null,
-    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
-) = botContext(withChatId, withMessageId, withInlineMessageId, bot.client, block)
+    update: Update? = null,
+    block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) = botContext(bot.client, withChatId, update, block)
 
 /**
- * Creates a bot context and executes a [block] that can call API requests
+ * Creates a bot context and executes a [block] within
  *
  * @param token Telegram bot token
- * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+ * @param withChatId Unique identifier for the target chat or username of the target channel
+ * (in the format `@channelusername`). Overrides chatId from [update] if not null.
+ * @param update update with which the context should be associated. If null, the update will be empty with an id of -1.
  * */
 @BotContextDsl
-suspend inline fun <T> botContext(
+suspend fun <T> botContext(
     token: String,
     withChatId: ChatId? = null,
-    withMessageId: Int? = null,
-    withInlineMessageId: String? = null,
-    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
-) =
-    botContext(withChatId, withMessageId, withInlineMessageId, TelegramApi.defaultClient(token), block)
+    update: Update? = null,
+    block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) = botContext(TelegramApi.defaultClient(token), withChatId, update, block)
 
 /**
- * Creates a bot context and executes a [block] that can call API requests
+ * Creates a bot context and executes a [block] within
  *
- * @param withChatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+ * @param withChatId Unique identifier for the target chat or username of the target channel
+ * (in the format `@channelusername`). Overrides chatId from [update] if not null.
+ * @param update update with which the context should be associated. If null, the update will be empty with an id of -1.
+ * @param client
  * */
 @BotContextDsl
-suspend inline fun <T> botContext(
+suspend fun <T> botContext(
+    client: HttpClient,
     withChatId: ChatId? = null,
-    withMessageId: Int? = null,
-    withInlineMessageId: String? = null,
-    client: HttpClient = TelegramApi.defaultClientInstance,
-    crossinline block: suspend context(BotContext<UnknownEventHandler>) () -> T
-) = block(createBotContext(withChatId, client))
+    update: Update? = null,
+    block: suspend context(BotContext<UnknownEventHandler>) () -> T
+) = block(createBotContext(withChatId, update, client))
 
-fun createBotContext(
+internal fun createBotContext(
     withChatId: ChatId? = null,
+    update: Update? = null,
     client: HttpClient = TelegramApi.defaultClientInstance,
 ) = object : BotContext<UnknownEventHandler> {
     override val client = client
-    override fun getChatId(): ChatId? = withChatId
+    override fun getChatId(): ChatId? = withChatId ?: update?.findChatId()
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
-        return UnknownEventHandler(Update(-1), bot.client).block()
+        return UnknownEventHandler(update ?: Update(-1), bot.client).block()
     }
 }
 
-fun createEventHandler(
+internal fun createEventHandler(
     withChatId: ChatId? = null,
     withMessageId: Int? = null,
     withInlineMessageId: String? = null,
@@ -98,16 +83,4 @@ fun createEventHandler(
     override val client: HttpClient = client
 }
 
-@DslMarker
-annotation class BotContextDsl
-
 internal fun noimpl(): Nothing = throw NotImplementedError()
-
-/**
- * Returns sticker name with base [name] appended with `_by_<bot_username>`
- *
- * @param bot current bot for getting [Bot.me]. If it is null then [getMe][API.getMe] was called
- * */
-// TODO can move me to the context?
-suspend fun <T : EventHandler> BotContext<T>.stickerSetName(name: String, bot: Bot? = null) =
-    "${name}_by_${bot?.me?.username ?: getMe().username}"
