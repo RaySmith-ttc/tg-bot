@@ -29,5 +29,6 @@ class BotConfig {
 
     var alwaysAnswerCallback: Boolean = false
 
+    var sendChatActionWithMedaMessage: Boolean = false
     var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
 }

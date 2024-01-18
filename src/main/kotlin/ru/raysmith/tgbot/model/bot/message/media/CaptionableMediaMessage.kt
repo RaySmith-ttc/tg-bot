@@ -1,19 +1,21 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.CaptionableMessage
+import ru.raysmith.tgbot.model.bot.message.EditableMessage
 import ru.raysmith.tgbot.model.bot.message.IMessage
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.noimpl
+import ru.raysmith.tgbot.utils.withSafeLength
 
-abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>, KeyboardCreator {
+abstract class CaptionableMediaMessage : MediaMessage(), IMessage<Message>, KeyboardCreator, EditableMessage {
 
     companion object {
         internal fun instance(
@@ -32,18 +34,29 @@ abstract class CaptionableMediaMessage : CaptionableMessage(), IMessage<Message>
         }
     }
 
+    protected var _caption: MessageText? = null
+
+    /** Simple caption text to send the message */
+    var caption: String? = null
+
+    fun hasCaption() = caption != null || _caption != null
+
+    /** Whether test should be truncated if caption length is greater than 1024 */
+    var safeTextLength: Boolean = Bot.config.safeTextLength
+
+    /**
+     * Sets a caption as [MessageText] object
+     * */
+    suspend fun captionWithEntities(setText: suspend MessageText.() -> Unit) {
+        _caption = MessageText(MessageTextType.CAPTION).apply { setText() }
+    }
+
+    fun getCaptionText(): String? =
+        _caption?.getTextString()
+            ?: caption?.let { if (safeTextLength) it.withSafeLength(MessageTextType.CAPTION) else it }
+
     /** [Parse mode][ParseMode] for a simple caption text */
     var parseMode: ParseMode? = null
-
-    protected var media: InputFile? = null
-    protected abstract val mediaName: String
-
-    override var messageThreadId: Int? = null
-    override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
-    override var keyboardMarkup: MessageKeyboard? = null
-    override var protectContent: Boolean? = null
 
     override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageCaption(
