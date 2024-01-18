@@ -16,6 +16,7 @@ import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
 import ru.raysmith.tgbot.model.bot.BotShortDescription
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
@@ -637,14 +638,14 @@ interface API {
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
      * */
-    suspend fun sendMediaGroup( // TODO work?
+    suspend fun sendMediaGroup(
         chatId: ChatId,
         messageThreadId: Int? = null,
         media: List<InputMediaGroup>,
         disableNotification: Boolean? = null,
         replyToMessageId: Int? = null,
         allowSendingWithoutReply: Boolean? = null,
-        inputFiles: List<InputFile>? = null // docs
+        inputFiles: List<InputFile>? = null // TODO     docs
     ) = request<List<Message>> {
         client.post("sendMediaGroup") {
             parameter("chat_id", chatId)
@@ -655,36 +656,18 @@ interface API {
             parameter("allow_sending_without_reply", allowSendingWithoutReply)
             if (inputFiles != null) {
                 var lastInputFilesIndex = 0
-
-//                println(
-//                    buildList {
-//                        media.map { inputMedia ->
-//                            when(inputMedia) {
-//                                is InputMediaGroupWithThumbnail -> {
-//                                    add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-//                                    if (inputMedia.thumbnail != null) {
-//                                        add(inputMedia.thumbnail!! to inputFiles[lastInputFilesIndex++])
-//                                    } else {}
-//                                }
-//                                else -> add(inputMedia.media to inputFiles[lastInputFilesIndex++])
-//                            }
-//                        }
-//                    }
-//                )
-
-                lastInputFilesIndex = 0
-
                 setMultiPartFormDataBody(
                     *buildList {
                         media.map { inputMedia ->
+                            println(inputMedia.media)
                             when(inputMedia) {
                                 is InputMediaGroupWithThumbnail -> {
-                                    add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                                    add(inputMedia.media.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
                                     if (inputMedia.thumbnail != null) {
-                                        add(inputMedia.thumbnail!!.drop(9) to inputFiles[lastInputFilesIndex++])
+                                        add(inputMedia.thumbnail!!.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
                                     } else {}
                                 }
-                                else -> add(inputMedia.media.drop(9) to inputFiles[lastInputFilesIndex++])
+                                else -> add(inputMedia.media.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
                             }
                         }
                     }.toTypedArray()

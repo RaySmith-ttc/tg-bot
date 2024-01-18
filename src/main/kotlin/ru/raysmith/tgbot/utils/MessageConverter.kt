@@ -186,6 +186,8 @@ suspend fun MessageHandler.messageAnyMedia(block: suspend (Media) -> Unit) = (
 
 // Users shared
 /** Returns [MessageConverter] instance for shared users */
-fun MessageHandler.messageUsersShared() = MessageConverter(message.userShared)
+fun MessageHandler.messageUsersShared() = MessageConverter(message.usersShared)
 
-// TODO missed chat_shared and other
+// Chat shared
+/** Returns [MessageConverter] instance for shared users */
+fun MessageHandler.messageChatShared() = MessageConverter(message.chatShared)

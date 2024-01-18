@@ -3,12 +3,8 @@ package ru.raysmith.tgbot.model.network.media.input
 import io.ktor.utils.io.core.*
 import io.ktor.utils.io.streams.*
 import kotlinx.serialization.Serializable
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.network.serializer.FileIdOrUrlSerializer
 import java.io.File
-import java.nio.file.Files
 
 @Suppress("DEPRECATION")
 interface Streamable {
@@ -36,28 +32,11 @@ sealed class InputFile {
             if (javaClass != other?.javaClass) return false
 
             other as ByteArray
-
-            if (!byteArray.contentEquals(other.byteArray)) return false
-
-            return true
+            return byteArray.contentEquals(other.byteArray)
         }
 
         override fun hashCode(): Int {
             return byteArray.contentHashCode()
         }
     }
-}
-
-fun NotReusableInputFile.toRequestBody(name: String) = (this as InputFile).toRequestBody(name)
-fun InputFile.toRequestBody(name: String) = when(this) {
-    is InputFile.ByteArray -> {
-        val body = byteArray.toRequestBody(mimeType.toMediaType())
-        MultipartBody.Part.createFormData(name, filename, body)
-    }
-    is InputFile.File -> {
-        val mimeType = Files.probeContentType(file.toPath())?.toMediaType()
-        val body = file.readBytes().toRequestBody(mimeType)
-        MultipartBody.Part.createFormData(name, file.name, body)
-    }
-    is InputFile.FileIdOrUrl -> MultipartBody.Part.createFormData(name, value)
 }

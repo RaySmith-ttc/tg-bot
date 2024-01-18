@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.model.network.UserShared
+import ru.raysmith.tgbot.model.network.UsersShared
 
 /**
  * This object defines the criteria used to request a suitable user.
@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.model.network.UserShared
 data class KeyboardButtonRequestUser(
 
     /**
-     * Identifier of the request, which will be received back in the [UserShared] object.
+     * Identifier of the request, which will be received back in the [UsersShared] object.
      * Must be unique within the message
      * */
     @SerialName("request_id") val requestId: Int,

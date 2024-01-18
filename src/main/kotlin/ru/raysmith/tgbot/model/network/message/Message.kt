@@ -215,8 +215,8 @@ data class Message(
      * */
     @SerialName("successful_payment") val successfulPayment: SuccessfulPayment? = null,
 
-    /** Service message: a user was shared with the bot */
-    @SerialName("user_shared") val userShared: UserShared? = null,
+    /** Service message: users were shared with the bot */
+    @SerialName("users_shared") val usersShared: UsersShared? = null,
 
     /** Service message: a chat was shared with the bot */
     @SerialName("chat_shared") val chatShared: ChatShared? = null,

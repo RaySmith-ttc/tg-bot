@@ -494,12 +494,17 @@ class Runner {
                 }
 
                 handleMessage {
+                    messageUsersShared()
+                        .onResult {
+                            println(it)
+                        } ?:
+
                     messageContact()
                         .verify { (it.userId?.value ?: 0) > 0 }
                         .convert { it.firstName + " " + it.lastName }
                         .onResult {
                             send(it)
-                        }
+                        } ?:
                     
                     messageContact(/*verification = { it.phoneNumber != "" }*/) {
                         send(it.toString())
@@ -637,6 +642,20 @@ class Runner {
 
                     isCommand("exception") {
                         throw IOException("test")
+                    }
+
+                    isCommand("userShared") {
+                        send {
+                            text = "Send users"
+                            replyKeyboard {
+                                row {
+                                    button {
+                                        text = "Select users"
+                                        requestUser = KeyboardButtonRequestUser(1, maxQuantity = 5)
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     isCommand("provide_commands_control") {

@@ -22,8 +22,8 @@ class MediaGroupMessage(override val client: HttpClient) :
     override var replyToMessageId: Int? = null
     override var allowSendingWithoutReply: Boolean? = null
 
-    /** send [ChatAction.UPLOAD_PHOTO] action while upload files to telegram server */
-    var sendAction = true
+    /** send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action while upload files to telegram server */
+    var sendAction = false
 
     private val inputMedia = mutableListOf<InputMediaGroup>()
 
@@ -91,7 +91,7 @@ class MediaGroupMessage(override val client: HttpClient) :
     ) {
         inputMedia.add(
             InputMediaPhoto(
-                getMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, captionEntities, hasSpoiler
+                applyMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, captionEntities, hasSpoiler
             )
         )
     }
@@ -102,7 +102,7 @@ class MediaGroupMessage(override val client: HttpClient) :
     ) {
         inputMedia.add(
             InputMediaPhoto(
-                getMedia(photo),
+                applyMedia(photo),
                 getCaption(printNulls, caption),
                 null,
                 getCaptionEntities(printNulls, safeTextLength, caption),
@@ -118,7 +118,7 @@ class MediaGroupMessage(override val client: HttpClient) :
     ) {
         inputMedia.add(
             InputMediaVideo(
-                getMedia(video), thumbnail?.let { getMedia(it) }, getCaption(caption, false, parseMode),
+                applyMedia(video), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode),
                 parseMode, captionEntities, width, height, duration, supportsStreaming, hasSpoiler
             )
         )
@@ -131,7 +131,7 @@ class MediaGroupMessage(override val client: HttpClient) :
     ) {
         inputMedia.add(
             InputMediaVideo(
-                getMedia(video), thumbnail?.let { getMedia(it) }, getCaption(printNulls, caption), null,
+                applyMedia(video), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
                 getCaptionEntities(printNulls, safeTextLength, caption), width, height, duration, supportsStreaming,
                 hasSpoiler
             )
@@ -146,7 +146,7 @@ class MediaGroupMessage(override val client: HttpClient) :
         checkMediaTypes<InputMediaDocument>("document")
         inputMedia.add(
             InputMediaDocument(
-                getMedia(document), thumbnail?.let { getMedia(it) }, getCaption(printNulls, caption), null,
+                applyMedia(document), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
                 getCaptionEntities(printNulls, safeTextLength, caption), disableContentTypeDetection
             )
         )
@@ -159,7 +159,7 @@ class MediaGroupMessage(override val client: HttpClient) :
         checkMediaTypes<InputMediaDocument>("document")
         inputMedia.add(
             InputMediaDocument(
-                getMedia(document), thumbnail?.let { getMedia(it) }, getCaption(caption, false, parseMode), parseMode,
+                applyMedia(document), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode), parseMode,
                 captionEntities, disableContentTypeDetection
             )
         )
@@ -173,7 +173,7 @@ class MediaGroupMessage(override val client: HttpClient) :
         checkMediaTypes<InputMediaAudio>("audio")
         inputMedia.add(
             InputMediaAudio(
-                getMedia(audio), thumbnail?.let { getMedia(it) }, getCaption(caption, false, parseMode),
+                applyMedia(audio), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode),
                 parseMode, captionEntities, duration, performer, title
             )
         )
@@ -187,7 +187,7 @@ class MediaGroupMessage(override val client: HttpClient) :
         checkMediaTypes<InputMediaAudio>("audio")
         inputMedia.add(
             InputMediaAudio(
-                getMedia(audio), thumbnail?.let { getMedia(it) }, getCaption(printNulls, caption), null,
+                applyMedia(audio), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
                 getCaptionEntities(printNulls, safeTextLength, caption), duration, performer, title
             )
         )

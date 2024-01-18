@@ -8,8 +8,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
 @Polymorphic
@@ -23,11 +21,6 @@ sealed class ChatId {
 
     override fun hashCode(): Int {
         return toStringValue().hashCode()
-    }
-
-    fun toRequestBody(): RequestBody = when (this) {
-        is ID -> value.toString().toRequestBody()
-        is Username -> value.toRequestBody()
     }
 
     fun toStringValue() = when (this) {
