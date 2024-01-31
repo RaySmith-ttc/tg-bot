@@ -15,7 +15,7 @@ class VideoNoteMessage(override val client: HttpClient) : MediaMessage() {
 
     override val mediaName: String = "video"
 
-    override suspend fun send(chatId: ChatId) = sendVideoNote(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideoNote(
         chatId = chatId,
         messageThreadId = messageThreadId,
         videoNote = media ?: error("$mediaName is required"),

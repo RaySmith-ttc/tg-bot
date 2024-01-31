@@ -32,12 +32,14 @@ import ru.raysmith.utils.letIf
  * ```
  * */
 @TextMessageDsl
-class MessageText(private val type: MessageTextType) {
-
-    var printNulls: Boolean = Bot.config.printNulls
+class MessageText(
+    val type: MessageTextType,
 
     /** Whether test should be truncated if text length is greater than 4096 */
     var safeTextLength: Boolean = Bot.config.safeTextLength
+) {
+
+    var printNulls: Boolean = Bot.config.printNulls
 
     private val text: StringBuilder = StringBuilder()
     val currentTextLength: Int

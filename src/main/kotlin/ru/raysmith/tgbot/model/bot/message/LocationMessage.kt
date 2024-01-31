@@ -25,7 +25,7 @@ class LocationMessage(
     override var allowSendingWithoutReply: Boolean? = null
     override var protectContent: Boolean? = null
 
-    override suspend fun send(chatId: ChatId) = sendLocation(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendLocation(
         chatId = chatId,
         messageThreadId = messageThreadId,
         latitude = latitude,

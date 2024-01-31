@@ -21,7 +21,7 @@ class ContactMessage(
     var lastName: String? = null
     var vcard: String? = null
 
-    override suspend fun send(chatId: ChatId) = sendContact(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendContact(
         chatId = chatId,
         messageThreadId = messageThreadId,
         phoneNumber = phoneNumber,

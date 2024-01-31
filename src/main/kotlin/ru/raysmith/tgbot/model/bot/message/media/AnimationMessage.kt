@@ -18,9 +18,9 @@ class AnimationMessage(override val client: HttpClient) : MediaMessageWithThumb(
 
     override val mediaName: String = "animation"
 
-    override suspend fun send(chatId: ChatId): Message = sendAnimation(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?): Message = sendAnimation(
         chatId = chatId,
-        messageThreadId = messageThreadId,
+        messageThreadId = messageThreadId ?: this.messageThreadId,
         animation = media ?: error("$mediaName is required"),
         duration = duration,
         width = width,

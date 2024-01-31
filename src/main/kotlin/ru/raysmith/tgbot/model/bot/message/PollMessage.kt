@@ -56,7 +56,7 @@ class PollMessage(
             if (safeTextLength) it.withSafeLength(MessageTextType.POLL_EXPLANATION) else it
         }
 
-    override suspend fun send(chatId: ChatId) = sendPoll(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPoll(
         chatId = chatId,
         messageThreadId = messageThreadId,
         question = question,

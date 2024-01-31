@@ -20,13 +20,12 @@ abstract class CaptionableMediaMessage : MediaMessage(), IMessage<Message>, Keyb
     companion object {
         internal fun instance(
             service: API, mediaName: String = "",
-            send: (chatId: ChatId) -> Message = { noimpl() }
+            send: (chatId: ChatId, messageThreadId: Int?) -> Message = { _, _ -> noimpl() }
         ): CaptionableMediaMessage {
             return object : CaptionableMediaMessage() {
                 override val mediaName: String = mediaName
                 override val client: HttpClient = service.client
-                override suspend fun send(chatId: ChatId) = send(chatId)
-
+                override suspend fun send(chatId: ChatId, messageThreadId: Int?) = send(chatId, messageThreadId)
                 override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
                 ): Message = noimpl()

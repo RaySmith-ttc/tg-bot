@@ -4,7 +4,6 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
-// TODO prolem: NetworkResponse<Boolean> not inheritance LiveLocationResponse
 @Serializable(with = LiveLocationResponseSerializer::class)
 sealed class LiveLocationResponse
 

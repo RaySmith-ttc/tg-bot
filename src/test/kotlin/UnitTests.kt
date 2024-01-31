@@ -1,3 +1,4 @@
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -9,7 +10,7 @@ import ru.raysmith.tgbot.utils.buildMarkdownV2String
 class UnitTests {
     
     @Test
-    fun formatHtmlString() {
+    fun formatHtmlString(): Unit = runBlocking {
         val html = buildHTMLString {
             bold("<&>")
         }
@@ -21,7 +22,7 @@ class UnitTests {
 
     @Test
     @Suppress("DEPRECATION")
-    fun formatMarkdownString() {
+    fun formatMarkdownString(): Unit = runBlocking {
         val markdown = buildMarkdownString {
             bold("2*2=4\n")
             italic("snake_case").text("\n")
@@ -42,7 +43,7 @@ class UnitTests {
     }
 
     @Test
-    fun formatMarkdownV2String() {
+    fun formatMarkdownV2String(): Unit = runBlocking {
         val markdown = buildMarkdownV2String {
             text("2+2=4\n")
             bold("2*2=4").text("\n")

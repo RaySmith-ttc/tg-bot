@@ -29,10 +29,17 @@ interface IMessage<T> : API {
     /** Protects the contents of the sent message from forwarding and saving */
     var protectContent: Boolean?
 
-    /** Send message to [chat] */
-    suspend fun send(chat: Chat): T = send(chat.id)
+    /**
+     * Send message to [chat]
+     *
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+     * */
+    suspend fun send(chat: Chat, messageThreadId: Int? = null): T = send(chat.id, messageThreadId)
 
-    // TODO add messageThreadId = Int? = null (?)
-    /** Send message to chat with [chatId] */
-    suspend fun send(chatId: ChatId): T
+    /**
+     * Send message to chat with [chatId]
+     *
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+     * */
+    suspend fun send(chatId: ChatId, messageThreadId: Int? = null): T
 }

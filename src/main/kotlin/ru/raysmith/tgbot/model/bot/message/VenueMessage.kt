@@ -22,7 +22,7 @@ class VenueMessage(
     var googlePlaceId: String? = null
     var googlePlaceType: String? = null
 
-    override suspend fun send(chatId: ChatId) = sendVenue(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVenue(
         chatId = chatId,
         messageThreadId = messageThreadId,
         latitude = latitude,

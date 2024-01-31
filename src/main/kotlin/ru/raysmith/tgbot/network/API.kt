@@ -2115,7 +2115,6 @@ interface API {
         }
     }
 
-    // TODO [alt] @param replyMarkup [MessageInlineKeyboard] builder for a new message inline keyboard.
     /**
      * Use this method to stop a poll which was sent by the bot. On success, the stopped [Poll] is returned
      *

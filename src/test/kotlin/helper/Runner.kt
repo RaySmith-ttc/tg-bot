@@ -17,6 +17,7 @@ import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.asChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
@@ -42,6 +43,8 @@ import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.model.network.response.BooleanResponse
+import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -263,7 +266,7 @@ class Runner {
 
                     global {
                         handleMyChatMember {
-                            send(update.findChatId()!!) {
+                            send(chatId = update.findChatId()!!) {
                                 text = update.findChatId()!!.toString()
                             }
                         }
@@ -485,7 +488,8 @@ class Runner {
 
                 handleMyChatMember {
                     if (newChatMember is ChatMemberMember) {
-                        send("Я родился")
+//                        send("Я родился")
+                        send(chat.id.value.toString())
                     }
                 }
 
@@ -536,7 +540,7 @@ class Runner {
                             }
                             return@handleMessage
                         } else if (message.text == "send other id") {
-                            send(1.asChatId()) {
+                            send(chatId = 1.asChatId()) {
                                 text = "this is not sent"
                             }
                         } else if (message.text == "text") {
@@ -673,7 +677,7 @@ class Runner {
                     }
 
                     isCommand("send_username") {
-                        send(ChatId.of("@dskfijfwndnslllaa1")) {
+                        send(chatId = ChatId.of("@dskfijfwndnslllaa1")) {
                             text = "send_username"
                         }
                     }
@@ -1259,6 +1263,11 @@ class Runner {
                                 inlineKeyboard {
                                     row("Test", CallbackQuery.EMPTY_CALLBACK_DATA)
                                 }
+                            }.let {
+                                when(it) {
+                                    is MessageResponse -> it.result
+                                    is BooleanResponse -> it.result
+                                }
                             }
                             Thread.sleep(5000)
                         }
@@ -1491,10 +1500,15 @@ class Runner {
 
                     isDataEqual("media_group_id") {
                         sendMediaGroup {
-                            photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
-
-                                text("test")
+                            val caption = buildMarkdownV2String(MessageTextType.CAPTION) {
+                                repeat(10) {
+                                    bold(generateString(500))
+                                }
                             }
+                            photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile(), caption, ParseMode.MARKDOWNV2)
+//                            photo("AgACAgIAAxkDAAIInGHCc89QKcGelysXyncJDzAZWaKNAAJMtjEbhJARSv14GxGJpnGuAQADAgADcwADIwQ".asTgFile()) {
+//                                text("test")
+//                            }
                             photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile())
                         }
                     }

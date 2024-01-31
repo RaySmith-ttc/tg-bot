@@ -27,9 +27,10 @@ class MediaGroupMessage(override val client: HttpClient) :
 
     private val inputMedia = mutableListOf<InputMediaGroup>()
 
+    // TODO [docs] safeTextLength not work when parseMode is not null
     private fun getCaption(caption: String?, safeTextLength: Boolean, parseMode: ParseMode?) = when {
         safeTextLength && parseMode == null -> caption?.withSafeLength(MessageTextType.CAPTION)
-        safeTextLength -> caption
+        safeTextLength -> caption // should not be cut because MessageText builders are doing their job
         else -> caption
     }
 
@@ -46,7 +47,7 @@ class MediaGroupMessage(override val client: HttpClient) :
             }
             .apply(caption).getEntities()
 
-    override suspend fun send(chatId: ChatId): List<Message> {
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?): List<Message> {
         return if (inputFiles.isEmpty()) {
             sendMediaGroup(
                 chatId = chatId,

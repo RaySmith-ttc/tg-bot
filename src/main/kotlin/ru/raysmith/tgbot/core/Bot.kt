@@ -78,7 +78,8 @@ class Bot(
             return PropertiesFactory.fromOrNull("tgbot.properties")?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
         
-        internal var config = BotConfig()
+        var config = BotConfig()
+        private set
     }
     
     private var needRefreshMe = false

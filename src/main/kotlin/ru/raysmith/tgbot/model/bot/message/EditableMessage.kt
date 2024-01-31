@@ -20,7 +20,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
             override var protectContent: Boolean? = null
             override var keyboardMarkup: MessageKeyboard? = null
             override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()
-            override suspend fun send(chatId: ChatId) = noimpl()
+            override suspend fun send(chatId: ChatId, messageThreadId: Int?) = noimpl()
         }
     }
 

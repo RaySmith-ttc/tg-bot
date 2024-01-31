@@ -52,7 +52,7 @@ class TextMessage(override val client: HttpClient) :
     /** Returns the [parseMode] if entities were not used, null otherwise */
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
-    override suspend fun send(chatId: ChatId) = sendMessage(
+    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendMessage(
         chatId = chatId,
         messageThreadId = messageThreadId,
         text = getMessageText(),

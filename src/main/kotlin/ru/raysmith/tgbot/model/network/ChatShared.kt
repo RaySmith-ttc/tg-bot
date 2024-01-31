@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.network
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestChat
 
-// TODO link KeyboardButtonRequestChat
 /**
  * This object contains information about the chat whose identifier was shared with the bot using a
  * [KeyboardButtonRequestChat] button.
