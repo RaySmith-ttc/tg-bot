@@ -6,7 +6,7 @@ import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.utils.getOrDefault
 
 // TODO
-//  • create new module with exposed extensions; use a lambda that returns list query (e.g. by last id) with offset method by default
+//  • [completed] create new module with exposed extensions; use a lambda that returns list query (e.g. by last id) with offset method by default
 //  • delete exposed dependencies
 //  • impl callback data in pages + fetcher (possibility to optimize SizedIterable.limit(count, offset) that can be replaced with .adjustWhere { // some logic with sorting })
 //  • docs

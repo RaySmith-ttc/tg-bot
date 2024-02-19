@@ -482,7 +482,7 @@ interface API {
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "document" to document,
-                "thumbnail" to thumbnail as InputFile,
+                "thumbnail" to thumbnail as InputFile?,
             )
         }
     }

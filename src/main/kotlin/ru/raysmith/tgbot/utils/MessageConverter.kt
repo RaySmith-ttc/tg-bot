@@ -91,7 +91,8 @@ suspend fun MessageHandler.messageDocument(block: suspend (Document) -> Unit) = 
 fun MessageHandler.messageImage() = MessageConverter(message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })
 
 /** Applies a [block] to the message image (document or compressed photo) or returns null if message doesn't contain image */
-fun MessageHandler.messageImage(block: (Media) -> Unit) = (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also { block(it) }
+suspend fun MessageHandler.messageImage(block: suspend (Media) -> Unit) =
+    (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also { block(it) }
 
 
 // Audio
