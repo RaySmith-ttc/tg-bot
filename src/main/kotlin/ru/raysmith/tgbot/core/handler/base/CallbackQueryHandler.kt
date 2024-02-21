@@ -11,12 +11,13 @@ import ru.raysmith.tgbot.core.handler.utils.DataCallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.utils.ValueDataCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import java.time.LocalDate
 
 data class CallbackQueryHandlerData(
     val handler: (suspend (CallbackQueryHandler.() -> Unit))? = null,
-    val datePicker: DatePicker? = null,
+    val features: MutableList<BotFeature>,
     val alwaysAnswer: Boolean
 )
 
@@ -26,6 +27,8 @@ open class CallbackQueryHandler(
     private val handlerData: Map<String, CallbackQueryHandlerData>,
     override val client: HttpClient
 ) : EventHandler, BaseCallbackHandler(query, client), BotContext<CallbackQueryHandler> {
+
+    protected val localFeatures: MutableList<BotFeature> = mutableListOf()
 
     override fun getChatId() = query.message?.chat?.id
     override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
@@ -38,18 +41,39 @@ open class CallbackQueryHandler(
         val logger: Logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
+    override suspend fun setupFeatures(vararg features: BotFeature) {
+        localFeatures.addAll(features)
+    }
+
+    context(EventHandler)
+    protected suspend fun handleLocalFeatures(handled: Boolean) {
+        localFeatures.forEach { feature ->
+            feature.handle(this as EventHandler, handled)
+        }
+    }
+
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !Bot.config.ignoreEmptyCallbackData) { answer() }
         else {
-            for (it in handlerData) {
-                if (isAnswered) {
+            for (data in handlerData) {
+                if (handled) {
                     break
                 }
 
-                it.value.datePicker?.handle(this) ?: it.value.handler?.invoke(this)
+                data.value.handler?.invoke(this)
             }
 
-            if (!isAnswered && handlerData.any { it.value.alwaysAnswer }) {
+            for (data in handlerData) {
+                if (data.value.features.isNotEmpty()) {
+                    for (feat in data.value.features) {
+                        feat.handle(this, handled)
+                    }
+                }
+            }
+
+            handleLocalFeatures(handled)
+
+            if (!handled && handlerData.any { it.value.alwaysAnswer }) {
                 answer()
             }
         }
@@ -57,10 +81,11 @@ open class CallbackQueryHandler(
 
     suspend fun datePickerResult(datePicker: DatePicker, datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
-        if (!isAnswered && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
+        if (!handled && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
             DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, client)
                 .apply { datePickerHandler(getDate()) }
+            handled = true
         }
     }
 
@@ -69,29 +94,32 @@ open class CallbackQueryHandler(
         datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate, additionalData: String?) -> Unit
     ) {
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
-        if (!isAnswered && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
+        if (!handled && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
             DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, client)
                 .apply { datePickerHandler(getDate(), datePickerData.additionalData) }
+            handled = true
         }
     }
 
     suspend fun isDataEqual(vararg value: String, equalHandler: suspend DataCallbackQueryHandler.(data: String) -> Unit) {
-        if (!isAnswered && query.data != null && query.data in value) {
+        if (!handled && query.data != null && query.data in value) {
             DataCallbackQueryHandler(query, query.data, client)
                 .apply { equalHandler(query.data!!) }
+            handled = true
         }
     }
 
     suspend fun isDataRegex(regex: Regex, regexHandler: suspend DataCallbackQueryHandler.(value: String) -> Unit) {
-        if (!isAnswered && query.data?.matches(regex) == true) {
+        if (!handled && query.data?.matches(regex) == true) {
             DataCallbackQueryHandler(query, query.data, client)
                 .apply { regexHandler(query.data!!) }
+            handled = true
         }
     }
 
     suspend fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Int) -> Unit) {
-        if (!isAnswered && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
+        if (!handled && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
             query.data.substring(paginationCallbackQueryPrefix.length).let {
                 // 1 = Pagination.SYMBOL_PAGE_PREFIX length
                 if (it.length <= 1) null
@@ -99,6 +127,7 @@ open class CallbackQueryHandler(
                     PaginationCallbackQueryHandler(query, page, client).apply { handler(page) }
                 }
             } ?: logger.warn("Pagination data incorrect. Are you sure '$paginationCallbackQueryPrefix' prefix should use isPage handler?")
+            handled = true
         }
     }
 
@@ -106,25 +135,16 @@ open class CallbackQueryHandler(
         vararg startWith: String,
         startWithHandler: suspend ValueDataCallbackQueryHandler.(value: String) -> Unit
     ) {
-        startWith.forEach { startWithEntry ->
-            if (!isAnswered && query.data != null && query.data.startsWith(startWithEntry)) {
+        for (startWithEntry in startWith) {
+            if (!handled && query.data != null && query.data.startsWith(startWithEntry)) {
                 val value = query.data.substring(startWithEntry.length)
                 if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
                     ValueDataCallbackQueryHandler(query, value, client)
                         .apply { startWithHandler(value) }
-                    return@forEach
+                    handled = true
+                    break
                 }
             }
-        }
-    }
-
-    // TODO скорее всего нужно удалить, т.к. не отображает описанию и не может быть сделан по задумке
-    //  Обработчики запускаются друг за другом (default -> datePiker1 -> datePiker2 -> ...) и в каждом есть возможность определить
-    @Deprecated("Not work correct. Deleted soon", replaceWith = ReplaceWith(""))
-    suspend fun isUnhandled(unknownHandler: suspend UnknownQueryHandler.(query: CallbackQuery) -> Unit) {
-        if (!isAnswered) {
-            UnknownQueryHandler(query)
-                .apply { unknownHandler(query) }
         }
     }
 

@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.updates.Update
 
@@ -12,8 +12,12 @@ class UnknownEventHandler(
     val update: Update,
     override val client: HttpClient,
     val handler: suspend UnknownEventHandler.() -> Unit = {}
-) : EventHandler, BotContext<UnknownEventHandler> {
-    override suspend fun handle() = handler()
+) : BaseEventHandler(), BotContext<UnknownEventHandler> {
+    override suspend fun handle() {
+        handler()
+        handled = true
+        handleLocalFeatures(handled)
+    }
     override fun getChatId() = update.findChatId()
 
     override var messageId = update.message?.messageId

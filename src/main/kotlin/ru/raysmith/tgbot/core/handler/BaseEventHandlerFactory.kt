@@ -7,12 +7,11 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.datepicker.DatePicker
+import ru.raysmith.tgbot.utils.datepicker.BotFeature
 
 @DslMarker
 annotation class HandlerDsl
 
-// TODO add userShared, chatShared
 @HandlerDsl
 open class BaseEventHandlerFactory : EventHandlerFactory {
 
@@ -171,8 +170,8 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     @HandlerDsl
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
+        features: List<BotFeature> = Bot.config.defaultCallbackQueryHandlerFeatures,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        datePicker: DatePicker? = null,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) {
@@ -180,7 +179,7 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
         }
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
         Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, datePicker, alwaysAnswer)
+        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, features.toMutableList(), alwaysAnswer)
     }
 
     @HandlerDsl

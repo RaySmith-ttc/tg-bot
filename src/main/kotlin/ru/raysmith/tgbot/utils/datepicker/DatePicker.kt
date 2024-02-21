@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.utils.datepicker
 
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.core.handler.EventHandlerFactory
+import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
@@ -12,11 +12,7 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-interface BotFeature {
-    fun handler(h: (eventHandlerFactory: EventHandlerFactory) -> Unit)
-}
-
-class DatePicker(val callbackQueryPrefix: String) {
+class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
     @Deprecated("Removed soon") // how many months back user can browse
     var monthLimitBack = -1
@@ -88,37 +84,39 @@ class DatePicker(val callbackQueryPrefix: String) {
         }
     }
 
-    suspend fun handle(handler: CallbackQueryHandler) {
-        handler.apply {
-            isDataStartWith(callbackQueryPrefix) { data ->
-                val datePickerData = DatePickerData.from(data)
-                when {
-                    datePickerData.yearPage != null -> {
-                        edit {
-                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.YEAR) }
-                            inlineKeyboard {
-                                setupMarkup(DatePickerState.YEAR, datePickerData.additionalData) {
-                                    setupYearsMarkup(datePickerData.yearPage, datePickerData.additionalData)
+    override suspend fun handle(handler: EventHandler, handled: Boolean) {
+        if (!handled && handler is CallbackQueryHandler) {
+            handler.apply {
+                isDataStartWith(callbackQueryPrefix) { data ->
+                    val datePickerData = DatePickerData.from(data)
+                    when {
+                        datePickerData.yearPage != null -> {
+                            edit {
+                                textWithEntities { messageText(datePickerData.additionalData, DatePickerState.YEAR) }
+                                inlineKeyboard {
+                                    setupMarkup(DatePickerState.YEAR, datePickerData.additionalData) {
+                                        setupYearsMarkup(datePickerData.yearPage, datePickerData.additionalData)
+                                    }
                                 }
                             }
                         }
-                    }
-                    datePickerData.y != null && datePickerData.m != null -> {
-                        edit {
-                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.DAY) }
-                            inlineKeyboard {
-                                setupMarkup(DatePickerState.DAY, datePickerData.additionalData) {
-                                    setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData)
+                        datePickerData.y != null && datePickerData.m != null -> {
+                            edit {
+                                textWithEntities { messageText(datePickerData.additionalData, DatePickerState.DAY) }
+                                inlineKeyboard {
+                                    setupMarkup(DatePickerState.DAY, datePickerData.additionalData) {
+                                        setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData)
+                                    }
                                 }
                             }
                         }
-                    }
-                    datePickerData.y != null && datePickerData.m == null -> {
-                        edit {
-                            textWithEntities { messageText(datePickerData.additionalData, DatePickerState.MONTH) }
-                            inlineKeyboard {
-                                setupMarkup(DatePickerState.MONTH, datePickerData.additionalData) {
-                                    setupMonthsMarkup(datePickerData.y, datePickerData.additionalData)
+                        datePickerData.y != null && datePickerData.m == null -> {
+                            edit {
+                                textWithEntities { messageText(datePickerData.additionalData, DatePickerState.MONTH) }
+                                inlineKeyboard {
+                                    setupMarkup(DatePickerState.MONTH, datePickerData.additionalData) {
+                                        setupMonthsMarkup(datePickerData.y, datePickerData.additionalData)
+                                    }
                                 }
                             }
                         }

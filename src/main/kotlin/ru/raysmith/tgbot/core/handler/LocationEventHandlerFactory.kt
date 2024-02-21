@@ -8,7 +8,7 @@ import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.datepicker.DatePicker
+import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
@@ -121,6 +121,7 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
         null -> UnknownEventHandler(update, client, unknownHandler)
     }
 
+    @HandlerDsl
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
     }
@@ -172,13 +173,13 @@ open class LocationEventHandlerFactory<T : LocationConfig>(val locationsWrapper:
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        datePicker: DatePicker? = null,
+        features: List<BotFeature> = Bot.config.defaultCallbackQueryHandlerFeatures,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) return
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
         Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, datePicker, alwaysAnswer)
+        callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, features.toMutableList(), alwaysAnswer)
     }
 
     internal suspend fun withHandlerId(handlerId: String, block: suspend LocationEventHandlerFactory<T>.() -> Unit) {

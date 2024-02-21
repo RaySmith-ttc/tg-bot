@@ -346,11 +346,11 @@ class Bot(
         additionalEventHandlers.add {
             when (it) {
                 is BaseEventHandlerFactory -> {
-                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, features = listOf(datePicker), handler = null)
                 }
     
                 is LocationEventHandlerFactory<*> -> {
-                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, datePicker = datePicker, handler = null)
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, features = listOf(datePicker), handler = null)
                 }
     
                 else -> return@add

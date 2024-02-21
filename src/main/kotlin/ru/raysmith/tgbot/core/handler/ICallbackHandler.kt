@@ -9,5 +9,5 @@ interface ICallbackHandler {
     suspend fun answer() = answer {  }
 
     /** Call [answerCallbackQuery](https://core.telegram.org/bots/api#answercallbackquery) with build parameters */
-    suspend fun answer(init: AnswerCallbackQuery.() -> Unit): Boolean
+    suspend fun answer(init: suspend AnswerCallbackQuery.() -> Unit): Boolean
 }

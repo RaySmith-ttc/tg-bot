@@ -25,8 +25,8 @@ class LocationCommandHandler<T : LocationConfig>(
     override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 ->
-                it1(config, this)
+            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+                handled = true
             }
         }
     }

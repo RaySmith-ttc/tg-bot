@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.model.network
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.media.PhotoSize
-import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 
 /** This object represent a user's profile pictures. */
 @Serializable

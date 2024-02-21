@@ -25,7 +25,7 @@ annotation class BotContextDsl
 
 // TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */
-interface BotContext<T : EventHandler> : ISender {
+interface BotContext<T : EventHandler> : ISender, IEditor {
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl

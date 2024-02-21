@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 /** This object represents a service message about a new forum topic created in the chat. */
 @Serializable
-data class ForumTopicCreated(
+data class ForumTopicCreated( // TODO move other to service package and inheritance from sealed class
 
     /** Name of the topic */
     @SerialName("name") val name: String,

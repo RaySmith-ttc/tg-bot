@@ -52,6 +52,7 @@ import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
+import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.locations.LocationConfig
@@ -66,10 +67,29 @@ import java.io.IOException
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
-val locations = false
+val locations = true
 val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
+}
+
+val UnhandledFeature = BotFeature { handler, handled ->
+    if (!handled && handler is CallbackQueryHandler) {
+        println("unhandled catch in feature")
+        handler.handled = true
+    }
+}
+
+val GlobalFeature = BotFeature { handler, handled ->
+    if (handler is CallbackQueryHandler) {
+        println("global feature...")
+    }
+}
+
+val OverridedGlobalFeature = BotFeature { handler, handled ->
+    if (handler is CallbackQueryHandler) {
+        println("overrided global feature...")
+    }
 }
 
 inline fun <reified T> T.toJson() = prettyPrintJson.encodeToString(this)
@@ -120,7 +140,8 @@ val datePicker = DatePicker("sys").apply {
 
     additionalRowsPosition = AdditionalRowsPosition.TOP
     additionalRows = {
-        row("some btn", CallbackQuery.EMPTY_CALLBACK_DATA)
+        row("some btn", "some_btn")
+        row("should be unhandled", "sbunhandled")
     }
     additionalRowsVisibleOnStates = setOf(DatePickerState.DAY, DatePickerState.YEAR)
 }
@@ -217,6 +238,7 @@ class Runner {
                     }
                 }.config {
 //                    this.locale = Locale.JAPAN
+                    defaultCallbackQueryHandlerFeatures = listOf(GlobalFeature)
                     paginationFetcherFactory = object : PaginationFetcherFactory {
                         override fun <T> getFetcher(): PaginationFetcher<T> {
                             return object : PaginationFetcher<T> {
@@ -310,14 +332,14 @@ class Runner {
                             println("handleCallbackQuery [global]")
                         }
 
-                        handleMessage {
-                            send {
-                                text = "test"
-                                inlineKeyboard {
-                                    row("asd", "asd")
-                                }
-                            }
-                        }
+//                        handleMessage {
+//                            send {
+//                                text = "test"
+//                                inlineKeyboard {
+//                                    row("asd", "asd")
+//                                }
+//                            }
+//                        }
                     }
 //
                     location("menu") {
@@ -334,7 +356,9 @@ class Runner {
                         handle {
                             handleCommand {
                                 isCommand("menu") {
-                                    send("menu")
+                                    send {
+                                        datePicker(datePicker)
+                                    }
                                 }
 
                                 isCommand("toother") {
@@ -343,12 +367,20 @@ class Runner {
                                 }
                             }
 
-                            handleMessage {
-                                send("handled in $name")
-                            }
+//                            handleMessage {
+//                                send("handled in $name")
+//                            }
 
-                            handleCallbackQuery(alwaysAnswer = false) {
-                                println("handleCallbackQuery [menu]")
+                            handleCallbackQuery(alwaysAnswer = false, features = listOf(OverridedGlobalFeature)) {
+                                setupFeatures(UnhandledFeature)
+
+                                isDataEqual("some_btn") {
+                                    println("handle some_btn")
+                                }
+
+                                isDataEqual("some_btn") {
+                                    println("handle some_btn [second]")
+                                }
                             }
 
                             handleUnknown {
@@ -715,7 +747,8 @@ class Runner {
                     }
 
                     isCommand("setChatMenuButtonWeb") {
-                        setChatMenuButton(MenuButtonWebApp("Test", WebAppInfo("https://192.168.0.104:8890")))
+//                        setChatMenuButton(MenuButtonWebApp("Test", WebAppInfo("https://192.168.0.104:8890")))
+                        setChatMenuButton(MenuButtonWebApp("Test", WebAppInfo("https://expodelivery.ru")))
                         send("success")
                     }
 
@@ -930,7 +963,8 @@ class Runner {
                                     row {
                                         button {
                                             text = "Open"
-                                            webApp = WebAppInfo("https://sandbox.raysmith.ru:8890/payment")
+//                                            webApp = WebAppInfo("https://sandbox.raysmith.ru:8890/payment")
+                                            webApp = WebAppInfo("https://expodelivery.ru")
                                         }
 
                                     }
@@ -1561,10 +1595,6 @@ class Runner {
                     isDataEqual("answertest") {
                         sendAnswerVariants(MessageAction.EDIT)
                         answer()
-                    }
-
-                    isUnhandled {
-                        logger.warn("Unhandled query (${query.data}): $query")
                     }
                 }
             }

@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.message.Message
 
@@ -12,7 +12,7 @@ open class EditedMessageHandler(
     val message: Message,
     override val client: HttpClient,
     private val handler: suspend EditedMessageHandler.() -> Unit = { }
-) : EventHandler, BotContext<EditedMessageHandler> {
+) : BaseEventHandler(), BotContext<EditedMessageHandler> {
 
     val editDate = message.editDate!!
     override fun getChatId() = message.chat.id
@@ -20,7 +20,11 @@ open class EditedMessageHandler(
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
 
-    override suspend fun handle() = handler()
+    override suspend fun handle() {
+        handler()
+        handled = true
+        handleLocalFeatures(handled)
+    }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<EditedMessageHandler>.() -> R): R {
         return EditedMessageHandler(message, bot.client, handler).block()

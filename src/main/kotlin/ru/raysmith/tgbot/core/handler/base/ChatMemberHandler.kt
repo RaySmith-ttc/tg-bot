@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.chat.Chat
@@ -22,7 +22,7 @@ open class ChatMemberHandler(
     val inviteLink: ChatInviteLink? = null,
     override val client: HttpClient,
     private val handler: suspend ChatMemberHandler.() -> Unit = { }
-) : EventHandler, BotContext<ChatMemberHandler> {
+) : BaseEventHandler(), BotContext<ChatMemberHandler> {
 
     override fun getChatId() = chat.id
     override fun getChatIdOrThrow() = chat.id
@@ -34,7 +34,11 @@ open class ChatMemberHandler(
         chatMember.inviteLink, client, handler
     )
 
-    override suspend fun handle() = handler()
+    override suspend fun handle() {
+        handler()
+        handled = true
+        handleLocalFeatures(handled)
+    }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
         return ChatMemberHandler(

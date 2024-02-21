@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.inline.InlineQuery
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
@@ -15,13 +15,17 @@ open class InlineQueryHandler(
     val inlineQuery: InlineQuery,
     override val client: HttpClient,
     private val handler: suspend InlineQueryHandler.() -> Unit = {}
-) : EventHandler, BotContext<InlineQueryHandler> {
+) : BaseEventHandler(), BotContext<InlineQueryHandler> {
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineQuery.from.id
     override fun getChatIdOrThrow() = inlineQuery.from.id
-    override suspend fun handle() = handler()
+    override suspend fun handle() {
+        handler()
+        handled = true
+        handleLocalFeatures(handled)
+    }
 
     /**
      * @see answerInlineQuery

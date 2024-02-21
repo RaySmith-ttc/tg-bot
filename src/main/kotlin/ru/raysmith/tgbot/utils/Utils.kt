@@ -4,7 +4,7 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotContextDsl
-import ru.raysmith.tgbot.core.handler.EventHandler
+import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -64,6 +64,9 @@ internal fun createBotContext(
     client: HttpClient = TelegramApi.defaultClientInstance,
 ) = object : BotContext<UnknownEventHandler> {
     override val client = client
+    override var messageId: Int? = update?.message?.messageId
+    override var inlineMessageId: String? = update?.callbackQuery?.inlineMessageId
+
     override fun getChatId(): ChatId? = withChatId ?: update?.findChatId()
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(update ?: Update(-1), bot.client).block()
@@ -75,7 +78,7 @@ internal fun createEventHandler(
     withMessageId: Int? = null,
     withInlineMessageId: String? = null,
     client: HttpClient = TelegramApi.defaultClientInstance,
-) = object : EventHandler {
+) = object : BaseEventHandler() {
     override suspend fun handle() {}
     override fun getChatId(): ChatId? = withChatId
     override var messageId: Int? = withMessageId

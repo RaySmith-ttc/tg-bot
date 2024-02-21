@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core
 
+import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
 import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
@@ -28,7 +29,10 @@ class BotConfig {
     } ?: Locale.getDefault()
 
     var alwaysAnswerCallback: Boolean = false
+    var ignoreEmptyCallbackData: Boolean = true
 
     var sendChatActionWithMedaMessage: Boolean = false
     var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
+
+    var defaultCallbackQueryHandlerFeatures: List<BotFeature> = emptyList()
 }
