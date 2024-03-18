@@ -46,7 +46,7 @@ class LocationsWrapper<L : LocationConfig> {
     
     private val additionalEventHandlers: MutableMap<String, suspend LocationEventHandlerFactory<L>.(L) -> Unit> = mutableMapOf()
     @LocationsDSLConfig
-    suspend fun global(
+    fun global(
         handlersId: String = CallbackQueryHandler.GLOBAL_HANDLER_ID,
         setup: suspend LocationEventHandlerFactory<L>.(config: L) -> Unit
     ) {
