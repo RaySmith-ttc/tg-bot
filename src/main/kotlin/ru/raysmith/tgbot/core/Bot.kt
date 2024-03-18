@@ -25,8 +25,6 @@ import java.io.IOException
 import java.util.*
 import kotlin.system.measureTimeMillis
 
-
-// TODO impl string-length safe util (sendMessage -> text.take(4096)), throw error or loop sending
 /**
  * Creates bot instance
  *
@@ -45,7 +43,7 @@ class Bot(
     val token: String? = null,
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
-    private var lastUpdateId: Int? = null, // TODO can be negative, reverse mode?
+    private var lastUpdateId: Int? = null,
 ) : API {
 
     init {
@@ -148,8 +146,6 @@ class Bot(
                 try {
                     val handler = if (isLocationsMode) {
                         locationsWrapper!!.getHandlerFactory(update).apply {
-                            
-                            // TODO delete?
                             additionalEventHandlers.forEach {
                                 apply(it)
                             }
@@ -258,7 +254,7 @@ class Bot(
                     updateScope.async {
                         val updates = try {
                             getUpdates(
-                                offset = lastUpdateId?.plus(1),
+                                offset = lastUpdateId,
                                 timeout = timeout,
                                 allowedUpdates = allowedUpdates
                             )
@@ -272,7 +268,7 @@ class Bot(
                                 newUpdate(update)
                             }
 
-                            lastUpdateId = updates.last().updateId
+                            lastUpdateId = updates.last().updateId + 1
                         }
                     }.await()
                 }
