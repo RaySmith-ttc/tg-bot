@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
+import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import kotlinx.serialization.modules.SerializersModule
@@ -78,6 +79,7 @@ object TelegramApi {
         ignoreUnknownKeys = true
         encodeDefaults = false
         classDiscriminator = "#type"
+        classDiscriminatorMode = ClassDiscriminatorMode.NONE
         namingStrategy = JsonNamingStrategy.SnakeCase
 
         serializersModule = SerializersModule {
