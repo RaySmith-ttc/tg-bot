@@ -11,7 +11,7 @@ class DefaultPaginationFetcherFactory : PaginationFetcherFactory {
                 val range = IntRange(offset, if (isLastPage) dataCount - 1 else lastIndex)
 
                 return if (data is List<T>) {
-                    data.subList(offset, if (isLastPage) dataCount - 1 else lastIndex)
+                    data.subList(offset, if (isLastPage) dataCount else lastIndex)
                 } else {
                     data.filterIndexed { index, _ -> index in range }
                 }
