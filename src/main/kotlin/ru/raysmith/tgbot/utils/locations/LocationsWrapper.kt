@@ -1,13 +1,14 @@
 package ru.raysmith.tgbot.utils.locations
 
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 
 @LocationsDSL
-class LocationsWrapper<L : LocationConfig> {
+class LocationsWrapper<L : LocationConfig>(override val bot: Bot) : BotHolder {
     internal val locations = mutableMapOf<String, Location<L>>()
     
     private var locationNameGetter: L.() -> String = { error("TODO") }
@@ -52,7 +53,8 @@ class LocationsWrapper<L : LocationConfig> {
     ) {
         additionalEventHandlers[handlersId] = setup
     }
-    
+
+    context(BotHolder)
     @LocationsDSL
     suspend fun location(name: String, @LocationsDSL newLocation: suspend Location<L>.() -> Unit) {
         add(createLocation(name, this) {
@@ -60,10 +62,10 @@ class LocationsWrapper<L : LocationConfig> {
         })
     }
 
-    suspend fun allowedUpdates(): Set<UpdateType> {
+    suspend fun allowedUpdates(bot: Bot): Set<UpdateType> {
         val config = configCreator(Update(0))
         val locationUpdates = locations.map { it.value.handlerFactory.allowedUpdates }.flatten()
-        val location = Location("", LocationEventHandlerFactory<L>(LocationsWrapper()))
+        val location = Location("", LocationEventHandlerFactory<L>(LocationsWrapper(bot)))
         val globalUpdates = location.handlerFactory.apply {
             additionalEventHandlers.forEach { (handlerId, handler) ->
                 withHandlerId(handlerId) {
@@ -84,8 +86,8 @@ class LocationsWrapper<L : LocationConfig> {
         
         return this
     }
-    
-    internal suspend fun getHandlerFactory(update: Update): LocationEventHandlerFactory<L> {
+
+    internal suspend fun getHandlerFactory(update: Update, bot: Bot): LocationEventHandlerFactory<L> {
         val config = configCreator(update)
         if (!filter.invoke(config, update)) {
             Bot.logger.debug("Update #${update.updateId} skipped by locations filter")

@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.API
+import ru.raysmith.tgbot.utils.getOrDefault
 
 /**
  * This object represents an incoming callback query from a callback button in an inline keyboard.
@@ -51,7 +52,7 @@ data class CallbackQuery(
     @SerialName("game_short_name") val gameShortName: String? = null,
 ) : ChatIdHolder {
     companion object {
-        val EMPTY_CALLBACK_DATA = Bot.config.emptyCallbackQuery
+        val EMPTY_CALLBACK_DATA = Bot.properties.getOrDefault("emptyCallbackQuery", " ")
     }
 
     override fun getChatId() = message?.chat?.id

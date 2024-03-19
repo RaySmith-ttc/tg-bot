@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -16,10 +15,10 @@ data class LocationChosenInlineQueryHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 class LocationChosenInlineQueryHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     private val handlerData: MutableMap<String, LocationChosenInlineQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : ChosenInlineQueryHandler(update.chosenInlineResult!!, client), LocationHandler<T> {
+) : ChosenInlineQueryHandler(update.chosenInlineResult!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
@@ -31,7 +30,7 @@ class LocationChosenInlineQueryHandler<T : LocationConfig>(
         handleLocalFeatures(handled)
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChosenInlineQueryHandler>.() -> R): R {
-        return LocationChosenInlineQueryHandler(update, bot.client, handlerData, locationsWrapper).let {
+        return LocationChosenInlineQueryHandler(update, bot, handlerData, locationsWrapper).let {
             this.block()
         }
     }

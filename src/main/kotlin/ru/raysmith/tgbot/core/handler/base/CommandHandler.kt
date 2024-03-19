@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotContextDsl
@@ -12,10 +11,9 @@ import ru.raysmith.tgbot.model.network.message.Message
 @HandlerDsl
 open class CommandHandler(
     val command: BotCommand, val message: Message,
-    override val client: HttpClient,
+    final override val bot: Bot,
     val handler: suspend CommandHandler.() -> Unit = { }
 ) : BaseEventHandler(), BotContext<CommandHandler> {
-
     override fun getChatId() = message.chat.id
     override fun getChatIdOrThrow() = message.chat.id
     override var messageId: Int? = message.messageId
@@ -29,7 +27,7 @@ open class CommandHandler(
 
     @BotContextDsl
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
-        return CommandHandler(command, message, bot.client, handler).block()
+        return CommandHandler(command, message, bot, handler).block()
     }
 }
 

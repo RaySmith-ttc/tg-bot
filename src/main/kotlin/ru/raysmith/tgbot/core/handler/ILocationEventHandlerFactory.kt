@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.core.handler
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.core.handler.location.*
@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory {
+interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory, BotHolder {
     val locationsWrapper: LocationsWrapper<T>
     var defaultHandlerId: String
 
@@ -42,9 +42,9 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
 
     @HandlerDsl
     fun handleCallbackQuery(
-        alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
+        alwaysAnswer: Boolean = bot.config.alwaysAnswerCallback,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        features: List<BotFeature> = Bot.config.defaultCallbackQueryHandlerFeatures,
+        features: List<BotFeature> = bot.config.defaultCallbackQueryHandlerFeatures,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     )
 
@@ -71,7 +71,8 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
 }
 
 @HandlerDsl
-open class LocationEventHandlerFactory<T : LocationConfig>(override val locationsWrapper: LocationsWrapper<T>) : ILocationEventHandlerFactory<T> {
+class LocationEventHandlerFactory<T : LocationConfig>(override val locationsWrapper: LocationsWrapper<T>) : ILocationEventHandlerFactory<T> {
+    override val bot: Bot = locationsWrapper.bot
     override var defaultHandlerId: String = CallbackQueryHandler.HANDLER_ID
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
@@ -114,67 +115,65 @@ open class LocationEventHandlerFactory<T : LocationConfig>(override val location
         unknownHandler = { }
     }
 
-    override fun getHandler(
-        update: Update, client: HttpClient
-    ): EventHandler = when(update.type) {
+    override fun getHandler(update: Update): EventHandler = when(update.type) {
         UpdateType.MESSAGE -> when(update.message!!.type) {
-            MessageType.COMMAND -> LocationCommandHandler(update, client, commandHandler, locationsWrapper)
-            MessageType.TEXT -> LocationMessageHandler(update, client, messageHandler, locationsWrapper)
+            MessageType.COMMAND -> LocationCommandHandler(update, bot, commandHandler, locationsWrapper)
+            MessageType.TEXT -> LocationMessageHandler(update, bot, messageHandler, locationsWrapper)
         }
 
         UpdateType.EDITED_MESSAGE -> LocationEditedMessageHandler(
-            update, client, editedMessageHandler, locationsWrapper
+            update, bot, editedMessageHandler, locationsWrapper
         )
 
         UpdateType.CHANNEL_POST -> LocationChannelPostHandler(
-            update, client, channelPostHandler, locationsWrapper
+            update, bot, channelPostHandler, locationsWrapper
         )
 
         UpdateType.EDITED_CHANNEL_POST -> LocationEditedChannelPostHandler(
-            update, client, editedChannelPostHandler, locationsWrapper
+            update, bot, editedChannelPostHandler, locationsWrapper
         )
 
         UpdateType.INLINE_QUERY -> LocationInlineQueryHandler(
-            update, client, inlineQueryHandler, locationsWrapper
+            update, bot, inlineQueryHandler, locationsWrapper
         )
 
         UpdateType.CHOSEN_INLINE_RESULT -> LocationChosenInlineQueryHandler(
-            update, client, chosenInlineQueryHandler, locationsWrapper
+            update, bot, chosenInlineQueryHandler, locationsWrapper
         )
 
         UpdateType.CALLBACK_QUERY -> LocationCallbackQueryHandler(
-            update, client, callbackQueryHandler, locationsWrapper
+            update, bot, callbackQueryHandler, locationsWrapper
         )
 
         UpdateType.SHIPPING_QUERY -> LocationShippingQueryHandler(
-            update, client, shippingQueryHandler, locationsWrapper
+            update, bot, shippingQueryHandler, locationsWrapper
         )
 
         UpdateType.PRE_CHECKOUT_QUERY -> LocationPreCheckoutQueryHandler(
-            update, client, preCheckoutQueryHandler, locationsWrapper
+            update, bot, preCheckoutQueryHandler, locationsWrapper
         )
 
         UpdateType.POLL -> LocationPollHandler(
-            update, client, pollHandler, locationsWrapper
+            update, bot, pollHandler, locationsWrapper
         )
 
         UpdateType.POLL_ANSWER -> LocationPollAnswerHandler(
-            update, client, pollAnswerHandler, locationsWrapper
+            update, bot, pollAnswerHandler, locationsWrapper
         )
 
         UpdateType.MY_CHAT_MEMBER -> LocationChatMemberHandler(
-            update, client, myChatMemberHandler, locationsWrapper
+            update, bot, myChatMemberHandler, locationsWrapper
         )
 
         UpdateType.CHAT_MEMBER -> LocationChatMemberHandler(
-            update, client, chatMemberHandler, locationsWrapper
+            update, bot, chatMemberHandler, locationsWrapper
         )
 
         UpdateType.CHAT_JOIN_REQUEST -> LocationChatJoinRequestHandler(
-            update, client, chatJoinRequestHandler, locationsWrapper
+            update, bot, chatJoinRequestHandler, locationsWrapper
         )
 
-        null -> UnknownEventHandler(update, client, unknownHandler)
+        null -> UnknownEventHandler(update, bot, unknownHandler)
     }
 
     @HandlerDsl

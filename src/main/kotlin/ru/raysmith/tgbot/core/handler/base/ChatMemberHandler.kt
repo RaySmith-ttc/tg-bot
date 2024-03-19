@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
@@ -20,18 +19,17 @@ open class ChatMemberHandler(
     val oldChatMember: ChatMember,
     val newChatMember: ChatMember,
     val inviteLink: ChatInviteLink? = null,
-    override val client: HttpClient,
+    final override val bot: Bot,
     private val handler: suspend ChatMemberHandler.() -> Unit = { }
 ) : BaseEventHandler(), BotContext<ChatMemberHandler> {
-
     override fun getChatId() = chat.id
     override fun getChatIdOrThrow() = chat.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    constructor(chatMember: ChatMemberUpdated, client: HttpClient, handler: suspend ChatMemberHandler.() -> Unit = { }) : this(
+    constructor(chatMember: ChatMemberUpdated, bot: Bot, handler: suspend ChatMemberHandler.() -> Unit = { }) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,
-        chatMember.inviteLink, client, handler
+        chatMember.inviteLink, bot, handler
     )
 
     override suspend fun handle() {
@@ -42,7 +40,7 @@ open class ChatMemberHandler(
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
         return ChatMemberHandler(
-            chat, from, date, oldChatMember, newChatMember, inviteLink, bot.client, handler
+            chat, from, date, oldChatMember, newChatMember, inviteLink, bot, handler
         ).block()
     }
 }

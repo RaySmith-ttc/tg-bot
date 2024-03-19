@@ -4,6 +4,7 @@ import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -14,8 +15,8 @@ import ru.raysmith.tgbot.utils.withSafeLength
 @Suppress("MemberVisibilityCanBePrivate")
 class PollMessage(
     val question: String, val options: List<String>,
-    override val client: HttpClient
-) : IMessage<Message>, KeyboardCreator {
+    override val bot: Bot // TODO replacer to BotConfig + other
+) : IMessage<Message>, KeyboardCreator, BotHolder {
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
@@ -42,13 +43,13 @@ class PollMessage(
     fun hasExplanation() = explanation != null || _explanation != null
 
     /** Whether test should be truncated if caption length is greater than 200 */
-    var safeTextLength: Boolean = Bot.config.safeTextLength
+    var safeTextLength: Boolean = bot.config.safeTextLength
 
     /**
      * Sets a explanation as [MessageText] object
      * */
     fun explanationWithEntities(setText: MessageText.() -> Unit) {
-        _explanation = MessageText(MessageTextType.CAPTION).apply(setText)
+        _explanation = MessageText(MessageTextType.CAPTION, bot.config).apply(setText)
     }
 
     fun getExplanationText(): String? =
@@ -77,4 +78,6 @@ class PollMessage(
         allowSendingWithoutReply = allowSendingWithoutReply,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
+
+    override val client: HttpClient = bot.client
 }

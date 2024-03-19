@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler
 
-import io.ktor.client.*
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
@@ -14,7 +13,7 @@ interface EventHandlerFactory {
     
     val allowedUpdates: Set<UpdateType>
     
-    fun getHandler(update: Update, client: HttpClient): EventHandler
+    fun getHandler(update: Update): EventHandler
 
     fun clear()
 }

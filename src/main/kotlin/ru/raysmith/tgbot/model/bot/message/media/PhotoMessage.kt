@@ -1,10 +1,12 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 
-class PhotoMessage(override val client: HttpClient) : CaptionableMediaMessage(), SpolerableContent {
+class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), SpolerableContent {
+    override val client: HttpClient = bot.client
 
     override var hasSpoiler: Boolean? = null
     var photo: InputFile?
@@ -12,6 +14,7 @@ class PhotoMessage(override val client: HttpClient) : CaptionableMediaMessage(),
         set(value) { media = value }
 
     override val mediaName: String = "photo"
+    override var sendChatAction: Boolean = bot.config.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPhoto(
         chatId = chatId,

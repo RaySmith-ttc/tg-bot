@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -9,10 +11,9 @@ import kotlin.time.Duration
 
 @Suppress("MemberVisibilityCanBePrivate")
 class LocationMessage(
-    val latitude: Double, val longitude: Double,
-    override val client: HttpClient
-) : IMessage<Message>, KeyboardCreator {
-
+    val latitude: Double, val longitude: Double, override val bot: Bot
+) : IMessage<Message>, KeyboardCreator, BotHolder {
+    override val client: HttpClient = bot.client
     var horizontalAccuracy: Double? = null
     var livePeriod: Duration? = null
     var heading: Int? = null

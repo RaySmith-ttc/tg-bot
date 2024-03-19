@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -20,15 +19,15 @@ data class LocationCallbackQueryHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 open class LocationCallbackQueryHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     protected val handlerData: Map<String, LocationCallbackQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : CallbackQueryHandler(update.callbackQuery!!, emptyMap(), client), LocationHandler<T> {
+) : CallbackQueryHandler(update.callbackQuery!!, emptyMap(), bot), LocationHandler<T> {
 
     override val config by lazy { config() }
 
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !Bot.config.ignoreEmptyCallbackData) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.config.ignoreEmptyCallbackData) { answer() }
 
         for (data in handlerData) {
             if (handled) {
@@ -53,6 +52,6 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
         }
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
-        return LocationCallbackQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
+        return LocationCallbackQueryHandler(update, bot, handlerData, locationsWrapper).block()
     }
 }

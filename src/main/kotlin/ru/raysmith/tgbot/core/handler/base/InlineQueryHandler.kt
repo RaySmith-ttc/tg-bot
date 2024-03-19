@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
@@ -13,7 +12,7 @@ import kotlin.time.Duration
 @HandlerDsl
 open class InlineQueryHandler(
     val inlineQuery: InlineQuery,
-    override val client: HttpClient,
+    final override val bot: Bot,
     private val handler: suspend InlineQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<InlineQueryHandler> {
     override var messageId: Int? = null
@@ -36,7 +35,7 @@ open class InlineQueryHandler(
     ) = answerInlineQuery(id, results, cacheTime, isPersonal, nextOffset, button)
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<InlineQueryHandler>.() -> R): R {
-        return InlineQueryHandler(inlineQuery, bot.client, handler).block()
+        return InlineQueryHandler(inlineQuery, bot, handler).block()
     }
 }
 

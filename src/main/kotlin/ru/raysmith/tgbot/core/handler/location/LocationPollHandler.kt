@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -16,10 +15,10 @@ data class LocationPollHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 class LocationPollHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     private val handlerData: MutableMap<String, LocationPollHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : PollHandler(update.poll!!, client), LocationHandler<T> {
+) : PollHandler(update.poll!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
@@ -31,6 +30,6 @@ class LocationPollHandler<T : LocationConfig>(
         handleLocalFeatures(handled)
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PollHandler>.() -> R): R {
-        return LocationPollHandler(update, bot.client, handlerData, locationsWrapper).block()
+        return LocationPollHandler(update, bot, handlerData, locationsWrapper).block()
     }
 }

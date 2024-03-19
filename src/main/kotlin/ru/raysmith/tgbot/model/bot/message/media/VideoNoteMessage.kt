@@ -1,10 +1,13 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 
-class VideoNoteMessage(override val client: HttpClient) : MediaMessage() {
+class VideoNoteMessage(override val bot: Bot) : MediaMessage(), BotHolder {
+    override val client: HttpClient = bot.client
 
     var videoNote: InputFile?
         get() = media
@@ -14,6 +17,7 @@ class VideoNoteMessage(override val client: HttpClient) : MediaMessage() {
     var length: Int? = null
 
     override val mediaName: String = "video"
+    override var sendChatAction: Boolean = bot.config.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideoNote(
         chatId = chatId,

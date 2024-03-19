@@ -1,11 +1,14 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.message.Message
 
-class AnimationMessage(override val client: HttpClient) : MediaMessageWithThumb(), SpolerableContent {
+class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableContent, BotHolder {
+    override val client: HttpClient = bot.client
 
     override var hasSpoiler: Boolean? = null
     var animation: InputFile?
@@ -17,6 +20,7 @@ class AnimationMessage(override val client: HttpClient) : MediaMessageWithThumb(
     var height: Int? = null
 
     override val mediaName: String = "animation"
+    override var sendChatAction: Boolean = bot.config.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?): Message = sendAnimation(
         chatId = chatId,

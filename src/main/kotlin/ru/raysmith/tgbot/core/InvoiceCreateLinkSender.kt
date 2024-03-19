@@ -5,18 +5,13 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
-import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 
-/** Builder of [sendInvoice][BotContext.sendInvoice] request */
-class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder {
+/** Builder of [sendInvoice][BotContext.createInvoiceLink] request */
+class InvoiceCreateLinkSender(override val bot: Bot) : API, BotHolder {
     override val client: HttpClient = bot.client
 
-    var messageThreadId: Int? = null
     var title: String? = null
     var description: String? = null
     var payload: String? = null
@@ -25,7 +20,6 @@ class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHold
     var prices: List<LabeledPrice>? = null
     var maxTipAmount: Int? = null
     var suggestedTipAmounts: List<Int>? = null
-    var startParameter: String? = null
     var providerData: JsonElement? = null
     var photoUrl: String? = null
     var photoSize: Int? = null
@@ -38,14 +32,8 @@ class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHold
     var sendPhoneNumberToProvider: Boolean? = null
     var sendEmailToProvider: Boolean? = null
     var isFlexible: Boolean? = null
-    var disableNotification: Boolean? = null
-    var replyToMessageId: Long? = null
-    var allowSendingWithoutReply: Boolean? = null
-    override var keyboardMarkup: MessageKeyboard? = null
 
-    suspend fun send(chatId: ChatId) = sendInvoice(
-        chatId = chatId,
-        messageThreadId = messageThreadId,
+    suspend fun send() = createInvoiceLink(
         title = title ?: "",
         description = description ?: "",
         payload = payload ?: "",
@@ -54,7 +42,6 @@ class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHold
         prices = prices?.let { Json.encodeToString(it) } ?: "",
         maxTipAmount = maxTipAmount,
         suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
-        startParameter = startParameter,
         providerData = providerData?.let { Json.encodeToString(it) },
         photoUrl = photoUrl,
         photoSize = photoSize,
@@ -66,11 +53,6 @@ class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHold
         needShippingAddress = needShippingAddress,
         sendPhoneNumberToProvider = sendPhoneNumberToProvider,
         sendEmailToProvider = sendEmailToProvider,
-        isFlexible = isFlexible,
-        disableNotification = disableNotification,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
-        replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
+        isFlexible = isFlexible
     )
 }
-

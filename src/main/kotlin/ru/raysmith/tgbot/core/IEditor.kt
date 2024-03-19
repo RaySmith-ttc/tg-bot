@@ -14,7 +14,7 @@ import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.pagination.Pagination
 
 /** Represent an object that can edit messages */
-interface IEditor : ChatIdHolder, API {
+interface IEditor : ChatIdHolder, API, BotHolder {
 
     /** Identifier of the message to be edited */
     var messageId: Int?
@@ -28,7 +28,7 @@ interface IEditor : ChatIdHolder, API {
         inlineMessageId: String? = this.inlineMessageId,
         caption: suspend MessageText.() -> Unit
     ): Message {
-        return CaptionableMediaMessage.instance(this)
+        return CaptionableMediaMessage.instance(bot)
             .apply { captionWithEntities(caption) }
             .edit(chatId, messageId, inlineMessageId)
     }
@@ -51,7 +51,7 @@ interface IEditor : ChatIdHolder, API {
         media: InputMedia,
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
-        return CaptionableMediaMessage.instance(this)
+        return CaptionableMediaMessage.instance(bot)
             .apply { inlineKeyboard(keyboard) }
             .editMedia<T>(chatId, messageId, inlineMessageId, media)
     }
@@ -62,7 +62,7 @@ interface IEditor : ChatIdHolder, API {
         inlineMessageId: String? = this.inlineMessageId,
         message: suspend TextMessage.() -> Unit
     ): Message {
-        return TextMessage(client).apply { message() }
+        return TextMessage(bot).apply { message() }
             .edit(chatId, messageId, inlineMessageId)
     }
 

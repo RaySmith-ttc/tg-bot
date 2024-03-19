@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.EditableMessage
 import ru.raysmith.tgbot.model.bot.message.IMessage
@@ -11,21 +12,24 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.noimpl
 import ru.raysmith.tgbot.utils.withSafeLength
 
-abstract class CaptionableMediaMessage : MediaMessage(), IMessage<Message>, KeyboardCreator, EditableMessage {
+abstract class CaptionableMediaMessage :
+    MediaMessage(), IMessage<Message>, KeyboardCreator, EditableMessage, BotHolder {
 
     companion object {
         internal fun instance(
-            service: API, mediaName: String = "",
+            bot: Bot, mediaName: String = "",
             send: (chatId: ChatId, messageThreadId: Int?) -> Message = { _, _ -> noimpl() }
         ): CaptionableMediaMessage {
             return object : CaptionableMediaMessage() {
+                override var sendChatAction: Boolean = false
                 override val mediaName: String = mediaName
-                override val client: HttpClient = service.client
+                override val client: HttpClient = bot.client
                 override suspend fun send(chatId: ChatId, messageThreadId: Int?) = send(chatId, messageThreadId)
+                override val bot: Bot = bot
+
                 override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
                 ): Message = noimpl()
@@ -41,13 +45,13 @@ abstract class CaptionableMediaMessage : MediaMessage(), IMessage<Message>, Keyb
     fun hasCaption() = caption != null || _caption != null
 
     /** Whether test should be truncated if caption length is greater than 1024 */
-    var safeTextLength: Boolean = Bot.config.safeTextLength
+    var safeTextLength: Boolean = bot.config.safeTextLength
 
     /**
      * Sets a caption as [MessageText] object
      * */
     suspend fun captionWithEntities(setText: suspend MessageText.() -> Unit) {
-        _caption = MessageText(MessageTextType.CAPTION).apply { setText() }
+        _caption = MessageText(MessageTextType.CAPTION, bot.config).apply { setText() }
     }
 
     fun getCaptionText(): String? =

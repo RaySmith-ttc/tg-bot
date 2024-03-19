@@ -30,6 +30,7 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
 import ru.raysmith.tgbot.model.network.response.BooleanResponse
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.MessageResponse
+import ru.raysmith.utils.properties.getOrNull
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -173,7 +174,8 @@ object TelegramApi {
 
 
     fun defaultClient(
-        token: String = Bot.config.token,
+        token: String = Bot.properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN")
+            ?: error("Can't create default http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property"),
         builder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
     ) = HttpClient(OkHttp) {
         engine {

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
@@ -10,10 +9,9 @@ import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
 @HandlerDsl
 open class PreCheckoutQueryHandler(
     val preCheckoutQuery: PreCheckoutQuery,
-    override val client: HttpClient,
+    final override val bot: Bot,
     private val handler: suspend PreCheckoutQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<PreCheckoutQueryHandler> {
-
     override fun getChatId() = preCheckoutQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
@@ -25,7 +23,7 @@ open class PreCheckoutQueryHandler(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PreCheckoutQueryHandler>.() -> R): R {
-        return PreCheckoutQueryHandler(preCheckoutQuery, bot.client, handler).let {
+        return PreCheckoutQueryHandler(preCheckoutQuery, bot, handler).let {
             this.block()
         }
     }

@@ -1,10 +1,12 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 
-class VideoMessage(override val client: HttpClient) : MediaMessageWithThumb(), SpolerableContent {
+class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableContent {
+    override val client: HttpClient = bot.client
 
     override var hasSpoiler: Boolean? = null
     var video: InputFile?
@@ -17,6 +19,7 @@ class VideoMessage(override val client: HttpClient) : MediaMessageWithThumb(), S
     var supportsStreaming: Boolean? = null
 
     override val mediaName: String = "video"
+    override var sendChatAction: Boolean = bot.config.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideo(
         chatId = chatId,

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -16,10 +15,10 @@ data class LocationChannelPostHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 open class LocationChannelPostHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     private val handlerData: Map<String, LocationChannelPostHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : ChannelPostHandler(update.message!!, client), LocationHandler<T> {
+) : ChannelPostHandler(update.message!!, bot), LocationHandler<T> {
     
     override val config by lazy { config() }
     override suspend fun handle() {
@@ -31,6 +30,6 @@ open class LocationChannelPostHandler<T : LocationConfig>(
         handleLocalFeatures(handled)
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChannelPostHandler>.() -> R): R {
-        return LocationChannelPostHandler(update, bot.client, handlerData, locationsWrapper).block()
+        return LocationChannelPostHandler(update, bot, handlerData, locationsWrapper).block()
     }
 }

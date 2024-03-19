@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -16,10 +15,10 @@ data class LocationPreCheckoutQueryHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 class LocationPreCheckoutQueryHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     private val handlerData: MutableMap<String, LocationPreCheckoutQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : PreCheckoutQueryHandler(update.preCheckoutQuery!!, client), LocationHandler<T> {
+) : PreCheckoutQueryHandler(update.preCheckoutQuery!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
@@ -31,6 +30,6 @@ class LocationPreCheckoutQueryHandler<T : LocationConfig>(
         handleLocalFeatures(handled)
     }
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<PreCheckoutQueryHandler>.() -> R): R {
-        return LocationPreCheckoutQueryHandler(update, bot.client, handlerData, locationsWrapper).block()
+        return LocationPreCheckoutQueryHandler(update, bot, handlerData, locationsWrapper).block()
     }
 }

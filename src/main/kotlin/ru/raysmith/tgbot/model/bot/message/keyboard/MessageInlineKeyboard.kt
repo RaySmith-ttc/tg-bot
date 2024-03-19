@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -17,6 +18,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
 
     suspend fun <T> pagination(pagination: Pagination<T>) = pagination.setupMarkup(this)
 
+    context(BotHolder)
     suspend fun <T> pagination(
         data: Iterable<T>,
         callbackQueryPrefix: String,
@@ -24,8 +26,8 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         setup: suspend Pagination<T>.() -> Unit = {},
         createButtons: suspend Row.(item: T) -> Unit
     ) {
-        Pagination.create(data, callbackQueryPrefix, page, setup, createButtons)
-            .setupMarkup(this)
+        Pagination.create(bot, data, callbackQueryPrefix, page, setup, createButtons)
+            .setupMarkup(this@MessageInlineKeyboard)
     }
 
     suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) {

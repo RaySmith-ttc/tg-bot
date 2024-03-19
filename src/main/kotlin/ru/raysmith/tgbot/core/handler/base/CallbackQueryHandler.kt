@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
@@ -25,11 +24,13 @@ data class CallbackQueryHandlerData(
 open class CallbackQueryHandler(
     final override val query: CallbackQuery,
     private val handlerData: Map<String, CallbackQueryHandlerData>,
-    override val client: HttpClient
-) : EventHandler, BaseCallbackHandler(query, client), BotContext<CallbackQueryHandler> {
+    final override val bot: Bot
+) : EventHandler, BaseCallbackHandler(query, bot.client), BotContext<CallbackQueryHandler> {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     protected val localFeatures: MutableList<BotFeature> = mutableListOf()
 
+    override val client = bot.client
     override fun getChatId() = query.message?.chat?.id
     override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
     override var messageId: Int? = query.message?.messageId
@@ -53,7 +54,7 @@ open class CallbackQueryHandler(
     }
 
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !Bot.config.ignoreEmptyCallbackData) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.config.ignoreEmptyCallbackData) { answer() }
         else {
             for (data in handlerData) {
                 if (handled) {
@@ -149,6 +150,6 @@ open class CallbackQueryHandler(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CallbackQueryHandler>.() -> R): R {
-        return CallbackQueryHandler(query, handlerData, bot.client).block()
+        return CallbackQueryHandler(query, handlerData, bot).block()
     }
 }

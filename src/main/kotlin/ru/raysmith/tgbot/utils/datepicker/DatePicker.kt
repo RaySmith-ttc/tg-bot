@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.utils.letIf
+import ru.raysmith.utils.properties.getOrNull
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -14,6 +15,7 @@ import java.util.*
 
 class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
+    // TODO remove
     @Deprecated("Removed soon") // how many months back user can browse
     var monthLimitBack = -1
         set(value) {
@@ -39,7 +41,8 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
     var timeZone = ZoneId.systemDefault()
     var locale: Locale? = null
-    private val _locale get() = locale ?: Bot.config.locale
+    private val _locale get() = locale ?: Bot.properties?.getOrNull("calendar_locale")
+        ?.let { Locale.forLanguageTag(it) } ?: Locale.getDefault()
 
     private val now get() = LocalDate.now(timeZone)
 

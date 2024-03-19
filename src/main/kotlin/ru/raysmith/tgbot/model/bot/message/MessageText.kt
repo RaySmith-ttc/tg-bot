@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import kotlinx.serialization.json.encodeToJsonElement
-import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
@@ -32,14 +32,11 @@ import ru.raysmith.utils.letIf
  * ```
  * */
 @TextMessageDsl
-class MessageText(
-    val type: MessageTextType,
+class MessageText(val type: MessageTextType, val config: BotConfig) {
 
     /** Whether test should be truncated if text length is greater than 4096 */
-    var safeTextLength: Boolean = Bot.config.safeTextLength
-) {
-
-    var printNulls: Boolean = Bot.config.printNulls
+    var safeTextLength: Boolean = config.safeTextLength
+    var printNulls: Boolean = config.printNulls
 
     private val text: StringBuilder = StringBuilder()
     val currentTextLength: Int

@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot.message
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.ParseMode
@@ -11,8 +12,8 @@ import ru.raysmith.tgbot.utils.withSafeLength
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][API.sendMessage] method */
 @TextMessageDsl
-class TextMessage(override val client: HttpClient) :
-    MessageWithReplyMarkup {
+class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
+    override val client: HttpClient = bot.client
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -27,7 +28,7 @@ class TextMessage(override val client: HttpClient) :
     var disableWebPagePreview: Boolean? = null
 
     /** Whether test should be truncated if text length is greater than 4096 */
-    var safeTextLength: Boolean = Bot.config.safeTextLength
+    var safeTextLength: Boolean = bot.config.safeTextLength
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
@@ -39,7 +40,7 @@ class TextMessage(override val client: HttpClient) :
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
     suspend fun textWithEntities(setText: suspend MessageText.() -> Unit) {
-        messageText = MessageText(MessageTextType.TEXT)
+        messageText = MessageText(MessageTextType.TEXT, bot.config)
         messageText!!.apply { setText() }
     }
 

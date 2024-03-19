@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.core.handler
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.base.*
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.utils.datepicker.BotFeature
 annotation class HandlerDsl
 
 @HandlerDsl
-open class BaseEventHandlerFactory : EventHandlerFactory {
+open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory, BotHolder {
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
@@ -55,70 +55,70 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
         unknownHandler = { }
     }
 
-    override fun getHandler(update: Update, client: HttpClient): EventHandler {
-        fun unknown() = UnknownEventHandler(update, client, unknownHandler)
+    override fun getHandler(update: Update): EventHandler {
+        fun unknown() = UnknownEventHandler(update, bot, unknownHandler)
 
         return when(update.type) {
             UpdateType.MESSAGE -> when(update.message!!.type) {
                 MessageType.COMMAND -> CommandHandler(
-                    BotCommand(update.message.text!!), update.message, client, commandHandler ?: return unknown()
+                    BotCommand(update.message.text!!), update.message, bot, commandHandler ?: return unknown()
                 )
                 MessageType.TEXT -> MessageHandler(
-                    update.message, client, messageHandler ?: return unknown()
+                    update.message, bot, messageHandler ?: return unknown()
                 )
             }
 
             UpdateType.EDITED_MESSAGE -> EditedMessageHandler(
-                update.editedMessage!!, client, editedMessageHandler ?: return unknown()
+                update.editedMessage!!, bot, editedMessageHandler ?: return unknown()
             )
 
             UpdateType.CHANNEL_POST -> ChannelPostHandler(
-                update.channelPost!!, client, channelPostHandler ?: return unknown()
+                update.channelPost!!, bot, channelPostHandler ?: return unknown()
             )
 
             UpdateType.EDITED_CHANNEL_POST -> EditedChannelPostHandler(
-                update.editedChannelPost!!, client, editedChannelPostHandler ?: return unknown()
+                update.editedChannelPost!!, bot, editedChannelPostHandler ?: return unknown()
             )
 
             UpdateType.INLINE_QUERY -> InlineQueryHandler(
-                update.inlineQuery!!, client, inlineQueryHandler ?: return unknown()
+                update.inlineQuery!!, bot, inlineQueryHandler ?: return unknown()
             )
 
             UpdateType.CHOSEN_INLINE_RESULT -> ChosenInlineQueryHandler(
-                update.chosenInlineResult!!, client, chosenInlineQueryHandler ?: return unknown()
+                update.chosenInlineResult!!, bot, chosenInlineQueryHandler ?: return unknown()
             )
 
             UpdateType.CALLBACK_QUERY -> CallbackQueryHandler(
-                update.callbackQuery!!, callbackQueryHandler, client
+                update.callbackQuery!!, callbackQueryHandler, bot
             )
 
             UpdateType.SHIPPING_QUERY -> ShippingQueryHandler(
-                update.shippingQuery!!, client, shippingQueryHandler ?: return unknown()
+                update.shippingQuery!!, bot, shippingQueryHandler ?: return unknown()
             )
 
             UpdateType.PRE_CHECKOUT_QUERY -> PreCheckoutQueryHandler(
-                update.preCheckoutQuery!!, client, preCheckoutQueryHandler ?: return unknown()
+                update.preCheckoutQuery!!, bot, preCheckoutQueryHandler ?: return unknown()
             )
 
             UpdateType.POLL -> PollHandler(
-                update.poll!!, client, pollHandler ?: return unknown()
+                update.poll!!, bot, pollHandler ?: return unknown()
             )
 
             UpdateType.POLL_ANSWER -> PollAnswerHandler(
-                update.pollAnswer!!, client, pollAnswerHandler ?: return unknown()
+                update.pollAnswer!!, bot, pollAnswerHandler ?: return unknown()
             )
 
 
             UpdateType.MY_CHAT_MEMBER -> ChatMemberHandler(
-                update.myChatMember!!, client, myChatMemberHandler ?: return unknown()
+                update.myChatMember!!, bot, myChatMemberHandler ?: return unknown()
             )
 
             UpdateType.CHAT_MEMBER -> ChatMemberHandler(
-                update.chatMember!!, client, chatMemberHandler ?: return unknown()
+                update.chatMember!!, bot, chatMemberHandler ?: return unknown()
             )
 
             UpdateType.CHAT_JOIN_REQUEST -> ChatJoinRequestHandler(
-                update.chatJoinRequest!!, client, chatJoinRequestHandler ?: return unknown()
+                update.chatJoinRequest!!, bot, chatJoinRequestHandler ?: return unknown()
             )
 
             null -> unknown()
@@ -169,8 +169,8 @@ open class BaseEventHandlerFactory : EventHandlerFactory {
     
     @HandlerDsl
     fun handleCallbackQuery(
-        alwaysAnswer: Boolean = Bot.config.alwaysAnswerCallback,
-        features: List<BotFeature> = Bot.config.defaultCallbackQueryHandlerFeatures,
+        alwaysAnswer: Boolean = bot.config.alwaysAnswerCallback,
+        features: List<BotFeature> = bot.config.defaultCallbackQueryHandlerFeatures,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {

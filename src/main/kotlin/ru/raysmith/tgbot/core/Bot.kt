@@ -70,15 +70,17 @@ class Bot(
     companion object {
         val logger: Logger = LoggerFactory.getLogger("tg-bot")
 
-        internal var properties = getProperties()
+        var properties = getProperties()
+            private set
+
         @JvmName("getPropertiesFromFile")
         internal fun getProperties(): Properties? {
             return PropertiesFactory.fromOrNull("tgbot.properties")?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
-        
-        var config = BotConfig()
-        private set
     }
+
+    var config = BotConfig()
+        private set
     
     private var needRefreshMe = false
     /** Api call result of [getMe][API.getMe] method */
@@ -94,9 +96,7 @@ class Bot(
     /** Reloads config from properties file */
     fun reloadConfig() {
         properties = getProperties()
-        config = BotConfig().also {
-            println("new Conf: ${it.locale}")
-        }
+        config = BotConfig()
         needRefreshMe = true
     }
     
@@ -145,13 +145,13 @@ class Bot(
             scope.launch {
                 try {
                     val handler = if (isLocationsMode) {
-                        locationsWrapper!!.getHandlerFactory(update).apply {
+                        locationsWrapper!!.getHandlerFactory(update, this@Bot).apply {
                             additionalEventHandlers.forEach {
                                 apply(it)
                             }
-                        }.getHandler(update, client)
+                        }.getHandler(update)
                     } else {
-                        eventHandlerFactory.getHandler(update, client)
+                        eventHandlerFactory.getHandler(update)
                     }
                     
                     with(handler) {
@@ -244,7 +244,7 @@ class Bot(
     
             val allowedUpdates = if (isLocationsMode) {
                 (eventHandlerFactory as LocationEventHandlerFactory<*>).locationsWrapper
-                    .allowedUpdates().toList().asParameter()
+                    .allowedUpdates(this).toList().asParameter()
             } else {
                 eventHandlerFactory.allowedUpdates.toList().asParameter()
             }
@@ -288,10 +288,8 @@ class Bot(
         startBot()
     }
 
-    // TODO убрать регистрацию обработчиков из EventHandlerFactory,
-    //  поместить в этом классе, оставить start() без аргументов
     suspend fun start(updateHandler: BaseEventHandlerFactory.(bot: Bot) -> Unit) {
-        eventHandlerFactory = BaseEventHandlerFactory()
+        eventHandlerFactory = BaseEventHandlerFactory(this)
         eventHandlerBuilder = {
             (eventHandlerFactory as BaseEventHandlerFactory).updateHandler(this)
         }
@@ -303,7 +301,7 @@ class Bot(
     private var locationsWrapper: LocationsWrapper<*>? = null
     @LocationsDSL
     suspend fun <T : LocationConfig> locations(setup: suspend LocationsWrapper<T>.() -> Unit) {
-        locationsWrapper = LocationsWrapper<T>().apply { setup() }
+        locationsWrapper = LocationsWrapper<T>(this).apply { setup() }
         eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)
         eventHandlerBuilder = {}
         isLocationsMode = true

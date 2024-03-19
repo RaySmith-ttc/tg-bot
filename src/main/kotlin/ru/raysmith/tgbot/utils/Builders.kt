@@ -1,24 +1,22 @@
 package ru.raysmith.tgbot.utils
 
-import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.network.message.ParseMode
 
 suspend inline fun buildHTMLString(
-    type: MessageTextType = MessageTextType.TEXT,
-    safeTextLength: Boolean = Bot.config.safeTextLength,
+    type: MessageTextType = MessageTextType.TEXT, botConfig: BotConfig = BotConfig.default,
     crossinline block: suspend MessageText.() -> Unit
 ): String {
-    return MessageText(type, safeTextLength).apply { block() }.format(ParseMode.HTML)
+    return MessageText(type, botConfig).apply { block() }.format(ParseMode.HTML)
 }
 
 suspend inline fun buildMarkdownV2String(
-    type: MessageTextType = MessageTextType.TEXT,
-    safeTextLength: Boolean = Bot.config.safeTextLength,
+    type: MessageTextType = MessageTextType.TEXT, botConfig: BotConfig = BotConfig.default,
     crossinline block: suspend MessageText.() -> Unit
 ): String {
-    return MessageText(type, safeTextLength).apply { block() }.format(ParseMode.MARKDOWNV2)
+    return MessageText(type, botConfig).apply { block() }.format(ParseMode.MARKDOWNV2)
 }
 
 @Deprecated(
@@ -26,9 +24,8 @@ suspend inline fun buildMarkdownV2String(
     ReplaceWith("buildMarkdownV2String {block()}")
 )
 suspend inline fun buildMarkdownString(
-    type: MessageTextType = MessageTextType.TEXT,
-    safeTextLength: Boolean = Bot.config.safeTextLength,
+    type: MessageTextType = MessageTextType.TEXT, botConfig: BotConfig = BotConfig.default,
     crossinline block: suspend MessageText.() -> Unit
 ): String {
-    return MessageText(type, safeTextLength).apply { block() }.format(@Suppress("DEPRECATION") ParseMode.MARKDOWN)
+    return MessageText(type, botConfig).apply { block() }.format(@Suppress("DEPRECATION") ParseMode.MARKDOWN)
 }

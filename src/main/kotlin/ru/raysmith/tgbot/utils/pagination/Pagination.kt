@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.utils.pagination
 
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.utils.getOrDefault
@@ -11,10 +12,11 @@ import ru.raysmith.tgbot.utils.getOrDefault
 //  • impl callback data in pages + fetcher (possibility to optimize SizedIterable.limit(count, offset) that can be replaced with .adjustWhere { // some logic with sorting })
 //  • docs
 class Pagination<T>(
+    override val bot: Bot,
     private val data: Iterable<T>,
     private val callbackQueryPrefix: String,
     private val createButtons: suspend MessageInlineKeyboard.Row.(item: T) -> Unit
-) {
+): BotHolder {
 
     companion object {
         const val PAGE_FIRST = -1
@@ -31,34 +33,35 @@ class Pagination<T>(
         val lastPageSymbol = Bot.properties.getOrDefault("pagination.lastpagesymbol", "»")
 
         // TODO use in addRows? [docs]
-        fun <T> itemsFor(pagination: Pagination<T>, page: Int, fetcher: PaginationFetcher<T> = Bot.config.paginationFetcherFactory.getFetcher()): List<T> {
-            val chunkSize = pagination.rows * pagination.columns
-            val dataCount = fetcher.getCount(pagination.data)
-            if (dataCount == 0) return emptyList()
-            val totalPages = ((dataCount / chunkSize) + if (dataCount % chunkSize != 0) 1 else 0)
-            val fixedPages: Int = when (page) {
-                PAGE_FIRST -> 1
-                PAGE_LAST -> totalPages
-                else -> if (totalPages < page) totalPages else if (page < 1) 1 else page
-            }
-
-            val offset = (fixedPages - 1) * chunkSize
-            return fetcher.fetchData(pagination.data, fixedPages, offset, chunkSize, pagination.rows, pagination.columns).toList()
-        }
+//        fun <T> itemsFor(pagination: Pagination<T>, page: Int, fetcher: PaginationFetcher<T> = bot.config.paginationFetcherFactory.getFetcher()): List<T> {
+//            val chunkSize = pagination.rows * pagination.columns
+//            val dataCount = fetcher.getCount(pagination.data)
+//            if (dataCount == 0) return emptyList()
+//            val totalPages = ((dataCount / chunkSize) + if (dataCount % chunkSize != 0) 1 else 0)
+//            val fixedPages: Int = when (page) {
+//                PAGE_FIRST -> 1
+//                PAGE_LAST -> totalPages
+//                else -> if (totalPages < page) totalPages else if (page < 1) 1 else page
+//            }
+//
+//            val offset = (fixedPages - 1) * chunkSize
+//            return fetcher.fetchData(pagination.data, fixedPages, offset, chunkSize, pagination.rows, pagination.columns).toList()
+//        }
 
         // TODO [docs]
         suspend fun <T> create(
+            bot: Bot,
             data: Iterable<T>,
             callbackQueryPrefix: String,
             page: Int = PAGE_FIRST,
             setup: suspend Pagination<T>.() -> Unit = {},
             createButtons: suspend MessageInlineKeyboard.Row.(item: T) -> Unit
-        ) = Pagination(data, callbackQueryPrefix, createButtons)
+        ) = Pagination(bot, data, callbackQueryPrefix, createButtons)
             .apply { setup() }
             .apply { this.startPage = page }
     }
 
-    var fetcher = Bot.config.paginationFetcherFactory.getFetcher<T>()
+    var fetcher = bot.config.paginationFetcherFactory.getFetcher<T>()
     var rows = defaultRows
     var columns = defaultColumns
     var addPagesRow = true

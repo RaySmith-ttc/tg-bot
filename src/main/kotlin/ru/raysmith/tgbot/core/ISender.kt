@@ -11,38 +11,38 @@ import ru.raysmith.tgbot.network.API
 
 // TODO add docs for methods
 /** Represent an object that can send messages */
-interface ISender : ChatIdHolder, API {
+interface ISender : ChatIdHolder, API, BotHolder {
 
     suspend fun send(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
-        return TextMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return TextMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendPhoto(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend PhotoMessage.() -> Unit): Message {
-        return PhotoMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return PhotoMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendAudio(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend AudioMessage.() -> Unit): Message {
-        return AudioMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return AudioMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendDocument(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend DocumentMessage.() -> Unit): Message {
-        return DocumentMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return DocumentMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendVideo(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend VideoMessage.() -> Unit): Message {
-        return VideoMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return VideoMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendAnimation(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend AnimationMessage.() -> Unit): Message {
-        return AnimationMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return AnimationMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendVoice(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend VoiceMessage.() -> Unit): Message {
-        return VoiceMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return VoiceMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendVideoNote(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend VideoNoteMessage.() -> Unit): Message {
-        return VideoNoteMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return VideoNoteMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendLocation(
@@ -52,7 +52,7 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         message: suspend LocationMessage.() -> Unit
     ): Message {
-        return LocationMessage(latitude, longitude, client).apply { message() }.send(chatId, messageThreadId)
+        return LocationMessage(latitude, longitude, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun editMessageLiveLocation(
@@ -63,7 +63,7 @@ interface ISender : ChatIdHolder, API {
         inlineMessageId: String? = null,
         message: suspend LocationMessage.() -> Unit
     ): LiveLocationResponse {
-        return LocationMessage(latitude, longitude, client).apply { message() }
+        return LocationMessage(latitude, longitude, bot).apply { message() }
             .edit(chatId, messageId, inlineMessageId)
     }
 
@@ -73,7 +73,7 @@ interface ISender : ChatIdHolder, API {
         inlineMessageId: String? = null,
         message: suspend LocationMessage.() -> Unit
     ): LiveLocationResponse {
-        return LocationMessage(0.0, 0.0, client).apply { message() }.stop(chatId, messageId, inlineMessageId)
+        return LocationMessage(0.0, 0.0, bot).apply { message() }.stop(chatId, messageId, inlineMessageId)
     }
 
     suspend fun sendVenue(
@@ -85,7 +85,7 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         message: suspend VenueMessage.() -> Unit
     ): Message {
-        return VenueMessage(latitude, longitude, title, address, client).apply { message() }.send(chatId, messageThreadId)
+        return VenueMessage(latitude, longitude, title, address, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendContact(
@@ -95,7 +95,7 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         message: suspend ContactMessage.() -> Unit
     ): Message {
-        return ContactMessage(phoneNumber, firstName, client).apply { message() }.send(chatId, messageThreadId)
+        return ContactMessage(phoneNumber, firstName, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendPoll(
@@ -105,11 +105,11 @@ interface ISender : ChatIdHolder, API {
         chatId: ChatId = getChatIdOrThrow(),
         message: suspend PollMessage.() -> Unit
     ): Message {
-        return PollMessage(question, options, client).apply { message() }.send(chatId, messageThreadId)
+        return PollMessage(question, options, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendDice(emoji: String, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {
-        return DiceMessage(emoji, client).apply { message() }.send(chatId, messageThreadId)
+        return DiceMessage(emoji, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
 
@@ -118,10 +118,10 @@ interface ISender : ChatIdHolder, API {
     }
 
     suspend fun sendMediaGroup(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend MediaGroupMessage.() -> Unit): List<Message> {
-        return MediaGroupMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return MediaGroupMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendSticker(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend StickerMessage.() -> Unit): Message {
-        return StickerMessage(client).apply { message() }.send(chatId, messageThreadId)
+        return StickerMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 }

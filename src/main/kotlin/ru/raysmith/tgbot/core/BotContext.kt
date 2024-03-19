@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core
 
+import io.ktor.client.*
 import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
@@ -26,6 +27,7 @@ annotation class BotContextDsl
 // TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */
 interface BotContext<T : EventHandler> : ISender, IEditor {
+    override val client: HttpClient get() = bot.client
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl
@@ -907,7 +909,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     @Suppress("KDocUnresolvedReference")
     suspend fun sendInvoice(chatId: ChatId = getChatIdOrThrow(), buildAction: InvoiceSender.() -> Unit): Message {
-        return InvoiceSender(client).apply(buildAction).send(chatId)
+        return InvoiceSender(bot).apply(buildAction).send(chatId)
     }
 
     /**
@@ -948,6 +950,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     @Suppress("KDocUnresolvedReference")
     suspend fun createInvoiceLink(buildAction: InvoiceCreateLinkSender.() -> Unit): String {
-        return InvoiceCreateLinkSender(client).apply(buildAction).send()
+        return InvoiceCreateLinkSender(bot).apply(buildAction).send()
     }
 }

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.bot.message.media
 
-import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -8,7 +7,7 @@ import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.message.Message
 
 abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
-    protected var sendChatAction: Boolean = Bot.config.sendChatActionWithMedaMessage
+    protected abstract var sendChatAction: Boolean
     protected var media: InputFile? = null
     protected abstract val mediaName: String
 

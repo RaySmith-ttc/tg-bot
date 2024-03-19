@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
@@ -13,10 +12,9 @@ import ru.raysmith.tgbot.model.network.payment.ShippingQuery
 @HandlerDsl
 open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
-    override val client: HttpClient,
+    final override val bot: Bot,
     private val handler: suspend ShippingQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<ShippingQueryHandler> {
-
     override fun getChatId() = shippingQuery.from.id
     override fun getChatIdOrThrow() = shippingQuery.from.id
     override var messageId: Int? = null
@@ -29,7 +27,7 @@ open class ShippingQueryHandler(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ShippingQueryHandler>.() -> R): R {
-        return ShippingQueryHandler(shippingQuery, bot.client, handler).block()
+        return ShippingQueryHandler(shippingQuery, bot, handler).block()
     }
 
     suspend fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {

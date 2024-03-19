@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.core.handler.location
 
-import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -16,10 +15,10 @@ data class LocationChatMemberHandlerData<T : LocationConfig>(
 
 @HandlerDsl
 class LocationChatMemberHandler<T : LocationConfig>(
-    override val update: Update, client: HttpClient,
+    override val update: Update, bot: Bot,
     private val handlerData: MutableMap<String, LocationChatMemberHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : ChatMemberHandler(update.myChatMember!!, client), LocationHandler<T> {
+) : ChatMemberHandler(update.myChatMember!!, bot), LocationHandler<T> {
     
     override val config by lazy { config() }
     override fun getChatId() = chat.id
@@ -37,6 +36,6 @@ class LocationChatMemberHandler<T : LocationConfig>(
     }
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChatMemberHandler>.() -> R): R {
-        return LocationChatMemberHandler(update, bot.client, handlerData, locationsWrapper).block()
+        return LocationChatMemberHandler(update, bot, handlerData, locationsWrapper).block()
     }
 }
