@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -15,6 +17,9 @@ open class InlineQueryHandler(
     final override val bot: Bot,
     private val handler: suspend InlineQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<InlineQueryHandler> {
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
+
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 

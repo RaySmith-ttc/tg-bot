@@ -39,7 +39,7 @@ interface IEditor : ChatIdHolder, API, BotHolder {
         inlineMessageId: String? = this.inlineMessageId,
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
-        return MessageWithReplyMarkup.instance(this)
+        return MessageWithReplyMarkup.instance(bot)
             .apply { inlineKeyboard(keyboard) }
             .editReplyMarkup(chatId, messageId, inlineMessageId)
     }

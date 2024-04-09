@@ -11,11 +11,12 @@ import ru.raysmith.tgbot.network.API
 /** Builder of [sendInvoice][BotContext.createInvoiceLink] request */
 class InvoiceCreateLinkSender(override val bot: Bot) : API, BotHolder {
     override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     var title: String? = null
     var description: String? = null
     var payload: String? = null
-    var providerToken: String? = bot.config.defaultProviderToken
+    var providerToken: String? = bot.botConfig.defaultProviderToken
     var currency: Currency? = null
     var prices: List<LabeledPrice>? = null
     var maxTipAmount: Int? = null

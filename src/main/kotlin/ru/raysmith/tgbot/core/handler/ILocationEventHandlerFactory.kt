@@ -42,9 +42,9 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
 
     @HandlerDsl
     fun handleCallbackQuery(
-        alwaysAnswer: Boolean = bot.config.alwaysAnswerCallback,
+        alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        features: List<BotFeature> = bot.config.defaultCallbackQueryHandlerFeatures,
+        features: List<BotFeature> = bot.botConfig.defaultCallbackQueryHandlerFeatures,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     )
 

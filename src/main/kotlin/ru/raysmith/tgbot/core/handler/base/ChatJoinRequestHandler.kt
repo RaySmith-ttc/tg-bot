@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -9,9 +11,11 @@ import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 @HandlerDsl
 open class ChatJoinRequestHandler(
     val chatJoinRequest: ChatJoinRequest,
-    override val bot: Bot,
+    final override val bot: Bot,
     private val handler: suspend ChatJoinRequestHandler.() -> Unit = { }
 ) : BaseEventHandler(), BotContext<ChatJoinRequestHandler> {
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     override fun getChatId() = chatJoinRequest.chat.id
     override var messageId: Int? = null

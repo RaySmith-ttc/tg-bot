@@ -61,7 +61,7 @@ class Pagination<T>(
             .apply { this.startPage = page }
     }
 
-    var fetcher = bot.config.paginationFetcherFactory.getFetcher<T>()
+    var fetcher = bot.botConfig.paginationFetcherFactory.getFetcher<T>()
     var rows = defaultRows
     var columns = defaultColumns
     var addPagesRow = true

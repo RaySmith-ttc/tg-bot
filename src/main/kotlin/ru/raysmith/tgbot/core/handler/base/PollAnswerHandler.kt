@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -12,6 +14,9 @@ open class PollAnswerHandler(
     final override val bot: Bot,
     private val handler: suspend PollAnswerHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<PollAnswerHandler> {
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
+
     override fun getChatId() = null
     override var messageId: Int? = null
     override var inlineMessageId: String? = null

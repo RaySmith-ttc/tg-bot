@@ -1,10 +1,14 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.CallbackQuery
 
 data class PaginationCallbackQueryHandler(
     override val query: CallbackQuery,
     val page: Int,
-    override val client: HttpClient
-) : BaseCallbackHandler(query, client)
+    override val bot: Bot
+) : BaseCallbackHandler(query, bot.client), BotHolder {
+    override val botConfig: BotConfig = bot.botConfig
+}

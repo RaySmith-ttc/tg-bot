@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
-import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.utils.datepicker.DatePickerData
 import java.time.LocalDate
@@ -9,8 +11,9 @@ data class DatePickerCallbackQueryHandler(
     override val query: CallbackQuery,
     val value: String,
     val prefix: String,
-    override val client: HttpClient
-) : BaseCallbackHandler(query, client) {
+    override val bot: Bot
+) : BaseCallbackHandler(query, bot.client), BotHolder {
+    override val botConfig: BotConfig = bot.botConfig
 
     val datePickerData = DatePickerData.from(value)
 

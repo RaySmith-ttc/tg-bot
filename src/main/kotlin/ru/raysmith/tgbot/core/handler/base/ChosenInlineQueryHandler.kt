@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -14,6 +16,8 @@ open class ChosenInlineQueryHandler(
 ) : BaseEventHandler(), BotContext<ChosenInlineQueryHandler> {
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     override fun getChatId() = inlineResult.from.id
     override fun getChatIdOrThrow() = inlineResult.from.id

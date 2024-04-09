@@ -1,8 +1,10 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -15,6 +17,9 @@ open class ShippingQueryHandler(
     final override val bot: Bot,
     private val handler: suspend ShippingQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<ShippingQueryHandler> {
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
+
     override fun getChatId() = shippingQuery.from.id
     override fun getChatIdOrThrow() = shippingQuery.from.id
     override var messageId: Int? = null

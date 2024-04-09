@@ -2,12 +2,14 @@ package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 
 @Suppress("MemberVisibilityCanBePrivate")
 class AudioMessage(override val bot: Bot) : MediaMessageWithThumb() {
     override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     var audio: InputFile?
         get() = media
@@ -18,7 +20,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb() {
     var performer: String? = null
 
     override val mediaName: String = "audio"
-    override var sendChatAction: Boolean = bot.config.sendChatActionWithMedaMessage
+    override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendAudio(
         chatId = chatId,

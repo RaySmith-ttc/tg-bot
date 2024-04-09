@@ -1,10 +1,8 @@
 package helper
 
-import io.ktor.client.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.SizedCollection
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
@@ -48,7 +46,6 @@ import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
@@ -59,15 +56,13 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import ru.raysmith.tgbot.utils.pagination.Pagination
-import ru.raysmith.tgbot.utils.pagination.PaginationFetcher
-import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
 import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
-val locations = true
+val locations = false
 val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
@@ -103,10 +98,6 @@ suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
 }
 
 var loc: String = "menu"
-
-val newApi = object : API {
-    override val client: HttpClient = TelegramApi.defaultClient()
-}
 
 var lookPollAnswers = false
 
@@ -229,7 +220,7 @@ class Runner {
             val logger = LoggerFactory.getLogger("bot")
             val notifierBot = Bot(token = "5031990924:AAG-7F1QzGqybvYW1CJdhvFlFUR0s5Icw6Y")
 
-            val bot = Bot(token = System.getenv("BOT_TOKEN")/*, lastUpdateId = 391851722*/)
+            val bot = Bot(token = System.getenv("BOT_TOKEN")/*, lastUpdateId = -2*/)
                 .onError { e -> logger.error(e.message, e) }
                 .onUpdate { updates ->
 //                    updates.forEach { println(it.callbackQuery?.data ?: it.message?.text) }
@@ -239,18 +230,18 @@ class Runner {
                 }.config {
 //                    this.locale = Locale.JAPAN
                     defaultCallbackQueryHandlerFeatures = listOf(GlobalFeature)
-                    paginationFetcherFactory = object : PaginationFetcherFactory {
-                        override fun <T> getFetcher(): PaginationFetcher<T> {
-                            return object : PaginationFetcher<T> {
-                                override fun getCount(data: Iterable<T>): Int {
-                                    return if (data is SizedCollection<T>) data.count().toInt() else data.count()
-                                }
-                                override fun fetchData(data: Iterable<T>, page: Int, offset: Int, count: Int, rows: Int, columns: Int): Iterable<T> {
-                                    return if (data is SizedCollection<T>) data.limit(count, offset.toLong()) else data
-                                }
-                            }
-                        }
-                    }
+//                    paginationFetcherFactory = object : PaginationFetcherFactory {
+//                        override fun <T> getFetcher(): PaginationFetcher<T> {
+//                            return object : PaginationFetcher<T> {
+//                                override fun getCount(data: Iterable<T>): Int {
+//                                    return if (data is SizedCollection<T>) data.count().toInt() else data.count()
+//                                }
+//                                override fun fetchData(data: Iterable<T>, page: Int, offset: Int, count: Int, rows: Int, columns: Int): Iterable<T> {
+//                                    return if (data is SizedCollection<T>) data.limit(count, offset.toLong()) else data.toList().subList((columns * rows) * (page - 1), ((columns * rows) * (page - 1) + (columns * rows)).coerceAtMost(data.count()))
+//                                }
+//                            }
+//                        }
+//                    }
                 }
                 .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
@@ -328,6 +319,7 @@ class Runner {
                             println(channelPost)
                         }
 
+                        // TODO not work
                         handleCallbackQuery(alwaysAnswer = true) {
                             println("handleCallbackQuery [global]")
                         }
@@ -344,55 +336,53 @@ class Runner {
 //
                     location("menu") {
                         onEnter {
-//                            send {
-//                                text = "in menu"
-//                                inlineKeyboard {
-//                                    row("dont do anything", "fv932mdcl")
-//                                }
-//                            }
+                            send {
+                                text = "in menu"
+                                inlineKeyboard {
+                                    row("dont do anything", "fv932mdcl")
+                                }
+                            }
                             println("on enter menu")
                         }
 
-                        handle {
-                            handleCommand {
-                                isCommand("menu") {
-                                    send {
-                                        datePicker(datePicker)
-                                    }
-                                }
-
-                                isCommand("toother") {
-                                    foo = "changed"
-                                    toLocation("other")
+                        handleCommand {
+                            isCommand("menu") {
+                                send {
+                                    datePicker(datePicker)
                                 }
                             }
 
-//                            handleMessage {
-//                                send("handled in $name")
-//                            }
+                            isCommand("toother") {
+                                foo = "changed"
+                                toLocation("other")
+                            }
+                        }
+                        handleMessage {
+                            send("handled in ${this@location.name}")
+                        }
+                        handleCallbackQuery(
+                            alwaysAnswer = false,
+                            features = listOf(OverridedGlobalFeature)
+                        ) {
+                            setupFeatures(UnhandledFeature)
 
-                            handleCallbackQuery(alwaysAnswer = false, features = listOf(OverridedGlobalFeature)) {
-                                setupFeatures(UnhandledFeature)
-
-                                isDataEqual("some_btn") {
-                                    println("handle some_btn")
-                                }
-
-                                isDataEqual("some_btn") {
-                                    println("handle some_btn [second]")
-                                }
+                            isDataEqual("some_btn") {
+                                println("handle some_btn")
                             }
 
-                            handleUnknown {
-                                send("unknown")
+                            isDataEqual("some_btn") {
+                                println("handle some_btn [second]")
                             }
+                        }
+                        handleUnknown {
+                            send("unknown")
                         }
 
                     }
 
                     location("other") {
                         onEnter {
-//                            send("in other\nfoo:${foo}")
+                            send("in other\nfoo:${foo}")
                             println("on enter other")
                         }
 
@@ -423,7 +413,7 @@ class Runner {
                             }
 
                             handleMessage {
-                                send("handled in $name")
+                                send("handled in ${this@location.name}")
 
                                 messageText()
                                     .verify { it.contains(".") }
@@ -994,6 +984,10 @@ class Runner {
                     isCommand("long") {
                         Thread.sleep(5000)
                         send("success")
+                    }
+
+                    isCommand("longtext") {
+                        send(generateString(4096 * 3))
                     }
 
                     isCommand("mrkd") {
@@ -1624,6 +1618,7 @@ suspend fun EventHandler.sendPagination(page: Int, action: MessageAction = Messa
     inlineKeyboard {
         pagination(pagesData, "pagination", page, setup = {
             columns = 2
+            rows = 5
         }) {
             button(it.toString(), "pitem$it")
         }

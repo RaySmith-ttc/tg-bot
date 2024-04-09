@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot.message
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -14,6 +15,7 @@ import ru.raysmith.tgbot.utils.withSafeLength
 @TextMessageDsl
 class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     /** Full text of message with entities */
     private var messageText: MessageText? = null
@@ -25,10 +27,10 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     var parseMode: ParseMode? = null
 
     /** Disables link previews for links in this message */
-    var disableWebPagePreview: Boolean? = null
+    var disableWebPagePreview = bot.botConfig.disableWebPagePreviews
 
     /** Whether test should be truncated if text length is greater than 4096 */
-    var safeTextLength: Boolean = bot.config.safeTextLength
+    var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
@@ -40,7 +42,7 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
     suspend fun textWithEntities(setText: suspend MessageText.() -> Unit) {
-        messageText = MessageText(MessageTextType.TEXT, bot.config)
+        messageText = MessageText(MessageTextType.TEXT, bot.botConfig)
         messageText!!.apply { setText() }
     }
 

@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.utils.io.streams.*
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
@@ -47,6 +48,7 @@ import java.time.ZonedDateTime
 import kotlin.time.Duration
 
 interface API {
+    val botConfig: BotConfig
     val client: HttpClient
 
     private suspend inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T {
@@ -218,7 +220,7 @@ interface API {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = null,
+        disableWebPagePreview: Boolean? = botConfig.disableWebPagePreviews,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyToMessageId: Int? = null,
@@ -1973,7 +1975,7 @@ interface API {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = null,
+        disableWebPagePreview: Boolean? = botConfig.disableWebPagePreviews,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageText") {

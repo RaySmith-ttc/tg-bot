@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.utils
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotContextDsl
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
@@ -25,7 +26,8 @@ suspend fun <T> botContext(
     block: suspend context(BotContext<UnknownEventHandler>) () -> T
 ) = object : BotContext<UnknownEventHandler> {
     override val bot = bot
-    override val client = bot.client
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
     override var messageId: Int? = update?.message?.messageId
     override var inlineMessageId: String? = update?.callbackQuery?.inlineMessageId
 
@@ -46,8 +48,9 @@ internal fun createEventHandler(
     override fun getChatId(): ChatId? = withChatId
     override var messageId: Int? = withMessageId
     override var inlineMessageId: String? = withInlineMessageId
-    override val client: HttpClient = bot.client
     override val bot: Bot = bot
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 }
 
 internal fun noimpl(): Nothing = throw NotImplementedError()

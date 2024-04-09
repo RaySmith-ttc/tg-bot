@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot.message.media
 
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.EditableMessage
@@ -26,9 +27,10 @@ abstract class CaptionableMediaMessage :
             return object : CaptionableMediaMessage() {
                 override var sendChatAction: Boolean = false
                 override val mediaName: String = mediaName
-                override val client: HttpClient = bot.client
                 override suspend fun send(chatId: ChatId, messageThreadId: Int?) = send(chatId, messageThreadId)
                 override val bot: Bot = bot
+                override val client: HttpClient = bot.client
+                override val botConfig: BotConfig = bot.botConfig
 
                 override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
@@ -45,13 +47,13 @@ abstract class CaptionableMediaMessage :
     fun hasCaption() = caption != null || _caption != null
 
     /** Whether test should be truncated if caption length is greater than 1024 */
-    var safeTextLength: Boolean = bot.config.safeTextLength
+    var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     /**
      * Sets a caption as [MessageText] object
      * */
     suspend fun captionWithEntities(setText: suspend MessageText.() -> Unit) {
-        _caption = MessageText(MessageTextType.CAPTION, bot.config).apply { setText() }
+        _caption = MessageText(MessageTextType.CAPTION, bot.botConfig).apply { setText() }
     }
 
     fun getCaptionText(): String? =

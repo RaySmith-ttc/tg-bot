@@ -79,7 +79,7 @@ class Bot(
         }
     }
 
-    var config = BotConfig()
+    override var botConfig = BotConfig()
         private set
     
     private var needRefreshMe = false
@@ -89,20 +89,20 @@ class Bot(
 
     init {
         if (token != null) {
-            config.token = token
+            botConfig.token = token
         }
     }
     
     /** Reloads config from properties file */
     fun reloadConfig() {
         properties = getProperties()
-        config = BotConfig()
+        botConfig = BotConfig()
         needRefreshMe = true
     }
     
     /** Setup new bot config */
     fun config(setup: BotConfig.() -> Unit): Bot {
-        config = BotConfig().apply(setup)
+        botConfig = BotConfig().apply(setup)
         needRefreshMe = true
         return this
     }
@@ -310,33 +310,38 @@ class Bot(
     }
 
     private var shutdownCommand: String? = null
+
+    /** Sets shutdown [command]. After calling the [command] bot will shut down. This can be handled in [Bot.onStop] */
     fun shutdownCommand(command: String): Bot {
         this.shutdownCommand = command.letIf({ it.startsWith("/") }) { it.drop(1) }
         return this
     }
 
+    /** Calling when the bot catch any exception */
     fun onError(onError: suspend (e: Exception) -> Unit): Bot {
         this.onError = onError
         return this
     }
 
+    /** Called when the bot stops working */
     fun onStop(onStop: suspend Bot.(handler: CommandHandler?) -> Unit): Bot {
         this.onStop = onStop
         return this
     }
 
-
+    /** Calling when the bot start */
     fun onStart(onStart: suspend Bot.() -> Unit): Bot {
         this.onStart = onStart
         return this
     }
 
+    /** Calling when the bot get new update from long pool */
     fun onUpdate(onUpdate: suspend (updates: List<Update>) -> Unit): Bot {
         this.onUpdate = onUpdate
         return this
     }
 
-    fun registerDatePicker(datePicker: DatePicker, alwaysAnswer: Boolean = config.alwaysAnswerCallback): Bot {
+    fun registerDatePicker(datePicker: DatePicker, alwaysAnswer: Boolean = botConfig.alwaysAnswerCallback): Bot {
         additionalEventHandlers.add {
             when (it) {
                 is BaseEventHandlerFactory -> {
@@ -353,21 +358,34 @@ class Bot(
         return this
     }
 
-    fun onMessageSend(onMessageSend: suspend (message: Message) -> Unit): Bot {
-        this.onMessageSend = onMessageSend
-        return this
-    }
+    // TODO ?
+//    fun onMessageSend(onMessageSend: suspend (message: Message) -> Unit): Bot {
+//        this.onMessageSend = onMessageSend
+//        return this
+//    }
 
-    // TODO add force param
-    suspend fun stop(handler: CommandHandler? = null) {
+    /**
+     * Stops bot working.
+     * @param handler CommandHandler that used for stopping with [shutdownCommand] or null
+     * @param force if true new updates and current handling will be finished
+     * */
+    suspend fun stop(handler: CommandHandler? = null, force: Boolean = false) {
         isActive = false
         updateScope.coroutineContext[Job]!!.children.forEach {
-            it.cancelAndJoin()
+            if (force) {
+                it.cancel()
+            } else {
+                it.cancelAndJoin()
+            }
         }
         onStop(this, handler)
         logger.info("Waiting all processing updates...")
         scope.coroutineContext[Job]!!.children.forEach {
-            it.cancelAndJoin()
+            if (force) {
+                it.cancel()
+            } else {
+                it.cancelAndJoin()
+            }
         }
     }
 }

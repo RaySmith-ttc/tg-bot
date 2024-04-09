@@ -15,12 +15,13 @@ import ru.raysmith.tgbot.network.API
 /** Builder of [sendInvoice][BotContext.sendInvoice] request */
 class InvoiceSender(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder {
     override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     var messageThreadId: Int? = null
     var title: String? = null
     var description: String? = null
     var payload: String? = null
-    var providerToken: String? = bot.config.defaultProviderToken
+    var providerToken: String? = bot.botConfig.defaultProviderToken
     var currency: Currency? = null
     var prices: List<LabeledPrice>? = null
     var maxTipAmount: Int? = null

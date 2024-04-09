@@ -27,7 +27,6 @@ annotation class BotContextDsl
 // TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */
 interface BotContext<T : EventHandler> : ISender, IEditor {
-    override val client: HttpClient get() = bot.client
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl
@@ -54,7 +53,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = null,
+        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyToMessageId: Int? = null,
@@ -736,7 +735,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = null,
+        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId? = getChatIdOrThrow()
     ): Message {
@@ -766,7 +765,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         caption: String,
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
-        disableWebPagePreview: Boolean? = null,
+        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
         replyMarkup: KeyboardMarkup? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Message {

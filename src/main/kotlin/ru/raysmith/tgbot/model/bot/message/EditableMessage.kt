@@ -1,18 +1,20 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import io.ktor.client.*
+import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.noimpl
 
 interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
     companion object {
-        internal fun instance(service: API) = object : MessageWithReplyMarkup {
-            override val client: HttpClient = service.client
+        internal fun instance(bot: Bot) = object : MessageWithReplyMarkup {
+            override val client: HttpClient = bot.client
+            override val botConfig: BotConfig = bot.botConfig
             override var messageThreadId: Int? = null
             override var disableNotification: Boolean? = null
             override var replyToMessageId: Int? = null

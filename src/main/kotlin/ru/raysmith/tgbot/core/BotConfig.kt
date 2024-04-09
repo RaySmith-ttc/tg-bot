@@ -38,4 +38,5 @@ class BotConfig {
     var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
 
     var defaultCallbackQueryHandlerFeatures: List<BotFeature> = emptyList()
+    var disableWebPagePreviews: Boolean? = null
 }

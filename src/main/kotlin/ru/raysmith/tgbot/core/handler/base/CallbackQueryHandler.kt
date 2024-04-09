@@ -1,8 +1,10 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -30,7 +32,8 @@ open class CallbackQueryHandler(
     @Suppress("MemberVisibilityCanBePrivate")
     protected val localFeatures: MutableList<BotFeature> = mutableListOf()
 
-    override val client = bot.client
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
     override fun getChatId() = query.message?.chat?.id
     override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
     override var messageId: Int? = query.message?.messageId
@@ -54,7 +57,7 @@ open class CallbackQueryHandler(
     }
 
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.config.ignoreEmptyCallbackData) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.botConfig.ignoreEmptyCallbackData) { answer() }
         else {
             for (data in handlerData) {
                 if (handled) {
@@ -84,7 +87,7 @@ open class CallbackQueryHandler(
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
         if (!handled && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
-            DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, client)
+            DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, bot)
                 .apply { datePickerHandler(getDate()) }
             handled = true
         }
@@ -97,7 +100,7 @@ open class CallbackQueryHandler(
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
         if (!handled && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
-            DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, client)
+            DatePickerCallbackQueryHandler(query, value, callbackQueryPrefix, bot)
                 .apply { datePickerHandler(getDate(), datePickerData.additionalData) }
             handled = true
         }
@@ -105,7 +108,7 @@ open class CallbackQueryHandler(
 
     suspend fun isDataEqual(vararg value: String, equalHandler: suspend DataCallbackQueryHandler.(data: String) -> Unit) {
         if (!handled && query.data != null && query.data in value) {
-            DataCallbackQueryHandler(query, query.data, client)
+            DataCallbackQueryHandler(query, query.data, bot)
                 .apply { equalHandler(query.data!!) }
             handled = true
         }
@@ -113,7 +116,7 @@ open class CallbackQueryHandler(
 
     suspend fun isDataRegex(regex: Regex, regexHandler: suspend DataCallbackQueryHandler.(value: String) -> Unit) {
         if (!handled && query.data?.matches(regex) == true) {
-            DataCallbackQueryHandler(query, query.data, client)
+            DataCallbackQueryHandler(query, query.data, bot)
                 .apply { regexHandler(query.data!!) }
             handled = true
         }
@@ -125,7 +128,7 @@ open class CallbackQueryHandler(
                 // 1 = Pagination.SYMBOL_PAGE_PREFIX length
                 if (it.length <= 1) null
                 else it.substring(1).toIntOrNull()?.let { page ->
-                    PaginationCallbackQueryHandler(query, page, client).apply { handler(page) }
+                    PaginationCallbackQueryHandler(query, page, bot).apply { handler(page) }
                 }
             } ?: logger.warn("Pagination data incorrect. Are you sure '$paginationCallbackQueryPrefix' prefix should use isPage handler?")
             handled = true
@@ -140,7 +143,7 @@ open class CallbackQueryHandler(
             if (!handled && query.data != null && query.data.startsWith(startWithEntry)) {
                 val value = query.data.substring(startWithEntry.length)
                 if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
-                    ValueDataCallbackQueryHandler(query, value, client)
+                    ValueDataCallbackQueryHandler(query, value, bot)
                         .apply { startWithHandler(value) }
                     handled = true
                     break

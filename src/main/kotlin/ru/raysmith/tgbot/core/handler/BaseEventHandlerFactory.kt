@@ -169,8 +169,8 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     
     @HandlerDsl
     fun handleCallbackQuery(
-        alwaysAnswer: Boolean = bot.config.alwaysAnswerCallback,
-        features: List<BotFeature> = bot.config.defaultCallbackQueryHandlerFeatures,
+        alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
+        features: List<BotFeature> = bot.botConfig.defaultCallbackQueryHandlerFeatures,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {

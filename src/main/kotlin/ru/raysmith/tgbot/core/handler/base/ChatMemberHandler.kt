@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.core.handler.base
 
+import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.HandlerDsl
@@ -26,6 +28,8 @@ open class ChatMemberHandler(
     override fun getChatIdOrThrow() = chat.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
+    override val client: HttpClient = bot.client
+    override val botConfig: BotConfig = bot.botConfig
 
     constructor(chatMember: ChatMemberUpdated, bot: Bot, handler: suspend ChatMemberHandler.() -> Unit = { }) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,
