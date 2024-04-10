@@ -51,7 +51,8 @@ data class ChatPermissions(
 
 ) {
     companion object {
-        // TODO docs
+
+        /** Returns [ChatPermissions] instance with all allowed actions */
         fun fullAccess() = ChatPermissions(
             canSendMessages = true,
             canSendAudios = true,

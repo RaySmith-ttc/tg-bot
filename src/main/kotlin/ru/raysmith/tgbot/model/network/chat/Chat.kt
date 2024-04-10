@@ -166,7 +166,6 @@ data class Chat(
      * */
     @SerialName("location") val location: ChatLocation? = null,
 ) {
-    // TODO move ban methods to interface, impl update types. It guarantee a context in a group, supergroup or channel
     /**
      * Ban a user in the group, supergroup or channel
      *

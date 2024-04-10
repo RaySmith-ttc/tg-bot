@@ -234,6 +234,7 @@ data class Message(
      * a Web App sent by the method requestWriteAccess
      * */
     @SerialName("write_access_allowed") val writeAccessAllowed: WriteAccessAllowed? = null,
+
     // TODO [passport support] add passport_data field (https://core.telegram.org/bots/api#message)
 
     /** Service message. A user in the chat triggered another user's proximity alert while sharing Live Location. */
@@ -312,7 +313,6 @@ data class Message(
         else -> null
     }
 
-    // TODO
     /**
      * Use this method to delete a message, including service messages, with the following limitations:
      * - A message can only be deleted if it was sent less than 48 hours ago.

@@ -2803,6 +2803,7 @@ interface API {
         }
     }
 
+    // TODO [docs]
     suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
 
     suspend fun downloadFile(file: File) = request<InputStream> {

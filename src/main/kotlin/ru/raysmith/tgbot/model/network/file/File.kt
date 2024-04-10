@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.file
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.BotContext
 
 /**
  * This object represents a file ready to be downloaded. The file can be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile.
@@ -26,6 +27,9 @@ data class File(
     @SerialName("file_path") val path: String? = null
 ) {
 
-    // TODO
-//    fun download()
+    // TODO [docs]
+    context(BotContext<*>)
+    suspend fun download() {
+        downloadFile(this)
+    }
 }

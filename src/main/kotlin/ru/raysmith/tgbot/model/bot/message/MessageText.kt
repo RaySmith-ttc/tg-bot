@@ -193,6 +193,8 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
             return this.length == other.length && this.offset == other.offset
         }
         if (parseMode == ParseMode.MARKDOWNV2) {
+
+            // TODO or delegate to API error?
             entities.forEachIndexed { i, entity ->
                 if (i != 0 && i != entities.size - 1 && entity.offset + entity.length == entities[i + 1].offset &&
                     (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (

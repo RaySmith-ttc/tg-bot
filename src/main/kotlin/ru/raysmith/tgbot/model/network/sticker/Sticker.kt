@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.media.PhotoSize
-import ru.raysmith.tgbot.model.network.message.MaskPosition
 
 /** This object represents a sticker. */
 @Serializable
