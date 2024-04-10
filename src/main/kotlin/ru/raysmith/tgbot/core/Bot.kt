@@ -75,7 +75,7 @@ class Bot(
 
         @JvmName("getPropertiesFromFile")
         internal fun getProperties(): Properties? {
-            return PropertiesFactory.fromOrNull("tgbot.properties")?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
+            return PropertiesFactory.fromOrNull("tgbot.properties") ?: PropertiesFactory.fromOrNull("bot.properties") // TODO [stable] remove second
         }
     }
 

@@ -2035,7 +2035,7 @@ interface API {
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
-     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param inlineMessageId Required if [chatId] and [messageId] are not specified. Identifier of the inline message
      * @param media New media content of the message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
@@ -2573,7 +2573,7 @@ interface API {
      * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
      * delivery cost, delivery tax, bonus, etc.)
      * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
-     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
+     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `maxTipAmount = 145`.
      * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
      * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
      * Defaults to 0

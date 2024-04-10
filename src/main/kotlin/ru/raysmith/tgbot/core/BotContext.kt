@@ -1,17 +1,16 @@
 package ru.raysmith.tgbot.core
 
-import io.ktor.client.*
-import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.buildKeyboard
 import ru.raysmith.tgbot.model.network.Poll
 import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
 import ru.raysmith.tgbot.model.network.chat.forum.IconColor
 import ru.raysmith.tgbot.model.network.chat.member.ChatMember
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
@@ -19,12 +18,12 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.network.API
 import java.time.ZonedDateTime
 
 @DslMarker
 annotation class BotContextDsl
 
-// TODO оставить только альтернативные варианты функций с билдерами или с заполненными chatId
 /** Allows to change a bot for the [handler][T] */
 interface BotContext<T : EventHandler> : ISender, IEditor {
 
@@ -44,10 +43,10 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
-     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param keyboardMarkup [KeyboardCreator] builder for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user
      * */
     suspend fun sendMessage(
         text: String,
@@ -58,13 +57,13 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         protectContent: Boolean? = null,
         replyToMessageId: Int? = null,
         allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
         messageThreadId: Int? = null,
-        chatId: ChatId = getChatIdOrThrow()
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): Message {
         return sendMessage(
             chatId, messageThreadId, text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply, keyboardMarkup
+            replyToMessageId, allowSendingWithoutReply,  keyboardMarkup?.let { buildKeyboard(it) }?.toMarkup()
         )
     }
 
@@ -106,11 +105,10 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Users will receive a notification with no sound.
      * @param replyToMessageId If the message is a reply, ID of the original message
      * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
-     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
      * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param keyboardMarkup [KeyboardCreator] builder for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user
      * */
-
     suspend fun copyMessage(
         fromChatId: ChatId,
         messageId: Int,
@@ -122,12 +120,14 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         protectContent: Boolean? = null,
         replyToMessageId: Int? = null,
         allowSendingWithoutReply: Boolean? = null,
-        keyboardMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
-    ) = copyMessage(
-        chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
-        replyToMessageId, allowSendingWithoutReply, keyboardMarkup
-    )
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
+    ): MessageId {
+        return copyMessage(
+            chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
+            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard(it) }?.toMarkup()
+        )
+    }
 
     /**
      * Use this method to ban a user in a group, a supergroup or a channel. In the case of supergroups and channels,
@@ -159,11 +159,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * group or channel automatically, but will be able to join via link, etc. The bot must be an administrator for
      * this to work. By default, this method guarantees that after the call the user is not a member of the chat,
      * but will be able to join it. So if the user is a member of the chat they will also be **removed** from the chat.
-     * If you don't want this, use the parameter _only_if_banned_. Returns *True* on success.
+     * If you don't want this, use the parameter _[onlyIfBanned]_. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * @param userId Unique identifier of the target user
      * @param onlyIfBanned Do nothing if the user is not banned
+     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
     suspend fun unbanChatMember(userId: ChatId.ID, onlyIfBanned: Boolean, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return unbanChatMember(chatId, userId, onlyIfBanned)
@@ -283,18 +283,18 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * _can_restrict_members_ administrator rights. Returns *True* on success.
      *
      * @param permissions New default chat permissions
-     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * @param useIndependentChatPermissions Pass *True* if chat permissions are set independently.
      * Otherwise, the [ChatPermissions.canSendOtherMessages] and [ChatPermissions.canAddWebPagePreviews]
      * permissions will imply the [ChatPermissions.canSendMessages], [ChatPermissions.canSendAudios],
      * [ChatPermissions.canSendDocuments], [ChatPermissions.canSendPhotos], [ChatPermissions.canSendVideos],
      * [ChatPermissions.canSendVideoNotes], and [ChatPermissions.canSendVoiceNotes] permissions;
      * the [ChatPermissions.canSendPolls] permission will imply the [ChatPermissions.canSendMessages] permission.
+     * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
     suspend fun setChatPermissions(
         permissions: ChatPermissions,
-        chatId: ChatId = getChatIdOrThrow(),
-        useIndependentChatPermissions: Boolean? = null
+        useIndependentChatPermissions: Boolean? = null,
+        chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
         return setChatPermissions(chatId, permissions, useIndependentChatPermissions)
     }
@@ -477,8 +477,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages'
      * administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
      * Returns *True* on success.
-     *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun unpinAllChatMessages(): Boolean {
         return unpinAllChatMessages(getChatIdOrThrow())
@@ -491,7 +489,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         return leaveChat(getChatIdOrThrow())
     }
 
-    // TODO docs
     /**
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
@@ -553,14 +550,16 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights.
      * Returns information about the created topic as a [ForumTopic] object.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param name Topic name, 1-128 characters
      * @param iconColor Color of the topic icon
      * @param iconCustomEmojiId Unique identifier of the custom emoji shown as the topic icon.
      * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun createForumTopic(
-        name: String, iconColor: IconColor? = null, iconCustomEmojiId: String? = null,
+        name: String,
+        iconColor: IconColor? = null,
+        iconCustomEmojiId: String? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): ForumTopic {
         return createForumTopic(chatId, name, iconColor, iconCustomEmojiId)
@@ -572,16 +571,18 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator
      * rights, unless it is the creator of the topic. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
      * @param name New topic name, 0-128 characters. If not specified or empty,
      * the current name of the topic will be kept
      * @param iconCustomEmojiId New unique identifier of the custom emoji shown as the topic icon.
-     * Use [getForumTopicIconStickers] to get all allowed custom emoji identifiers.
+     * Use [getForumTopicIconStickers][API.getForumTopicIconStickers] to get all allowed custom emoji identifiers.
      * ass an empty string to remove the icon. If not specified, the current icon will be kept
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun editForumTopic(
-        messageThreadId: Int, name: String? = null, iconCustomEmojiId: String? = null,
+        messageThreadId: Int,
+        name: String? = null,
+        iconCustomEmojiId: String? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
         return editForumTopic(chatId, messageThreadId, name, iconCustomEmojiId)
@@ -593,8 +594,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights,
      * unless it is the creator of the topic. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun closeForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return closeForumTopic(chatId, messageThreadId)
@@ -606,8 +607,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights,
      * unless it is the creator of the topic. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun reopenForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return reopenForumTopic(chatId, messageThreadId)
@@ -618,8 +619,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canDeleteMessages*][ChatAdministratorRights.canDeleteMessages] administrator rights. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun deleteForumTopic(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return deleteForumTopic(chatId, messageThreadId)
@@ -631,8 +632,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * [*canPinMessages*][ChatAdministratorRights.canPinMessages] administrator right in the supergroup.
      * Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param messageThreadId Unique identifier for the target message thread of the forum topic
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun unpinAllForumTopicMessages(messageThreadId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return unpinAllForumTopicMessages(chatId, messageThreadId)
@@ -643,8 +644,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * The bot must be an administrator in the chat for this to work and must have the
      * [*canManageTopics*][ChatAdministratorRights.canManageTopics] administrator rights. Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * @param name New topic name, 1-128 characters
+     * @param chatId Unique identifier for the target chat or username of the target supergroup
      * */
     suspend fun editGeneralForumTopic(name: String, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return editGeneralForumTopic(chatId, name)
@@ -705,11 +706,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to change the bot's menu button in a private chat, or the default menu button.
      * Returns *True* on Success.
      *
+     * @param menuButton [MenuButton] object for the bot's new menu button. Defaults to [MenuButtonDefault]
      * @param chatId Unique identifier for the target private chat.
      * If not specified, default bot's menu button will be changed
-     * @param menuButton [MenuButton] object for the bot's new menu button. Defaults to [MenuButtonDefault]
      * */
-    suspend fun setChatMenuButton(menuButton: MenuButton? = null, chatId: ChatId? = null): Boolean {
+    suspend fun setChatMenuButton(menuButton: MenuButton? = null, chatId: ChatId? = getChatIdOrThrow()): Boolean {
         return setChatMenuButton(chatId, menuButton)
     }
 
@@ -717,8 +718,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to edit text and game messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
-     * @param chatId Required if [inlineMessageId] is not specified.
-     * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param text New text of the message, 1-4096 characters after entities parsing
@@ -726,7 +725,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param entities A JSON-serialized list of special entities that appear in message text,
      * which can be specified instead of parseMode
      * @param disableWebPagePreview Disables link previews for links in this message
-     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel
+     * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageText(
         messageId: Int? = null,
@@ -735,11 +736,12 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         parseMode: ParseMode? = null,
         entities: String? = null,
         disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
-        replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId? = getChatIdOrThrow()
+        chatId: ChatId? = getChatIdOrThrow(),
+        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return editMessageText(
-            chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview, replyMarkup
+            chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview,
+            buildInlineKeyboard(keyboardMarkup).toMarkup()
         )
     }
 
@@ -747,8 +749,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to edit captions of messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
-     * @param chatId Required if [inlineMessageId] is not specified.
-     * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param caption New caption of the message, 0-1024 characters after entities parsing
@@ -756,7 +756,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param captionEntities A JSON-serialized list of special entities that appear in the caption,
      * which can be specified instead of parseMode
      * @param disableWebPagePreview Disables link previews for links in this message
-     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel
+     * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageCaption(
         messageId: Int? = null,
@@ -765,11 +767,12 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
         disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
-        replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
     ): Message {
         return editMessageCaption(
-            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities, replyMarkup
+            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities,
+            buildInlineKeyboard(keyboardMarkup).toMarkup()
         )
     }
 
@@ -781,22 +784,22 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * via its file_id or specify a URL. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise *True* is returned.
      *
+     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
+     * @param inlineMessageId Required if [chatId] and [messageId] are not specified. Identifier of the inline message
+     * @param media A JSON-serialized object for a new media content of the message
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
-     * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
-     * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
-     * @param media A JSON-serialized object for a new media content of the message
-     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
+     * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageMedia(
         messageId: Int? = null,
         inlineMessageId: String? = null,
         media: InputMedia,
-        replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
     ): Message {
         return editMessageMedia(
-            chatId, messageId, inlineMessageId, media, replyMarkup
+            chatId, messageId, inlineMessageId, media, buildInlineKeyboard(keyboardMarkup).toMarkup()
         )
     }
 
@@ -804,28 +807,28 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to edit only the reply markup of messages. On success,
      * if the edited message is not an inline message, the edited [Message] is returned, otherwise *True* is returned.
      *
-     * @param chatId Required if [inlineMessageId] is not specified.
-     * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
-     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
+     * @param chatId Required if [inlineMessageId] is not specified.
+     * Unique identifier for the target chat or username of the target channel
+     * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageReplyMarkup(
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        replyMarkup: KeyboardMarkup? = null,
-        chatId: ChatId = getChatIdOrThrow()
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
     ): Message {
         return editMessageReplyMarkup(
-            chatId, messageId, inlineMessageId, replyMarkup
+            chatId, messageId, inlineMessageId, buildInlineKeyboard(keyboardMarkup).toMarkup()
         )
     }
 
     /**
      * Use this method to stop a poll which was sent by the bot. On success, the stopped [Poll] is returned
      *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageId Identifier of the original message with the poll
+     * @param chatId Unique identifier for the target chat or username of the target channel
      * @param keyboard [MessageInlineKeyboard] builder for a new message inline keyboard.
      * */
     suspend fun stopPoll(
@@ -833,8 +836,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         chatId: ChatId = getChatIdOrThrow(),
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Poll {
-        val replyMarkup = buildInlineKeyboard(keyboard).toMarkup()
-        return stopPoll(chatId, messageId, replyMarkup)
+        return stopPoll(chatId, messageId, buildInlineKeyboard(keyboard).toMarkup())
     }
 
     /**
@@ -850,8 +852,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      *
      * Returns *True* on success.
      *
-     * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageId Identifier of the message to delete
+     * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return deleteMessage(chatId, messageId)
@@ -861,93 +863,16 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to send invoices. On success, the sent Message is returned.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
-     * @param title Product name, 1-32 characters
-     * @param description Product description, 1-255 characters
-     * @param payload Bot-defined invoice payload, 1-128 bytes.
-     * This will not be displayed to the user, use for your internal processes.
-     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
-     * @param currency Three-letter ISO 4217 currency code, see
-     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
-     * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.)
-     * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
-     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
-     * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
-     * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
-     * Defaults to 0
-     * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
-     * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
-     * The suggested tip amounts must be positive, passed in a strictly increased order and must
-     * not exceed *max_tip_amount*.
-     * @param startParameter Unique deep-linking parameter. If left empty, *forwarded copies* of the sent message will
-     * have a *Pay* button, allowing multiple users to pay directly from the forwarded message, using the same invoice.
-     * If non-empty, forwarded copies of the sent message will have a URL button with a deep link to the bot
-     * (instead of a *Pay* button), with the value used as the start parameter
-     * @param providerData A JSON-serialized data about the invoice, which will be shared with the payment provider.
-     * A detailed description of required fields should be provided by the payment provider.
-     * @param photoUrl URL of the product photo for the invoice. Can be a photo of the goods or a marketing
-     * image for a service. People like it better when they see what they are paying for.
-     * @param photoSize Photo size in bytes
-     * @param photoWidth Photo width
-     * @param photoHeight Photo height
-     * @param needName Pass *True*, if you require the user's full name to complete the order
-     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
-     * @param needEmail Pass *True*, if you require the user's email address to complete the order
-     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
-     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
-     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
-     * @param isFlexible Pass *True*, if the final price depends on the shipping method
-     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
-     * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to
-     * message is not found
-     * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
-     * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
-    @Suppress("KDocUnresolvedReference")
-    suspend fun sendInvoice(chatId: ChatId = getChatIdOrThrow(), buildAction: InvoiceSender.() -> Unit): Message {
-        return InvoiceSender(bot).apply(buildAction).send(chatId)
+    suspend fun sendInvoice(
+        chatId: ChatId = getChatIdOrThrow(),
+        buildAction: SendInvoiceRequestBuilder.() -> Unit
+    ): Message {
+        return SendInvoiceRequestBuilder(bot).apply(buildAction).send(chatId)
     }
 
-    /**
-     * Use this method to create a link for an invoice. Returns the created invoice link as String on success.
-     *
-     * @param title Product name, 1-32 characters
-     * @param description Product description, 1-255 characters
-     * @param payload Bot-defined invoice payload, 1-128 bytes.
-     * This will not be displayed to the user, use for your internal processes.
-     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
-     * @param currency Three-letter ISO 4217 currency code, see
-     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
-     * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.)
-     * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
-     * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
-     * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
-     * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
-     * Defaults to 0
-     * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
-     * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
-     * The suggested tip amounts must be positive, passed in a strictly increased order and must
-     * not exceed *max_tip_amount*.
-     * @param providerData A JSON-serialized data about the invoice, which will be shared with the payment provider.
-     * A detailed description of required fields should be provided by the payment provider.
-     * @param photoUrl URL of the product photo for the invoice. Can be a photo of the goods or a marketing
-     * image for a service. People like it better when they see what they are paying for.
-     * @param photoSize Photo size in bytes
-     * @param photoWidth Photo width
-     * @param photoHeight Photo height
-     * @param needName Pass *True*, if you require the user's full name to complete the order
-     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
-     * @param needEmail Pass *True*, if you require the user's email address to complete the order
-     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
-     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
-     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
-     * @param isFlexible Pass *True*, if the final price depends on the shipping method
-     * */
-    @Suppress("KDocUnresolvedReference")
-    suspend fun createInvoiceLink(buildAction: InvoiceCreateLinkSender.() -> Unit): String {
-        return InvoiceCreateLinkSender(bot).apply(buildAction).send()
+    /** Use this method to create a link for an invoice. Returns the created invoice link as String on success. */
+    suspend fun createInvoiceLink(buildAction: CreateInvoiceLinkRequestBuilder.() -> Unit): String {
+        return CreateInvoiceLinkRequestBuilder(bot).apply(buildAction).send()
     }
 }
