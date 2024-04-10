@@ -1,13 +1,12 @@
 package ru.raysmith.tgbot.utils.datepicker
 
-import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.utils.letIf
-import ru.raysmith.utils.properties.getOrNull
 import java.time.*
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -40,9 +39,9 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     var additionalRowsVisibleOnStates = DatePickerState.entries.toSet()
 
     var timeZone = ZoneId.systemDefault()
+
     var locale: Locale? = null
-    private val _locale get() = locale ?: Bot.properties?.getOrNull("calendar_locale")
-        ?.let { Locale.forLanguageTag(it) } ?: Locale.getDefault()
+    private fun locale(botConfig: BotConfig) = locale ?: botConfig.locale
 
     private val now get() = LocalDate.now(timeZone)
 
@@ -52,7 +51,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     var dates: (data: String?) -> ClosedRange<LocalDate> = { LocalDate.of(1900, 1, 1)..LocalDate.of(2099, 12, 31) }
 
     var yearsColumns = 5
-        get() = field.coerceIn(1, 8)
+        get() = field.coerceIn(1, 8) // TODO ?
 
     var yearsRows = 10
 
@@ -65,12 +64,12 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         require(callbackQueryPrefix.length <= 52) { "Callback query prefix for date picker is too long" }
     }
 
-    suspend fun setupMarkup(messageInlineKeyboard: MessageInlineKeyboard, data: String?) {
+    suspend fun setupMarkup(botConfig: BotConfig, messageInlineKeyboard: MessageInlineKeyboard, data: String?) {
         val date = initDate
         messageInlineKeyboard.setupMarkup(startWithState, data) {
             when(startWithState) {
-                DatePickerState.DAY -> setupDaysMarkup(date.year, date.monthValue, data)
-                DatePickerState.MONTH -> setupMonthsMarkup(date.year, data)
+                DatePickerState.DAY -> setupDaysMarkup(botConfig, date.year, date.monthValue, data)
+                DatePickerState.MONTH -> setupMonthsMarkup(botConfig, date.year, data)
                 DatePickerState.YEAR -> setupYearsMarkup(date.year, data)
             }
         }
@@ -108,7 +107,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
                                 textWithEntities { messageText(datePickerData.additionalData, DatePickerState.DAY) }
                                 inlineKeyboard {
                                     setupMarkup(DatePickerState.DAY, datePickerData.additionalData) {
-                                        setupDaysMarkup(datePickerData.y, datePickerData.m, datePickerData.additionalData)
+                                        setupDaysMarkup(this@isDataStartWith.botConfig, datePickerData.y, datePickerData.m, datePickerData.additionalData)
                                     }
                                 }
                             }
@@ -118,7 +117,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
                                 textWithEntities { messageText(datePickerData.additionalData, DatePickerState.MONTH) }
                                 inlineKeyboard {
                                     setupMarkup(DatePickerState.MONTH, datePickerData.additionalData) {
-                                        setupMonthsMarkup(datePickerData.y, datePickerData.additionalData)
+                                        setupMonthsMarkup(this@isDataStartWith.botConfig, datePickerData.y, datePickerData.additionalData)
                                     }
                                 }
                             }
@@ -129,7 +128,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         }
     }
 
-    private fun Month.localized(style: TextStyle = TextStyle.FULL_STANDALONE) = getDisplayName(style, _locale)
+    private fun Month.localized(botConfig: BotConfig, style: TextStyle = TextStyle.FULL_STANDALONE) = getDisplayName(style, locale(botConfig))
     private fun Number.toIso() = if (this.toInt() < 10) "0$this" else this.toString()
     private fun Number.toIso(isYear: Boolean = false) = this.toString().padStart(if (isYear) 4 else 2, '0')
     private fun getMonthsDiff(year: Int, month: Int, date: LocalDate = now): Long {
@@ -197,7 +196,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         }
     }
 
-    private suspend fun MessageInlineKeyboard.setupMonthsMarkup(year: Int, data: String?) {
+    private suspend fun MessageInlineKeyboard.setupMonthsMarkup(botConfig: BotConfig, year: Int, data: String?) {
         val datesRange = dates(data)
         val firstDate = getFirstDate(datesRange)
         val lastDate = getLastDate(datesRange)
@@ -216,12 +215,11 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         monthSequence.take(12).chunked(4).toList().map { row ->
             row {
                 row.forEach {
-
                     val diffWithLastDate = getMonthsDiff(year, it.value, lastDate)
                     val diffWithFirstDate = getMonthsDiff(year, it.value, firstDate)
                     val clickable = diffWithLastDate >= 0 && diffWithFirstDate <= 0
 
-                    val title = if (clickable) if (year == now.year && it.value == now.monthValue) "·${it.localized()}·" else it.localized() else " "
+                    val title = if (clickable) if (year == now.year && it.value == now.monthValue) "·${it.localized(botConfig)}·" else it.localized(botConfig) else " "
                     val callbackQuery = if (clickable) "${callbackQueryPrefix}{${data ?: ""}}y${year.toIso(true)}m${it.value.toIso()}" else CallbackQuery.EMPTY_CALLBACK_DATA
                     button(title, callbackQuery)
                 }
@@ -229,7 +227,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         }
     }
 
-    private suspend fun MessageInlineKeyboard.setupDaysMarkup(callbackYear: Int, callbackMonth: Int, data: String?) {
+    private suspend fun MessageInlineKeyboard.setupDaysMarkup(botConfig: BotConfig, callbackYear: Int, callbackMonth: Int, data: String?) {
         val datesRange = dates(data)
 
         val year = when {
@@ -265,7 +263,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
             else button(" ", CallbackQuery.EMPTY_CALLBACK_DATA)
 
             button(
-                "${Month.of(month).localized(TextStyle.SHORT_STANDALONE)} $year",
+                "${Month.of(month).localized(botConfig, TextStyle.SHORT_STANDALONE)} $year",
                 if (monthPickerEnabled) "${callbackQueryPrefix}{${data ?: ""}}y${year.toIso(true)}"
                 else CallbackQuery.EMPTY_CALLBACK_DATA
             )
@@ -316,7 +314,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         }
 
         val dayOfWeekSequence = generateSequence(DayOfWeek.of(1)) { it + 1}
-        fun DayOfWeek.localized() = getDisplayName(TextStyle.SHORT_STANDALONE, _locale)
+        fun DayOfWeek.localized() = getDisplayName(TextStyle.SHORT_STANDALONE, locale(botConfig))
 
         // Day of week headers
         row {

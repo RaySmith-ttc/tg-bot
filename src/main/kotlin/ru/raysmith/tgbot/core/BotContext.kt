@@ -88,7 +88,6 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         chatId: ChatId = getChatIdOrThrow()
     ): Message {
         return forwardMessage(chatId, messageThreadId, fromChatId, disableNotification, protectContent, messageId)
-
     }
 
     /**

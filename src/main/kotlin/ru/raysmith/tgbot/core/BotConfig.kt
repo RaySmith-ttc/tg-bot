@@ -5,8 +5,7 @@ import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
 import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
 import ru.raysmith.utils.properties.getOrNull
-
-// TODO add global disable links preview
+import java.util.*
 
 /** Contains customizable bot options */
 class BotConfig {
@@ -27,9 +26,9 @@ class BotConfig {
         ?: throw IllegalArgumentException("Property pagination.columns is not Int")
     var firstPageSymbol = Bot.properties.getOrDefault("pagination.firstPageSymbol", "«")
     var lastPageSymbol = Bot.properties.getOrDefault("pagination.lastPageSymbol", "»")
-//    var locale = Bot.properties?.getOrNull("calendar_locale")?.let { // TODO [docs] can't be obtain from  config
-//        Locale.forLanguageTag(it)
-//    } ?: Locale.getDefault()
+    var locale = Bot.properties?.getOrNull("calendar_locale")?.let {
+        Locale.forLanguageTag(it)
+    } ?: Locale.getDefault()
 
     var alwaysAnswerCallback: Boolean = false
     var ignoreEmptyCallbackData: Boolean = true

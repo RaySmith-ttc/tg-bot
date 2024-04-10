@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
+import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
@@ -30,8 +31,12 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
             .setupMarkup(this@MessageInlineKeyboard)
     }
 
-    suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) {
-        datePicker.setupMarkup(this, data)
+    context(BotHolder)
+    suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) =
+        createDatePicker(bot.botConfig, datePicker, data)
+
+    suspend fun createDatePicker(botConfig: BotConfig, datePicker: DatePicker, data: String? = null) {
+        datePicker.setupMarkup(botConfig, this, data)
     }
 
     fun row(row: Row) = _rows.add(row)
