@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.utils.letIf
 import java.time.*
 import java.time.format.TextStyle
@@ -13,22 +14,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 class DatePicker(val callbackQueryPrefix: String) : BotFeature {
-
-    // TODO remove
-    @Deprecated("Removed soon") // how many months back user can browse
-    var monthLimitBack = -1
-        set(value) {
-            require(value >= -1) { "monthLimitBack must be positive" }
-            field = value
-        }
-
-    @Deprecated("Removed soon")
-    var monthLimitForward = -1 // how many months forward user can browse
-        set(value) {
-            require(value >= -1) { "monthLimitForward must be positive" }
-            field = value
-        }
-
     var monthPickerEnabled = true
     var yearsPickerEnabled = true
 
@@ -138,11 +123,11 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     }
 
     private fun getFirstDate(datesRange: ClosedRange<LocalDate>) = now
-        .withYear(if (monthLimitBack == -1) datesRange.start.year else now.year - (monthLimitBack / 12) - if (now.monthValue - (monthLimitBack % 12) < 0) 1 else 0)
-        .withMonth(if (monthLimitBack == -1) datesRange.start.monthValue else now.monthValue - (monthLimitBack % 12))
+        .withYear(datesRange.start.year)
+        .withMonth(datesRange.start.monthValue)
     private fun getLastDate(datesRange: ClosedRange<LocalDate>) = now
-        .withYear(if (monthLimitForward == -1) datesRange.endInclusive.year else now.year + (monthLimitForward / 12) + if (now.monthValue + monthLimitForward > 12) 1 else 0)
-        .withMonth(if (monthLimitForward == -1) datesRange.endInclusive.monthValue else (now.monthValue + (monthLimitForward % 12)) % 12)
+        .withYear(datesRange.endInclusive.year)
+        .withMonth(datesRange.endInclusive.monthValue)
 
     private suspend fun MessageInlineKeyboard.setupYearsMarkup(fromYear: Int, data: String?) {
         val datesRange = dates(data)
@@ -253,9 +238,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
         val allowFutureByDates = year < datesRange.endInclusive.year || (year == datesRange.endInclusive.year && month < datesRange.endInclusive.monthValue)
 
         row {
-            val diff = getMonthsDiff(year, month)
-
-            if ((monthLimitBack == -1 || diff < monthLimitBack) && allowPastByDates) {
+            if (allowPastByDates) {
                 val updatedYear = (if (month == 1) year - 1 else year)
                 val updatedMonth = (if (month == 1) 12 else month - 1)
                 button("«", "${callbackQueryPrefix}{${data ?: ""}}y${updatedYear.toIso(true)}m${updatedMonth.toIso()}")
@@ -268,7 +251,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
                 else CallbackQuery.EMPTY_CALLBACK_DATA
             )
             
-            if ((monthLimitForward == -1 || diff > -monthLimitForward) && allowFutureByDates) {
+            if (allowFutureByDates) {
                 val updatedYear = (if (month == 12) year + 1 else year)
                 val updatedMonth = (if (month == 12) 1 else month + 1)
                 button("»", "${callbackQueryPrefix}{${data ?: ""}}y${updatedYear.toIso(true)}m${updatedMonth.toIso()}")

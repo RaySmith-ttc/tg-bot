@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.core.handler.utils.DataCallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.utils.ValueDataCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.utils.datepicker.BotFeature
+import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import java.time.LocalDate
 

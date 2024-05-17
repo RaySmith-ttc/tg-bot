@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.utils.datepicker
+package ru.raysmith.tgbot.utils
 
 import ru.raysmith.tgbot.core.handler.EventHandler
 

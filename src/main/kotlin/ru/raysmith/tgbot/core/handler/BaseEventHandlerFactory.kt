@@ -7,7 +7,7 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.datepicker.BotFeature
+import ru.raysmith.tgbot.utils.BotFeature
 
 @DslMarker
 annotation class HandlerDsl

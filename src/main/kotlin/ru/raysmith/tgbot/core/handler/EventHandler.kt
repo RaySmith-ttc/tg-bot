@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.core.IEditor
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.datepicker.BotFeature
+import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 

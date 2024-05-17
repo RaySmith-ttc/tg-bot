@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.core
 
-import ru.raysmith.tgbot.utils.datepicker.BotFeature
+import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
 import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
@@ -34,6 +34,12 @@ class BotConfig {
     var ignoreEmptyCallbackData: Boolean = true
 
     var sendChatActionWithMedaMessage: Boolean = false
+
+    /**
+     * Instance of [PaginationFetcherFactory]. It describes how to fetch page data from all data in pagination.
+     * For example, you may want to change default fetch logic when use _SizedIterable from kotlin exposed library_
+     * to add limit to query
+     * */
     var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
 
     var defaultCallbackQueryHandlerFeatures: List<BotFeature> = emptyList()

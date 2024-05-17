@@ -1,6 +1,10 @@
 package ru.raysmith.tgbot.utils.pagination
 
-// TODO docs
+/**
+ * Default implementation of [PaginationFetcherFactory].
+ *
+ * It uses [subList][List.subList] method for [Lists][List] of filter by indexes for other collections
+ * */
 class DefaultPaginationFetcherFactory : PaginationFetcherFactory {
     override fun <T> getFetcher(): PaginationFetcher<T> {
         return object : PaginationFetcher<T> {
