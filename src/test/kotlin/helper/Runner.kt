@@ -49,7 +49,6 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
-import ru.raysmith.tgbot.utils.datepicker.BotFeature
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.locations.LocationConfig

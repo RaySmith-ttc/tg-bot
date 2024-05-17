@@ -28,6 +28,7 @@ class LocationCommandHandler<T : LocationConfig>(
                 handled = true
             }
         }
+        handleLocalFeatures(handled)
     }
 
     suspend fun isCommand(value: String, equalHandler: suspend LocationCommandHandler<T>.(argsString: String?) -> Unit) {

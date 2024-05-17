@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.5"
+version = "1.0.0-beta.7"
 
 repositories {
     mavenCentral()
@@ -86,7 +86,6 @@ tasks {
             freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
             freeCompilerArgs += "-Xcontext-receivers"
             freeCompilerArgs += "-XXLanguage:+UnitConversionsOnArbitraryExpressions"
-            jvmTarget = JavaVersion.VERSION_1_8.toString()
         }
     }
     withType<Test> {
