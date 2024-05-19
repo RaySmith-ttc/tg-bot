@@ -48,10 +48,10 @@ class LocationsWrapper<L : LocationConfig>(override val bot: Bot) : BotHolder {
     private val additionalEventHandlers: MutableMap<String, suspend LocationEventHandlerFactory<L>.(L) -> Unit> = mutableMapOf()
     @LocationsDSLConfig
     fun global(
-        handlersId: String = CallbackQueryHandler.GLOBAL_HANDLER_ID,
+        handlerId: String = CallbackQueryHandler.GLOBAL_HANDLER_ID,
         setup: suspend LocationEventHandlerFactory<L>.(config: L) -> Unit
     ) {
-        additionalEventHandlers[handlersId] = setup
+        additionalEventHandlers[handlerId] = setup
     }
 
     context(BotHolder)
@@ -87,7 +87,7 @@ class LocationsWrapper<L : LocationConfig>(override val bot: Bot) : BotHolder {
         return this
     }
 
-    internal suspend fun getHandlerFactory(update: Update, bot: Bot): LocationEventHandlerFactory<L> {
+    internal suspend fun getHandlerFactory(update: Update): LocationEventHandlerFactory<L> {
         val config = configCreator(update)
         if (!filter.invoke(config, update)) {
             Bot.logger.debug("Update #${update.updateId} skipped by locations filter")

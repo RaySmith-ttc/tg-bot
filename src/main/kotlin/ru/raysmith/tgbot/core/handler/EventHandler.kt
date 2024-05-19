@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 interface EventHandler : ChatIdHolder, IEditor, ISender {
     var handled: Boolean
-    suspend fun setupFeatures(vararg features: BotFeature)
+    suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean = false)
     suspend fun handle()
 }
 
@@ -19,8 +19,9 @@ abstract class BaseEventHandler : EventHandler {
     override var handled: Boolean = false
     protected val localFeatures: MutableList<BotFeature> = mutableListOf()
 
-    override suspend fun setupFeatures(vararg features: BotFeature) {
-        localFeatures.addAll(features)
+    override suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean) {
+        if (callFirst) localFeatures.addAll(0, features.toList())
+        else localFeatures.addAll(features)
     }
 
     context(EventHandler)

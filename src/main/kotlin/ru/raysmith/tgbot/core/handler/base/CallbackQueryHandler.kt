@@ -18,7 +18,6 @@ import java.time.LocalDate
 
 data class CallbackQueryHandlerData(
     val handler: (suspend (CallbackQueryHandler.() -> Unit))? = null,
-    val features: MutableList<BotFeature>,
     val alwaysAnswer: Boolean
 )
 
@@ -45,8 +44,13 @@ open class CallbackQueryHandler(
         val logger: Logger = LoggerFactory.getLogger("callback-query-handler-$HANDLER_ID")
     }
 
-    override suspend fun setupFeatures(vararg features: BotFeature) {
-        localFeatures.addAll(features)
+    init {
+        localFeatures.addAll(bot.botConfig.defaultCallbackQueryHandlerFeatures.toTypedArray())
+    }
+
+    override suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean) {
+        if (callFirst) localFeatures.addAll(0, features.toList())
+        else localFeatures.addAll(features)
     }
 
     context(EventHandler)
@@ -57,7 +61,7 @@ open class CallbackQueryHandler(
     }
 
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.botConfig.ignoreEmptyCallbackData) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && bot.botConfig.ignoreEmptyCallbackData) { answer() }
         else {
             for (data in handlerData) {
                 if (handled) {
@@ -65,14 +69,6 @@ open class CallbackQueryHandler(
                 }
 
                 data.value.handler?.invoke(this)
-            }
-
-            for (data in handlerData) {
-                if (data.value.features.isNotEmpty()) {
-                    for (feat in data.value.features) {
-                        feat.handle(this, handled)
-                    }
-                }
             }
 
             handleLocalFeatures(handled)
@@ -142,7 +138,7 @@ open class CallbackQueryHandler(
         for (startWithEntry in startWith) {
             if (!handled && query.data != null && query.data.startsWith(startWithEntry)) {
                 val value = query.data.substring(startWithEntry.length)
-                if (value != CallbackQuery.EMPTY_CALLBACK_DATA) {
+                if (value != CallbackQuery.EMPTY_CALLBACK_DATA || !bot.botConfig.ignoreEmptyCallbackData) {
                     ValueDataCallbackQueryHandler(query, value, bot)
                         .apply { startWithHandler(value) }
                     handled = true

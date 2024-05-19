@@ -145,7 +145,7 @@ class Bot(
             scope.launch {
                 try {
                     val handler = if (isLocationsMode) {
-                        locationsWrapper!!.getHandlerFactory(update, this@Bot).apply {
+                        locationsWrapper!!.getHandlerFactory(update).apply {
                             additionalEventHandlers.forEach {
                                 apply(it)
                             }
@@ -345,11 +345,11 @@ class Bot(
         additionalEventHandlers.add {
             when (it) {
                 is BaseEventHandlerFactory -> {
-                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, features = listOf(datePicker), handler = null)
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, handler = { setupFeatures(datePicker, callFirst = true) })
                 }
     
                 is LocationEventHandlerFactory<*> -> {
-                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, features = listOf(datePicker), handler = null)
+                    it.handleCallbackQuery(alwaysAnswer, handlerId = datePicker.handlerId, handler = { setupFeatures(datePicker, callFirst = true) })
                 }
     
                 else -> return@add

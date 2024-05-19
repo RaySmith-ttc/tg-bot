@@ -61,7 +61,7 @@ import java.io.IOException
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
-val locations = false
+val locations = true
 val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
@@ -277,6 +277,7 @@ class Runner {
                     filter { true }
 
                     global {
+                        defaultHandlerId = ""
                         handleMyChatMember {
                             send(chatId = update.findChatId()!!) {
                                 text = update.findChatId()!!.toString()
@@ -318,9 +319,9 @@ class Runner {
                             println(channelPost)
                         }
 
-                        // TODO not work
                         handleCallbackQuery(alwaysAnswer = true) {
                             println("handleCallbackQuery [global]")
+                            answer()
                         }
 
 //                        handleMessage {
@@ -345,7 +346,7 @@ class Runner {
                         }
 
                         handleCommand {
-                            isCommand("menu") {
+                            isCommand("dp") {
                                 send {
                                     datePicker(datePicker)
                                 }
@@ -361,9 +362,9 @@ class Runner {
                         }
                         handleCallbackQuery(
                             alwaysAnswer = false,
-                            features = listOf(OverridedGlobalFeature)
+//                            features = listOf(OverridedGlobalFeature)
                         ) {
-                            setupFeatures(UnhandledFeature)
+                            setupFeatures(OverridedGlobalFeature, UnhandledFeature)
 
                             isDataEqual("some_btn") {
                                 println("handle some_btn")
@@ -407,7 +408,6 @@ class Runner {
                             }
 
                             handleEditedMessage {
-
                                 println("Message was edit in other")
                             }
 

@@ -7,7 +7,6 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.BotFeature
 
 @DslMarker
 annotation class HandlerDsl
@@ -170,7 +169,6 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     @HandlerDsl
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
-        features: List<BotFeature> = bot.botConfig.defaultCallbackQueryHandlerFeatures,
         handlerId: String = CallbackQueryHandler.HANDLER_ID,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {
@@ -179,7 +177,7 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
         }
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
         Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, features.toMutableList(), alwaysAnswer)
+        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, alwaysAnswer)
     }
 
     @HandlerDsl

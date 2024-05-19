@@ -8,13 +8,12 @@ import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory, BotHolder {
     val locationsWrapper: LocationsWrapper<T>
-    var defaultHandlerId: String
+    var defaultHandlerId: String  // TODO exposed to client
 
     @HandlerDsl
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit)
@@ -43,8 +42,7 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
     @HandlerDsl
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
-        handlerId: String = CallbackQueryHandler.HANDLER_ID,
-        features: List<BotFeature> = bot.botConfig.defaultCallbackQueryHandlerFeatures,
+        handlerId: String = defaultHandlerId,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     )
 
@@ -71,9 +69,11 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
 }
 
 @HandlerDsl
-class LocationEventHandlerFactory<T : LocationConfig>(override val locationsWrapper: LocationsWrapper<T>) : ILocationEventHandlerFactory<T> {
-    override val bot: Bot = locationsWrapper.bot
+class LocationEventHandlerFactory<T : LocationConfig>(
+    override val locationsWrapper: LocationsWrapper<T>,
     override var defaultHandlerId: String = CallbackQueryHandler.HANDLER_ID
+) : ILocationEventHandlerFactory<T> {
+    override val bot: Bot = locationsWrapper.bot
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
@@ -228,13 +228,12 @@ class LocationEventHandlerFactory<T : LocationConfig>(override val locationsWrap
     override fun handleCallbackQuery(
         alwaysAnswer: Boolean,
         handlerId: String,
-        features: List<BotFeature>,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     ) {
         if (callbackQueryHandler.containsKey(handlerId)) return
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
         Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, features.toMutableList(), alwaysAnswer)
+        callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, alwaysAnswer)
     }
 
     internal suspend fun withHandlerId(handlerId: String, block: suspend LocationEventHandlerFactory<T>.() -> Unit) {

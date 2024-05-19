@@ -8,13 +8,11 @@ import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 data class LocationCallbackQueryHandlerData<T : LocationConfig>(
     val handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
-    val features: MutableList<BotFeature>,
     val alwaysAnswer: Boolean
 )
 
@@ -27,8 +25,13 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
     override val botConfig: BotConfig = bot.botConfig
     override val config by lazy { config() }
 
+//    init {
+//        println("init LocationCallbackQueryHandler")
+//        localFeatures.addAll(bot.botConfig.defaultCallbackQueryHandlerFeatures.toTypedArray())
+//    }
+
     override suspend fun handle() {
-        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && !bot.botConfig.ignoreEmptyCallbackData) { answer() }
+        if (query.data == CallbackQuery.EMPTY_CALLBACK_DATA && bot.botConfig.ignoreEmptyCallbackData) { answer() }
 
         for (data in handlerData) {
             if (handled) {
@@ -36,14 +39,6 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
             }
 
             data.value.handler?.let { h -> h(config, this) }
-        }
-
-        for (data in handlerData) {
-            if (data.value.features.isNotEmpty()) {
-                for (feat in data.value.features) {
-                    feat.handle(this, handled)
-                }
-            }
         }
 
         handleLocalFeatures(handled)
