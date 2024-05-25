@@ -40,10 +40,8 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     }
 
     fun row(row: Row) = _rows.add(row)
-    suspend fun row(text: String, callbackData: String) = row { button(text, callbackData) }
-    suspend fun row(setRow: suspend Row.() -> Unit) {
-        _rows.add(Row().apply { setRow() })
-    }
+    fun row(text: String, callbackData: String) = _rows.add(Row().apply { button(text, callbackData) })
+    suspend fun row(setRow: suspend Row.() -> Unit) = _rows.add(Row().apply { setRow() })
 
     class Row : MessageKeyboardRow<Button> {
         private val _buttons: MutableList<Button> = mutableListOf()
@@ -60,8 +58,8 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
                 }
             )
         }
-        fun button(setButton: Button.() -> Unit) {
-            _buttons.add(Button().apply(setButton))
+        suspend fun button(setButton: suspend Button.() -> Unit) {
+            _buttons.add(Button().apply { setButton() })
         }
 
         override fun iterator(): Iterator<Button> = buttons.iterator()

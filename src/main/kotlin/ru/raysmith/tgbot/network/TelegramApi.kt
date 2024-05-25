@@ -22,6 +22,10 @@ import ru.raysmith.tgbot.model.network.chat.member.*
 import ru.raysmith.tgbot.model.network.command.*
 import ru.raysmith.tgbot.model.network.inline.content.*
 import ru.raysmith.tgbot.model.network.inline.result.*
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
+import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
 import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
@@ -168,6 +172,12 @@ object TelegramApi {
             polymorphic(LiveLocationResponse::class) {
                 subclass(BooleanResponse::class)
                 subclass(MessageResponse::class)
+            }
+
+            polymorphic(KeyboardMarkup::class) {
+                subclass(InlineKeyboardMarkup::class)
+                subclass(ReplyKeyboardMarkup::class)
+                subclass(ReplyKeyboardRemove::class)
             }
         }
     }

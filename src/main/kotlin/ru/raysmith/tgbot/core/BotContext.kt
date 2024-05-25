@@ -63,7 +63,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     ): Message {
         return sendMessage(
             chatId, messageThreadId, text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply,  keyboardMarkup?.let { buildKeyboard(it) }?.toMarkup()
+            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -125,7 +125,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     ): MessageId {
         return copyMessage(
             chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard(it) }?.toMarkup()
+            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -165,7 +165,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param onlyIfBanned Do nothing if the user is not banned
      * @param chatId Unique identifier for the target group or username of the target supergroup or channel
      * */
-    suspend fun unbanChatMember(userId: ChatId.ID, onlyIfBanned: Boolean, chatId: ChatId = getChatIdOrThrow()): Boolean {
+    suspend fun unbanChatMember(
+        userId: ChatId.ID, onlyIfBanned: Boolean, chatId: ChatId = getChatIdOrThrow()
+    ): Boolean {
         return unbanChatMember(chatId, userId, onlyIfBanned)
     }
 
@@ -737,11 +739,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         entities: String? = null,
         disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
         chatId: ChatId? = getChatIdOrThrow(),
-        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit
+        keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageText(
             chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview,
-            buildInlineKeyboard(keyboardMarkup).toMarkup()
+            keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -768,11 +770,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         captionEntities: String? = null,
         disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
         chatId: ChatId = getChatIdOrThrow(),
-        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
+        keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageCaption(
             chatId, messageId, inlineMessageId, caption, parseMode, captionEntities,
-            buildInlineKeyboard(keyboardMarkup).toMarkup()
+            keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -796,10 +798,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         inlineMessageId: String? = null,
         media: InputMedia,
         chatId: ChatId = getChatIdOrThrow(),
-        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
+        keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageMedia(
-            chatId, messageId, inlineMessageId, media, buildInlineKeyboard(keyboardMarkup).toMarkup()
+            chatId, messageId, inlineMessageId, media,
+            keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -817,10 +820,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         messageId: Int? = null,
         inlineMessageId: String? = null,
         chatId: ChatId = getChatIdOrThrow(),
-        keyboardMarkup: suspend MessageInlineKeyboard.() -> Unit,
+        keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageReplyMarkup(
-            chatId, messageId, inlineMessageId, buildInlineKeyboard(keyboardMarkup).toMarkup()
+            chatId, messageId, inlineMessageId,
+            keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -829,14 +833,14 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      *
      * @param messageId Identifier of the original message with the poll
      * @param chatId Unique identifier for the target chat or username of the target channel
-     * @param keyboard [MessageInlineKeyboard] builder for a new message inline keyboard.
+     * @param keyboardMarkup [MessageInlineKeyboard] builder for a new message inline keyboard.
      * */
     suspend fun stopPoll(
         messageId: Int,
         chatId: ChatId = getChatIdOrThrow(),
-        keyboard: suspend MessageInlineKeyboard.() -> Unit
+        keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Poll {
-        return stopPoll(chatId, messageId, buildInlineKeyboard(keyboard).toMarkup())
+        return stopPoll(chatId, messageId, keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup())
     }
 
     /**
@@ -866,13 +870,15 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     suspend fun sendInvoice(
         chatId: ChatId = getChatIdOrThrow(),
-        buildAction: SendInvoiceRequestBuilder.() -> Unit
+        buildAction: suspend SendInvoiceRequestBuilder.() -> Unit
     ): Message {
-        return SendInvoiceRequestBuilder(bot).apply(buildAction).send(chatId)
+        return SendInvoiceRequestBuilder(bot).apply { buildAction() }.send(chatId)
     }
 
     /** Use this method to create a link for an invoice. Returns the created invoice link as String on success. */
-    suspend fun createInvoiceLink(buildAction: CreateInvoiceLinkRequestBuilder.() -> Unit): String {
-        return CreateInvoiceLinkRequestBuilder(bot).apply(buildAction).send()
+    suspend fun createInvoiceLink(
+        buildAction: suspend CreateInvoiceLinkRequestBuilder.() -> Unit
+    ): String {
+        return CreateInvoiceLinkRequestBuilder(bot).apply { buildAction() }.send()
     }
 }

@@ -36,7 +36,7 @@ open class CommandHandler(
     }
 }
 
-suspend inline fun CommandHandler.isCommand(value: String, crossinline equalHandler: suspend CommandHandler.(argsString: String?) -> Unit) {
+inline fun CommandHandler.isCommand(value: String, equalHandler: CommandHandler.(argsString: String?) -> Unit) {
     if (command.body == value) {
         equalHandler(command.argsString)
     }

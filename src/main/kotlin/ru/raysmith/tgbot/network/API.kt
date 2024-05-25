@@ -51,7 +51,7 @@ interface API {
     val botConfig: BotConfig
     val client: HttpClient
 
-    private suspend inline fun <reified T> request(crossinline block: suspend () -> HttpResponse): T {
+    private suspend inline fun <reified T> request(block: () -> HttpResponse): T {
         val response = block()
 
         if (response.status.isSuccess()) {
