@@ -18,6 +18,7 @@ suspend fun <T : LocationConfig> createLocation(name: String, wrapper: Locations
 
 @LocationsDSL
 class Location<T : LocationConfig>(val name: String, internal val handlerFactory: LocationEventHandlerFactory<T>) : ILocationEventHandlerFactory<T> by handlerFactory {
+    internal var isAdditionalHandlersInit = false
     internal lateinit var update: Update
     
     var onEnter: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }

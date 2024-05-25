@@ -23,7 +23,7 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     private var editedChannelPostHandler: (suspend (EditedChannelPostHandler.() -> Unit))? = null
     private var inlineQueryHandler: (suspend (InlineQueryHandler.() -> Unit))? = null
     private var chosenInlineQueryHandler: (suspend (ChosenInlineQueryHandler.() -> Unit))? = null
-    private val callbackQueryHandler: MutableMap<String, CallbackQueryHandlerData> = mutableMapOf()
+    private val callbackQueryHandler: MutableList<CallbackQueryHandlerData> = mutableListOf()
     private var shippingQueryHandler: (suspend (ShippingQueryHandler.() -> Unit))? = null
     private var preCheckoutQueryHandler: (suspend (PreCheckoutQueryHandler.() -> Unit))? = null
     private var pollHandler: (suspend (PollHandler.() -> Unit))? = null
@@ -169,15 +169,10 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     @HandlerDsl
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
-        handlerId: String = CallbackQueryHandler.HANDLER_ID,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
     ) {
-        if (callbackQueryHandler.containsKey(handlerId)) {
-            throw IllegalArgumentException("Callback handler with id '$handlerId' already registered")
-        }
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
-        Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = CallbackQueryHandlerData(handler, alwaysAnswer)
+        callbackQueryHandler.add(CallbackQueryHandlerData(handler, alwaysAnswer))
     }
 
     @HandlerDsl

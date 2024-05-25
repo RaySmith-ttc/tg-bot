@@ -2,7 +2,6 @@ package ru.raysmith.tgbot.core.handler
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
-import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
@@ -13,85 +12,82 @@ import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory, BotHolder {
     val locationsWrapper: LocationsWrapper<T>
-    var defaultHandlerId: String  // TODO exposed to client
 
     @HandlerDsl
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit)
 
     @HandlerDsl
-    fun handleMessage(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationMessageHandler<T>.() -> Unit))
+    fun handleMessage(handler: suspend (context(T) LocationMessageHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleCommand(handlerId: String = defaultHandlerId, handler:suspend (context(T) LocationCommandHandler<T>.() -> Unit))
+    fun handleCommand(handler:suspend (context(T) LocationCommandHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleEditedMessage(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationEditedMessageHandler<T>.() -> Unit))
+    fun handleEditedMessage(handler: suspend (context(T) LocationEditedMessageHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleChannelPost(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationChannelPostHandler<T>.() -> Unit))
+    fun handleChannelPost(handler: suspend (context(T) LocationChannelPostHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleEditedChannelPost(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationEditedChannelPostHandler<T>.() -> Unit))
+    fun handleEditedChannelPost(handler: suspend (context(T) LocationEditedChannelPostHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleInlineQuery(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationInlineQueryHandler<T>.() -> Unit))
+    fun handleInlineQuery(handler: suspend (context(T) LocationInlineQueryHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleChosenInlineQuery(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit))
+    fun handleChosenInlineQuery(handler: suspend (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit))
 
     @HandlerDsl
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
-        handlerId: String = defaultHandlerId,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     )
 
     @HandlerDsl
-    fun handleShippingQuery(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationShippingQueryHandler<T>.() -> Unit))
+    fun handleShippingQuery(handler: suspend (context(T) LocationShippingQueryHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handlePreCheckoutQuery(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit))
+    fun handlePreCheckoutQuery(handler: suspend (context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handlePoll(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationPollHandler<T>.() -> Unit))
+    fun handlePoll(handler: suspend (context(T) LocationPollHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handlePollAnswer(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationPollAnswerHandler<T>.() -> Unit))
+    fun handlePollAnswer(handler: suspend (context(T) LocationPollAnswerHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleMyChatMember(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit))
+    fun handleMyChatMember(handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleChatMember(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit))
+    fun handleChatMember(handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit))
 
     @HandlerDsl
-    fun handleChatJoinRequest(handlerId: String = defaultHandlerId, handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit))
+    fun handleChatJoinRequest(handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit))
 }
 
 @HandlerDsl
 class LocationEventHandlerFactory<T : LocationConfig>(
     override val locationsWrapper: LocationsWrapper<T>,
-    override var defaultHandlerId: String = CallbackQueryHandler.HANDLER_ID
 ) : ILocationEventHandlerFactory<T> {
     override val bot: Bot = locationsWrapper.bot
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
-    private val messageHandler: MutableMap<String, LocationMessageHandlerData<T>> = mutableMapOf()
-    private val commandHandler: MutableMap<String, LocationCommandHandlerData<T>> = mutableMapOf()
-    private val editedMessageHandler: MutableMap<String, LocationEditMessageHandlerData<T>> = mutableMapOf()
-    private val channelPostHandler: MutableMap<String, LocationChannelPostHandlerData<T>> = mutableMapOf()
-    private val editedChannelPostHandler: MutableMap<String, LocationEditedChannelPostHandlerData<T>> = mutableMapOf()
-    private val inlineQueryHandler: MutableMap<String, LocationInlineQueryHandlerData<T>> = mutableMapOf()
-    private val chosenInlineQueryHandler: MutableMap<String, LocationChosenInlineQueryHandlerData<T>> = mutableMapOf()
-    private val callbackQueryHandler: MutableMap<String, LocationCallbackQueryHandlerData<T>> = mutableMapOf()
-    private val shippingQueryHandler: MutableMap<String, LocationShippingQueryHandlerData<T>> = mutableMapOf()
-    private val preCheckoutQueryHandler: MutableMap<String, LocationPreCheckoutQueryHandlerData<T>> = mutableMapOf()
-    private val pollHandler: MutableMap<String, LocationPollHandlerData<T>> = mutableMapOf()
-    private val pollAnswerHandler: MutableMap<String, LocationPollAnswerHandlerData<T>> = mutableMapOf()
-    private val myChatMemberHandler: MutableMap<String, LocationChatMemberHandlerData<T>> = mutableMapOf()
-    private val chatMemberHandler: MutableMap<String, LocationChatMemberHandlerData<T>> = mutableMapOf()
-    private val chatJoinRequestHandler: MutableMap<String, LocationChatJoinRequestHandlerData<T>> = mutableMapOf()
+    private val messageHandler: MutableList<LocationMessageHandlerData<T>> = mutableListOf()
+    private val commandHandler: MutableList<LocationCommandHandlerData<T>> = mutableListOf()
+    private val editedMessageHandler: MutableList<LocationEditMessageHandlerData<T>> = mutableListOf()
+    private val channelPostHandler: MutableList<LocationChannelPostHandlerData<T>> = mutableListOf()
+    private val editedChannelPostHandler: MutableList<LocationEditedChannelPostHandlerData<T>> = mutableListOf()
+    private val inlineQueryHandler: MutableList<LocationInlineQueryHandlerData<T>> = mutableListOf()
+    private val chosenInlineQueryHandler: MutableList<LocationChosenInlineQueryHandlerData<T>> = mutableListOf()
+    private val callbackQueryHandler: MutableList<LocationCallbackQueryHandlerData<T>> = mutableListOf()
+    private val shippingQueryHandler: MutableList<LocationShippingQueryHandlerData<T>> = mutableListOf()
+    private val preCheckoutQueryHandler: MutableList<LocationPreCheckoutQueryHandlerData<T>> = mutableListOf()
+    private val pollHandler: MutableList<LocationPollHandlerData<T>> = mutableListOf()
+    private val pollAnswerHandler: MutableList<LocationPollAnswerHandlerData<T>> = mutableListOf()
+    private val myChatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
+    private val chatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
+    private val chatJoinRequestHandler: MutableList<LocationChatJoinRequestHandlerData<T>> = mutableListOf()
 
     private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
 
@@ -183,105 +179,95 @@ class LocationEventHandlerFactory<T : LocationConfig>(
 
 
     @HandlerDsl
-    override fun handleMessage(handlerId: String, handler: suspend (context(T) LocationMessageHandler<T>.() -> Unit)) {
+    override fun handleMessage(handler: suspend (context(T) LocationMessageHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.MESSAGE)
-        messageHandler[handlerId] = LocationMessageHandlerData(handler)
+        messageHandler.add(LocationMessageHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleCommand(handlerId: String, handler:suspend (context(T) LocationCommandHandler<T>.() -> Unit)) {
+    override fun handleCommand(handler:suspend (context(T) LocationCommandHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.MESSAGE)
-        commandHandler[handlerId] = LocationCommandHandlerData(handler)
+        commandHandler.add(LocationCommandHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleEditedMessage(handlerId: String, handler: suspend (context(T) LocationEditedMessageHandler<T>.() -> Unit)) {
+    override fun handleEditedMessage(handler: suspend (context(T) LocationEditedMessageHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.EDITED_MESSAGE)
-        editedMessageHandler[handlerId] = LocationEditMessageHandlerData(handler)
+        editedMessageHandler.add(LocationEditMessageHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleChannelPost(handlerId: String, handler: suspend (context(T) LocationChannelPostHandler<T>.() -> Unit)) {
+    override fun handleChannelPost(handler: suspend (context(T) LocationChannelPostHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHANNEL_POST)
-        channelPostHandler[handlerId] = LocationChannelPostHandlerData(handler)
+        channelPostHandler.add(LocationChannelPostHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleEditedChannelPost(handlerId: String, handler: suspend (context(T) LocationEditedChannelPostHandler<T>.() -> Unit)) {
+    override fun handleEditedChannelPost(handler: suspend (context(T) LocationEditedChannelPostHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
-        editedChannelPostHandler[handlerId] = LocationEditedChannelPostHandlerData(handler)
+        editedChannelPostHandler.add(LocationEditedChannelPostHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleInlineQuery(handlerId: String, handler: suspend (context(T) LocationInlineQueryHandler<T>.() -> Unit)) {
+    override fun handleInlineQuery(handler: suspend (context(T) LocationInlineQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.INLINE_QUERY)
-        inlineQueryHandler[handlerId] = LocationInlineQueryHandlerData(handler)
+        inlineQueryHandler.add(LocationInlineQueryHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleChosenInlineQuery(handlerId: String, handler: suspend (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)) {
+    override fun handleChosenInlineQuery(handler: suspend (context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHOSEN_INLINE_RESULT)
-        chosenInlineQueryHandler[handlerId] = LocationChosenInlineQueryHandlerData(handler)
+        chosenInlineQueryHandler.add(LocationChosenInlineQueryHandlerData(handler))
     }
 
     @HandlerDsl
     override fun handleCallbackQuery(
         alwaysAnswer: Boolean,
-        handlerId: String,
         handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
     ) {
-        if (callbackQueryHandler.containsKey(handlerId)) return
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
-        Bot.logger.debug("Register callbackQueryHandler '${handlerId}'")
-        callbackQueryHandler[handlerId] = LocationCallbackQueryHandlerData(handler, alwaysAnswer)
-    }
-
-    internal suspend fun withHandlerId(handlerId: String, block: suspend LocationEventHandlerFactory<T>.() -> Unit) {
-        val defaultHandlerIdBck = defaultHandlerId
-        defaultHandlerId = handlerId
-        block()
-        defaultHandlerId = defaultHandlerIdBck
+        callbackQueryHandler.add(LocationCallbackQueryHandlerData(handler, alwaysAnswer))
     }
 
     @HandlerDsl
-    override fun handleShippingQuery(handlerId: String, handler: suspend (context(T) LocationShippingQueryHandler<T>.() -> Unit)) {
+    override fun handleShippingQuery(handler: suspend (context(T) LocationShippingQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.SHIPPING_QUERY)
-        shippingQueryHandler[handlerId] = LocationShippingQueryHandlerData(handler)
+        shippingQueryHandler.add(LocationShippingQueryHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handlePreCheckoutQuery(handlerId: String , handler: suspend (context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)) {
+    override fun handlePreCheckoutQuery(handler: suspend (context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.PRE_CHECKOUT_QUERY)
-        preCheckoutQueryHandler[handlerId] = LocationPreCheckoutQueryHandlerData(handler)
+        preCheckoutQueryHandler.add(LocationPreCheckoutQueryHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handlePoll(handlerId: String, handler: suspend (context(T) LocationPollHandler<T>.() -> Unit)) {
+    override fun handlePoll(handler: suspend (context(T) LocationPollHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.POLL)
-        pollHandler[handlerId] = LocationPollHandlerData(handler)
+        pollHandler.add(LocationPollHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handlePollAnswer(handlerId: String, handler: suspend (context(T) LocationPollAnswerHandler<T>.() -> Unit)) {
+    override fun handlePollAnswer(handler: suspend (context(T) LocationPollAnswerHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.POLL_ANSWER)
-        pollAnswerHandler[handlerId] = LocationPollAnswerHandlerData(handler)
+        pollAnswerHandler.add(LocationPollAnswerHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleMyChatMember(handlerId: String, handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
+    override fun handleMyChatMember(handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.MY_CHAT_MEMBER)
-        myChatMemberHandler[handlerId] = LocationChatMemberHandlerData(handler)
+        myChatMemberHandler.add(LocationChatMemberHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleChatMember(handlerId: String, handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
+    override fun handleChatMember(handler: suspend (context(T) LocationChatMemberHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHAT_MEMBER)
-        chatMemberHandler[handlerId] = LocationChatMemberHandlerData(handler)
+        chatMemberHandler.add(LocationChatMemberHandlerData(handler))
     }
 
     @HandlerDsl
-    override fun handleChatJoinRequest(handlerId: String, handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit)) {
+    override fun handleChatJoinRequest(handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
-        chatJoinRequestHandler[handlerId] = LocationChatJoinRequestHandlerData(handler)
+        chatJoinRequestHandler.add(LocationChatJoinRequestHandlerData(handler))
     }
 }

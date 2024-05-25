@@ -19,9 +19,9 @@ data class LocationCallbackQueryHandlerData<T : LocationConfig>(
 @HandlerDsl
 open class LocationCallbackQueryHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    protected val handlerData: Map<String, LocationCallbackQueryHandlerData<T>>,
+    protected val handlerData: List<LocationCallbackQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : CallbackQueryHandler(update.callbackQuery!!, emptyMap(), bot), LocationHandler<T> {
+) : CallbackQueryHandler(update.callbackQuery!!, emptyList(), bot), LocationHandler<T> {
     override val botConfig: BotConfig = bot.botConfig
     override val config by lazy { config() }
 
@@ -38,12 +38,12 @@ open class LocationCallbackQueryHandler<T : LocationConfig>(
                 break
             }
 
-            data.value.handler?.let { h -> h(config, this) }
+            data.handler?.let { h -> h(config, this) }
         }
 
         handleLocalFeatures(handled)
 
-        if (!handled && handlerData.any { it.value.alwaysAnswer }) {
+        if (!handled && handlerData.any { it.alwaysAnswer }) {
             answer()
         }
     }

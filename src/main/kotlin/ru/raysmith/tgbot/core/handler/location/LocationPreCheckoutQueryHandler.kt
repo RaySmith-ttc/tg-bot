@@ -16,14 +16,14 @@ data class LocationPreCheckoutQueryHandlerData<T : LocationConfig>(
 @HandlerDsl
 class LocationPreCheckoutQueryHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableMap<String, LocationPreCheckoutQueryHandlerData<T>>,
+    private val handlerData: MutableList<LocationPreCheckoutQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : PreCheckoutQueryHandler(update.preCheckoutQuery!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(config, this) }?.also {
                 handled = true
             }
         }

@@ -17,14 +17,14 @@ data class LocationCommandHandlerData<T : LocationConfig>(
 @HandlerDsl
 class LocationCommandHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    private val handlerData: Map<String, LocationCommandHandlerData<T>>,
+    private val handlerData: List<LocationCommandHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : CommandHandler(BotCommand(update.message!!.text!!), update.message, bot), LocationHandler<T> {
     
     override val config by lazy { config() }
     override suspend fun handle() {
-        handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+        for (it in handlerData) {
+            it.handler?.let { it1 -> it1(config, this) }?.also {
                 handled = true
             }
         }

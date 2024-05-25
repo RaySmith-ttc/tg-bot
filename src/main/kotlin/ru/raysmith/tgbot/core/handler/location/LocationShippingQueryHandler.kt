@@ -16,14 +16,14 @@ data class LocationShippingQueryHandlerData<T : LocationConfig>(
 @HandlerDsl
 class LocationShippingQueryHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableMap<String, LocationShippingQueryHandlerData<T>>,
+    private val handlerData: MutableList<LocationShippingQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : ShippingQueryHandler(update.shippingQuery!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(config, this) }?.also {
                 handled = true
             }
         }

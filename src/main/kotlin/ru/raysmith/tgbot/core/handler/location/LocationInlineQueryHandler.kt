@@ -16,14 +16,14 @@ data class LocationInlineQueryHandlerData<T : LocationConfig>(
 @HandlerDsl
 class LocationInlineQueryHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableMap<String, LocationInlineQueryHandlerData<T>>,
+    private val handlerData: MutableList<LocationInlineQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : InlineQueryHandler(update.inlineQuery!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(config, this) }?.also {
                 handled = true
             }
         }

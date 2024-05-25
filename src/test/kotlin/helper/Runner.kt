@@ -90,8 +90,6 @@ inline fun <reified T> T.toJson() = prettyPrintJson.encodeToString(this)
 
 suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
     textWithEntities {
-        println(value)
-        println(value.toJson())
         pre(value.toJson(), "json")
     }
 }
@@ -277,7 +275,6 @@ class Runner {
                     filter { true }
 
                     global {
-                        defaultHandlerId = ""
                         handleMyChatMember {
                             send(chatId = update.findChatId()!!) {
                                 text = update.findChatId()!!.toString()
@@ -292,12 +289,12 @@ class Runner {
                                     }
                                 }
                             }
-                            isCommand("menu") {
-                                toLocation("menu")
-                            }
-                            isCommand("other") {
-                                toLocation("other")
-                            }
+//                            isCommand("menu") {
+//                                toLocation("menu")
+//                            }
+//                            isCommand("other") {
+//                                toLocation("other")
+//                            }
                             isCommand("poll") {
                                 toLocation("poll")
                             }
@@ -321,7 +318,6 @@ class Runner {
 
                         handleCallbackQuery(alwaysAnswer = true) {
                             println("handleCallbackQuery [global]")
-                            answer()
                         }
 
 //                        handleMessage {

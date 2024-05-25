@@ -16,14 +16,14 @@ data class LocationEditMessageHandlerData<T : LocationConfig>(
 @HandlerDsl
 class LocationEditedMessageHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableMap<String, LocationEditMessageHandlerData<T>>,
+    private val handlerData: MutableList<LocationEditMessageHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
 ) : EditedMessageHandler(update.editedMessage!!, bot), LocationHandler<T> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.value.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(config, this) }?.also {
                 handled = true
             }
         }

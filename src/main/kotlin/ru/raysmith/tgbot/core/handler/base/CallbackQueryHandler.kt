@@ -24,7 +24,7 @@ data class CallbackQueryHandlerData(
 @HandlerDsl
 open class CallbackQueryHandler(
     final override val query: CallbackQuery,
-    private val handlerData: Map<String, CallbackQueryHandlerData>,
+    private val handlerData: List<CallbackQueryHandlerData>,
     final override val bot: Bot
 ) : EventHandler, BaseCallbackHandler(query, bot.client), BotContext<CallbackQueryHandler> {
 
@@ -68,12 +68,12 @@ open class CallbackQueryHandler(
                     break
                 }
 
-                data.value.handler?.invoke(this)
+                data.handler?.invoke(this)
             }
 
             handleLocalFeatures(handled)
 
-            if (!handled && handlerData.any { it.value.alwaysAnswer }) {
+            if (!handled && handlerData.any { it.alwaysAnswer }) {
                 answer()
             }
         }
