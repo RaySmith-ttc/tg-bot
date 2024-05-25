@@ -1,18 +1,18 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     alias(libs.plugins.kotlinx.serialization)
-    kotlin("jvm") version "2.0.0-Beta2"
-    id("maven-publish")
+    alias(libs.plugins.benManes.versions)
+    kotlin("jvm") version "2.0.0"
+    `maven-publish`
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.7"
+version = "1.0.0-beta.8-rc.1"
 
 repositories {
     mavenCentral()
     mavenLocal()
-    jcenter()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/raysmith-ttc/utils")
@@ -51,45 +51,52 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     // Logging
-//    implementation(libs.log4j.core)
-    implementation("org.apache.logging.log4j:log4j:2.19.0")
-    implementation("io.ktor:ktor-client-logging-jvm:2.3.4")
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.4")
+    implementation(libs.log4j)
 
     // Network
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.bundles.ktor.client.jvm)
-    implementation(libs.ktor.client.okhttp)
+    implementation(libs.bundles.ktor.client)
 
     // Utils
     implementation(libs.raysmith.utils)
 
     // Testing
-    testImplementation("org.assertj:assertj-core:3.23.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
-    testImplementation("org.mockito:mockito-core:4.8.0")
+    testImplementation(kotlin("test"))
+    testImplementation(libs.assertj.core)
     testImplementation(libs.konsist)
+    testImplementation(libs.log4j.slf4j2.impl)
+
+    // Webapp
     testImplementation(libs.ktor.server.core.jvm)
     testImplementation(libs.ktor.server.netty)
     testImplementation(libs.ktor.network.tlsCertificates)
-    testImplementation(libs.log4j.slf4j18.impl)
-//    testImplementation(libs.slf4j.api)
-//    testImplementation(libs.slf4j.reload4j)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-Xcontext-receivers",
+            "-XXLanguage:+UnitConversionsOnArbitraryExpressions",
+        )
+    }
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-            freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
-            freeCompilerArgs += "-Xcontext-receivers"
-            freeCompilerArgs += "-XXLanguage:+UnitConversionsOnArbitraryExpressions"
-        }
-    }
     withType<Test> {
         useJUnitPlatform()
+    }
+
+    withType<DependencyUpdatesTask> {
+        gradleReleaseChannel = "current"
+        rejectVersionIf {
+            val version = candidate.version
+            val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+            val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+            val isStable = stableKeyword || regex.matches(version)
+            isStable.not()
+        }
     }
 }
 

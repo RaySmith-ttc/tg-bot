@@ -1,17 +1,18 @@
 [versions]
-kotlin = "2.0.0-Beta1"
+kotlin = "2.0.0"
 
-kotlinx-coroutines = "1.7.1"
+kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.6.3"
 kotlinx-datetime = "0.4.0"
 
-ktor = "2.3.4"
+ktor = "2.3.11"
 
 exposed = "0.41.1"
 
-utils = "2.1.0"
+utils = "2.5.1"
 
 logback = "1.4.4"
+log4j = "2.23.1"
 slf4j = "2.0.9"
 kodein = "7.20.2"
 sentry = "6.18.1"
@@ -76,9 +77,11 @@ raysmith-utils = { module = "ru.raysmith:utils", version.ref = "utils" }
 
 # utils
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-log4j-core = { module = "org.apache.logging.log4j:log4j-core", version = "2.20.0" }
+log4j = { module = "org.apache.logging.log4j:log4j", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 log4j-slf4j18-impl = { module = "org.apache.logging.log4j:log4j-slf4j18-impl", version = "2.18.0" }
+log4j-slf4j2-impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version = "2.23.1" }
 slf4j-reload4j = { module = "org.slf4j:slf4j-reload4j", version.ref = "slf4j" }
 slf4j-log4j13 = { module = "org.slf4j:slf4j-log4j13", version = "1.0.1" }
 
@@ -88,12 +91,14 @@ kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-konsist = { module = "com.lemonappdev:konsist", version = "0.12.2" }
+konsist = { module = "com.lemonappdev:konsist", version = "0.15.1" }
+assertj-core = { module = "org.assertj:assertj-core", version = "3.25.3" }
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+benManes-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 
 [bundles]
 ktor-server = [
@@ -102,11 +107,7 @@ ktor-server = [
     "ktor-server-auth", "ktor-server-swagger", "ktor-server-openapi"
 ]
 ktor-client = [
-    "ktor-client-core", "ktor-client-js", "ktor-client-logging", "ktor-client-contentNegotiation",
-    "ktor-client-websockets", "ktor-serialization-kotlinx-json", "ktor-client-auth"
-]
-ktor-client-jvm = [
-    "ktor-client-core", "ktor-client-cio", "ktor-client-logging", "ktor-client-contentNegotiation",
+    "ktor-client-core", "ktor-client-okhttp", "ktor-client-logging", "ktor-client-contentNegotiation",
     "ktor-client-websockets", "ktor-serialization-kotlinx-json", "ktor-client-auth"
 ]
 database = ["exposed-core", "exposed-dao", "exposed-jdbc", "mysql-connector", "hikari"]
