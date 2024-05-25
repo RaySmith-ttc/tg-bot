@@ -2,12 +2,13 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.utils.buildHTMLString
 import ru.raysmith.tgbot.utils.buildMarkdownString
 import ru.raysmith.tgbot.utils.buildMarkdownV2String
 
-class UnitTests {
+class RichMessageBuildersTests {
     
     @Test
     fun formatHtmlString(): Unit = runBlocking {
@@ -56,7 +57,6 @@ class UnitTests {
             text("te[xt").text("\n")
             spoiler("|||||").text("\n")
             text("_*[]???()~`>#+-=|{}.!\n")
-//            italic("ital").mix("ik_under", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).underline("line").text("\n")
             mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE)
         }
 
@@ -78,5 +78,14 @@ class UnitTests {
         """.trimMargin()
 
         assertEquals(expected, markdown)
+    }
+
+    @Test
+    fun appendItalicAndUnderlineShouldThrowException() {
+        assertThrows<IllegalStateException> {
+            buildMarkdownV2String {
+                italic("ital").mix("ik_under", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).underline("line")
+            }
+        }
     }
 }

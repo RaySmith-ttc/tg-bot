@@ -3,8 +3,7 @@ import com.lemonappdev.konsist.api.ext.list.constructors
 import com.lemonappdev.konsist.api.ext.list.functions
 import com.lemonappdev.konsist.api.ext.list.parameters
 import com.lemonappdev.konsist.api.ext.list.properties
-import com.lemonappdev.konsist.api.verify.assert
-import com.lemonappdev.konsist.core.util.replaceLast
+import com.lemonappdev.konsist.api.verify.assertTrue
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PolymorphicKind
@@ -25,7 +24,7 @@ class KonsistTests {
             .filter { it.hasDataModifier && it.hasAnnotation { a -> a.representsType(Serializable::class.qualifiedName!!) } }
             .constructors
             .parameters.filter { it.type.isNullable }
-            .assert { it.hasDefaultValue() }
+            .assertTrue { it.hasDefaultValue() }
     }
 
     @Test
@@ -35,8 +34,8 @@ class KonsistTests {
             .filter { it.hasAnnotation { a -> a.representsType(Serializable::class.qualifiedName!!) } }
         val properties = classes.properties()
 
-        classes.assert { it.hasKDoc }
-        properties.assert { it.hasKDoc }
+        classes.assertTrue { it.hasKDoc }
+        properties.assertTrue { it.hasKDoc }
     }
 
     @Test
@@ -46,7 +45,7 @@ class KonsistTests {
             .filter { it.name == API::class.simpleName }
             .functions()
             .filter { it.hasPublicOrDefaultModifier }
-            .assert { it.hasKDoc }
+            .assertTrue { it.hasKDoc }
     }
 
     @Test
@@ -72,7 +71,9 @@ class KonsistTests {
 
                 children.forEach { childDeclaration ->
                     val classname = sealed.fullyQualifiedName
-                    val child = Class.forName(childDeclaration.fullyQualifiedName.letIf(!childDeclaration.isTopLevel) { it.replaceLast(".", "$") }).kotlin
+                    val child = Class.forName(childDeclaration.fullyQualifiedName.letIf(!childDeclaration.isTopLevel) {
+                        it.replaceRange(it.lastIndexOf(".").let { it..it }, "$")
+                    }).kotlin
                     val childSerializer = child.companionObject!!.functions.first { f -> f.name == "serializer" }.call(child.companionObject!!.objectInstance) as KSerializer<*>
                     if (childSerializer.descriptor.kind !is PrimitiveKind && childSerializer.descriptor.kind !is PolymorphicKind) {
                         val childSerialName = childSerializer.descriptor.serialName
