@@ -17,6 +17,7 @@ import ru.raysmith.tgbot.model.bot.asChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.buildReplyKeyboard
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
 import ru.raysmith.tgbot.model.network.chat.forum.IconColor
@@ -1010,11 +1011,24 @@ class Runner {
                         }
                     }
 
-                    // TODO failed
                     isCommand("serialize") {
                         val string = buildInlineKeyboard {
                             row("title", "query")
                         }.let { TelegramApi.json.encodeToString(it) }
+
+                        println(string)
+
+                        send {
+                            text = string
+                            keyboardMarkup = TelegramApi.json.decodeFromString(string)
+                        }
+                    }
+                    isCommand("serialize2") {
+                        val string = buildReplyKeyboard {
+                            row("title")
+                        }.let { TelegramApi.json.encodeToString(it) }
+
+                        println(string)
 
                         send {
                             text = string

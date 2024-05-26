@@ -1,16 +1,32 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
-import ru.raysmith.tgbot.network.TelegramApi
+
+internal object MessageKeyboardPolymorphicSerializer : JsonContentPolymorphicSerializer<MessageKeyboard>(MessageKeyboard::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MessageKeyboard> {
+        return when(element.jsonObject["class"]?.jsonPrimitive?.content) {
+            "MessageInlineKeyboard" -> MessageInlineKeyboard.serializer()
+            "MessageReplyKeyboard" -> MessageReplyKeyboard.serializer()
+            "RemoveKeyboard" -> RemoveKeyboard.serializer()
+            else -> error("Class discriminator not found for MessageKeyboard implementation class. Check the 'classDiscriminator' field has @EncodeDefault and @SerialName(\"class\") annotations")
+        }
+    }
+}
 
 @KeyboardDsl
-interface MessageKeyboard {
+@Serializable(with = MessageKeyboardPolymorphicSerializer::class)
+sealed interface MessageKeyboard {
+    val classDiscriminator: String
     fun toMarkup(): KeyboardMarkup?
-    fun toJson() = TelegramApi.json.encodeToString(toMarkup())
 
     companion object {
         suspend fun of(keyboardMarkup: KeyboardMarkup) = when(keyboardMarkup) {

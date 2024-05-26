@@ -18,6 +18,9 @@ import kotlinx.serialization.modules.subclass
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
+import ru.raysmith.tgbot.model.bot.message.keyboard.RemoveKeyboard
 import ru.raysmith.tgbot.model.network.chat.member.*
 import ru.raysmith.tgbot.model.network.command.*
 import ru.raysmith.tgbot.model.network.inline.content.*
@@ -178,6 +181,11 @@ object TelegramApi {
                 subclass(InlineKeyboardMarkup::class)
                 subclass(ReplyKeyboardMarkup::class)
                 subclass(ReplyKeyboardRemove::class)
+            }
+
+            polymorphic(MessageKeyboard::class) {
+                subclass(MessageInlineKeyboard::class)
+                subclass(RemoveKeyboard::class)
             }
         }
     }

@@ -1,5 +1,8 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
@@ -9,7 +12,13 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.pagination.Pagination
 
+@Serializable
 class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Row> {
+
+    @EncodeDefault
+    @SerialName("class")
+    override val classDiscriminator = "MessageInlineKeyboard"
+
     private val _rows: MutableList<Row> = mutableListOf()
     val rows: List<Row> = _rows
 
@@ -43,6 +52,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     fun row(text: String, callbackData: String) = _rows.add(Row().apply { button(text, callbackData) })
     suspend fun row(setRow: suspend Row.() -> Unit) = _rows.add(Row().apply { setRow() })
 
+    @Serializable
     class Row : MessageKeyboardRow<Button> {
         private val _buttons: MutableList<Button> = mutableListOf()
         override val buttons: List<Button> = _buttons
@@ -65,6 +75,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         override fun iterator(): Iterator<Button> = buttons.iterator()
     }
 
+    @Serializable
     class Button : MessageKeyboardButton {
         var text: String = ""
         var url: String? = null

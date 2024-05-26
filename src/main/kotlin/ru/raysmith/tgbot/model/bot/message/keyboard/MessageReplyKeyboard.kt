@@ -1,11 +1,18 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.keyboard.*
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 
+@Serializable
 class MessageReplyKeyboard : MessageKeyboard {
+    @EncodeDefault
+    @SerialName("class")
+    override val classDiscriminator = "MessageReplyKeyboard"
     var isPersistent: Boolean? = null
-    var resizeKeyboard: Boolean? = true
+    var resizeKeyboard: Boolean? = true // TODO ?
     var oneTimeKeyboard: Boolean? = null
     var inputFieldPlaceholder: String? = null
     var selective: Boolean? = null
@@ -23,6 +30,7 @@ class MessageReplyKeyboard : MessageKeyboard {
         )
     }
 
+    @Serializable
     class Row : MessageKeyboardRow<Button> {
         private val _buttons: MutableList<Button> = mutableListOf()
         override val buttons: List<Button> = _buttons
@@ -44,6 +52,7 @@ class MessageReplyKeyboard : MessageKeyboard {
         override fun iterator() = buttons.iterator()
     }
 
+    @Serializable
     class Button : MessageKeyboardButton {
         var text: String = ""
         var requestUser: KeyboardButtonRequestUser? = null
