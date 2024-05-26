@@ -13,8 +13,8 @@ class BotConfig {
         val default = BotConfig()
     }
 
+    var verifyMarkdown2Format = Bot.properties.getOrDefault("verifyMarkdown2Format", "true").toBoolean()
     var safeTextLength = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
-    // TODO [~] add sendSequentiallyLargeMessage: Boolean for sending 3 message for 10.000 symbols message
     var printNulls = Bot.properties.getOrDefault("printNulls", "false").toBoolean()
     var defaultProviderToken = Bot.properties?.getOrNull("providerToken")
 //    var emptyCallbackQuery = Bot.properties.getOrDefault("emptyCallbackQuery", " ") // TODO [docs] can't be obtain from  config

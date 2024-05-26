@@ -34,11 +34,15 @@ import ru.raysmith.utils.letIf
 @TextMessageDsl
 class MessageText(val type: MessageTextType, val config: BotConfig) {
 
-    /** Whether test should be truncated if text length is greater than 4096 */
+    /** Whether text should be truncated if text length is greater than 4096 */
     var safeTextLength: Boolean = config.safeTextLength
+
+    /** Whether null values should display in the message text */
     var printNulls: Boolean = config.printNulls
 
     private val text: StringBuilder = StringBuilder()
+
+    /** Current the message text length */
     val currentTextLength: Int
         get() = text.length
 
@@ -142,71 +146,86 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
         }
     }
 
-    // fix bad mix entities in MessageText builders after adding raw entity with
-    //
-    // bold("some text")
-    // entity(MessageEntityType.ITALIC) {
-    //     offset = 2
-    //     length = 5
-    // }
-    //
-    // BOLD 0 -> 8
-    // ITALIC 2 -> 6
-    // --->
-    // BOLD 0 -> 1, MIX(BOLD, ITALIC) 2 -> 6, BOLD 7 -> 8
-    // TODO not work with recursive
+    /** @author ChatGPT-3 */
     private fun fixed(entities: List<MessageEntity>): List<MessageEntity> {
-        val blacklist = mutableListOf<MessageEntity>()
+        val sortedEntities = entities.sortedBy { it.offset }
 
-        val res = buildList {
-            entities.forEach { entity ->
-                val badMix = entities.find { it.offset > entity.offset && it.offset + it.length < entity.offset + entity.length }
-                if (badMix != null) {
-                    add(MessageEntity(entity.type, entity.offset, badMix.offset - entity.offset))
-                    add(MessageEntity(entity.type, badMix.offset, badMix.offset + badMix.length - badMix.offset))
-                    add(MessageEntity(badMix.type, badMix.offset, badMix.offset + badMix.length - badMix.offset))
-                    val offset = badMix.offset + badMix.length
-                    add(MessageEntity(entity.type, offset, entity.offset + entity.length - offset))
+        fun processEntities(entities: List<MessageEntity>): List<MessageEntity> {
+            val newEntities = mutableListOf<MessageEntity>()
+            val blacklist = mutableListOf<MessageEntity>()
 
-                    blacklist.add(badMix)
+            for (entity in entities) {
+                val overlappingEntities = entities.filter {
+                    it != entity && it.offset < entity.offset + entity.length && it.offset + it.length > entity.offset
+                }
+
+                if (overlappingEntities.isNotEmpty()) {
+                    overlappingEntities.forEach { overlappingEntity ->
+                        if (overlappingEntity.offset > entity.offset) {
+                            newEntities.add(entity.copy(length = overlappingEntity.offset - entity.offset))
+                        }
+
+                        val start = maxOf(entity.offset, overlappingEntity.offset)
+                        val end = minOf(entity.offset + entity.length, overlappingEntity.offset + overlappingEntity.length)
+                        newEntities.add(entity.copy(offset = start, length = end - start))
+                        newEntities.add(overlappingEntity.copy(offset = start, length = end - start))
+
+                        if (entity.offset + entity.length > overlappingEntity.offset + overlappingEntity.length) {
+                            newEntities.add(
+                                entity.copy(
+                                    offset = overlappingEntity.offset + overlappingEntity.length,
+                                    length = entity.offset + entity.length - (overlappingEntity.offset + overlappingEntity.length)
+                                )
+                            )
+                        }
+
+                        blacklist.add(overlappingEntity)
+                    }
                 } else if (!blacklist.contains(entity)) {
-                    add(entity)
+                    newEntities.add(entity)
                 }
             }
+
+            return newEntities.distinct()
         }
 
-        return if (blacklist.isNotEmpty()) fixed(res)
-        else res.also {
-            val textString = getTextString()
-            it.forEach {
-//                println("$it --> ${textString.substring(it.offset, it.offset + it.length)}")
-            }
-        }
+        var currentEntities = sortedEntities
+        var previousSize: Int
+
+        do {
+            previousSize = currentEntities.size
+            currentEntities = processEntities(currentEntities)
+        } while (currentEntities.size != previousSize)
+
+        return currentEntities
     }
 
     fun format(parseMode: ParseMode): String {
         val textString = getTextString()
         if (entities.isEmpty()) return textString.escape(parseMode)
 
-        val entities = fixed(getEntities()).sortedBy { it.offset }
+        val entities: List<MessageEntity> = fixed(getEntities()).sortedBy { it.offset }
         fun MessageEntity.isSameLengthAndOffset(other: MessageEntity): Boolean {
             return this.length == other.length && this.offset == other.offset
         }
-        if (parseMode == ParseMode.MARKDOWNV2) {
-
-            // TODO or delegate to API error?
+        if (parseMode == ParseMode.MARKDOWNV2 && config.verifyMarkdown2Format) {
             entities.forEachIndexed { i, entity ->
-                if (i != 0 && i != entities.size - 1 && entity.offset + entity.length == entities[i + 1].offset &&
+                if (i != 0 && i != entities.lastIndex && entity.offset + entity.length == entities[i + 1].offset &&
                     (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (
                         ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
                         ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
                     )
                 ) {
-                    // TODO show text with problem
+
+                    val prev = entities[(i - 2).coerceAtLeast(0)]
+                    val next = entities[(i + 2).coerceAtMost(entities.lastIndex)]
+                    val problematicText = textString.substring(prev.offset, prev.offset + entity.length + next.length)
+
                     throw IllegalStateException(
-                        "MarkdownV2 not allowed to append italic and underline entities. " +
-                                "Use the mix method for append both types, append another type " +
-                                "if you try to append two italic/underline in a row, or create an HTML string instead"
+                        "MarkdownV2 not allowed to append italic and underline entities in text '$problematicText'. " +
+                        "Use the mix method for append both types, append another type " +
+                        "if you try to append two italic/underline in a row, or create an HTML string instead." +
+                        "To disable this verification set verifyMarkdown2Format = false in bot config"
                     )
                 }
             }
@@ -222,9 +241,6 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
                 val mix = entities.filterIndexed { j, e -> j != i && e.length == entity.length && e.offset == entity.offset && pathsOfEntities.add(j) }.let {
                     if (it.isNotEmpty()) it.toMutableList().apply { add(entity) } else it
                 }
-//                val mix = entities.filterIndexed { j, e -> j != i && ((e.length == entity.length && e.offset == entity.offset) || (e.offset >= entity.offset && e.offset + e.length <= entity.offset + entity.length)) && pathsOfEntities.add(j) }.let {
-//                    if (it.isNotEmpty()) it.toMutableList().apply { add(entity) } else it
-//                }
                 val usedPartOfMix = pathsOfEntities.contains(i)
 
                 if (mix.isEmpty()) {
@@ -251,7 +267,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
                 }
 
                 // text without entity between two entities
-                if (entities.size != i + 1/* && entity.offset + entity.length != entities[i + 1].offset*/) {
+                if (entities.size != i + 1 && !usedPartOfMix) {
                     var end: Int? = null
                     for (j in entities.indices) {
                         if (j > i) {

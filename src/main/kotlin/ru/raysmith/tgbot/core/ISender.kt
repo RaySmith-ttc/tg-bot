@@ -9,7 +9,7 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.network.API
 
-// TODO add docs for methods
+// TODO [docs] methods
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, API, BotHolder {
 
@@ -111,7 +111,6 @@ interface ISender : ChatIdHolder, API, BotHolder {
     suspend fun sendDice(emoji: String, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {
         return DiceMessage(emoji, bot).apply { message() }.send(chatId, messageThreadId)
     }
-
 
     suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return sendChatAction(chatId, action, messageThreadId)

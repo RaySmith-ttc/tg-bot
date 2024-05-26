@@ -61,7 +61,7 @@ import java.io.IOException
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
-val locations = true
+val locations = false
 val prettyPrintJson = Json(TelegramApi.json) {
     prettyPrint = true
     prettyPrintIndent = " "
@@ -142,7 +142,9 @@ fun MessageText.setupTestMessage(message: Message) {
     italic("Lik: ").textLink("vk", "vk.com").n()
     text("Mixed: ").strikethrough("qwe")
         .mix("rty", MessageEntityType.STRIKETHROUGH, MessageEntityType.UNDERLINE)
-        .strikethrough("uio").n()
+        .strikethrough("uio")
+        .mix("fgb", MessageEntityType.BOLD, MessageEntityType.UNDERLINE)
+        .n()
     text("Mention: ").mention("@raysmithdev").n()
     text("Text mention: ").textMention("ray", message.from!!).n()
     spoiler("Spoiler").n()
@@ -151,7 +153,7 @@ fun MessageText.setupTestMessage(message: Message) {
 
     entity(MessageEntityType.STRIKETHROUGH) {
         offset = 2
-        length = 30
+        length = 138
     }
 }
 

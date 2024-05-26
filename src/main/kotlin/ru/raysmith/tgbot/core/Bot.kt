@@ -9,7 +9,6 @@ import ru.raysmith.tgbot.core.handler.EventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
@@ -55,7 +54,6 @@ class Bot(
     // callbacks
     private var onError: suspend (e: Exception) -> Unit = { }
     private var onUpdate: suspend (updates: List<Update>) -> Unit = { }
-    private var onMessageSend: suspend (message: Message) -> Unit = { }
     private var onStart: suspend Bot.() -> Unit = { }
     private var onStop: suspend Bot.(handler: CommandHandler?) -> Unit = { }
 
@@ -198,8 +196,7 @@ class Bot(
         lastUpdateId = (lastUpdateId ?: 0) + 1
     }
 
-    // TODO redundant?
-    private suspend fun safeNetwork(action: suspend () -> Unit) {
+    private suspend inline fun safeNetwork(action: () -> Unit) {
         try {
             action()
         } catch (e: BotException) {
@@ -353,12 +350,6 @@ class Bot(
         }
         return this
     }
-
-    // TODO ?
-//    fun onMessageSend(onMessageSend: suspend (message: Message) -> Unit): Bot {
-//        this.onMessageSend = onMessageSend
-//        return this
-//    }
 
     /**
      * Stops bot working.
