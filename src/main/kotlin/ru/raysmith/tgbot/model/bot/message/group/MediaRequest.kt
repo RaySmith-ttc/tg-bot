@@ -3,6 +3,10 @@ package ru.raysmith.tgbot.model.bot.message.group
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 
+internal class MediaRequestInternal : MediaRequest() {
+    fun applyMediaExposed(media: InputFile) = super.applyMedia(media)
+}
+
 abstract class MediaRequest {
 
     companion object {

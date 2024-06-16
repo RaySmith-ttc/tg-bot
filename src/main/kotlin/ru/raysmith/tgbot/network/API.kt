@@ -11,6 +11,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.utils.io.streams.*
+import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.bot.BotDescription
@@ -18,6 +19,7 @@ import ru.raysmith.tgbot.model.bot.BotName
 import ru.raysmith.tgbot.model.bot.BotShortDescription
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
+import ru.raysmith.tgbot.model.bot.message.group.MediaRequestInternal
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
@@ -661,7 +663,6 @@ interface API {
                 setMultiPartFormDataBody(
                     *buildList {
                         media.map { inputMedia ->
-                            println(inputMedia.media)
                             when(inputMedia) {
                                 is InputMediaGroupWithThumbnail -> {
                                     add(inputMedia.media.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
@@ -2238,7 +2239,6 @@ interface API {
         }
     }
 
-    // TODO
     /**
      * Use this method to create a new sticker set owned by a user.
      * The bot will be able to edit the sticker set thus created. Returns *True* on success.
@@ -2251,78 +2251,37 @@ interface API {
      * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
      * bot in context
      * @param title Sticker set title, 1-64 characters
-     * @param block Sticker set builder
+     * @param stickers List of stickers
+     * @param stickerType Type of stickers in the set. By default, a regular sticker set is created.
+     * @param needsRepainting Pass *True* if stickers in the sticker set must be repainted to the color of text when
+     * used in messages, the accent color if used as emoji status, white on chat photos, or another appropriate color
+     * based on context; for custom emoji sticker sets only
      * */
-//    suspend fun createNewStickerSet(
-//        userId: ChatId.ID,
-//        name: String,
-//        title: String,
-//        stickerFormat: StickerFormat,
-//        block: CreateNewStickerInStickerSet.() -> Unit,
-//    ) = request<Boolean> {
-//        val set = CreateNewStickerInStickerSet(userId, name, title, stickerFormat).apply(block)
-//        client.post("createNewStickerSet") {
-//            parameter("user_id", userId)
-//            parameter("name", name)
-//            parameter("title", title)
-//            parameter("stickers", set.getAddedStickers())
-//            parameter("sticker_format", stickerFormat)
-//            parameter("sticker_type", set.stickerType)
-//            parameter("needs_repainting", set.needsRepainting)
-//            setMultiPartFormDataBody(
-//                "mediaPart1" to mediaPart1,
-//                "mediaPart2" to mediaPart2,
-//                "mediaPart3" to mediaPart3,
-//                "mediaPart4" to mediaPart4,
-//                "mediaPart5" to mediaPart5,
-//                "mediaPart6" to mediaPart6,
-//                "mediaPart7" to mediaPart7,
-//                "mediaPart8" to mediaPart8,
-//                "mediaPart9" to mediaPart9,
-//                "mediaPart10" to mediaPart10,
-//                "mediaPart11" to mediaPart11,
-//                "mediaPart12" to mediaPart12,
-//                "mediaPart13" to mediaPart13,
-//                "mediaPart14" to mediaPart14,
-//                "mediaPart15" to mediaPart15,
-//                "mediaPart16" to mediaPart16,
-//                "mediaPart17" to mediaPart17,
-//                "mediaPart18" to mediaPart18,
-//                "mediaPart19" to mediaPart19,
-//                "mediaPart20" to mediaPart20,
-//                "mediaPart21" to mediaPart21,
-//                "mediaPart22" to mediaPart22,
-//                "mediaPart23" to mediaPart23,
-//                "mediaPart24" to mediaPart24,
-//                "mediaPart25" to mediaPart25,
-//                "mediaPart26" to mediaPart26,
-//                "mediaPart27" to mediaPart27,
-//                "mediaPart28" to mediaPart28,
-//                "mediaPart29" to mediaPart29,
-//                "mediaPart30" to mediaPart30,
-//                "mediaPart31" to mediaPart31,
-//                "mediaPart32" to mediaPart32,
-//                "mediaPart33" to mediaPart33,
-//                "mediaPart34" to mediaPart34,
-//                "mediaPart35" to mediaPart35,
-//                "mediaPart36" to mediaPart36,
-//                "mediaPart37" to mediaPart37,
-//                "mediaPart38" to mediaPart38,
-//                "mediaPart39" to mediaPart39,
-//                "mediaPart40" to mediaPart40,
-//                "mediaPart41" to mediaPart41,
-//                "mediaPart42" to mediaPart42,
-//                "mediaPart43" to mediaPart43,
-//                "mediaPart44" to mediaPart44,
-//                "mediaPart45" to mediaPart45,
-//                "mediaPart46" to mediaPart46,
-//                "mediaPart47" to mediaPart47,
-//                "mediaPart48" to mediaPart48,
-//                "mediaPart49" to mediaPart49,
-//                "mediaPart50" to mediaPart50,
-//            )
-//        }
-//    }
+    suspend fun createNewStickerSet(
+        userId: ChatId.ID,
+        name: String,
+        title: String,
+        stickers: List<InputSticker>,
+        stickerType: StickerType? = null,
+        needsRepainting: Boolean? = null
+    ) = request<Boolean> {
+        val req = MediaRequestInternal()
+
+        client.post("createNewStickerSet") {
+            parameter("user_id", userId)
+            parameter("name", name)
+            parameter("title", title)
+            parameter("sticker_type", stickerType)
+            parameter("needs_repainting", needsRepainting)
+            parameter("stickers", TelegramApi.json.encodeToString(stickers.map { sticker ->
+                sticker.toSerializable { req.applyMediaExposed(it) }
+            }))
+
+            setMultiPartFormDataBody(*req.inputFiles.mapIndexed { i, file ->
+                "file${i + 1}" to file
+            }.toTypedArray())
+        }
+    }
 
     /**
      * Use this method to add a new sticker to a set created by the bot.
@@ -2346,10 +2305,16 @@ interface API {
         name: String,
         sticker: InputSticker,
     ) = request<Boolean> {
+        val req = MediaRequestInternal()
+
         client.post("addStickerToSet") {
             parameter("user_id", userId)
             parameter("name", name)
-            parameter("sticker", sticker)
+            parameter("sticker", sticker.toSerializable { req.applyMediaExposed(it) })
+
+            setMultiPartFormDataBody(*req.inputFiles.mapIndexed { i, file ->
+                "file${i + 1}" to file
+            }.toTypedArray())
         }
     }
 

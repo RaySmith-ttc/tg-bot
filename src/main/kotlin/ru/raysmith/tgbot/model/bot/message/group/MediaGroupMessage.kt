@@ -65,7 +65,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 val action = when {
                     inputMedia.all { it is InputMediaVideo } -> ChatAction.UPLOAD_VIDEO
                     inputMedia.all { it is InputMediaPhoto } -> ChatAction.UPLOAD_PHOTO
-                    inputMedia.all { it is InputMediaDocument } -> ChatAction.UPLOAD_DOCUMENT
+//                    inputMedia.all { it is InputMediaDocument } -> ChatAction.UPLOAD_DOCUMENT // redundant
                     inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
                     else -> null
                 }

@@ -18,6 +18,7 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageId
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.sticker.CreateNewStickerInStickerSet
 import ru.raysmith.tgbot.network.API
 import java.time.ZonedDateTime
 
@@ -861,6 +862,32 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     suspend fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return deleteMessage(chatId, messageId)
+    }
+
+    /**
+     * Use this method to create a new sticker set owned by a user.
+     * The bot will be able to edit the sticker set thus created. Returns *True* on success.
+     *
+     * @param userId User identifier of created sticker set owner
+     * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
+     * Can contain only English letters, digits and underscores. Must begin with a letter,
+     * can't contain consecutive underscores and must end in `"_by_<bot_username>"`.
+     * `<bot_username>` is case insensitive. 1-64 characters.
+     * You can use [stickerSetName][ru.raysmith.tgbot.utils.stickerSetName] method to automatically create name for
+     * bot in context
+     * @param title Sticker set title, 1-64 characters
+     * @param block Sticker set builder
+     *
+     * > You can use [stickerSetShareLink][ru.raysmith.tgbot.utils.stickerSetShareLink] method to create share link
+     * to created sticker set
+     * */
+    suspend fun createNewStickerSet(
+        userId: ChatId.ID,
+        name: String,
+        title: String,
+        block: CreateNewStickerInStickerSet.() -> Unit
+    ): Boolean {
+        return CreateNewStickerInStickerSet(userId, name, title).apply(block).create()
     }
 
     /**

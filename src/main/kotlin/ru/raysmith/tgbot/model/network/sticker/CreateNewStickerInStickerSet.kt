@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.model.network.sticker
 
 import io.ktor.client.*
+import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
@@ -24,8 +25,6 @@ open class CreateNewStickerInStickerSet(
     /** Sticker set title, 1-64 characters */
     val title: String,
 
-    /** Format of stickers in the set */
-    val stickerFormat: StickerFormat
 ) : MediaRequest() {
 
     /** Type of stickers in the set. By default, a regular sticker set is created. */
@@ -40,68 +39,16 @@ open class CreateNewStickerInStickerSet(
      * */
     var needsRepainting: Boolean? = null
 
-    private val stickers = mutableListOf<InputSticker>()
+    internal val stickers = mutableListOf<InputSticker>()
 
-    fun sticker(sticker: InputFile, emojiList: List<String>, maskPosition: MaskPosition? = null, keywords: List<String>? = null) {
-        stickers.add(InputSticker(sticker, emojiList, maskPosition, keywords))
+    fun sticker(sticker: InputFile, format: StickerFormat, emojiList: List<String>, maskPosition: MaskPosition? = null, keywords: List<String>? = null) {
+        stickers.add(InputSticker(sticker, format, emojiList, maskPosition, keywords))
     }
 
     context(BotContext<*>)
-    internal fun create(): Boolean {
-        TODO()
-//        return service.createNewStickerSet(
-//            userId, name, title, json.encodeToString(stickers.map { sticker -> sticker.toSerializable { getMedia(it) } }),
-//            stickerFormat, stickerType, needsRepainting,
-//            multipartBodyParts.getOrNull(0),
-//            multipartBodyParts.getOrNull(1),
-//            multipartBodyParts.getOrNull(2),
-//            multipartBodyParts.getOrNull(3),
-//            multipartBodyParts.getOrNull(4),
-//            multipartBodyParts.getOrNull(5),
-//            multipartBodyParts.getOrNull(6),
-//            multipartBodyParts.getOrNull(7),
-//            multipartBodyParts.getOrNull(8),
-//            multipartBodyParts.getOrNull(9),
-//            multipartBodyParts.getOrNull(10),
-//            multipartBodyParts.getOrNull(11),
-//            multipartBodyParts.getOrNull(12),
-//            multipartBodyParts.getOrNull(13),
-//            multipartBodyParts.getOrNull(14),
-//            multipartBodyParts.getOrNull(15),
-//            multipartBodyParts.getOrNull(16),
-//            multipartBodyParts.getOrNull(17),
-//            multipartBodyParts.getOrNull(18),
-//            multipartBodyParts.getOrNull(19),
-//            multipartBodyParts.getOrNull(20),
-//            multipartBodyParts.getOrNull(21),
-//            multipartBodyParts.getOrNull(22),
-//            multipartBodyParts.getOrNull(23),
-//            multipartBodyParts.getOrNull(24),
-//            multipartBodyParts.getOrNull(25),
-//            multipartBodyParts.getOrNull(26),
-//            multipartBodyParts.getOrNull(27),
-//            multipartBodyParts.getOrNull(28),
-//            multipartBodyParts.getOrNull(29),
-//            multipartBodyParts.getOrNull(30),
-//            multipartBodyParts.getOrNull(31),
-//            multipartBodyParts.getOrNull(32),
-//            multipartBodyParts.getOrNull(33),
-//            multipartBodyParts.getOrNull(34),
-//            multipartBodyParts.getOrNull(35),
-//            multipartBodyParts.getOrNull(36),
-//            multipartBodyParts.getOrNull(37),
-//            multipartBodyParts.getOrNull(38),
-//            multipartBodyParts.getOrNull(39),
-//            multipartBodyParts.getOrNull(40),
-//            multipartBodyParts.getOrNull(41),
-//            multipartBodyParts.getOrNull(42),
-//            multipartBodyParts.getOrNull(43),
-//            multipartBodyParts.getOrNull(44),
-//            multipartBodyParts.getOrNull(45),
-//            multipartBodyParts.getOrNull(46),
-//            multipartBodyParts.getOrNull(47),
-//            multipartBodyParts.getOrNull(48),
-//            multipartBodyParts.getOrNull(49)
-//        ).execute().body()?.result ?: errorBody()
+    internal suspend fun create(): Boolean {
+        return createNewStickerSet(
+            userId, name, title, stickers, stickerType, needsRepainting
+        )
     }
 }

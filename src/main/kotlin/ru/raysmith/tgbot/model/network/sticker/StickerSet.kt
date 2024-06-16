@@ -17,12 +17,6 @@ data class StickerSet(
     /** Type of stickers in the set */
     @SerialName("sticker_type") val stickerType: StickerType,
 
-    /** *True*, if the sticker set contains [animated stickers](https://telegram.org/blog/animated-stickers) */
-    @SerialName("is_animated") val isAnimated: Boolean,
-
-    /** *True*, if the sticker set contains [video stickers](https://telegram.org/blog/video-stickers-better-reactions) */
-    @SerialName("is_video") val isVideo: Boolean,
-
     /** List of all set stickers */
     @SerialName("stickers") val stickers: List<Sticker>,
 
