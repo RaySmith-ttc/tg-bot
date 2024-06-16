@@ -3,6 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.benManes.versions)
+    alias(libs.plugins.dokka)
     kotlin("jvm") version "2.0.0"
     `maven-publish`
 }
