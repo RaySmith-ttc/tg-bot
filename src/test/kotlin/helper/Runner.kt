@@ -50,8 +50,8 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
-import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
+import ru.raysmith.tgbot.utils.datepicker.createDatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
@@ -59,7 +59,9 @@ import ru.raysmith.tgbot.utils.pagination.Pagination
 import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 val locations = false
@@ -99,40 +101,35 @@ var loc: String = "menu"
 
 var lookPollAnswers = false
 
-val datePicker = DatePicker("sys").apply {
-//    locale = Locale.forLanguageTag("us")
-    messageText = { data, state ->
+val datePicker = createDatePicker("sys") {
+    locale { _, _ ->
+        Locale.forLanguageTag("ru-RU")
+    }
+    firstDayOfWeek { _, _ ->
+        DayOfWeek.SATURDAY
+    }
+    messageText { _, data, state ->
         bold("Title").n()
         n()
         text("Data: $data").n()
         text("State: $state").n()
     }
-    dates = {
-        LocalDate.now()..LocalDate.now().plusYears(3)
+    dates(LocalDate.now(), LocalDate.now().plusYears(3))
+
+    yearsColumns(6)
+    yearsRows(4)
+
+    startWithState { _, _ ->
+        DatePickerState.DAY
     }
-//    monthLimitBack = 5
-//    monthLimitForward = 3
-//    allowFutureDays = false
-//    allowPastDays = false
-//    years = 2000..2022
 
-//    initDate = LocalDate.of(2000, 1, 1)
-//    dates = { data ->
-//        println(data)
-//        LocalDate.of(2021, 3, 1)..LocalDate.of(2022, 11, 20)
-//    }
-
-    yearsColumns = 6
-    yearsRows = 4
-
-    startWithState = DatePickerState.DAY
-
-    additionalRowsPosition = AdditionalRowsPosition.TOP
-    additionalRows = {
-        row("some btn", "some_btn")
-        row("should be unhandled", "sbunhandled")
+    additionalRowsPosition(AdditionalRowsPosition.TOP)
+    additionalRows { _, _, state ->
+        if (state in listOf(DatePickerState.DAY, DatePickerState.YEAR)) {
+            row("some btn", "some_btn")
+            row("should be unhandled", "sbunhandled")
+        }
     }
-    additionalRowsVisibleOnStates = setOf(DatePickerState.DAY, DatePickerState.YEAR)
 }
 
 fun MessageText.setupTestMessage(message: Message) {

@@ -93,7 +93,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
 
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
     fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {
-        datePicker.messageText(this, data, datePicker.startWithState)
+        datePicker.messageText(this, config, data, datePicker.startWithState(config, data))
     }
 
     fun mix(

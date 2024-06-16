@@ -12,7 +12,7 @@ class MessageReplyKeyboard : MessageKeyboard {
     @SerialName("class")
     override val classDiscriminator = "MessageReplyKeyboard"
     var isPersistent: Boolean? = null
-    var resizeKeyboard: Boolean? = true // TODO ?
+    var resizeKeyboard: Boolean? = true
     var oneTimeKeyboard: Boolean? = null
     var inputFieldPlaceholder: String? = null
     var selective: Boolean? = null
