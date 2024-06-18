@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.chat.member
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
@@ -7,6 +8,6 @@ import ru.raysmith.tgbot.model.network.User
 @Serializable
 data class ChatMemberMember(
     /** The member's status in the chat, always “member” */
-    override val status: String,
-    override val user: User,
+    @SerialName("status") override val status: String,
+    @SerialName("user") override val user: User,
 ) : ChatMember()

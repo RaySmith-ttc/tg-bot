@@ -34,11 +34,11 @@ data class KeyboardButtonRequestUsers(
     @SerialName("max_quantity") val maxQuantity: Int? = null,
 
     /** Pass *True* to request the users' first and last names */
-    val requestName: Boolean? = null,
+    @SerialName("request_name") val requestName: Boolean? = null,
 
     /** Pass *True* to request the users' usernames */
-    val requestUsername: Boolean? = null,
+    @SerialName("request_username") val requestUsername: Boolean? = null,
 
     /** Pass *True* to request the users' photos */
-    val requestPhoto: Boolean? = null,
+    @SerialName("request_photo") val requestPhoto: Boolean? = null,
 )

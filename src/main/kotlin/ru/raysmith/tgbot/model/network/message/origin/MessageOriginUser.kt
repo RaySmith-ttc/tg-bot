@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.message.origin
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
@@ -8,10 +9,10 @@ import ru.raysmith.tgbot.model.network.User
 data class MessageOriginUser(
 
     /** Date the message was sent originally in Unix time */
-    override val date: Int,
+    @SerialName("date") override val date: Int,
 
     /** User that sent the message originally */
-    val senderUser: User
+    @SerialName("sender_user") val senderUser: User
 
 ) : MessageOrigin() {
     override val type: String = "user"

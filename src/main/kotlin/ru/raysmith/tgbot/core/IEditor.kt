@@ -9,6 +9,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
+import ru.raysmith.tgbot.model.network.message.InaccessibleMessage
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.pagination.Pagination
@@ -80,14 +81,18 @@ interface IEditor : ChatIdHolder, API, BotHolder {
 
     private fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
         var res: InlineKeyboardButton? = null
-        if (query.message?.replyMarkup?.keyboard != null) {
-            keyboard@ for (row in query.message.replyMarkup.keyboard) {
-                row@ for (button in row) {
-//                    if (pagePrefix != null && button.callbackData != null && !button.callbackData.startsWith(pagePrefix)) break@row
-                    if (pagePrefix != null && row.none { it.callbackData?.startsWith(pagePrefix) == true }) break@row
-                    if (button.text.startsWith(Pagination.SYMBOL_CURRENT_PAGE) && button.text.endsWith(Pagination.SYMBOL_CURRENT_PAGE)) {
-                        res = button
-                        break@keyboard
+        when(query.message) {
+            is InaccessibleMessage, null -> {}
+            is Message -> {
+                if (query.message.replyMarkup?.keyboard != null) {
+                    keyboard@ for (row in query.message.replyMarkup.keyboard) {
+                        row@ for (button in row) {
+                            if (pagePrefix != null && row.none { it.callbackData?.startsWith(pagePrefix) == true }) break@row
+                            if (button.text.startsWith(Pagination.SYMBOL_CURRENT_PAGE) && button.text.endsWith(Pagination.SYMBOL_CURRENT_PAGE)) {
+                                res = button
+                                break@keyboard
+                            }
+                        }
                     }
                 }
             }

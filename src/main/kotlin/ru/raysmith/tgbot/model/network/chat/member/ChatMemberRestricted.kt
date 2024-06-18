@@ -8,8 +8,9 @@ import ru.raysmith.tgbot.model.network.User
 @Serializable
 data class ChatMemberRestricted(
     /** The member's status in the chat, always “restricted” */
-    override val status: String,
-    override val user: User,
+    @SerialName("status") override val status: String,
+
+    @SerialName("user")  override val user: User,
 
     /** *True*, if the user is allowed to change the chat title, photo and other settings */
     @SerialName("is_member") val isMember: Boolean,

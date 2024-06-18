@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.network.message.origin
 
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.network.serializer.MessageOriginSerializer
 
@@ -12,7 +11,6 @@ import ru.raysmith.tgbot.network.serializer.MessageOriginSerializer
  * - [MessageOriginChat]
  * - [MessageOriginChannel]
  * */
-@Polymorphic
 @Serializable(with = MessageOriginSerializer::class)
 sealed class MessageOrigin {
 

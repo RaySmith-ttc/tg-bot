@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.updates.boost
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
@@ -11,7 +12,7 @@ import ru.raysmith.tgbot.model.network.User
 data class ChatBoostSourceGiftCode(
 
     /** User that boosted the chat */
-    val user: User
+    @SerialName("user") val user: User
 ) : ChatBoostSource() {
 
     /** Source of the boost, always “gift_code” */

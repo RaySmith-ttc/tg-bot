@@ -8,13 +8,13 @@ import kotlinx.serialization.Serializable
 data class Venue(
 
     /** Venue location. Can't be a live location */
-    val location: Location,
+    @SerialName("location") val location: Location,
 
     /** Name of the venue */
-    val title: String,
+    @SerialName("title") val title: String,
 
     /** Address of the venue */
-    val address: String,
+    @SerialName("address") val address: String,
 
     /** Foursquare identifier of the venue */
     @SerialName("foursquare_id") val foursquareId: String? = null,

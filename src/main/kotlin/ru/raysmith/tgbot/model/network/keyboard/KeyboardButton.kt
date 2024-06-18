@@ -24,7 +24,7 @@ data class KeyboardButton(
      * Tapping on any user will send their identifier to the bot in a [userShared][Message.usersShared] service message.
      * Available in private chats only.
      * */
-    val requestUsers: KeyboardButtonRequestUsers? = null,
+    @SerialName("request_users") val requestUsers: KeyboardButtonRequestUsers? = null,
 
     /**
      * If specified, pressing the button will open a list of suitable chats.

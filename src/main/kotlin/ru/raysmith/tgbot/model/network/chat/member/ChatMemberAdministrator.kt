@@ -8,8 +8,9 @@ import ru.raysmith.tgbot.model.network.User
 @Serializable
 data class ChatMemberAdministrator(
     /** The member's status in the chat, always “administrator” */
-    override val status: String,
-    override val user: User,
+    @SerialName("status") override val status: String,
+    
+    @SerialName("user") override val user: User,
 
     /** *True*, if the bot is allowed to edit administrator privileges of that user */
     @SerialName("can_be_edited") val canBeEdited: Boolean,

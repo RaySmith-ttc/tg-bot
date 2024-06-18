@@ -10,13 +10,13 @@ import ru.raysmith.tgbot.model.network.message.PollType
 data class Poll(
 
     /** Unique poll identifier */
-    val id: String,
+    @SerialName("id") val id: String,
 
     /** Poll question, 1-300 characters */
-    val question: String,
+    @SerialName("question") val question: String,
 
     /** List of poll options */
-    val options: List<PollOption>,
+    @SerialName("options") val options: List<PollOption>,
 
     /** Total number of users that voted in the poll */
     @SerialName("total_voter_count") val totalVoterCount: Int,

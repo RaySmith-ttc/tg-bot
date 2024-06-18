@@ -46,7 +46,7 @@ data class Chat(
      * Identifier of the accent color for the chat name and backgrounds of the chat photo, reply header,
      * and link preview. See [accent colors][AccentColors] for more details.
      * */
-    val accentColorId: Int? = null,
+    @SerialName("accent_color_id") val accentColorId: Int? = null,
 
     /** Chat photo. Returned only in [getChat][API.getChat]. */
     @SerialName("photo") val photo: ChatPhoto? = null,
@@ -62,19 +62,19 @@ data class Chat(
      * List of available reactions allowed in the chat. If omitted, then all [emoji reactions][ReactionTypeEmoji.emoji]
      * are allowed.
      * */
-    val availableReactions: List<ReactionType>? = null,
+    @SerialName("available_reactions") val availableReactions: List<ReactionType>? = null,
 
     /** Custom emoji identifier of the emoji chosen by the chat for the reply header and link preview background */
-    val backgroundCustomEmojiId: String? = null,
+    @SerialName("background_custom_emoji_id") val backgroundCustomEmojiId: String? = null,
 
     /**
      * Identifier of the accent color for the chat's profile background.
      * See [profile accent colors][ProfileAccentColors] for more details.
      * */
-    val profileAccentColorId: String? = null,
+    @SerialName("profile_accent_color_id") val profileAccentColorId: String? = null,
 
     /** Custom emoji identifier of the emoji chosen by the chat for its profile background */
-    val profileBackgroundCustomEmojiId: String? = null,
+    @SerialName("profile_background_custom_emoji_id") val profileBackgroundCustomEmojiId: String? = null,
 
     /**
      * Custom emoji identifier of emoji status of the other party in a private chat.
@@ -144,6 +144,12 @@ data class Chat(
     @SerialName("slow_mode_delay") val slowModeDelay: Int? = null,
 
     /**
+     * For supergroups, the minimum number of boosts that a non-administrator user needs to add in order to ignore
+     * slow mode and chat permissions
+     * */
+    @SerialName("unrestrict_boost_count") val unrestrictBoostCount: Int? = null,
+
+    /**
      * The time after which all messages sent to the chat will be automatically deleted; in seconds.
      * Returned only in [getChat][BotContext.getChat].
      * */
@@ -168,7 +174,7 @@ data class Chat(
     @SerialName("has_protected_content") val hasProtectedContent: Boolean? = null,
 
     /** *True*, if new chat members will have access to old messages; available only to chat administrators */
-    val hasVisibleHistory: Boolean? = null,
+    @SerialName("has_visible_history") val hasVisibleHistory: Boolean? = null,
 
     /**
      * For supergroups, name of group sticker set. Returned only in [getChat][BotContext.getChat].
@@ -179,6 +185,11 @@ data class Chat(
      * True, if the bot can change the group sticker set. Returned only in [getChat][BotContext.getChat].
      * */
     @SerialName("can_set_sticker_set") val canSetStickerSet: Boolean? = null,
+
+    /**
+     * True, if the bot can change the group sticker set. Returned only in [getChat][BotContext.getChat].
+     * */
+    @SerialName("custom_emoji_sticker_set_name") val customEmojiStickerSetName: Boolean? = null,
 
     /**
      * Unique identifier for the linked chat, i.e. the discussion group identifier for a channel and vice versa;

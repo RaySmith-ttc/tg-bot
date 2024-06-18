@@ -8,8 +8,8 @@ import ru.raysmith.tgbot.model.network.User
 @Serializable
 data class ChatMemberOwner(
     /** The member's status in the chat, always “creator” */
-    override val status: String,
-    override val user: User,
+    @SerialName("status") override val status: String,
+    @SerialName("user") override val user: User,
 
     /** *True*, if the user's presence in the chat is hidden */
     @SerialName("is_anonymous") val isAnonymous: Boolean,

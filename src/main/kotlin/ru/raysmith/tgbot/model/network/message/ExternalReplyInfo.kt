@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.message
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.Poll
@@ -19,81 +20,81 @@ import ru.raysmith.tgbot.model.network.sticker.Sticker
 data class ExternalReplyInfo(
 
     /** Origin of the message replied to by the given message */
-    val origin: MessageOrigin,
+    @SerialName("origin") val origin: MessageOrigin,
 
     /** Chat the original message belongs to. Available only if the chat is a supergroup or a channel. */
-    val chat: Chat? = null,
+    @SerialName("chat") val chat: Chat? = null,
 
     /**
      * Unique message identifier inside the original chat. Available only if the original chat is a supergroup or
      * a channel.
      * */
-    val messageId: Int? = null,
+    @SerialName("message_id") val messageId: Int? = null,
 
     /** Options used for link preview generation for the original message, if it is a text message */
-    val linkPreviewOptions: LinkPreviewOptions? = null,
+    @SerialName("link_preview_options") val linkPreviewOptions: LinkPreviewOptions? = null,
 
     /** Message is an animation, information about the animation */
-    val animation: Animation? = null,
+    @SerialName("animation") val animation: Animation? = null,
 
     /** Message is an audio file, information about the file */
-    val audio: Audio? = null,
+    @SerialName("audio") val audio: Audio? = null,
 
     /** Message is a general file, information about the file */
-    val document: Document? = null,
+    @SerialName("document") val document: Document? = null,
 
     /** Message is a photo, available sizes of the photo */
-    val photo: List<PhotoSize>? = null,
+    @SerialName("photo") val photo: List<PhotoSize>? = null,
 
     /** Message is a sticker, information about the sticker */
-    val sticker: Sticker? = null,
+    @SerialName("sticker") val sticker: Sticker? = null,
 
     /** Message is a forwarded story */
-    val story: Story? = null,
+    @SerialName("story") val story: Story? = null,
 
     /** Message is a video, information about the video */
-    val video: Video? = null,
+    @SerialName("video") val video: Video? = null,
 
     /**
      * Message is a [video note](https://telegram.org/blog/video-messages-and-telescope),
      * information about the video message
      * */
-    val videoNote: VideoNote? = null,
+    @SerialName("video_note") val videoNote: VideoNote? = null,
 
     /** Message is a voice message, information about the file */
-    val voice: Voice? = null,
+    @SerialName("voice") val voice: Voice? = null,
 
     /** *True*, if the message media is covered by a spoiler animation */
-    val hasMediaSpoiler: Boolean? = null,
+    @SerialName("has_media_spoiler") val hasMediaSpoiler: Boolean? = null,
 
     /** Message is a shared contact, information about the contact */
-    val contact: Contact? = null,
+    @SerialName("contact") val contact: Contact? = null,
 
     /** Message is a dice with random value */
-    val dice: Dice? = null,
+    @SerialName("dice") val dice: Dice? = null,
 
     // TODO [game support]
 //    /** Message is a game, information about the game. [More about games »](https://core.telegram.org/bots/api#games) */
-//    val game: Game? = null,
+//    @SerialName("game) val game: Game? = null,
 
     /** Message is a scheduled giveaway, information about the giveaway */
-    val giveaway: Giveaway? = null,
+    @SerialName("giveaway") val giveaway: Giveaway? = null,
 
     /** A giveaway with public winners was completed */
-    val giveawayWinners: GiveawayWinners? = null,
+    @SerialName("giveaway_winners") val giveawayWinners: GiveawayWinners? = null,
 
     /**
      * Message is an invoice for a payment, information about the invoice.
      * [More about payments »](https://core.telegram.org/bots/api#payments)
      * */
-    val invoice: Invoice? = null,
+    @SerialName("invoice") val invoice: Invoice? = null,
 
     /** Message is a shared location, information about the location */
-    val location: Location? = null,
+    @SerialName("location") val location: Location? = null,
 
     /** Message is a native poll, information about the poll */
-    val poll: Poll? = null,
+    @SerialName("poll") val poll: Poll? = null,
 
     /** Message is a venue, information about the venue */
-    val venue: Venue? = null,
+    @SerialName("venue") val venue: Venue? = null,
 )

@@ -16,6 +16,7 @@ import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.message.origin.MessageOrigin
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
+import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostAdded
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApiException
 
@@ -39,6 +40,9 @@ data class Message(
      * */
     @SerialName("sender_chat") val senderChat: Chat? = null,
 
+    /** If the sender of the message boosted the chat, the number of boosts added by the user */
+    @SerialName("sender_boost_count") val senderBoostCount: Int? = null,
+
     /** Date the message was sent in Unix time */
     @SerialName("date") override val date: Int,
 
@@ -46,7 +50,7 @@ data class Message(
     @SerialName("chat") override val chat: Chat,
 
     /** Information about the original message for forwarded messages */
-    val forwardOrigin: MessageOrigin? = null,
+    @SerialName("forward_origin") val forwardOrigin: MessageOrigin? = null,
 
     /** *True*, if the message is sent to a forum topic */
     @SerialName("is_topic_message") val isTopicMessage: Boolean? = null,
@@ -61,10 +65,13 @@ data class Message(
     @SerialName("reply_to_message") val replyToMessage: Message? = null,
 
     /** Information about the message that is being replied to, which may come from another chat or forum topic */
-    val externalReply: ExternalReplyInfo? = null,
+    @SerialName("external_reply") val externalReply: ExternalReplyInfo? = null,
 
     /** For replies that quote part of the original message, the quoted part of the message */
-    val quote: TextQuote? = null,
+    @SerialName("quote") val quote: TextQuote? = null,
+
+    /** For replies to a story, the original story */
+    @SerialName("reply_to_story") val replyToStory: Story? = null,
 
     /** Bot through which the message was sent */
     @SerialName("via_bot") val viaBot: User? = null,
@@ -256,6 +263,9 @@ data class Message(
     /** Service message. A user in the chat triggered another user's proximity alert while sharing Live Location. */
     @SerialName("proximity_alert_triggered") val proximityAlertTriggered: ProximityAlertTriggered? = null,
 
+    /** Service message: user boosted the chat */
+    @SerialName("boost_added") val boostAdded: ChatBoostAdded? = null,
+
     /** Service message: forum topic created */
     @SerialName("forum_topic_created") val forumTopicCreated: ForumTopicCreated? = null,
 
@@ -275,16 +285,16 @@ data class Message(
     @SerialName("general_forum_topic_unhidden") val generalForumTopicUnhidden: GeneralForumTopicUnhidden? = null,
 
     /** Service message: a scheduled giveaway was created */
-    val giveawayCreated: GiveawayCreated? = null,
+    @SerialName("giveaway_created") val giveawayCreated: GiveawayCreated? = null,
 
     /** The message is a scheduled giveaway message */
-    val giveaway: Giveaway? = null,
+    @SerialName("giveaway") val giveaway: Giveaway? = null,
 
     /** A giveaway with public winners was completed */
-    val giveawayWinners: GiveawayWinners? = null,
+    @SerialName("giveaway_winners") val giveawayWinners: GiveawayWinners? = null,
 
     /** Service message: a giveaway without public winners was completed */
-    val giveawayCompleted: GiveawayCompleted? = null,
+    @SerialName("giveaway_completed") val giveawayCompleted: GiveawayCompleted? = null,
 
     /** Service message: video chat scheduled */
     @SerialName("video_chat_scheduled") val videoChatScheduled: VideoChatScheduled? = null,

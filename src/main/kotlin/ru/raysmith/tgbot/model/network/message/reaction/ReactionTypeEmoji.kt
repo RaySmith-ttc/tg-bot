@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.model.network.message.reaction
 
 import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** The reaction is based on an emoji. */
@@ -14,7 +15,7 @@ data class ReactionTypeEmoji(
      * "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉",
      * "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
      * */
-    val emoji: String
+    @SerialName("emoji") val emoji: String
 
 ) : ReactionType() {
 

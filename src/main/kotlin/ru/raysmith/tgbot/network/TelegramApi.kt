@@ -12,31 +12,9 @@ import io.ktor.util.*
 import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.bot.message.keyboard.RemoveKeyboard
-import ru.raysmith.tgbot.model.network.chat.member.*
-import ru.raysmith.tgbot.model.network.command.*
-import ru.raysmith.tgbot.model.network.inline.content.*
-import ru.raysmith.tgbot.model.network.inline.result.*
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
-import ru.raysmith.tgbot.model.network.media.input.*
-import ru.raysmith.tgbot.model.network.menubutton.MenuButton
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
-import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
-import ru.raysmith.tgbot.model.network.response.BooleanResponse
-import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
-import ru.raysmith.tgbot.model.network.response.MessageResponse
 import ru.raysmith.utils.properties.getOrNull
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -89,107 +67,7 @@ object TelegramApi {
         classDiscriminator = "#type"
         classDiscriminatorMode = ClassDiscriminatorMode.NONE
         namingStrategy = JsonNamingStrategy.SnakeCase
-
-        serializersModule = SerializersModule {
-            polymorphic(InputMessageContent::class) {
-                subclass(InputTextMessageContent::class)
-            }
-
-            polymorphic(BotCommandScope::class) {
-                subclass(BotCommandScopeDefault::class)
-                subclass(BotCommandScopeAllPrivateChats::class)
-                subclass(BotCommandScopeAllGroupChats::class)
-                subclass(BotCommandScopeAllChatAdministrators::class)
-                subclass(BotCommandScopeChat::class)
-                subclass(BotCommandScopeChatAdministrators::class)
-                subclass(BotCommandScopeChatMember::class)
-            }
-
-            polymorphic(InputMessageContent::class) {
-                subclass(InputTextMessageContent::class)
-                subclass(InputLocationMessageContent::class)
-                subclass(InputVenueMessageContent::class)
-                subclass(InputContactMessageContent::class)
-                subclass(InputInvoiceMessageContent::class)
-            }
-
-            polymorphic(InlineQueryResult::class) {
-                subclass(InlineQueryResultCachedAudio::class)
-                subclass(InlineQueryResultCachedDocument::class)
-                subclass(InlineQueryResultCachedGif::class)
-                subclass(InlineQueryResultCachedMpeg4Gif::class)
-                subclass(InlineQueryResultCachedPhoto::class)
-                subclass(InlineQueryResultCachedSticker::class)
-                subclass(InlineQueryResultCachedVideo::class)
-                subclass(InlineQueryResultCachedVoice::class)
-                subclass(InlineQueryResultArticle::class)
-                subclass(InlineQueryResultAudio::class)
-                subclass(InlineQueryResultContact::class)
-                subclass(InlineQueryResultGame::class)
-                subclass(InlineQueryResultDocument::class)
-                subclass(InlineQueryResultGif::class)
-                subclass(InlineQueryResultLocation::class)
-                subclass(InlineQueryResultMpeg4Gif::class)
-                subclass(InlineQueryResultPhoto::class)
-                subclass(InlineQueryResultVenue::class)
-                subclass(InlineQueryResultVideo::class)
-                subclass(InlineQueryResultVoice::class)
-            }
-
-            polymorphic(ChatMember::class) {
-                subclass(ChatMemberOwner::class)
-                subclass(ChatMemberLeft::class)
-                subclass(ChatMemberMember::class)
-                subclass(ChatMemberAdministrator::class)
-                subclass(ChatMemberBanned::class)
-                subclass(ChatMemberRestricted::class)
-            }
-
-            polymorphic(InputMedia::class) {
-                subclass(InputMediaAnimation::class)
-                subclass(InputMediaDocument::class)
-                subclass(InputMediaAudio::class)
-                subclass(InputMediaPhoto::class)
-                subclass(InputMediaVideo::class)
-            }
-
-            polymorphic(InputMediaGroup::class) {
-                subclass(InputMediaDocument::class)
-                subclass(InputMediaAudio::class)
-                subclass(InputMediaPhoto::class)
-                subclass(InputMediaVideo::class)
-            }
-
-            polymorphic(InputMediaGroupWithThumbnail::class) {
-                subclass(InputMediaDocument::class)
-                subclass(InputMediaAudio::class)
-                subclass(InputMediaVideo::class)
-            }
-
-            polymorphic(MenuButton::class) {
-                subclass(MenuButtonCommands::class)
-                subclass(MenuButtonWebApp::class)
-                subclass(MenuButtonDefault::class)
-            }
-
-            polymorphic(LiveLocationResponse::class) {
-                subclass(BooleanResponse::class)
-                subclass(MessageResponse::class)
-            }
-
-            polymorphic(KeyboardMarkup::class) {
-                subclass(InlineKeyboardMarkup::class)
-                subclass(ReplyKeyboardMarkup::class)
-                subclass(ReplyKeyboardRemove::class)
-            }
-
-            polymorphic(MessageKeyboard::class) {
-                subclass(MessageInlineKeyboard::class)
-                subclass(RemoveKeyboard::class)
-            }
-        }
     }
-
 
     fun defaultClient(
         token: String = Bot.properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN")

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.network.message
 
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.network.serializer.MaybeInaccessibleMessageSerializer
@@ -11,7 +10,6 @@ import ru.raysmith.tgbot.network.serializer.MaybeInaccessibleMessageSerializer
  * - [Message]
  * - [InaccessibleMessage]
  * */
-@Polymorphic
 @Serializable(with = MaybeInaccessibleMessageSerializer::class)
 sealed class MaybeInaccessibleMessage {
     /** Chat the message belonged to */
@@ -23,4 +21,3 @@ sealed class MaybeInaccessibleMessage {
     /** Always 0. The field can be used to differentiate regular and inaccessible messages. */
     abstract val date: Int
 }
-

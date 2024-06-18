@@ -48,14 +48,14 @@ data class Update(
      * specify "message_reaction" in the list of *allowed_updates* to receive these updates.
      * The update isn't received for reactions set by bots.
      * */
-    val messageReaction: MessageReactionUpdated? = null,
+    @SerialName("message_reaction") val messageReaction: MessageReactionUpdated? = null,
 
     /**
      * Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the chat and
      * must explicitly specify "message_reaction_count" in the list of *allowed_updates* to receive these updates.
      * The updates are grouped and can be sent with delay up to a few minutes.
      * */
-    val messageReactionCount: MessageReactionCountUpdated? = null,
+    @SerialName("message_reaction_count") val messageReactionCount: MessageReactionCountUpdated? = null,
 
     /** New incoming inline query */
     @SerialName("inline_query") val inlineQuery: InlineQuery? = null,

@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.updates.boost
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.chat.Chat
 
@@ -8,14 +9,14 @@ import ru.raysmith.tgbot.model.network.chat.Chat
 data class ChatBoostRemoved(
 
     /** Chat which was boosted */
-    val chat: Chat,
+    @SerialName("chat") val chat: Chat,
 
     /** Unique identifier of the boost */
-    val boostIId: String,
+    @SerialName("boost_id") val boostId: String,
 
     /** Point in time (Unix timestamp) when the boost was removed */
-    val removeDate: Int,
+    @SerialName("remove_date") val removeDate: Int,
 
     /** Source of the removed boost */
-    val source: ChatBoostSource
+    @SerialName("source") val source: ChatBoostSource
 )

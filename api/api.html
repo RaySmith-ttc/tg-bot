@@ -1002,8 +1002,8 @@
       </h3>
       <p>All queries to the Telegram Bot API must be served over HTTPS and need to be presented in this form: <code>https://api.telegram.org/bot&lt;token&gt;/METHOD_NAME</code>. Like this for example: </p>
       <pre>
-					<code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe</code>
-				</pre>
+          <code>https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe</code>
+        </pre>
       <p>We support <strong>GET</strong> and <strong>POST</strong> HTTP methods. We support four ways of passing parameters in Bot API requests: </p>
       <ul>
         <li>
@@ -6383,7 +6383,7 @@
       </h6>
       <p>To use this mode, pass <em>MarkdownV2</em> in the <em>parse_mode</em> field. Use the following syntax in your message: </p>
       <pre>
-																																								<code>*bold \*text*
+                                                                                <code>*bold \*text*
 _italic \*text_
 __underline__
 ~strikethrough~
@@ -6392,7 +6392,7 @@ __underline__
 [inline URL](http://www.example.com/)
 [inline mention of a user](tg://user?id=123456789)
 ![
-																																									<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">](tg://emoji?id=5368324170671202286)
+                                                                                  <img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">](tg://emoji?id=5368324170671202286)
 `inline fixed-width code`
 ```
 pre-formatted fixed-width code block
@@ -6400,8 +6400,8 @@ pre-formatted fixed-width code block
 ```python
 pre-formatted fixed-width code block written in the Python programming language
 ```
-																																									</code>
-																																								</pre>
+                                                                                  </code>
+                                                                                </pre>
       <p>Please note:</p>
       <ul>
         <li>Any character with code between 1 and 126 inclusively can be escaped anywhere with a preceding '\' character, in which case it is treated as an ordinary character and not a part of the markup. This implies that '\' character usually must be escaped with a preceding '\' character.</li>
@@ -6419,7 +6419,7 @@ pre-formatted fixed-width code block written in the Python programming language
       </h6>
       <p>To use this mode, pass <em>HTML</em> in the <em>parse_mode</em> field. The following tags are currently supported: </p>
       <pre>
-																																									<code>&lt;b&gt;bold&lt;/b&gt;, &lt;strong&gt;bold&lt;/strong&gt;
+                                                                                  <code>&lt;b&gt;bold&lt;/b&gt;, &lt;strong&gt;bold&lt;/strong&gt;
 &lt;i&gt;italic&lt;/i&gt;, &lt;em&gt;italic&lt;/em&gt;
 &lt;u&gt;underline&lt;/u&gt;, &lt;ins&gt;underline&lt;/ins&gt;
 &lt;s&gt;strikethrough&lt;/s&gt;, &lt;strike&gt;strikethrough&lt;/strike&gt;, &lt;del&gt;strikethrough&lt;/del&gt;
@@ -6428,12 +6428,12 @@ pre-formatted fixed-width code block written in the Python programming language
 &lt;a href="http://www.example.com/"&gt;inline URL&lt;/a&gt;
 &lt;a href="tg://user?id=123456789"&gt;inline mention of a user&lt;/a&gt;
 &lt;tg-emoji emoji-id="5368324170671202286"&gt;
-																																										<img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">&lt;/tg-emoji&gt;
+                                                                                    <img class="emoji" src="//telegram.org/img/emoji/40/F09F918D.png" width="20" height="20" alt="👍">&lt;/tg-emoji&gt;
 &lt;code&gt;inline fixed-width code&lt;/code&gt;
 &lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;
 &lt;pre&gt;&lt;code class="language-python"&gt;pre-formatted fixed-width code block written in the Python programming language&lt;/code&gt;&lt;/pre&gt;
-																																										</code>
-																																									</pre>
+                                                                                    </code>
+                                                                                  </pre>
       <p>Please note:</p>
       <ul>
         <li>Only the tags mentioned above are currently supported.</li>
@@ -6452,7 +6452,7 @@ pre-formatted fixed-width code block written in the Python programming language
       </h6>
       <p>This is a legacy mode, retained for backward compatibility. To use this mode, pass <em>Markdown</em> in the <em>parse_mode</em> field. Use the following syntax in your message: </p>
       <pre>
-																																										<code>*bold text*
+                                                                                    <code>*bold text*
 _italic text_
 [inline URL](http://www.example.com/)
 [inline mention of a user](tg://user?id=123456789)
@@ -6463,7 +6463,7 @@ pre-formatted fixed-width code block
 ```python
 pre-formatted fixed-width code block written in the Python programming language
 ```</code>
-																																									</pre>
+                                                                                  </pre>
       <p>Please note:</p>
       <ul>
         <li>Entities must not be nested, use parse mode <a href="#markdownv2-style">MarkdownV2</a> instead. </li>

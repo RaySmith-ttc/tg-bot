@@ -1,7 +1,6 @@
 package ru.raysmith.tgbot.model.bot
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -10,7 +9,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
 
-@Polymorphic
 @Serializable(with = ChatIdSerializer::class)
 sealed class ChatId {
 

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.network.updates.boost
 
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.network.serializer.ChatBoostSourceSerializer
 
@@ -11,7 +10,6 @@ import ru.raysmith.tgbot.network.serializer.ChatBoostSourceSerializer
  * - [ChatBoostSourceGiftCode]
  * - [ChatBoostSourceGiveaway]
  * */
-@Polymorphic
 @Serializable(with = ChatBoostSourceSerializer::class)
 sealed class ChatBoostSource {
 

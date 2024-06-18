@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.giveaway
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
 
@@ -8,11 +9,11 @@ import ru.raysmith.tgbot.model.network.message.Message
 data class GiveawayCompleted(
 
     /** Number of winners in the giveaway */
-    val winnerCount: Int,
+    @SerialName("winner_count") val winnerCount: Int,
 
     /** Number of undistributed prizes */
-    val unclaimedPrizeCount: Int? = null,
+    @SerialName("unclaimed_prize_count") val unclaimedPrizeCount: Int? = null,
 
     /** Message with the giveaway that was completed, if it wasn't deleted */
-    val giveawayMessage: Message? = null
+    @SerialName("giveaway_message") val giveawayMessage: Message? = null
 )

@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.network.keyboard
 
-import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class InlineKeyboardMarkup(
 
     /** Array of button rows, each represented by an Array of [InlineKeyboardButton] objects */
-    @SerialName("inline_keyboard") @Required val keyboard: List<List<InlineKeyboardButton>>
+    @SerialName("inline_keyboard") val keyboard: List<List<InlineKeyboardButton>>
 ) : KeyboardMarkup()

@@ -5,7 +5,7 @@ import kotlinx.serialization.json.*
 import ru.raysmith.tgbot.model.network.chat.member.*
 
 object ChatMemberSerializer : JsonContentPolymorphicSerializer<ChatMember>(ChatMember::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out ChatMember> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ChatMember> {
         require(element is JsonObject)
 
         val statusElement = element["status"] ?: throw IllegalArgumentException("ChatMember response has no status field")

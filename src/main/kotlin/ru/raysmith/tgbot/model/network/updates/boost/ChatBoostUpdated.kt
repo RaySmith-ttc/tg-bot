@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.model.network.updates.boost
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.chat.Chat
 
@@ -8,8 +9,8 @@ import ru.raysmith.tgbot.model.network.chat.Chat
 data class ChatBoostUpdated(
 
     /** Chat which was boosted */
-    val chat: Chat,
+    @SerialName("chat") val chat: Chat,
 
     /** Information about the chat boost */
-    val boost: ChatBoost
+    @SerialName("boost") val boost: ChatBoost
 )
