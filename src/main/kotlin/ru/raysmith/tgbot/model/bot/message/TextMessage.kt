@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
@@ -26,16 +27,15 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     /** [Parse mode][ParseMode] for a simple text */
     var parseMode: ParseMode? = null
 
-    /** Disables link previews for links in this message */
-    var disableWebPagePreview = bot.botConfig.disableWebPagePreviews
+    /** Link preview generation options for the message */
+    var linkPreviewOptions = bot.botConfig.linkPreviewOptions
 
     /** Whether test should be truncated if text length is greater than 4096 */
     var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
 
@@ -61,11 +61,10 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
         text = getMessageText(),
         parseMode = getParseModeIfNeed(),
         entities = messageText?.getEntitiesString(),
-        disableWebPagePreview = disableWebPagePreview,
+        linkPreviewOptions = linkPreviewOptions,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 
@@ -76,8 +75,8 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
         text = getMessageText(),
         parseMode = getParseModeIfNeed(),
         entities = messageText?.getEntitiesString(),
-        replyMarkup = keyboardMarkup?.toMarkup(),
-        disableWebPagePreview = disableWebPagePreview
+        linkPreviewOptions = linkPreviewOptions,
+        replyMarkup = keyboardMarkup?.toMarkup()
     )
 
     suspend fun datePicker(datePicker: DatePicker, data: String? = null) {

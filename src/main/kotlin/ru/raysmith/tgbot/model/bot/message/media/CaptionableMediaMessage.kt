@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.noimpl
 import ru.raysmith.tgbot.utils.withSafeLength
 
@@ -31,6 +32,7 @@ abstract class CaptionableMediaMessage :
                 override val bot: Bot = bot
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
+                override var replyParameters: ReplyParameters? = null
 
                 override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?

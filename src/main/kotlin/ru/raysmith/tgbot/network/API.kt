@@ -37,17 +37,18 @@ import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.MessageId
-import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.message.*
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.network.updates.boost.UserChatBoosts
 import java.io.InputStream
 import java.time.ZonedDateTime
 import kotlin.time.Duration
+
+// TODO missed docs + check alt. method in BotContext
 
 interface API {
     val botConfig: BotConfig
@@ -202,19 +203,22 @@ interface API {
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
      *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param text Text of the message to be sent, 1-4096 characters after entities parsing
      * @param parseMode [ParseMode] for parsing entities in the message text.
-     * @param entities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
-     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param entities List of special entities that appear in message text, which can be specified instead
+     * of *[parseMode]*
+     * @param linkPreviewOptions Link preview generation options for the message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param keyboardMarkup Additional interface options. Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
-     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user.
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param replyParameters Description of the message to reply to
+     * @param keyboardMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun sendMessage(
         chatId: ChatId,
@@ -222,11 +226,10 @@ interface API {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = botConfig.disableWebPagePreviews,
+        linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendMessage") {
@@ -235,25 +238,26 @@ interface API {
             parameter("text", text)
             parameter("parse_mode", parseMode)
             parameter("entities", entities)
-            parameter("disable_web_page_preview", disableWebPagePreview)
+            parameter("link_preview_options", linkPreviewOptions)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
 
     /**
-     * Use this method to forward messages of any kind. Service messages can't be forwarded. On success, the sent [Message] is returned.
+     * Use this method to forward messages of any kind. Service messages can't be forwarded.
+     * On success, the sent [Message] is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param fromChatId Unique identifier for the chat where the original message was sent
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the forwarded message from forwarding and saving
      * @param messageId Message identifier in the chat specified in [fromChatId]
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     *
      * */
     suspend fun forwardMessage(
         chatId: ChatId,
@@ -274,7 +278,42 @@ interface API {
     }
 
     /**
-     * Use this method to copy messages of any kind. Service messages and invoice messages can't be copied.
+     * Use this method to forward multiple messages of any kind. If some of the specified messages can't be found or
+     * forwarded, they are skipped. Service messages and messages with protected content can't be forwarded.
+     * Album grouping is kept for forwarded messages. On success, the sent [Message] is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param fromChatId Unique identifier for the chat where the original message was sent
+     * @param messageIds A list of 1-100 identifiers of messages in the chat [fromChatId] to forward.
+     * The identifiers must be specified in a strictly increasing order.
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the forwarded message from forwarding and saving
+     * */
+    suspend fun forwardMessages(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        fromChatId: ChatId,
+        messageIds: List<Int>,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+    ) = request<List<MessageId>> {
+        client.post("forwardMessages") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("from_chat_id", fromChatId)
+            parameter("message_ids", messageIds)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+        }
+    }
+
+    /**
+     * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
+     * and invoice messages can't be copied. A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only
+     * if the value of the field [correctOptionId][Poll.correctOptionId] is known to the bot.
      * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
      *
@@ -291,9 +330,7 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
-     * replied-to message is not found
+     * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
@@ -309,8 +346,7 @@ interface API {
         captionEntities: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<MessageId> {
         client.post("copyMessage") {
@@ -323,8 +359,63 @@ interface API {
             parameter("caption_entities", captionEntities)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
+            parameter("reply_markup", replyMarkup)
+        }
+    }
+
+    /**
+     * Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
+     * they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't
+     * be copied. A quiz poll can be copied only if the value of the field [correctOptionId][Poll.correctOptionId] is
+     * known to the bot. The method is analogous to the method [forwardMessages], but the copied messages don't have
+     * a link to the original message. Album grouping is kept for copied messages.
+     * On success, an array of [MessageId] of the sent messages is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param fromChatId Unique identifier for the chat where the original message was sent
+     * @param messageIds A list of 1-100 identifiers of messages in the chat [fromChatId] to copy. T
+     * he identifiers must be specified in a strictly increasing order.
+     * @param caption New caption for media, 0-1024 characters after entities parsing.
+     * If not specified, the original caption is kept
+     * @param parseMode [ParseMode] for parsing entities in the message caption.
+     * @param captionEntities List of special entities that appear in message text,
+     * which can be specified instead of *[parseMode]*
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param replyParameters Description of the message to reply to
+     * @param replyMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
+     * */
+    suspend fun copyMessages(
+        chatId: ChatId,
+        messageThreadId: Int? = null,
+        fromChatId: ChatId,
+        messageIds: List<Int>,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
+        replyMarkup: KeyboardMarkup? = null,
+    ) = request<List<MessageId>> {
+        client.post("copyMessages") {
+            parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("from_chat_id", fromChatId)
+            parameter("message_ids", messageIds)
+            parameter("caption", caption)
+            parameter("parse_mode", parseMode)
+            parameter("caption_entities", captionEntities)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
         }
     }
@@ -349,9 +440,7 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
-     * replied-to message is not found
+     * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
@@ -367,8 +456,7 @@ interface API {
         parseMode: ParseMode? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendPhoto") {
@@ -380,8 +468,7 @@ interface API {
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
             setMultiPartFormDataBody(
                 "photo" to photo,
@@ -411,9 +498,7 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified
-     * replied-to message is not found
+     * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
@@ -432,8 +517,7 @@ interface API {
         thumbnail: NotReusableInputFile? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendAudio") {
@@ -447,8 +531,7 @@ interface API {
             parameter("title", title)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
             setMultiPartFormDataBody(
                 "audio" to audio,
@@ -468,8 +551,7 @@ interface API {
         disableContentTypeDetection: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendDocument") {
@@ -481,8 +563,7 @@ interface API {
             parameter("disable_content_type_detection", disableContentTypeDetection)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "document" to document,
@@ -505,8 +586,7 @@ interface API {
         supportsStreaming: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendVideo") {
@@ -522,8 +602,7 @@ interface API {
             parameter("supports_streaming", supportsStreaming)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "video" to video
@@ -545,8 +624,7 @@ interface API {
         hasSpoiler: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendAnimation") {
@@ -562,8 +640,7 @@ interface API {
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "animation" to animation
@@ -581,8 +658,7 @@ interface API {
         duration: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendVoice") {
@@ -594,8 +670,7 @@ interface API {
             parameter("duration", duration)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "voice" to voice
@@ -611,8 +686,7 @@ interface API {
         length: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendVideoNote") {
@@ -622,8 +696,7 @@ interface API {
             parameter("length", length)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "video_note" to videoNote
@@ -639,25 +712,22 @@ interface API {
      * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass True, if the message should be sent even if the specified replied-to message is not found
+     * @param replyParameters Description of the message to reply to
      * */
     suspend fun sendMediaGroup(
         chatId: ChatId,
         messageThreadId: Int? = null,
         media: List<InputMediaGroup>,
         disableNotification: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
-        inputFiles: List<InputFile>? = null // TODO     docs
+        replyParameters: ReplyParameters? = null,
+        inputFiles: List<InputFile>? = null // TODO docs
     ) = request<List<Message>> {
         client.post("sendMediaGroup") {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
             parameter("media", media)
             parameter("disable_notification", disableNotification)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             if (inputFiles != null) {
                 var lastInputFilesIndex = 0
                 setMultiPartFormDataBody(
@@ -690,8 +760,7 @@ interface API {
         proximityAlertRadius: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendLocation") {
@@ -705,8 +774,7 @@ interface API {
             parameter("proximity_alert_radius", proximityAlertRadius)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
@@ -724,8 +792,7 @@ interface API {
         googlePlaceType: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendVenue") {
@@ -741,8 +808,7 @@ interface API {
             parameter("google_place_type", googlePlaceType)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
@@ -756,8 +822,7 @@ interface API {
         vcard: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendContact") {
@@ -769,8 +834,7 @@ interface API {
             parameter("vcard", vcard)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
@@ -792,8 +856,7 @@ interface API {
         isClosed: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendPoll") {
@@ -813,8 +876,7 @@ interface API {
             parameter("is_closed", isClosed)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
@@ -825,8 +887,7 @@ interface API {
         emoji: String,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendDice") {
@@ -835,8 +896,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
     }
@@ -850,6 +910,35 @@ interface API {
             parameter("chat_id", chatId)
             parameter("action", action)
             parameter("message_thread_id", messageThreadId)
+        }
+    }
+
+    /**
+     * Use this method to change the chosen reactions on a message. Service messages can't be reacted to.
+     * Automatically forwarded messages from a channel to its discussion group have the same available reactions as
+     * messages in the channel. Returns *True* on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of the target message. If the message belongs to a media group, the reaction is set
+     * to the first non-deleted message in the group instead.
+     * @param reaction A JSON-serialized list of reaction types to set on the message. Currently, as non-premium users,
+     * bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present
+     * on the message or explicitly allowed by chat administrators.
+     *
+     * @param isBig Pass *True* to set the reaction with a big animation
+     * */
+    suspend fun setMessageReaction(
+        chatId: ChatId,
+        messageId: Int,
+        reaction: List<ReactionType>,
+        isBig: Boolean,
+    ) = request<Boolean> {
+        client.post("setMessageReaction") {
+            parameter("chat_id", chatId)
+            parameter("message_id", messageId)
+            parameter("reaction", reaction)
+            parameter("is_big", isBig)
         }
     }
 
@@ -982,10 +1071,10 @@ interface API {
      * Pass _False_ for all boolean parameters to demote a user. Returns *True* on success.
      *
      * @param userId Unique identifier of the target user
-     * @param administratorRights New administrator rights
+     * @param administratorRights New administrator rights // TODO docs
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    suspend fun promoteChatMember( // TODO docs
+    suspend fun promoteChatMember(
         chatId: ChatId,
         userId: ChatId.ID,
         isAnonymous: Boolean? = null,
@@ -1733,6 +1822,20 @@ interface API {
     }
 
     /**
+     * Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat.
+     * Returns a [UserChatBoosts] object.
+     * */
+    suspend fun getUserChatBoosts(
+        chatId: ChatId,
+        userId: ChatId.ID
+    ) = request<UserChatBoosts> {
+        client.post("getUserChatBoosts") {
+            parameter("chat_id", chatId)
+            parameter("user_id", userId)
+        }
+    }
+
+    /**
      * Use this method to change the list of the bot's commands.
      *
      * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands.
@@ -1966,7 +2069,7 @@ interface API {
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param entities A JSON-serialized list of special entities that appear in message text,
      * which can be specified instead of parseMode
-     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param linkPreviewOptions Link preview generation options for the message
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageText(
@@ -1976,7 +2079,7 @@ interface API {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = botConfig.disableWebPagePreviews,
+        linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageText") {
@@ -1986,7 +2089,7 @@ interface API {
             parameter("text", text)
             parameter("parse_mode", parseMode)
             parameter("entities", entities)
-            parameter("disable_web_page_preview", disableWebPagePreview)
+            parameter("link_preview_options", linkPreviewOptions )
             parameter("reply_markup", replyMarkup)
         }
     }
@@ -2163,6 +2266,20 @@ interface API {
         }
     }
 
+    /**
+     * Use this method to delete multiple messages simultaneously. If some of the specified messages can't be found,
+     * they are skipped. Returns *True* on success.
+     * */
+    suspend fun deleteMessages(
+        chatId: ChatId,
+        messageIds: List<Int>,
+    ) = request<Boolean> {
+        client.post("deleteMessages") {
+            parameter("chat_id", chatId)
+            parameter("message_ids", messageIds)
+        }
+    }
+
     suspend fun sendSticker(
         chatId: ChatId,
         messageThreadId: Int? = null,
@@ -2170,8 +2287,7 @@ interface API {
         emoji: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("sendSticker") {
@@ -2180,8 +2296,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
                 "sticker" to sticker
@@ -2566,8 +2681,7 @@ interface API {
      * @param isFlexible Pass *True*, if the final price depends on the shipping method
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to
+     * @param replyParameters Description of the message to reply to
      * message is not found
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
@@ -2597,8 +2711,7 @@ interface API {
         sendEmailToProvider: Boolean? = null,
         isFlexible: Boolean? = null,
         disableNotification: Boolean? = null,
-        replyToMessageId: Long? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         replyMarkup: InlineKeyboardMarkup? = null
     ) = request<Message> {
         client.post("sendInvoice") {
@@ -2626,8 +2739,7 @@ interface API {
             parameter("send_email_to_provider", sendEmailToProvider)
             parameter("is_flexible", isFlexible)
             parameter("disable_notification", disableNotification)
-            parameter("reply_to_message_id", replyToMessageId)
-            parameter("allow_sending_without_reply", allowSendingWithoutReply)
+            parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
         }
     }

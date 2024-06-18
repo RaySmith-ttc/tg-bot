@@ -11,6 +11,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.withSafeLength
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -23,8 +24,7 @@ class PollMessage(
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
     override var protectContent: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
@@ -77,8 +77,7 @@ class PollMessage(
         isClosed = isClosed,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

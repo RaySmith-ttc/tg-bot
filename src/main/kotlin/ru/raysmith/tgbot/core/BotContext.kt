@@ -15,9 +15,8 @@ import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.MessageId
-import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.*
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
 import ru.raysmith.tgbot.model.network.sticker.CreateNewStickerInStickerSet
 import ru.raysmith.tgbot.network.API
 import java.time.ZonedDateTime
@@ -37,34 +36,36 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      *
      * @param text Text of the message to be sent, 1-4096 characters after entities parsing
      * @param parseMode [ParseMode] for parsing entities in the message text.
-     * @param entities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
-     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param entities List of special entities that appear in message text, which can be specified instead
+     * of *[parseMode]*
+     * @param linkPreviewOptions Link preview generation options for the message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+     * @param replyParameters Description of the message to reply to
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param chatId Unique identifier for the target chat or username of the target channel
-     * @param keyboardMarkup [KeyboardCreator] builder for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
-     * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user
+     * @param keyboardMarkup [KeyboardCreator] builder for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user
      * */
     suspend fun sendMessage(
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
+        linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         messageThreadId: Int? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): Message {
         return sendMessage(
-            chatId, messageThreadId, text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
+            chatId, messageThreadId, text, parseMode, entities, linkPreviewOptions, disableNotification, protectContent,
+            replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
 
@@ -91,8 +92,36 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     }
 
     /**
-     * Use this method to copy messages of any kind. Service messages and invoice messages can't be copied.
-     * The method is analogous to the method forwardMessage, but the copied message doesn't have a link to the
+     * Use this method to forward messages of any kind. Service messages can't be forwarded.
+     * On success, the sent [Message] is returned.
+     *
+     * @param fromChatId Unique identifier for the chat where the original message was sent
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the forwarded message from forwarding and saving
+     * @param messageIds A list of 1-100 identifiers of messages in the chat [fromChatId] to forward.
+     * The identifiers must be specified in a strictly increasing order.
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     *
+     *  */
+    suspend fun forwardMessages(
+        fromChatId: ChatId,
+        messageIds: List<Int>,
+        messageThreadId: Int? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): List<MessageId> {
+        return forwardMessages(chatId, messageThreadId, fromChatId, messageIds, disableNotification, protectContent)
+    }
+
+    /**
+     * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
+     * and invoice messages can't be copied. A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only
+     * if the value of the field [correctOptionId][Poll.correctOptionId] is known to the bot.
+     * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
      *
      * @param fromChatId Unique identifier for the chat where the original message was sent
@@ -101,11 +130,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param caption New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
      * @param parseMode [ParseMode] for parsing entities in the message caption.
      * @param captionEntities List of special entities that appear in message text, which can be specified instead of *[parseMode]*
-     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param showCaptionAboveMedia *True*, if the caption must be shown above the message media. Ignored if a new caption isn't specified.
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
-     * @param replyToMessageId If the message is a reply, ID of the original message
-     * @param allowSendingWithoutReply Pass *True*, if the message should be sent even if the specified replied-to message is not found
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param replyParameters Description of the message to reply to
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [KeyboardCreator] builder for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards), instructions to remove reply keyboard or to force a reply from the user
@@ -117,17 +146,89 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
+        showCaptionAboveMedia: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
-        replyToMessageId: Int? = null,
-        allowSendingWithoutReply: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): MessageId {
         return copyMessage(
             chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
-            replyToMessageId, allowSendingWithoutReply, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
+            replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
+    }
+
+    /**
+     * Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
+     * they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't
+     * be copied. A quiz poll can be copied only if the value of the field [correctOptionId][Poll.correctOptionId] is
+     * known to the bot. The method is analogous to the method [forwardMessages], but the copied messages don't have
+     * a link to the original message. Album grouping is kept for copied messages.
+     * On success, an array of [MessageId] of the sent messages is returned.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
+     * @param fromChatId Unique identifier for the chat where the original message was sent
+     * @param messageIds A list of 1-100 identifiers of messages in the chat [fromChatId] to copy. T
+     * he identifiers must be specified in a strictly increasing order.
+     * @param caption New caption for media, 0-1024 characters after entities parsing.
+     * If not specified, the original caption is kept
+     * @param parseMode [ParseMode] for parsing entities in the message caption.
+     * @param captionEntities List of special entities that appear in message text,
+     * which can be specified instead of *[parseMode]*
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param replyParameters Description of the message to reply to
+     * @param keyboardMarkup Additional interface options. Object for an
+     * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
+     * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
+     * instructions to remove reply keyboard or to force a reply from the user.
+     * */
+    suspend fun copyMessages(
+        fromChatId: ChatId,
+        messageIds: List<Int>,
+        messageThreadId: Int? = null,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: String? = null,
+        showCaptionAboveMedia: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
+        chatId: ChatId = getChatIdOrThrow(),
+        keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
+    ): List<MessageId> {
+        return copyMessages(
+            chatId, messageThreadId, fromChatId, messageIds, caption, parseMode, captionEntities, disableNotification, protectContent,
+            replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
+        )
+    }
+
+    /**
+     * Use this method to change the chosen reactions on a message. Service messages can't be reacted to.
+     * Automatically forwarded messages from a channel to its discussion group have the same available reactions as
+     * messages in the channel. Returns *True* on success.
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * (in the format `@channelusername`)
+     * @param messageId Identifier of the target message. If the message belongs to a media group, the reaction is set
+     * to the first non-deleted message in the group instead.
+     * @param reaction A JSON-serialized list of reaction types to set on the message. Currently, as non-premium users,
+     * bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present
+     * on the message or explicitly allowed by chat administrators.
+     *
+     * @param isBig Pass *True* to set the reaction with a big animation
+     * */
+    suspend fun setMessageReaction(
+        messageId: Int,
+        reaction: List<ReactionType>,
+        isBig: Boolean,
+        chatId: ChatId = getChatIdOrThrow(),
+    ): Boolean {
+        return setMessageReaction(chatId, messageId, reaction, isBig)
     }
 
     /**
@@ -727,7 +828,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param entities A JSON-serialized list of special entities that appear in message text,
      * which can be specified instead of parseMode
-     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param linkPreviewOptions Link preview generation options for the message
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
@@ -738,12 +839,12 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
-        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
+        linkPreviewOptions: LinkPreviewOptions? = bot.botConfig.linkPreviewOptions,
         chatId: ChatId? = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageText(
-            chatId, messageId, inlineMessageId, text, parseMode, entities, disableWebPagePreview,
+            chatId, messageId, inlineMessageId, text, parseMode, entities, linkPreviewOptions,
             keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
@@ -758,7 +859,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param captionEntities A JSON-serialized list of special entities that appear in the caption,
      * which can be specified instead of parseMode
-     * @param disableWebPagePreview Disables link previews for links in this message
+     * @param linkPreviewOptions Link preview generation options for the message
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
@@ -769,7 +870,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         caption: String,
         parseMode: ParseMode? = null,
         captionEntities: String? = null,
-        disableWebPagePreview: Boolean? = bot.botConfig.disableWebPagePreviews,
+        linkPreviewOptions: LinkPreviewOptions? = bot.botConfig.linkPreviewOptions,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {

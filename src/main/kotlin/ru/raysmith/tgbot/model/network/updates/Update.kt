@@ -9,8 +9,12 @@ import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 import ru.raysmith.tgbot.model.network.chat.member.ChatMemberUpdated
 import ru.raysmith.tgbot.model.network.inline.InlineQuery
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionCountUpdated
+import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionUpdated
 import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
 import ru.raysmith.tgbot.model.network.payment.ShippingQuery
+import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostRemoved
+import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostUpdated
 
 /**
  * This object represents an incoming update.
@@ -38,6 +42,20 @@ data class Update(
 
     /** New version of a channel post that is known to the bot and was edited */
     @SerialName("edited_channel_post") val editedChannelPost: Message? = null,
+
+    /**
+     * A reaction to a message was changed by a user. The bot must be an administrator in the chat and must explicitly
+     * specify "message_reaction" in the list of *allowed_updates* to receive these updates.
+     * The update isn't received for reactions set by bots.
+     * */
+    val messageReaction: MessageReactionUpdated? = null,
+
+    /**
+     * Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the chat and
+     * must explicitly specify "message_reaction_count" in the list of *allowed_updates* to receive these updates.
+     * The updates are grouped and can be sent with delay up to a few minutes.
+     * */
+    val messageReactionCount: MessageReactionCountUpdated? = null,
 
     /** New incoming inline query */
     @SerialName("inline_query") val inlineQuery: InlineQuery? = null,
@@ -83,7 +101,13 @@ data class Update(
      * */
     @SerialName("chat_join_request") val chatJoinRequest: ChatJoinRequest? = null,
 
-    ) {
+    /** A chat boost was added or changed. The bot must be an administrator in the chat to receive these updates. */
+    @SerialName("chat_boost") val chatBoost: ChatBoostUpdated? = null,
+
+    /** A boost was removed from a chat. The bot must be an administrator in the chat to receive these updates. */
+    @SerialName("removed_chat_boost") val removedChatBoost: ChatBoostRemoved? = null,
+
+) {
 
     /** Type of update. Null if unknown */
     val type: UpdateType? = when {
@@ -101,6 +125,8 @@ data class Update(
         shippingQuery != null -> UpdateType.SHIPPING_QUERY
         preCheckoutQuery != null -> UpdateType.PRE_CHECKOUT_QUERY
         chatJoinRequest != null -> UpdateType.CHAT_JOIN_REQUEST
+        messageReaction != null -> UpdateType.MESSAGE_REACTION
+        messageReactionCount != null -> UpdateType.MESSAGE_REACTION_COUNT
         else -> null
     }
 
@@ -120,6 +146,8 @@ data class Update(
         UpdateType.SHIPPING_QUERY -> shippingQuery!!.from
         UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.from
         UpdateType.CHAT_JOIN_REQUEST -> chatJoinRequest!!.from
+        UpdateType.MESSAGE_REACTION -> messageReaction!!.user
+        UpdateType.MESSAGE_REACTION_COUNT -> null
         null -> null
     }
 
@@ -139,6 +167,8 @@ data class Update(
         UpdateType.SHIPPING_QUERY -> shippingQuery!!.getChatId()
         UpdateType.PRE_CHECKOUT_QUERY -> preCheckoutQuery!!.getChatId()
         UpdateType.CHAT_JOIN_REQUEST -> chatJoinRequest!!.getChatId()
+        UpdateType.MESSAGE_REACTION -> messageReaction!!.getChatId()
+        UpdateType.MESSAGE_REACTION_COUNT -> messageReactionCount!!.getChatId()
         null -> null
     }
 

@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeEmoji
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.toChatId
 
@@ -40,6 +42,12 @@ data class Chat(
      * */
     @SerialName("is_forum") val isForum: Boolean? = null,
 
+    /**
+     * Identifier of the accent color for the chat name and backgrounds of the chat photo, reply header,
+     * and link preview. See [accent colors][AccentColors] for more details.
+     * */
+    val accentColorId: Int? = null,
+
     /** Chat photo. Returned only in [getChat][API.getChat]. */
     @SerialName("photo") val photo: ChatPhoto? = null,
 
@@ -49,6 +57,24 @@ data class Chat(
      * for private chats, supergroups and channels. Returned only in [getChat][BotContext.getChat].
      * */
     @SerialName("active_usernames") val activeUsernames: List<String>? = null,
+
+    /**
+     * List of available reactions allowed in the chat. If omitted, then all [emoji reactions][ReactionTypeEmoji.emoji]
+     * are allowed.
+     * */
+    val availableReactions: List<ReactionType>? = null,
+
+    /** Custom emoji identifier of the emoji chosen by the chat for the reply header and link preview background */
+    val backgroundCustomEmojiId: String? = null,
+
+    /**
+     * Identifier of the accent color for the chat's profile background.
+     * See [profile accent colors][ProfileAccentColors] for more details.
+     * */
+    val profileAccentColorId: String? = null,
+
+    /** Custom emoji identifier of the emoji chosen by the chat for its profile background */
+    val profileBackgroundCustomEmojiId: String? = null,
 
     /**
      * Custom emoji identifier of emoji status of the other party in a private chat.
@@ -140,6 +166,9 @@ data class Chat(
      * The field is only available to chat administrators. Returned only in [getChat][BotContext.getChat].
      * */
     @SerialName("has_protected_content") val hasProtectedContent: Boolean? = null,
+
+    /** *True*, if new chat members will have access to old messages; available only to chat administrators */
+    val hasVisibleHistory: Boolean? = null,
 
     /**
      * For supergroups, name of group sticker set. Returned only in [getChat][BotContext.getChat].

@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.withSafeLength
 
 class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<Message>>, BotHolder {
@@ -22,8 +23,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
 
     /** send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action while upload files to telegram server */
     var sendAction = false
@@ -57,8 +57,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 messageThreadId = messageThreadId,
                 media = inputMedia,
                 disableNotification = disableNotification,
-                replyToMessageId = replyToMessageId,
-                allowSendingWithoutReply = allowSendingWithoutReply,
+                replyParameters = replyParameters
             )
         } else {
             if (sendAction) {
@@ -80,8 +79,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 messageThreadId = messageThreadId,
                 media = inputMedia,
                 disableNotification = disableNotification,
-                replyToMessageId = replyToMessageId,
-                allowSendingWithoutReply = allowSendingWithoutReply,
+                replyParameters = replyParameters,
                 inputFiles = inputFiles
             )
         }

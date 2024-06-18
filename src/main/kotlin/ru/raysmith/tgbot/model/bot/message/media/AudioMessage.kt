@@ -35,8 +35,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb() {
         thumbnail = thumbnail,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup()
     )
 }

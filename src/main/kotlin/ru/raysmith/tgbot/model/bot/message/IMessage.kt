@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.network.API
 
 interface IMessage<T> : API {
@@ -20,11 +21,8 @@ interface IMessage<T> : API {
      * */
     var disableNotification: Boolean?
 
-    /** If the message is a reply, ID of the original message */
-    var replyToMessageId: Int?
-
-    /** Pass True, if the message should be sent even if the specified replied-to message is not found */
-    var allowSendingWithoutReply: Boolean?
+    /** Description of the message to reply to */
+    var replyParameters: ReplyParameters?
 
     /** Protects the contents of the sent message from forwarding and saving */
     var protectContent: Boolean?

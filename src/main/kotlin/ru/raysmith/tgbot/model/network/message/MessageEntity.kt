@@ -93,7 +93,10 @@ data class MessageEntity(
                 "![$string]${customEmojiId?.let { "(tg://emoji?id=$it)" } ?: ""}",
                 string
             )
-            else -> string
+            MessageEntityType.BLOCKQUOTE -> getForParseMode("<blockquote>$string</blockquote>", string, ">$string")
+            MessageEntityType.EXPANDABLE_BLOCKQUOTE -> getForParseMode("<blockquote expandable>$string</blockquote>", string, "**>$string")
+            MessageEntityType.HASHTAG, MessageEntityType.CASHTAG, MessageEntityType.BOT_COMMAND,
+            MessageEntityType.EMAIL, MessageEntityType.PHONE_NUMBER -> string
         }
     }
 }

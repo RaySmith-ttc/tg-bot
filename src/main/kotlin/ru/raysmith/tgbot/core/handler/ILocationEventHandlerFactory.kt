@@ -63,6 +63,12 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
 
     @HandlerDsl
     fun handleChatJoinRequest(handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit))
+
+    @HandlerDsl
+    fun handleMessageReaction(handler: suspend (context(T) LocationMessageReactionHandler<T>.() -> Unit))
+
+    @HandlerDsl
+    fun handleMessageReactionCount(handler: suspend (context(T) LocationMessageReactionCountHandler<T>.() -> Unit))
 }
 
 @HandlerDsl
@@ -88,6 +94,8 @@ class LocationEventHandlerFactory<T : LocationConfig>(
     private val myChatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
     private val chatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
     private val chatJoinRequestHandler: MutableList<LocationChatJoinRequestHandlerData<T>> = mutableListOf()
+    private val messageReactionHandler: MutableList<LocationMessageReactionHandlerData<T>> = mutableListOf()
+    private val messageReactionCountHandler: MutableList<LocationMessageReactionCountHandlerData<T>> = mutableListOf()
 
     private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
 
@@ -108,6 +116,8 @@ class LocationEventHandlerFactory<T : LocationConfig>(
         myChatMemberHandler.clear()
         chatMemberHandler.clear()
         chatJoinRequestHandler.clear()
+        messageReactionHandler.clear()
+        messageReactionCountHandler.clear()
         unknownHandler = { }
     }
 
@@ -167,6 +177,14 @@ class LocationEventHandlerFactory<T : LocationConfig>(
 
         UpdateType.CHAT_JOIN_REQUEST -> LocationChatJoinRequestHandler(
             update, bot, chatJoinRequestHandler, locationsWrapper
+        )
+
+        UpdateType.MESSAGE_REACTION -> LocationMessageReactionHandler(
+            update, bot, messageReactionHandler, locationsWrapper
+        )
+
+        UpdateType.MESSAGE_REACTION_COUNT -> LocationMessageReactionCountHandler(
+            update, bot, messageReactionCountHandler, locationsWrapper
         )
 
         null -> UnknownEventHandler(update, bot, unknownHandler)
@@ -269,5 +287,17 @@ class LocationEventHandlerFactory<T : LocationConfig>(
     override fun handleChatJoinRequest(handler: suspend (context(T) LocationChatJoinRequestHandler<T>.() -> Unit)) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler.add(LocationChatJoinRequestHandlerData(handler))
+    }
+
+    @HandlerDsl
+    override fun handleMessageReaction(handler: suspend (context(T) LocationMessageReactionHandler<T>.() -> Unit)) {
+        allowedUpdates.add(UpdateType.MESSAGE_REACTION)
+        messageReactionHandler.add(LocationMessageReactionHandlerData(handler))
+    }
+
+    @HandlerDsl
+    override fun handleMessageReactionCount(handler: suspend (context(T) LocationMessageReactionCountHandler<T>.() -> Unit)) {
+        allowedUpdates.add(UpdateType.MESSAGE_REACTION_COUNT)
+        messageReactionCountHandler.add(LocationMessageReactionCountHandlerData(handler))
     }
 }

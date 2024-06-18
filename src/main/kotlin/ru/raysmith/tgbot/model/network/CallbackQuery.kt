@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.MaybeInaccessibleMessage
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.getOrDefault
 
@@ -31,8 +31,8 @@ data class CallbackQuery(
     /** Sender */
     @SerialName("from") val from: User,
 
-    /** Message with the callback button that originated the query. Note that message content and message date will not be available if the message is too old */
-    @SerialName("message") val message: Message? = null,
+    /** Message sent by the bot with the callback button that originated the query*/
+    @SerialName("message") val message: MaybeInaccessibleMessage? = null,
 
     /** Identifier of the message sent via the bot in inline mode, that originated the query. */
     @SerialName("inline_message_id") val inlineMessageId: String? = null,

@@ -55,7 +55,7 @@ class MessageReplyKeyboard : MessageKeyboard {
     @Serializable
     class Button : MessageKeyboardButton {
         var text: String = ""
-        var requestUser: KeyboardButtonRequestUser? = null
+        var requestUser: KeyboardButtonRequestUsers? = null
         var requestChat:  KeyboardButtonRequestChat? = null
         var requestContact: Boolean? = null
         var requestLocation: Boolean? = null

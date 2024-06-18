@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
 class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
     override val client: HttpClient = bot.client
@@ -21,6 +22,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
 
     override val mediaName: String = "sticker"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var replyParameters: ReplyParameters? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendSticker(
         chatId = chatId,
@@ -29,8 +31,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
         emoji = emoji,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

@@ -29,7 +29,7 @@ import ru.raysmith.tgbot.model.network.inline.content.InputTextMessageContent
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultArticle
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonPollType
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestChat
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestUser
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestUsers
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.media.input.InputMediaPhoto
 import ru.raysmith.tgbot.model.network.media.input.asTgFile
@@ -37,10 +37,8 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.MessageEntityType
-import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.PollType
+import ru.raysmith.tgbot.model.network.message.*
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeEmoji
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.response.BooleanResponse
 import ru.raysmith.tgbot.model.network.response.MessageResponse
@@ -133,25 +131,71 @@ val datePicker = createDatePicker("sys") {
 }
 
 fun MessageText.setupTestMessage(message: Message) {
-    text("text").n()
-    underline("Hello").n()
-    bold("Phone: ").phoneNumber("+79876543210").n()
-    bold("Phone: ").phoneNumber("+79876543210").n()
-    italic("Lik: ").textLink("vk", "vk.com").n()
-    text("Mixed: ").strikethrough("qwe")
-        .mix("rty", MessageEntityType.STRIKETHROUGH, MessageEntityType.UNDERLINE)
-        .strikethrough("uio")
-        .mix("fgb", MessageEntityType.BOLD, MessageEntityType.UNDERLINE)
-        .n()
-    text("Mention: ").mention("@raysmithdev").n()
-    text("Text mention: ").textMention("ray", message.from!!).n()
-    spoiler("Spoiler").n()
-//    text("emoji: ").emoji("\uD83D\uDC4D")
-    text("custom emoji: ").emoji("\uD83D\uDC4D", "5368324170671202286")
+    bold("bold *text").n()
+    italic("italic *text").n()
+    underline("underline").n()
+    strikethrough("strikethrough").n()
+    spoiler("spoiler").n()
+
+    bold("bold ")
+        .mix("italic bold ", MessageEntityType.ITALIC, MessageEntityType.BOLD)
+        .mix("italic bold strikethrough ", MessageEntityType.ITALIC, MessageEntityType.BOLD, MessageEntityType.STRIKETHROUGH)
+        .mix("italic bold strikethrough spoiler ", MessageEntityType.ITALIC, MessageEntityType.BOLD, MessageEntityType.STRIKETHROUGH, MessageEntityType.SPOILER)
+        .mix("underline italic bold", MessageEntityType.UNDERLINE, MessageEntityType.ITALIC, MessageEntityType.BOLD)
+        .bold("bold").n()
+
+    textLink("inline URL", "https://www.example.com/").n()
+    mention("@raysmith").n()
+    textMention("inline mention of a user", message.from!!).n()
+    emoji("\uD83E\uDD26\uD83C\uDFFC\u200D♂\uFE0F", "1").n()
+    code("inline fixed-width code").n()
+    pre("pre-formatted fixed-width code block").n()
+    pre("pre-formatted fixed-width code block written in the Kotlin programming language", "kotlin").n()
+
+    blockquote("""
+        Block quotation started
+        Block quotation continued
+        Block quotation continued
+        Block quotation continued
+        The last line of the block quotation
+    """.trimIndent()).n()
+
+    expandableBlockquote("""
+        The expandable block quotation started right after the previous block quotation
+        It is separated from the previous block quotation by an empty bold entity
+        Expandable block quotation continued
+        Hidden by default part of the expandable block quotation started
+        Expandable block quotation continued
+        The last line of the expandable block quotation with the expandability mark
+    """.trimIndent()).n()
+
+    text("end line")
+
+
+//    text("text").n()
+//    underline("Hello").n()
+//    bold("Phone: ").phoneNumber("+79876543210").n()
+//    bold("Phone: ").phoneNumber("+79876543210").n()
+//    italic("Lik: ").textLink("vk", "vk.com").n()
+//    text("Mixed: ").strikethrough("qwe")
+//        .mix("rty", MessageEntityType.STRIKETHROUGH, MessageEntityType.UNDERLINE)
+//        .strikethrough("uio")
+//        .mix("fgb", MessageEntityType.BOLD, MessageEntityType.UNDERLINE)
+//        .n()
+//    text("Mention: ").mention("@raysmithdev").n()
+//    text("Text mention: ").textMention("ray", message.from!!).n()
+//    spoiler("Spoiler").n()
+////    text("emoji: ").emoji("\uD83D\uDC4D")
+//    text("custom emoji: ").emoji("\uD83D\uDC4D", "5368324170671202286").n()
+//    blockquote("blockquote").n()
+//    expandableBlockquote("expandableBlockquote").n()
+//
+//
+
 
     entity(MessageEntityType.STRIKETHROUGH) {
         offset = 2
-        length = 138
+        length = currentTextLength - 2
     }
 }
 
@@ -514,6 +558,14 @@ class Runner {
                     answerPreCheckoutQuery(true)
                 }
 
+                handleMessageReaction {
+                    println(messageReaction)
+                }
+
+                handleMessageReactionCount {
+                    println(messageReactionCount)
+                }
+
                 handleMessage {
                     messageUsersShared()
                         .onResult {
@@ -567,7 +619,7 @@ class Runner {
                             }
                         } else {
                             send {
-                                disableWebPagePreview = true
+                                linkPreviewOptions = LinkPreviewOptions.DISABLED
                                 textWithEntities {
                                     setupTestMessage(message)
                                 }
@@ -672,7 +724,7 @@ class Runner {
                                 row {
                                     button {
                                         text = "Select users"
-                                        requestUser = KeyboardButtonRequestUser(1, maxQuantity = 5)
+                                        requestUser = KeyboardButtonRequestUsers(1, maxQuantity = 5)
                                     }
                                 }
                             }
@@ -1343,11 +1395,14 @@ class Runner {
                         }
                     }
 
-                    isCommand("sendstiker") {
+                    isCommand("sendSticker") {
                         sendSticker {
-                            sticker = "BQACAgIAAxUHZRldlNqmhN8w1gHFbVBmGQupp7MAAs8yAAJubchIuSn03p5b2EQwBA".asTgFile()
+                            sticker = "CAACAgIAAxUAAWZvRYBa3vXOJahFYNgH5mmGcCd4AALZUAACca54S9ZsAAH860QmBjUE".asTgFile()
+//                            sticker = "CAACAgQAAxkDAAJcSmZvOk-vK_uIEi-2CVCO_x0FWkEQAAKYBQAC8NIlUftR5YrfrWgZNQQ".asTgFile()
 //                            sticker = "https://www.gstatic.com/webp/gallery/1.webp".asTgFile()
 //                            sticker = "files/image1.png".asResources().asTgFile()
+                        }.also {
+                            println(it)
                         }
                     }
 
@@ -1365,24 +1420,49 @@ class Runner {
                             return@isCommand
                         }
                         val (name, title) = args.split(" ")
-//                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, StickerFormat.STATIC) {
-//                            stickerType = StickerType.REGULAR
-//                            sticker("files/logo.png".asResources().asTgFile(), listOf("\uD83D\uDE0E"))
-//                        }
+
+                        val stickers = listOf(
+                            InputSticker(
+                                "files/logo.png".asResources().asTgFile(),
+                                StickerFormat.STATIC,
+                                listOf("\uD83D\uDE0E"),
+                                keywords = listOf("logo")
+                            )
+                        )
+
+                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, stickers)
+
+                        send(stickerSetShareLink(name))
                     }
 
-                    isCommand("getStickerSet") {
-                        val stickerSet = getStickerSet(stickerSetName("name"))
+                    isCommand("getStickerSet") { args ->
+                        if (args == null) {
+                            send("Bad syntax: /getStickerSet <name>")
+                            return@isCommand
+                        }
+
+                        val stickerSet = getStickerSet(stickerSetName(args))
                         println(stickerSet.toJson())
+//                        send(stickerSet)
                     }
 //
                     isCommand("addStickerToSet") { args ->
+                        if (args == null || args.count { it == ' ' } > 1) {
+                            send("Bad syntax: /getStickerSet <name> [file]")
+                            return@isCommand
+                        }
+
+                        val spaceIndex = args.lastIndexOf(' ').let { if (it == -1) null else it }
+                        val name = args.substring(0, spaceIndex ?: args.length)
+                        val file = if (spaceIndex == null) "CAACAgIAAxkBAAJK3GTziBDbwOYDCcleop0DHBMk9CdYAAITIgAChpJJS6Z_IJsc_IGpMAQ" else args.substring(spaceIndex + 1)
+
                         val sticker = InputSticker(
-                            (args ?: "CAACAgIAAxkBAAJK3GTziBDbwOYDCcleop0DHBMk9CdYAAITIgAChpJJS6Z_IJsc_IGpMAQ").asTgFile(),
+                            file.asTgFile(),
+                            StickerFormat.STATIC,
                             listOf("\uD83D\uDE08"),
                             keywords = listOf("asd")
                         )
-                        addStickerToSet(getChatIdOrThrow(), stickerSetName("name"), sticker)
+                        addStickerToSet(getChatIdOrThrow(), stickerSetName(name), sticker)
                     }
 
                     isCommand("setStickerSetThumbnail") {
@@ -1459,7 +1539,7 @@ class Runner {
                                 row {
                                     button {
                                         text = "user"
-                                        requestUser = KeyboardButtonRequestUser(1)
+                                        requestUser = KeyboardButtonRequestUsers(1)
                                     }
                                 }
                             }
@@ -1512,6 +1592,12 @@ class Runner {
 //                            getChatIdOrThrow(),
 //                            photo = "https://i.ibb.co/ZS7TT09/image.png".asTgFile()
 //                        )
+                    }
+
+                    isCommand("setMessageReaction") {
+                        setMessageReaction(messageId!!, listOf(
+                            ReactionTypeEmoji("🤡")
+                        ), isBig = true)
                     }
                 }
 

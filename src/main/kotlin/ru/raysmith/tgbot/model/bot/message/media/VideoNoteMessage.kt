@@ -29,8 +29,7 @@ class VideoNoteMessage(override val bot: Bot) : MediaMessage(), BotHolder {
         length = length,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

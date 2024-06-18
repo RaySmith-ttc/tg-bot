@@ -11,6 +11,7 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
 
+
 /**
  * Represents message text or caption as string with entities
  *
@@ -43,8 +44,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
     private val text: StringBuilder = StringBuilder()
 
     /** Current the message text length */
-    val currentTextLength: Int
-        get() = text.length
+    val currentTextLength: Int get() = text.length
 
     private var entities: MutableList<MessageEntity> = mutableListOf()
 
@@ -90,6 +90,8 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
     fun textLink(text: Any?, url: String) = appendEntity(MessageEntityType.TEXT_LINK, text, url = url)
     fun textMention(text: String?, user: User) = appendEntity(MessageEntityType.TEXT_MENTION, text, user = user)
     fun emoji(emoji: String?, id: String) = appendEntity(MessageEntityType.CUSTOM_EMOJI, emoji, customEmojiId = id)
+    fun blockquote(text: Any?) = appendEntity(MessageEntityType.BLOCKQUOTE, text)
+    fun expandableBlockquote(text: Any?) = appendEntity(MessageEntityType.EXPANDABLE_BLOCKQUOTE, text)
 
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
     fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {

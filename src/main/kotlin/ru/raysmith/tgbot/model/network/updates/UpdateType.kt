@@ -62,5 +62,11 @@ enum class UpdateType {
      * A request to join the chat has been sent. The bot must have the can_invite_users
      * administrator right in the chat to receive these updates.
      * */
-    @SerialName("chat_join_request") CHAT_JOIN_REQUEST
+    @SerialName("chat_join_request") CHAT_JOIN_REQUEST,
+
+    /** A reaction to a message was changed by a user */
+    @SerialName("message_reaction") MESSAGE_REACTION,
+
+    /** Reactions to a message with anonymous reactions were changed */
+    @SerialName("message_reaction_count") MESSAGE_REACTION_COUNT,
 }

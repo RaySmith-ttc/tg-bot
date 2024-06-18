@@ -37,8 +37,7 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
         supportsStreaming = supportsStreaming,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

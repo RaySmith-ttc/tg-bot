@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.UsersShared
 
 /**
- * This object defines the criteria used to request a suitable user.
- * The identifier of the selected user will be shared with the bot when the corresponding button is pressed.
+ * This object defines the criteria used to request suitable users.
+ * Information about the selected users will be shared with the bot when the corresponding button is pressed.
  * [More about requesting users »](https://core.telegram.org/bots/features#chat-and-user-selection)
  * */
 @Serializable
-data class KeyboardButtonRequestUser(
+data class KeyboardButtonRequestUsers(
 
     /**
      * Identifier of the request, which will be received back in the [UsersShared] object.
@@ -30,8 +30,15 @@ data class KeyboardButtonRequestUser(
      * */
     @SerialName("user_is_premium") val userIsPremium: Boolean? = null,
 
-    /**
-     * The maximum number of users to be selected; 1-10. Defaults to 1.
-     * */
+    /** The maximum number of users to be selected; 1-10. Defaults to 1. */
     @SerialName("max_quantity") val maxQuantity: Int? = null,
+
+    /** Pass *True* to request the users' first and last names */
+    val requestName: Boolean? = null,
+
+    /** Pass *True* to request the users' usernames */
+    val requestUsername: Boolean? = null,
+
+    /** Pass *True* to request the users' photos */
+    val requestPhoto: Boolean? = null,
 )

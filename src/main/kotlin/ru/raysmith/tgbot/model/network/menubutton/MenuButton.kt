@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.menubutton
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.network.serializer.MenuButtonSerializer
 
 /**
  * This object describes the bot's menu button in a private chat. It should be one of

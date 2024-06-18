@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
 class ContactMessage(
     val phoneNumber: String, val firstName: String,
@@ -17,10 +18,9 @@ class ContactMessage(
     override val botConfig: BotConfig = bot.botConfig
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
     override var protectContent: Boolean? = null
     override var keyboardMarkup: MessageKeyboard? = null
+    override var replyParameters: ReplyParameters? = null
 
     var lastName: String? = null
     var vcard: String? = null
@@ -34,8 +34,7 @@ class ContactMessage(
         vcard = vcard,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

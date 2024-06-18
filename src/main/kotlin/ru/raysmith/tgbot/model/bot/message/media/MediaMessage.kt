@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
 abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
     protected abstract var sendChatAction: Boolean
@@ -13,8 +14,7 @@ abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
 }

@@ -9,6 +9,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 
@@ -119,11 +120,8 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
      * */
     var disableNotification: Boolean? = null
 
-    /** If the message is a reply, ID of the original message */
-    var replyToMessageId: Long? = null
-
-    /** Pass *True*, if the message should be sent even if the specified replied-to message is not found */
-    var allowSendingWithoutReply: Boolean? = null
+    /** Description of the message to reply to */
+    var replyParameters: ReplyParameters? = null
 
     /**
      * Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
@@ -156,8 +154,7 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
         sendEmailToProvider = sendEmailToProvider,
         isFlexible = isFlexible,
         disableNotification = disableNotification,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
     )
 }

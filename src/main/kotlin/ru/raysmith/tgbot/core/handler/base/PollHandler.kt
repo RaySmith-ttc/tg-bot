@@ -31,4 +31,3 @@ open class PollHandler(
         return PollHandler(poll, bot, handler).block()
     }
 }
-

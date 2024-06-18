@@ -28,8 +28,7 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup()
     )
 }

@@ -31,6 +31,8 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     private var myChatMemberHandler: (suspend (ChatMemberHandler.() -> Unit))? = null
     private var chatMemberHandler: (suspend (ChatMemberHandler.() -> Unit))? = null
     private var chatJoinRequestHandler: (suspend (ChatJoinRequestHandler.() -> Unit))? = null
+    private var messageReactionHandler: (suspend (MessageReactionHandler.() -> Unit))? = null
+    private var messageReactionCountHandler: (suspend (MessageReactionCountHandler.() -> Unit))? = null
 
     private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
 
@@ -51,6 +53,8 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
         myChatMemberHandler = null
         chatMemberHandler = null
         chatJoinRequestHandler = null
+        messageReactionHandler = null
+        messageReactionCountHandler = null
         unknownHandler = { }
     }
 
@@ -107,7 +111,6 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
                 update.pollAnswer!!, bot, pollAnswerHandler ?: return unknown()
             )
 
-
             UpdateType.MY_CHAT_MEMBER -> ChatMemberHandler(
                 update.myChatMember!!, bot, myChatMemberHandler ?: return unknown()
             )
@@ -118,6 +121,14 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
 
             UpdateType.CHAT_JOIN_REQUEST -> ChatJoinRequestHandler(
                 update.chatJoinRequest!!, bot, chatJoinRequestHandler ?: return unknown()
+            )
+
+            UpdateType.MESSAGE_REACTION -> MessageReactionHandler(
+                update.messageReaction!!, bot, messageReactionHandler ?: return unknown()
+            )
+
+            UpdateType.MESSAGE_REACTION_COUNT ->MessageReactionCountHandler(
+                update.messageReactionCount!!, bot, messageReactionCountHandler ?: return unknown()
             )
 
             null -> unknown()
@@ -215,6 +226,19 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
     fun handleChatJoinRequest(handler: suspend ChatJoinRequestHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler = handler
+    }
+
+    @HandlerDsl
+    fun handleMessageReaction(handler: suspend MessageReactionHandler.() -> Unit) {
+        allowedUpdates.add(UpdateType.MESSAGE_REACTION)
+        messageReactionHandler = handler
+    }
+
+
+    @HandlerDsl
+    fun handleMessageReactionCount(handler: suspend MessageReactionCountHandler.() -> Unit) {
+        allowedUpdates.add(UpdateType.MESSAGE_REACTION_COUNT)
+        messageReactionCountHandler = handler
     }
 
     @HandlerDsl

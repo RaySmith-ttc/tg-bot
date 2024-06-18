@@ -18,13 +18,13 @@ data class KeyboardButton(
      * it will be sent as a message when the button is pressed
      * */
     @SerialName("text") val text: String,
-    
+
     /**
      * If specified, pressing the button will open a list of suitable users.
      * Tapping on any user will send their identifier to the bot in a [userShared][Message.usersShared] service message.
      * Available in private chats only.
      * */
-    @SerialName("request_user") val requestUser: KeyboardButtonRequestUser? = null,
+    val requestUsers: KeyboardButtonRequestUsers? = null,
 
     /**
      * If specified, pressing the button will open a list of suitable chats.
@@ -38,7 +38,7 @@ data class KeyboardButton(
      * Available in private chats only
      * */
     @SerialName("request_contact") val requestContact: Boolean? = null,
-    
+
     /** If True, the user's current location will be sent when the button is pressed. Available in private chats only */
     @SerialName("request_location") val requestLocation: Boolean? = null,
 
@@ -47,6 +47,6 @@ data class KeyboardButton(
      * Available in private chats only.
      * */
     @SerialName("request_poll") val requestPoll: KeyboardButtonPollType? = null,
-    
+
     @SerialName("web_app") val webApp: WebAppInfo? = null
 ) : IKeyboardButton

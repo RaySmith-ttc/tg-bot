@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.noimpl
 
 interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
@@ -17,8 +18,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
             override val botConfig: BotConfig = bot.botConfig
             override var messageThreadId: Int? = null
             override var disableNotification: Boolean? = null
-            override var replyToMessageId: Int? = null
-            override var allowSendingWithoutReply: Boolean? = null
+            override var replyParameters: ReplyParameters? = null
             override var protectContent: Boolean? = null
             override var keyboardMarkup: MessageKeyboard? = null
             override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()

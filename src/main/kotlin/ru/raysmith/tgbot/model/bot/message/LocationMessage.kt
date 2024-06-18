@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import kotlin.time.Duration
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -25,8 +26,7 @@ class LocationMessage(
 
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
-    override var replyToMessageId: Int? = null
-    override var allowSendingWithoutReply: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
     override var protectContent: Boolean? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendLocation(
@@ -40,8 +40,7 @@ class LocationMessage(
         proximityAlertRadius = proximityAlertRadius,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 

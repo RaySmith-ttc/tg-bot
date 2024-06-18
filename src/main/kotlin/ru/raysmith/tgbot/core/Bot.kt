@@ -252,6 +252,7 @@ class Bot(
                                 allowedUpdates = allowedUpdates
                             )
                         } catch (e: Exception) {
+                            safeOnError(e)
                             return@async
                         }
 

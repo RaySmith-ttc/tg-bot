@@ -6,8 +6,9 @@ import kotlinx.serialization.Serializable
 /**
  * Type of the entity. Can be “mention” (@username), “hashtag” (#hashtag), “cashtag” ($USD),
  * “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org),
- * “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text),
- * “strikethrough” (strikethrough text), “code” (monowidth string), “pre” (monowidth block),
+ * “phone_number” (+1-212-555-0123),  “bold” (bold text), “italic” (italic text), “underline” (underlined text),
+ * “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation),
+ * “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block),
  * “text_link” (for clickable text URLs), “text_mention” (for users without usernames),
  * “custom_emoji” (for inline custom emoji stickers)
  *
@@ -31,5 +32,7 @@ enum class MessageEntityType {
     @SerialName("pre") PRE,
     @SerialName("text_link") TEXT_LINK,
     @SerialName("text_mention") TEXT_MENTION,
-    @SerialName("custom_emoji") CUSTOM_EMOJI;
+    @SerialName("custom_emoji") CUSTOM_EMOJI,
+    @SerialName("blockquote") BLOCKQUOTE,
+    @SerialName("expandable_blockquote") EXPANDABLE_BLOCKQUOTE;
 }

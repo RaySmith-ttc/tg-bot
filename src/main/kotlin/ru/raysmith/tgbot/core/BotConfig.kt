@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core
 
+import ru.raysmith.tgbot.model.network.message.LinkPreviewOptions
 import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
@@ -43,5 +44,5 @@ class BotConfig {
     var paginationFetcherFactory: PaginationFetcherFactory = DefaultPaginationFetcherFactory()
 
     var defaultCallbackQueryHandlerFeatures: List<BotFeature> = emptyList()
-    var disableWebPagePreviews: Boolean? = null
+    var linkPreviewOptions: LinkPreviewOptions? = null
 }

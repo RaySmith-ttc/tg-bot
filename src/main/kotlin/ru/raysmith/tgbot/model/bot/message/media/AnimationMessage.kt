@@ -37,8 +37,7 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,
-        replyToMessageId = replyToMessageId,
-        allowSendingWithoutReply = allowSendingWithoutReply,
+        replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

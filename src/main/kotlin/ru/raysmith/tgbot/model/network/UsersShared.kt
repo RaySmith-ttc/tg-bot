@@ -3,11 +3,11 @@ package ru.raysmith.tgbot.model.network
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestUser
+import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestUsers
 
 /**
  * This object contains information about the user whose identifier was shared with the bot using a
- * [KeyboardButtonRequestUser] button.
+ * [KeyboardButtonRequestUsers] button.
  * */
 @Serializable
 data class UsersShared(
