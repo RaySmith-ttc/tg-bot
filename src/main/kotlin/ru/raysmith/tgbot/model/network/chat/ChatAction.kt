@@ -12,6 +12,7 @@ enum class ChatAction {
     @SerialName("record_voice") RECORD_VOICE,
     @SerialName("upload_voice") UPLOAD_VOICE,
     @SerialName("upload_document") UPLOAD_DOCUMENT,
+    @SerialName("choose_sticker") CHOOSE_STICKER,
     @SerialName("find_location") FIND_LOCATION,
     @SerialName("record_video_note") RECORD_VIDEO_NOTE,
     @SerialName("upload_video_note") UPLOAD_VIDEO_NOTE,

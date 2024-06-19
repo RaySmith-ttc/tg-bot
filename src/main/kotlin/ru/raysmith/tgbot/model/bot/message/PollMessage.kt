@@ -26,6 +26,7 @@ class PollMessage(
     override var disableNotification: Boolean? = null
     override var replyParameters: ReplyParameters? = null
     override var protectContent: Boolean? = null
+    override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
     var isAnonymous: Boolean? = null
@@ -61,6 +62,7 @@ class PollMessage(
         }
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPoll(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         question = question,

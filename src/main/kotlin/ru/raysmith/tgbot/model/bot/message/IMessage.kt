@@ -27,6 +27,9 @@ interface IMessage<T> : API {
     /** Protects the contents of the sent message from forwarding and saving */
     var protectContent: Boolean?
 
+    /** Unique identifier of the business connection on behalf of which the message will be sent */
+    var businessConnectionId: String?
+
     /**
      * Send message to [chat]
      *

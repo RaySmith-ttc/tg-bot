@@ -38,6 +38,7 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
+    override var businessConnectionId: String? = null
 
     /** Sets the text as a [MessageText] object */
     @TextMessageDsl
@@ -56,6 +57,7 @@ class TextMessage(override val bot: Bot) : MessageWithReplyMarkup, BotHolder {
     private fun getParseModeIfNeed() = if (messageText != null) null else parseMode
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendMessage(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         text = getMessageText(),

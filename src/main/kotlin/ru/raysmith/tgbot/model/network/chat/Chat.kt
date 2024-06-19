@@ -4,6 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.bisiness.BusinessIntro
+import ru.raysmith.tgbot.model.network.bisiness.BusinessLocation
+import ru.raysmith.tgbot.model.network.bisiness.BusinessOpeningHours
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeEmoji
@@ -57,6 +60,21 @@ data class Chat(
      * for private chats, supergroups and channels. Returned only in [getChat][BotContext.getChat].
      * */
     @SerialName("active_usernames") val activeUsernames: List<String>? = null,
+
+    /** For private chats, the date of birth of the user */
+    @SerialName("birthdate ") val birthdate : Birthdate? = null,
+
+    /** For private chats with business accounts, the intro of the business */
+    @SerialName("business_intro ") val businessIntro : BusinessIntro? = null,
+
+    /** For private chats with business accounts, the location of the business */
+    @SerialName("business_location ") val businessLocation : BusinessLocation? = null,
+
+    /** For private chats with business accounts, the opening hours of the business */
+    @SerialName("business_opening_hours ") val businessOpeningHours : BusinessOpeningHours? = null,
+
+    /** For private chats, the personal channel of the user */
+    @SerialName("personal_chat") val personalChat : Chat? = null,
 
     /**
      * List of available reactions allowed in the chat. If omitted, then all [emoji reactions][ReactionTypeEmoji.emoji]

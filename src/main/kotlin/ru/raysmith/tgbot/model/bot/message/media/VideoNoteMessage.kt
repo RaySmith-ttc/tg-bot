@@ -22,6 +22,7 @@ class VideoNoteMessage(override val bot: Bot) : MediaMessage(), BotHolder {
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideoNote(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         videoNote = media ?: error("$mediaName is required"),

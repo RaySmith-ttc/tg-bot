@@ -44,7 +44,16 @@ data class Message(
     @SerialName("sender_boost_count") val senderBoostCount: Int? = null,
 
     /** Date the message was sent in Unix time */
+    @SerialName("sender_business_bot") val senderBusinessBot: User? = null,
+
+    /** Date the message was sent in Unix time */
     @SerialName("date") override val date: Int,
+
+    /**
+     * The bot that actually sent the message on behalf of the business account.
+     * Available only for outgoing messages sent on behalf of the connected business account.
+     * */
+    @SerialName("business_connection_id") val businessConnectionId: String? = null,
 
     /** Conversation the message belongs to */
     @SerialName("chat") override val chat: Chat,
@@ -81,6 +90,12 @@ data class Message(
 
     /** *True*, if the message can't be forwarded */
     @SerialName("has_protected_content") val hasProtectedContent: Boolean? = null,
+
+    /**
+     * True, if the message was sent by an implicit action, for example, as an away or a greeting business message,
+     * or as a scheduled message
+     * */
+    @SerialName("is_from_offline") val isFromOffline: Boolean? = null,
 
     /** The unique identifier of a media message group this message belongs to */
     @SerialName("media_group_id") val mediaGroupId: String? = null,

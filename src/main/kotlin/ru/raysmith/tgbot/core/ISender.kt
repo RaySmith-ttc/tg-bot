@@ -112,8 +112,8 @@ interface ISender : ChatIdHolder, API, BotHolder {
         return DiceMessage(emoji, bot).apply { message() }.send(chatId, messageThreadId)
     }
 
-    suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return sendChatAction(chatId, action, messageThreadId)
+    suspend fun sendChatAction(action: ChatAction, messageThreadId: Int? = null, businessConnectionId: String? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
+        return sendChatAction(businessConnectionId, chatId, messageThreadId, action)
     }
 
     suspend fun sendMediaGroup(messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend MediaGroupMessage.() -> Unit): List<Message> {

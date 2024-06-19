@@ -23,6 +23,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
+    override var businessConnectionId: String? = null
     override var replyParameters: ReplyParameters? = null
 
     /** send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action while upload files to telegram server */
@@ -53,6 +54,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     override suspend fun send(chatId: ChatId, messageThreadId: Int?): List<Message> {
         return if (inputFiles.isEmpty()) {
             sendMediaGroup(
+                businessConnectionId = businessConnectionId,
                 chatId = chatId,
                 messageThreadId = messageThreadId,
                 media = inputMedia,
@@ -70,11 +72,12 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 }
 
                 if (action != null) {
-                    sendChatAction(chatId, action, messageThreadId)
+                    sendChatAction(businessConnectionId, chatId, messageThreadId, action)
                 }
             }
 
             sendMediaGroup(
+                businessConnectionId = businessConnectionId,
                 chatId = chatId,
                 messageThreadId = messageThreadId,
                 media = inputMedia,

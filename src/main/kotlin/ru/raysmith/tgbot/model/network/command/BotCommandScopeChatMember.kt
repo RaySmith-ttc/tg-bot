@@ -18,7 +18,7 @@ data class BotCommandScopeChatMember(
 
     /** Unique identifier of the target user */
     @SerialName("user_id")
-    val userId: Long
+    val userId: ChatId.ID
 ): BotCommandScope() {
 
     /** Scope type, must be *chat_member* */

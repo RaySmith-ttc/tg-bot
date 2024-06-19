@@ -19,6 +19,7 @@ class ContactMessage(
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
+    override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var replyParameters: ReplyParameters? = null
 
@@ -26,6 +27,7 @@ class ContactMessage(
     var vcard: String? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendContact(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         phoneNumber = phoneNumber,

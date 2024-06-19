@@ -48,6 +48,12 @@ data class User(
 
     /** *True*, if the bot supports inline queries. Returned only in [getMe][BotContext.getMe]. */
     @SerialName("supports_inline_queries") val supportsInlineQueries: Boolean? = null,
+
+    /**
+     * *True*, if the bot can be connected to a Telegram Business account to receive its messages.
+     * Returned only in [getMe][BotContext.getMe].
+     * */
+    @SerialName("can_connect_to_business") val canConnectToBusiness: Boolean? = null,
 ) {
 
     /**

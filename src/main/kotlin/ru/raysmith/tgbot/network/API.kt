@@ -21,6 +21,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequestInternal
 import ru.raysmith.tgbot.model.network.*
+import ru.raysmith.tgbot.model.network.bisiness.BusinessConnection
 import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
 import ru.raysmith.tgbot.model.network.chat.forum.IconColor
@@ -32,6 +33,7 @@ import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
+import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.input.*
@@ -203,6 +205,8 @@ interface API {
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be sent
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
      * for forum supergroups only
@@ -221,6 +225,7 @@ interface API {
      * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun sendMessage(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         text: String,
@@ -423,6 +428,8 @@ interface API {
     /**
      * Use this method to send photos
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be sent
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
      * for forum supergroups only
@@ -447,6 +454,7 @@ interface API {
      * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun sendPhoto(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         photo: InputFile,
@@ -481,6 +489,8 @@ interface API {
      * Your audio must be in the .MP3 or .M4A format. On success, the sent Message is returned.
      * Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be sent
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
      * for forum supergroups only
@@ -505,6 +515,7 @@ interface API {
      * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun sendAudio(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         audio: InputFile,
@@ -541,6 +552,7 @@ interface API {
     }
 
     suspend fun sendDocument(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         document: InputFile,
@@ -573,6 +585,7 @@ interface API {
     }
 
     suspend fun sendVideo(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         video: InputFile,
@@ -611,6 +624,7 @@ interface API {
     }
 
     suspend fun sendAnimation(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         animation: InputFile,
@@ -649,6 +663,7 @@ interface API {
     }
 
     suspend fun sendVoice(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         voice: InputFile,
@@ -679,6 +694,7 @@ interface API {
     }
 
     suspend fun sendVideoNote(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         videoNote: InputFile,
@@ -709,12 +725,15 @@ interface API {
      * Documents and audio filescan be only grouped in an album with messages of the same type.
      * On success, an array of Messages that were sent is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be sent
      * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
      * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
      * @param replyParameters Description of the message to reply to
      * */
     suspend fun sendMediaGroup(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         media: List<InputMediaGroup>,
@@ -750,6 +769,7 @@ interface API {
     }
 
     suspend fun sendLocation(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         latitude: Double,
@@ -780,6 +800,7 @@ interface API {
     }
 
     suspend fun sendVenue(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         latitude: Double,
@@ -814,6 +835,7 @@ interface API {
     }
 
     suspend fun sendContact(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         phoneNumber: String,
@@ -840,6 +862,7 @@ interface API {
     }
 
     suspend fun sendPoll(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         question: String,
@@ -882,6 +905,7 @@ interface API {
     }
 
     suspend fun sendDice(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         emoji: String,
@@ -901,12 +925,37 @@ interface API {
         }
     }
 
+    /**
+     * Use this method when you need to tell the user that something is happening on the bot's side.The status is set
+     * for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+     * Returns True on success.
+     *
+     * > Example: The [ImageBot](https://t.me/imagebot) needs some time to process a request and upload the image.
+     * Instead of sending a text message along the lines of “Retrieving image, please wait…”, the bot may use
+     * [sendChatAction] with action = [ChatAction.UPLOAD_PHOTO]. The user will see a “sending photo” status for the bot.
+     *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the action
+     * will be sent
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread; for supergroups only
+     * @param action Type of action to broadcast. Choose one, depending on what the user is about to receive:
+     * - [ChatAction.TYPING] for text messages,
+     * - [ChatAction.UPLOAD_PHOTO] for photos,
+     * - [ChatAction.RECORD_VIDEO] or [ChatAction.UPLOAD_VIDEO] for videos,
+     * - [ChatAction.RECORD_VOICE] or [ChatAction.UPLOAD_VOICE] for voice notes,
+     * - [ChatAction.UPLOAD_DOCUMENT] for general files,
+     * - [ChatAction.CHOOSE_STICKER] for stickers,
+     * - [ChatAction.FIND_LOCATION] for location data,
+     * - [ChatAction.RECORD_VIDEO_NOTE] or [ChatAction.UPLOAD_VIDEO_NOTE] for video notes.
+     * */
     suspend fun sendChatAction(
+        businessConnectionId: String? = null,
         chatId: ChatId,
-        action: ChatAction,
         messageThreadId: Int? = null,
+        action: ChatAction,
     ) = request<Boolean> {
         client.post("sendChatAction") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("action", action)
             parameter("message_thread_id", messageThreadId)
@@ -1802,8 +1851,17 @@ interface API {
     }
 
     /**
-     * Use this method to send answers to callback queries sent from [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
+     * Use this method to send answers to callback queries sent from
+     * [inline keyboards](https://core.telegram.org/bots/features#inline-keyboards). The answer will be displayed
      * to the user as a notification at the top of the chat screen or as an alert. On success, *True* is returned.
+     *
+     * @param callbackQueryId Unique identifier for the query to be answered
+     * @param text Text of the notification. If not specified, nothing will be shown to the user, 0-200 characters
+     * @param showAlert If *True*, an alert will be shown by the client instead of a notification at the top of
+     * the chat screen. Defaults to *false*.
+     * @param url URL that will be opened by the user's client. If you have created a [Game] and accepted the
+     * conditions via [@BotFather](https://t.me/botfather), specify the URL that opens your game - note that this will
+     * only work if the query comes from a [InlineKeyboardButton.callbackGame] button.
      * */
     suspend fun answerCallbackQuery(
         callbackQueryId: String,
@@ -1824,6 +1882,9 @@ interface API {
     /**
      * Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat.
      * Returns a [UserChatBoosts] object.
+     *
+     * @param chatId Unique identifier for the chat or username of the channel
+     * @param userId Unique identifier of the target user
      * */
     suspend fun getUserChatBoosts(
         chatId: ChatId,
@@ -1836,13 +1897,29 @@ interface API {
     }
 
     /**
+     * Use this method to get information about the connection of the bot with a business account.
+     * Returns a [BusinessConnection] object on success.
+     *
+     * @param Unique identifier of the business connection
+     * */
+    suspend fun getBusinessConnection(
+        businessConnectionId: String,
+    ) = request<BusinessConnection> {
+        client.post("getBusinessConnection") {
+            parameter("business_connection_id", businessConnectionId)
+        }
+    }
+
+    /**
      * Use this method to change the list of the bot's commands.
      *
      * @see <a href="https://core.telegram.org/bots#commands">commands</a> for more details about bot commands.
      * Returns *True* on success
      *
-     * @param commands list of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
-     * @param scope [scope][BotCommandScope] of users for which the commands are relevant. Defaults to [BotCommandScopeDefault].
+     * @param commands list of bot commands to be set as the list of the bot's commands.
+     * At most 100 commands can be specified.
+     * @param scope [scope][BotCommandScope] of users for which the commands are relevant.
+     * Defaults to [BotCommandScopeDefault].
      * @param languageCode A two-letter ISO 639-1 language code. If empty, commands will be applied to all
      * users from the given scope, for whose language there are no dedicated commands
      * */
@@ -2269,6 +2346,11 @@ interface API {
     /**
      * Use this method to delete multiple messages simultaneously. If some of the specified messages can't be found,
      * they are skipped. Returns *True* on success.
+     *
+     * See [deleteMessage] for limitations on which messages can be deleted
+     *
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageIds A list of 1-100 identifiers of messages to delete.
      * */
     suspend fun deleteMessages(
         chatId: ChatId,
@@ -2281,6 +2363,7 @@ interface API {
     }
 
     suspend fun sendSticker(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageThreadId: Int? = null,
         sticker: InputFile,
@@ -2463,6 +2546,38 @@ interface API {
     }
 
     /**
+     * Use this method to replace an existing sticker in a sticker set with a new one.The method is equivalent to
+     * calling [deleteStickerFromSet], then [addStickerToSet], then [setStickerPositionInSet].
+     * Returns *True* on success.
+     *
+     * @param userId User identifier of the sticker set owner
+     * @param name Sticker set name
+     * @param oldSticker File identifier of the replaced sticker
+     * @param sticker A object with information about the added sticker.
+     * If exactly the same sticker had already been added to the set, then the set remains unchanged.
+     * */
+    suspend fun replaceStickerInSet(
+        userId: ChatId.ID,
+        name: String,
+        oldSticker: String,
+        sticker: InputSticker,
+    ) = request<Boolean> {
+        val req = MediaRequestInternal()
+
+        client.post("replaceStickerInSet") {
+            parameter("user_id", userId)
+            parameter("name", name)
+            parameter("old_sticker", oldSticker)
+
+            parameter("sticker", sticker.toSerializable { req.applyMediaExposed(it) })
+
+            setMultiPartFormDataBody(*req.inputFiles.mapIndexed { i, file ->
+                "file${i + 1}" to file
+            }.toTypedArray())
+        }
+    }
+
+    /**
      * Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
      * The sticker must belong to a sticker set created by the bot. Returns *True* on success.
      *
@@ -2548,11 +2663,13 @@ interface API {
     suspend fun setStickerSetThumbnail(
         name: String,
         userId: ChatId.ID,
-        thumbnail: InputFile,
+        format: StickerFormat,
+        thumbnail: InputFile? = null,
     ) = request<Boolean> {
         client.post("setStickerSetThumbnail") {
             parameter("name", name)
             parameter("user_id", userId)
+            parameter("format", format)
             setMultiPartFormDataBody(
                 "thumbnail" to thumbnail,
             )
@@ -2567,7 +2684,7 @@ interface API {
      * */
     suspend fun setCustomEmojiStickerSetThumbnail(
         name: String,
-        customEmojiId: String?,
+        customEmojiId: String? = null,
     ) = request<Boolean> {
         client.post("setCustomEmojiStickerSetThumbnail") {
             parameter("name", name)

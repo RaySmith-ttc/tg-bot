@@ -20,6 +20,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
             override var disableNotification: Boolean? = null
             override var replyParameters: ReplyParameters? = null
             override var protectContent: Boolean? = null
+            override var businessConnectionId: String? = null
             override var keyboardMarkup: MessageKeyboard? = null
             override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()
             override suspend fun send(chatId: ChatId, messageThreadId: Int?) = noimpl()

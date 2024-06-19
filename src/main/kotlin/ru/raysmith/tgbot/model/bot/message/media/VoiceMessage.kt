@@ -22,6 +22,7 @@ class VoiceMessage(override val bot: Bot) : MediaMessageWithThumb() {
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVoice(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         voice = media ?: error("$mediaName is required"),

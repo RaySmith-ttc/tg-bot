@@ -24,6 +24,9 @@ import java.time.ZonedDateTime
 @DslMarker
 annotation class BotContextDsl
 
+// TODO remove chatId args (see deleteMessages)
+// TODO improve interface documentation
+
 /** Allows to change a bot for the [handler][T] */
 interface BotContext<T : EventHandler> : ISender, IEditor {
 
@@ -34,6 +37,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     /**
      * Use this method to send text messages. On success, the sent [Message] is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be sent
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param text Text of the message to be sent, 1-4096 characters after entities parsing
      * @param parseMode [ParseMode] for parsing entities in the message text.
      * @param entities List of special entities that appear in message text, which can be specified instead
@@ -43,15 +51,13 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param replyParameters Description of the message to reply to
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
-     * for forum supergroups only
-     * @param chatId Unique identifier for the target chat or username of the target channel
-     * @param keyboardMarkup [KeyboardCreator] builder for an
+     * @param keyboardMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
      * [custom reply keyboard](https://core.telegram.org/bots#keyboards),
-     * instructions to remove reply keyboard or to force a reply from the user
+     * instructions to remove reply keyboard or to force a reply from the user.
      * */
     suspend fun sendMessage(
+        businessConnectionId: String? = null,
         text: String,
         parseMode: ParseMode? = null,
         entities: String? = null,
@@ -64,7 +70,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): Message {
         return sendMessage(
-            chatId, messageThreadId, text, parseMode, entities, linkPreviewOptions, disableNotification, protectContent,
+            businessConnectionId, chatId, messageThreadId, text, parseMode, entities, linkPreviewOptions,
+            disableNotification, protectContent,
             replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
@@ -963,6 +970,20 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     suspend fun deleteMessage(messageId: Int, chatId: ChatId = getChatIdOrThrow()): Boolean {
         return deleteMessage(chatId, messageId)
+    }
+
+    /**
+     * *This method use chat from current [bot context][BotContext].*
+     *
+     * Use this method to delete multiple messages simultaneously. If some of the specified messages can't be found,
+     * they are skipped. Returns *True* on success.
+     *
+     * See [deleteMessage] for limitations on which messages can be deleted
+     *
+     * @param messageIds A list of 1-100 identifiers of messages to delete.
+     * */
+    suspend fun deleteMessages(messageIds: List<Int>): Boolean {
+        return deleteMessages(getChatIdOrThrow(), messageIds)
     }
 
     /**

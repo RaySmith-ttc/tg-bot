@@ -4,6 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.*
+import ru.raysmith.tgbot.model.network.bisiness.BusinessConnection
+import ru.raysmith.tgbot.model.network.bisiness.BusinessMessagesDeleted
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
 import ru.raysmith.tgbot.model.network.chat.member.ChatMemberUpdated
@@ -42,6 +44,21 @@ data class Update(
 
     /** New version of a channel post that is known to the bot and was edited */
     @SerialName("edited_channel_post") val editedChannelPost: Message? = null,
+
+    /**
+     * The bot was connected to or disconnected from a business account, or a user edited an existing
+     * connection with the bot
+     * */
+    @SerialName("business_connection") val businessConnection: BusinessConnection? = null,
+
+    /** New message from a connected business account */
+    @SerialName("business_message") val businessMessage: Message? = null,
+
+    /** New version of a message from a connected business account */
+    @SerialName("edited_business_message") val editedBusinessMessage: BusinessMessagesDeleted? = null,
+
+    /** Messages were deleted from a connected business account */
+    @SerialName("deleted_business_messages") val deletedBusinessMessages: Message? = null,
 
     /**
      * A reaction to a message was changed by a user. The bot must be an administrator in the chat and must explicitly
@@ -107,7 +124,7 @@ data class Update(
     /** A boost was removed from a chat. The bot must be an administrator in the chat to receive these updates. */
     @SerialName("removed_chat_boost") val removedChatBoost: ChatBoostRemoved? = null,
 
-) {
+    ) {
 
     /** Type of update. Null if unknown */
     val type: UpdateType? = when {

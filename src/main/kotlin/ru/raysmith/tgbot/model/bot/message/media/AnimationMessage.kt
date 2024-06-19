@@ -25,6 +25,7 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?): Message = sendAnimation(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId ?: this.messageThreadId,
         animation = media ?: error("$mediaName is required"),

@@ -53,5 +53,14 @@ data class KeyboardButtonRequestChat(
 
     /** Pass *True* to request a chat with the bot as a member. Otherwise, no additional restrictions are applied. */
     @SerialName("bot_is_member") val botIsMember: Boolean? = null,
+
+    /** Pass *True* to request the chat's title */
+    @SerialName("request_title") val requestTitle: Boolean? = null,
+
+    /** Pass *True* to request the chat's username */
+    @SerialName("request_username") val requestUsername: Boolean? = null,
+
+    /** Pass *True* to request the chat's photo */
+    @SerialName("request_photo") val requestPhoto: Boolean? = null,
 )
 

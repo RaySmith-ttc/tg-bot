@@ -36,14 +36,13 @@ class KonsistTests {
     }
 
     @Test
-    fun `all Serializable classes and it's fields should have KDoc`() {
-        val classes = Konsist.scopeFromProject()
+    fun `all Serializable classes and it's fields and functions should have KDoc`() {
+        Konsist.scopeFromProject()
             .classes()
             .filter { it.hasAnnotation { a -> a.representsType(Serializable::class.qualifiedName!!) } }
-        val properties = classes.properties()
-
-        classes.assertTrue { it.hasKDoc }
-        properties.assertTrue { it.hasKDoc }
+            .apply { assertTrue { it.hasKDoc } }
+            .apply { properties().assertTrue { it.hasKDoc } }
+            .apply { functions().assertTrue { it.hasKDoc } }
     }
 
     @Test

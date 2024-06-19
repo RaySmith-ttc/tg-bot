@@ -25,6 +25,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
     override var replyParameters: ReplyParameters? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendSticker(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
         sticker = media ?: error("$mediaName is required"),
