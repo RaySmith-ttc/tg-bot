@@ -17,6 +17,7 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
 
     override val mediaName: String = "photo"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPhoto(
         businessConnectionId = businessConnectionId,
@@ -25,7 +26,7 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
         photo = media ?: error("$mediaName is required"),
         caption = getCaptionText(),
         parseMode = parseMode,
-        captionEntities = _caption?.getEntitiesString(),
+        captionEntities = _caption?.getEntities(),
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,

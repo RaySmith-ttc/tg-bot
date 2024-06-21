@@ -1,36 +1,18 @@
 package ru.raysmith.tgbot.model.bot.message
 
-import kotlinx.serialization.json.encodeToJsonElement
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
 
+// TODO docs
 
 /**
  * Represents message text or caption as string with entities
- *
- * @param printNulls
- * Set true for apply null strings to message text
- *
- * `printNulls = true`:
- * ```
- * textWithEntities {
- *     text("Some text: ").text(null) // Output: 'Some text: null'
- * }
- * ```
- *
- * `printNulls = false`:
- * ```
- * textWithEntities {
- *     text("Some text: ").text(null) // Output: 'Some text: '
- * }
- * ```
  * */
 @TextMessageDsl
 class MessageText(val type: MessageTextType, val config: BotConfig) {
@@ -38,7 +20,23 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
     /** Whether text should be truncated if text length is greater than 4096 */
     var safeTextLength: Boolean = config.safeTextLength
 
-    /** Whether null values should display in the message text */
+    /**
+     * Whether null values should display in the message text. *[BotConfig.printNulls] by default.*
+     *
+     * `printNulls = true`:
+     * ```
+     * textWithEntities {
+     *     text("Some text: ").text(null) // Output: 'Some text: null'
+     * }
+     * ```
+     *
+     * `printNulls = false`:
+     * ```
+     * textWithEntities {
+     *     text("Some text: ").text(null) // Output: 'Some text: '
+     * }
+     * ```
+     * */
     var printNulls: Boolean = config.printNulls
 
     private val text: StringBuilder = StringBuilder()
@@ -48,12 +46,13 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
 
     private var entities: MutableList<MessageEntity> = mutableListOf()
 
-    fun getEntitiesString() = TelegramApi.json.encodeToJsonElement(
-        if (safeTextLength) getSafeEntities() else entities.toList()
-    ).toString()
-
+    /** Returns result of [getNotSafeEntities] or [getSafeEntities] depends on [safeTextLength] */
     fun getEntities(): List<MessageEntity> = if (safeTextLength) getSafeEntities() else entities
 
+    /** Returns all entities applied to the message text */
+    fun getNotSafeEntities() = entities
+
+    /** Returns an entity that does not exceed the [safeTextLength] boundary */
     fun getSafeEntities(): List<MessageEntity> {
         return entities
             .filter { it.offset < type.maxLength }
@@ -66,6 +65,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
             }.toList()
     }
 
+    /** Returns text of the message depends on [safeTextLength] */
     fun getTextString() = if (safeTextLength) text.toString().withSafeLength(type) else text.toString()
 
     fun text(text: Any?): MessageText {
@@ -137,7 +137,9 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
                     MessageEntityType.PRE, MessageEntityType.CODE -> replace("\\", "\\\\").replace("`", "\\`")
                     else -> {
                         var res = this
-                        listOf("_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!").forEach {
+                        listOf(
+                            "_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"
+                        ).forEach {
                             res = res.replace(it, "\\$it")
                         }
 
@@ -202,6 +204,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
         return currentEntities
     }
 
+    /** Returns the message string that can be used with [parseMode] applied to send the message */
     fun format(parseMode: ParseMode): String {
         val textString = getTextString()
         if (entities.isEmpty()) return textString.escape(parseMode)
@@ -293,10 +296,18 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
         }
     }
 
-    fun appendEntity(type: MessageEntityType, text: Any?, url: String? = null, language: String? = null, user: User? = null, customEmojiId: String? = null): MessageText {
+    fun appendEntity(
+        type: MessageEntityType, text: Any?, url: String? = null, language: String? = null, user: User? = null,
+        customEmojiId: String? = null
+    ): MessageText {
         if (!printNulls && text == null) return this
         text.toString().also { t ->
-            entities.add(MessageEntity(type, offset = this.text.length, t.length, url = url, language = language, user = user, customEmojiId = customEmojiId))
+            entities.add(
+                MessageEntity(
+                    type, offset = this.text.length, t.length, url = url, language = language, user = user,
+                    customEmojiId = customEmojiId
+                )
+            )
             this.text.append(t)
         }
         return this

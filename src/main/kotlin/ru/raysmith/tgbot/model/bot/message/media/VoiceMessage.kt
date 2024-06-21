@@ -6,7 +6,7 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 
-class VoiceMessage(override val bot: Bot) : MediaMessageWithThumb() {
+class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage() {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -20,6 +20,7 @@ class VoiceMessage(override val bot: Bot) : MediaMessageWithThumb() {
 
     override val mediaName: String = "audio"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVoice(
         businessConnectionId = businessConnectionId,
@@ -28,7 +29,7 @@ class VoiceMessage(override val bot: Bot) : MediaMessageWithThumb() {
         voice = media ?: error("$mediaName is required"),
         caption = getCaptionText(),
         parseMode = parseMode,
-        captionEntities = _caption?.getEntitiesString(),
+        captionEntities = _caption?.getEntities(),
         duration = duration,
         disableNotification = disableNotification,
         protectContent = protectContent,

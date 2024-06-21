@@ -26,10 +26,10 @@ import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostUpdated
 data class Update(
 
     /**
-     * The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially.
-     * This ID becomes especially handy if you're using Webhooks, since it allows you to ignore repeated updates or
-     * to restore the correct update sequence, should they get out of order. If there are no new updates for at least
-     * a week, then identifier of the next update will be chosen randomly instead of sequentially.
+     * The update's unique identifier. Update identifiers start from a certain positive number and increase
+     * sequentially. This ID becomes especially handy if you're using Webhooks, since it allows you to ignore repeated
+     * updates or to restore the correct update sequence, should they get out of order. If there are no new updates for
+     * at least a week, then identifier of the next update will be chosen randomly instead of sequentially.
      * */
     @SerialName("update_id") val updateId: Int,
 
@@ -97,7 +97,10 @@ data class Update(
     /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot */
     @SerialName("poll") val poll: Poll? = null,
 
-    /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
+    /**
+     * A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by
+     * the bot itself.
+     * */
     @SerialName("poll_answer") val pollAnswer: PollAnswer? = null,
 
     /**
@@ -168,7 +171,9 @@ data class Update(
         null -> null
     }
 
-    /** Find [chat][Chat] id by current update. Always `null` for [UpdateType.POLL] and [UpdateType.POLL_ANSWER] updates */
+    /**
+     * Find [chat][Chat] id by current update. Always `null` for [UpdateType.POLL] and [UpdateType.POLL_ANSWER] updates
+     * */
     fun findChatId(): ChatId? = when(type) {
         UpdateType.MESSAGE -> message!!.getChatId()
         UpdateType.EDITED_MESSAGE -> editedMessage!!.getChatId()
@@ -188,12 +193,5 @@ data class Update(
         UpdateType.MESSAGE_REACTION_COUNT -> messageReactionCount!!.getChatId()
         null -> null
     }
-
-
-    /**
-     * Indicates whether an update handler was found and processing was started.
-     *
-     * If you are handling updates using the dsl [handleUnknown][ru.raysmith.tgbot.core.BaseEventHandlerFactory.handleUnknown] method, explicitly set the value yourself.  */
-    var isHandled: Boolean = false
 }
 

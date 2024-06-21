@@ -14,7 +14,7 @@ interface Streamable {
 fun String.asTgFile() = InputFile.FileIdOrUrl(this)
 
 fun File.asTgFile() = InputFile.File(this)
-fun ByteArray.asTgFile(filename: String, mimeType: String) = InputFile.ByteArray(this, filename, mimeType)
+fun ByteArray.asTgFile(filename: String, mimeType: String? = null) = InputFile.ByteArray(this, filename, mimeType)
 
 sealed class InputFile {
     @Serializable(with = FileIdOrUrlSerializer::class)
@@ -23,7 +23,7 @@ sealed class InputFile {
         override fun input() = file.inputStream().asInput()
     }
     data class ByteArray(
-        val byteArray: kotlin.ByteArray, val filename: String, val mimeType: String
+        val byteArray: kotlin.ByteArray, val filename: String, val mimeType: String? = null
     ) : InputFile(), NotReusableInputFile, Streamable {
         override fun input() = ByteReadPacket(byteArray)
 

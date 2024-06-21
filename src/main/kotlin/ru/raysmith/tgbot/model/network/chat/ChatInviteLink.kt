@@ -4,12 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.User
 
-@Serializable
-data class ChatInviteLinkResponse(
-    @SerialName("ok") val ok: Boolean,
-    @SerialName("result") val result: ChatInviteLink
-)
-
 /** Represents an invite link for a chat. */
 @Serializable
 data class ChatInviteLink(

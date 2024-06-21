@@ -23,6 +23,7 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
 
     override val mediaName: String = "animation"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?): Message = sendAnimation(
         businessConnectionId = businessConnectionId,
@@ -32,9 +33,10 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
         duration = duration,
         width = width,
         height = height,
+        thumbnail = thumbnail,
         caption = getCaptionText(),
         parseMode = parseMode,
-        captionEntities = _caption?.getEntitiesString(),
+        captionEntities = _caption?.getEntities(),
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,

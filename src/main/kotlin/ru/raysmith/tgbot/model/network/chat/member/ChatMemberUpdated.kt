@@ -29,6 +29,12 @@ data class ChatMemberUpdated(
     /** Chat invite link, which was used by the user to join the chat; for joining by invite link events only. */
     @SerialName("invite_link") val inviteLink: ChatInviteLink? = null,
 
+    /**
+     * True, if the user joined the chat after sending a direct join request without using an invite link and
+     * being approved by an administrator
+     * */
+    @SerialName("via_join_request") val viaJoinRequest: Boolean? = null,
+
     /** *True*, if the user joined the chat via a chat folder invite link */
     @SerialName("via_chat_folder_invite_link") val viaChatFolderInviteLink: Boolean? = null,
 

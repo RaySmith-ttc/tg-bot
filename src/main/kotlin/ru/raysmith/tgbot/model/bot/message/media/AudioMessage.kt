@@ -21,6 +21,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb() {
 
     override val mediaName: String = "audio"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendAudio(
         businessConnectionId = businessConnectionId,
@@ -29,7 +30,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb() {
         audio = audio ?: error("$mediaName is required"),
         caption = getCaptionText(),
         parseMode = parseMode,
-        captionEntities = _caption?.getEntitiesString(),
+        captionEntities = _caption?.getEntities(),
         duration = duration,
         performer = performer,
         title = title,

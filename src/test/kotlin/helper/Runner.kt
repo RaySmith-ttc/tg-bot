@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.asChatId
+import ru.raysmith.tgbot.model.bot.message.LivePeriod
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
@@ -60,7 +61,6 @@ import java.io.IOException
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.*
-import kotlin.time.Duration.Companion.minutes
 
 val locations = false
 val prettyPrintJson = Json(TelegramApi.json) {
@@ -473,14 +473,30 @@ class Runner {
 
                     location("poll") {
                         onEnter {
-                            val poll = sendPoll("Question", listOf("1", "2", "3")) {
+                            val poll = sendPoll {
+
+                                question {
+                                    text = ""
+                                    textWithEntities {
+                                        text("Some ").bold("Question")
+                                    }
+                                }
+
+                                explanation {
+                                    text = ""
+                                    textWithEntities {
+                                        bold("Expl: ").text("Wrong answer")
+                                    }
+                                }
+                                option { text = "1" }
+                                option { text = "2" }
+                                option { text = "3" }
+
                                 isAnonymous = false
                                 type = PollType.QUIZ
                                 correctOptionId = 0
-                                explanationWithEntities {
-                                    bold("Expl: ").text("Wrong answer")
-                                }
                                 openPeriod = 10
+
                                 inlineKeyboard {
                                     row("Button", "btn")
                                 }
@@ -813,13 +829,29 @@ class Runner {
                     }
 
                     isCommand("stopPoll") {
-                        val poll = sendPoll("Question", listOf("1", "2", "3")) {
+                        val poll = sendPoll {
                             type = PollType.QUIZ
                             correctOptionId = 0
-                            explanationWithEntities {
-                                bold("Expl: ").text("Wrong answer")
-                            }
                             openPeriod = 5
+
+                            question {
+                                text = ""
+                                textWithEntities {
+                                    text("Some ").bold("Question")
+                                }
+                            }
+
+                            explanation {
+                                text = ""
+                                textWithEntities {
+                                    bold("Expl: ").text("Wrong answer")
+                                }
+                            }
+
+                            option { text = "1" }
+                            option { text = "2" }
+                            option { text = "3" }
+
                             inlineKeyboard {
                                 row("Button", "btn")
                             }
@@ -1155,6 +1187,12 @@ class Runner {
                         }
                     }
 
+                    isCommand("voice") {
+                        sendVoice {
+                            voice = "audio2.mp3".asResources().asTgFile()
+                        }
+                    }
+
                     isCommand("send_audio") {
                         sendMediaGroup {
                             audio("audio2.mp3".asResources().asTgFile(), "files/size.small.jpg".asResources().asTgFile()) {
@@ -1319,7 +1357,11 @@ class Runner {
                                 n()
                                 text("Body")
                             }
-                            animation = "files/anim1.gif".asResources().asTgFile()
+
+//                            animation = "files/anim1.gif".asResources().asTgFile()
+                            animation = "files/video2.webm".asResources().asTgFile() // with thumb
+
+                            thumbnail = "files/size.small.jpg".asResources().asTgFile()
                             hasSpoiler = true
                         }
                     }
@@ -1335,9 +1377,11 @@ class Runner {
                     isCommand("editMessageLiveLocation") {
                         var lat = 56.843139
                         var heading = 0
+
                         val message = sendLocation(lat, 60.596065) {
                             this.heading = heading
-                            this.livePeriod = 1.minutes
+//                            this.livePeriod = LivePeriod.Duration(1.minutes)
+                            this.livePeriod = LivePeriod.Indefinitely
                             inlineKeyboard {
                                 row("Test", " ")
                             }
@@ -1378,18 +1422,49 @@ class Runner {
                     }
 
                     isCommand("poll") {
-                        sendPoll("Question", listOf("1", "2", "3")) {
+                        sendPoll {
                             type = PollType.QUIZ
                             correctOptionId = 0
-                            explanationWithEntities {
-                                bold("Expl: ").text("Wrong answer")
+
+                            question {
+                                textWithEntities {
+                                    text("Some ").bold("Question")
+                                }
                             }
+
+                            explanation {
+                                textWithEntities {
+                                    bold("Expl: ").text("Wrong answer")
+                                }
+                            }
+
+                            option { text = "1" }
+
+                            option {
+                                textWithEntities {
+                                    text("2")
+                                }
+                            }
+
+                            option {
+                                textWithEntities {
+                                    text("3").emoji("\uD83E\uDD26\uD83C\uDFFC\u200D♂\uFE0F", "1")
+                                }
+                            }
+
                             openPeriod = 5
                         }
                     }
 
                     isCommand("pollForAnswer") {
-                        sendPoll("Question", listOf("1", "2", "3")) {
+                        sendPoll {
+                            question {
+                                text = "Question"
+                            }
+
+                            option { text = "1" }
+                            option { text = "2" }
+
                             type = PollType.REGULAR
                             isAnonymous = false
                         }
@@ -1467,7 +1542,7 @@ class Runner {
 
                     isCommand("setStickerSetThumbnail") {
                         setStickerSetThumbnail(
-                            stickerSetName("name"), getChatIdOrThrow(),
+                            stickerSetName("name"), getChatIdOrThrow(), StickerFormat.STATIC,
                             InputFile.FileIdOrUrl("https://i.ibb.co/ZS7TT09/image.png")
                         )
                     }
@@ -1598,6 +1673,14 @@ class Runner {
                         setMessageReaction(messageId!!, listOf(
                             ReactionTypeEmoji("🤡")
                         ), isBig = true)
+                    }
+
+                    isCommand("getChat") {
+                        send {
+                            textWithEntities {
+                                pre(prettyPrintJson.encodeToString(getChat()), "json")
+                            }
+                        }
                     }
                 }
 

@@ -4,6 +4,7 @@ import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.*
 import ru.raysmith.tgbot.model.bot.message.group.MediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.media.*
+import ru.raysmith.tgbot.model.bot.message.poll.PollMessage
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
@@ -99,13 +100,11 @@ interface ISender : ChatIdHolder, API, BotHolder {
     }
 
     suspend fun sendPoll(
-        question: String,
-        options: List<String>,
         messageThreadId: Int? = null,
         chatId: ChatId = getChatIdOrThrow(),
         message: suspend PollMessage.() -> Unit
     ): Message {
-        return PollMessage(question, options, bot).apply { message() }.send(chatId, messageThreadId)
+        return PollMessage(bot).apply { message() }.send(chatId, messageThreadId)
     }
 
     suspend fun sendDice(emoji: String, messageThreadId: Int? = null, chatId: ChatId = getChatIdOrThrow(), message: suspend DiceMessage.() -> Unit): Message {

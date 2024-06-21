@@ -33,6 +33,7 @@ abstract class CaptionableMediaMessage :
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
                 override var replyParameters: ReplyParameters? = null
+                override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
                 override suspend fun editReplyMarkup(
                     chatId: ChatId?, messageId: Int?, inlineMessageId: String?
@@ -49,7 +50,7 @@ abstract class CaptionableMediaMessage :
     fun hasCaption() = caption != null || _caption != null
 
     /** Whether test should be truncated if caption length is greater than 1024 */
-    var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    abstract var safeTextLength: Boolean
 
     /**
      * Sets a caption as [MessageText] object
@@ -68,7 +69,7 @@ abstract class CaptionableMediaMessage :
     override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageCaption(
             chatId, messageId, inlineMessageId, getCaptionText() ?: "", parseMode = null,
-            _caption?.getEntitiesString(), keyboardMarkup?.toMarkup()
+            _caption?.getEntities(), keyboardMarkup?.toMarkup()
         )
     }
 

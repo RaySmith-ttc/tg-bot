@@ -9,7 +9,6 @@ import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
-import kotlin.time.Duration
 
 @Suppress("MemberVisibilityCanBePrivate")
 class LocationMessage(
@@ -19,7 +18,13 @@ class LocationMessage(
     override val botConfig: BotConfig = bot.botConfig
 
     var horizontalAccuracy: Double? = null
-    var livePeriod: Duration? = null
+
+    /**
+     * Period during which the location will be updated (see [Live Locations](https://telegram.org/blog/live-locations),
+     * should be between `60` and `86400`, or [LivePeriod.Indefinitely] for live locations that can be edited
+     * indefinitely.
+     * */
+    var livePeriod: LivePeriod? = null
     var heading: Int? = null
     var proximityAlertRadius: Int? = null
     override var keyboardMarkup: MessageKeyboard? = null
@@ -37,7 +42,7 @@ class LocationMessage(
         latitude = latitude,
         longitude = longitude,
         horizontalAccuracy = horizontalAccuracy,
-        livePeriod = livePeriod?.inWholeSeconds?.toInt(),
+        livePeriod = livePeriod,
         heading = heading,
         proximityAlertRadius = proximityAlertRadius,
         disableNotification = disableNotification,

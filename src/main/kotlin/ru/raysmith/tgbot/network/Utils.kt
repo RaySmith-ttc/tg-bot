@@ -6,7 +6,6 @@ import io.ktor.http.*
 import io.ktor.utils.io.streams.*
 import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.model.network.media.input.InputFile
-import java.nio.file.Files
 import kotlin.time.Duration
 
 internal inline fun <reified T> HttpRequestBuilder.parameter(key: String, value: T?) {
@@ -40,12 +39,15 @@ internal fun HttpRequestBuilder.setMultiPartFormDataBody(vararg files: Pair<Stri
                         name,
                         InputProvider { inputFile.file.inputStream().asInput() },
                         Headers.build {
-                            append(HttpHeaders.ContentType, Files.probeContentType(inputFile.file.toPath()))
+//                            append(HttpHeaders.ContentType, Files.probeContentType(inputFile.file.toPath()))
                             append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.file.name}\"")
-                        })
+                        }
+                    )
 
                     is InputFile.ByteArray -> append(name, inputFile.byteArray, Headers.build {
-                        append(HttpHeaders.ContentType, inputFile.mimeType)
+                        if (inputFile.mimeType != null) {
+                            append(HttpHeaders.ContentType, inputFile.mimeType)
+                        }
                         append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.filename}\"")
                     })
 

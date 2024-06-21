@@ -18,8 +18,10 @@ import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
 import ru.raysmith.tgbot.model.bot.BotShortDescription
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.LivePeriod
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequest
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequestInternal
+import ru.raysmith.tgbot.model.bot.message.poll.InputPollOption
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.bisiness.BusinessConnection
 import ru.raysmith.tgbot.model.network.chat.*
@@ -230,7 +232,7 @@ interface API {
         messageThreadId: Int? = null,
         text: String,
         parseMode: ParseMode? = null,
-        entities: String? = null,
+        entities: List<MessageEntity>? = null,
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
@@ -348,7 +350,7 @@ interface API {
         messageId: Int,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyParameters: ReplyParameters? = null,
@@ -404,7 +406,7 @@ interface API {
         messageIds: List<Int>,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyParameters: ReplyParameters? = null,
@@ -459,7 +461,7 @@ interface API {
         messageThreadId: Int? = null,
         photo: InputFile,
         caption: String? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         hasSpoiler: Boolean? = null,
         parseMode: ParseMode? = null,
         disableNotification: Boolean? = null,
@@ -521,7 +523,7 @@ interface API {
         audio: InputFile,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         duration: Int? = null,
         performer: String? = null,
         title: String? = null,
@@ -559,7 +561,7 @@ interface API {
         thumbnail: NotReusableInputFile?,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         disableContentTypeDetection: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
@@ -592,9 +594,10 @@ interface API {
         duration: Int? = null,
         width: Int? = null,
         height: Int? = null,
+        thumbnail: NotReusableInputFile? = null,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         hasSpoiler: Boolean? = null,
         supportsStreaming: Boolean? = null,
         disableNotification: Boolean? = null,
@@ -618,7 +621,8 @@ interface API {
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
-                "video" to video
+                "video" to video,
+                "thumbnail" to thumbnail as InputFile,
             )
         }
     }
@@ -631,10 +635,10 @@ interface API {
         duration: Int? = null,
         width: Int? = null,
         height: Int? = null,
-        thumbnail: String? = null,
+        thumbnail: NotReusableInputFile? = null,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         hasSpoiler: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
@@ -647,7 +651,6 @@ interface API {
             parameter("duration", duration)
             parameter("width", width)
             parameter("height", height)
-            parameter("thumbnail", thumbnail)
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
@@ -657,7 +660,8 @@ interface API {
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
-                "animation" to animation
+                "animation" to animation,
+                "thumbnail" to thumbnail as InputFile?,
             )
         }
     }
@@ -669,7 +673,7 @@ interface API {
         voice: InputFile,
         caption: String? = null,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         duration: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
@@ -775,7 +779,7 @@ interface API {
         latitude: Double,
         longitude: Double,
         horizontalAccuracy: Double? = null,
-        livePeriod: Int? = null,
+        livePeriod: LivePeriod? = null,
         heading: Int? = null,
         proximityAlertRadius: Int? = null,
         disableNotification: Boolean? = null,
@@ -866,14 +870,16 @@ interface API {
         chatId: ChatId? = null,
         messageThreadId: Int? = null,
         question: String,
-        options: String,
+        questionParseMode: ParseMode? = null,
+        questionEntities: List<MessageEntity>? = null,
+        options: List<InputPollOption>,
         isAnonymous: Boolean? = null,
         type: PollType? = null,
         allowsMultipleAnswers: Boolean? = null,
         correctOptionId: Int? = null,
         explanation: String? = null,
-        explanationParseMode: String? = null,
-        explanationEntities: String? = null,
+        explanationParseMode: ParseMode? = null,
+        explanationEntities: List<MessageEntity>? = null,
         openPeriod: Int? = null,
         closeDate: Int? = null,
         isClosed: Boolean? = null,
@@ -886,6 +892,8 @@ interface API {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
             parameter("question", question)
+            parameter("question_parse_mode", questionParseMode)
+            parameter("question_entities", questionEntities)
             parameter("options", options)
             parameter("is_anonymous", isAnonymous)
             parameter("type", type)
@@ -1524,13 +1532,13 @@ interface API {
     /**
      * Use this method to get up to date information about the chat (current name of the user for one-on-one
      * conversations, current username of a user, group or channel, etc.).
-     * Returns a [Chat] object on success.
+     * Returns a [ChatFullInfo] object on success.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
     suspend fun getChat(
         chatId: ChatId
-    ) = request<Chat> {
+    ) = request<ChatFullInfo> {
         client.post("getChat") {
             parameter("chat_id", chatId)
         }
@@ -2155,7 +2163,7 @@ interface API {
         inlineMessageId: String? = null,
         text: String,
         parseMode: ParseMode? = null,
-        entities: String? = null,
+        entities: List<MessageEntity>? = null,
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -2191,7 +2199,7 @@ interface API {
         inlineMessageId: String? = null,
         caption: String,
         parseMode: ParseMode? = null,
-        captionEntities: String? = null,
+        captionEntities: List<MessageEntity>? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageCaption") {

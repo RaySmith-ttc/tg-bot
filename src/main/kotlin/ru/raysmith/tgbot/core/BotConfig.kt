@@ -16,6 +16,24 @@ class BotConfig {
 
     var verifyMarkdown2Format = Bot.properties.getOrDefault("verifyMarkdown2Format", "true").toBoolean()
     var safeTextLength = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
+
+    /**
+     * Whether null values should display in the message text. *False by default*.
+     *
+     * `printNulls = true`:
+     * ```
+     * textWithEntities {
+     *     text("Some text: ").text(null) // Output: 'Some text: null'
+     * }
+     * ```
+     *
+     * `printNulls = false`:
+     * ```
+     * textWithEntities {
+     *     text("Some text: ").text(null) // Output: 'Some text: '
+     * }
+     * ```
+     * */
     var printNulls = Bot.properties.getOrDefault("printNulls", "false").toBoolean()
     var defaultProviderToken = Bot.properties?.getOrNull("providerToken")
 //    var emptyCallbackQuery = Bot.properties.getOrDefault("emptyCallbackQuery", " ") // TODO [docs] can't be obtain from  config

@@ -15,6 +15,11 @@ data class Poll(
     /** Poll question, 1-300 characters */
     @SerialName("question") val question: String,
 
+    /**
+     * Special entities that appear in the question. Currently, only custom emoji entities are allowed in poll questions
+     * */
+    @SerialName("question_entities") val questionEntities: List<MessageEntity>? = null,
+
     /** List of poll options */
     @SerialName("options") val options: List<PollOption>,
 

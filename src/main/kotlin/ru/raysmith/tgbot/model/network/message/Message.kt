@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
+import ru.raysmith.tgbot.model.network.chat.background.ChatBackground
 import ru.raysmith.tgbot.model.network.chat.forum.*
 import ru.raysmith.tgbot.model.network.giveaway.Giveaway
 import ru.raysmith.tgbot.model.network.giveaway.GiveawayCompleted
@@ -219,20 +220,10 @@ data class Message(
     /** Service message: auto-delete timer settings changed in the chat */
     @SerialName("message_auto_delete_timer_changed") val messageAutoDeleteTimerChanged: MessageAutoDeleteTimerChanged? = null,
 
-    /**
-     * The group has been migrated to a supergroup with the specified identifier. This number may have more than 32
-     * significant bits and some programming languages may have difficulty/silent defects in interpreting it.
-     * But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe
-     * for storing this identifier.
-     * */
+    /** The group has been migrated to a supergroup with the specified identifier. */
     @SerialName("migrate_to_chat_id") val migrateToChatId: Long? = null,
 
-    /**
-     * The supergroup has been migrated from a group with the specified identifier. This number may have more than 32
-     * significant bits and some programming languages may have difficulty/silent defects in interpreting it.
-     * But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe
-     * for storing this identifier.
-     * */
+    /** The supergroup has been migrated from a group with the specified identifier. */
     @SerialName("migrate_from_chat_id") val migrateFromChatId: Long? = null,
 
     /**
@@ -280,6 +271,9 @@ data class Message(
 
     /** Service message: user boosted the chat */
     @SerialName("boost_added") val boostAdded: ChatBoostAdded? = null,
+
+    /** Service message: chat background set */
+    @SerialName("chat_background_set") val chatBackgroundSet: ChatBackground? = null,
 
     /** Service message: forum topic created */
     @SerialName("forum_topic_created") val forumTopicCreated: ForumTopicCreated? = null,

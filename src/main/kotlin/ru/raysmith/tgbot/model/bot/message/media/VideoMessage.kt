@@ -22,6 +22,7 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
 
     override val mediaName: String = "video"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
+    override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideo(
         businessConnectionId = businessConnectionId,
@@ -30,11 +31,12 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
         video = media ?: error("$mediaName is required"),
         caption = getCaptionText(),
         parseMode = parseMode,
-        captionEntities = _caption?.getEntitiesString(),
+        captionEntities = _caption?.getEntities(),
         hasSpoiler = hasSpoiler,
         duration = duration,
         width = width,
         height = height,
+        thumbnail = thumbnail,
         supportsStreaming = supportsStreaming,
         disableNotification = disableNotification,
         protectContent = protectContent,

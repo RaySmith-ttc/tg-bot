@@ -9,7 +9,9 @@ interface IMessage<T> : API {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
         const val MAX_CAPTION_LENGTH = 1024
+        const val MAX_POLL_QUESTION_LENGTH = 300
         const val MAX_POLL_EXPLANATION_LENGTH = 200
+        const val MAX_POLL_OPTION_LENGTH = 100
     }
 
     /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
