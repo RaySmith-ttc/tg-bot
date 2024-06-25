@@ -34,6 +34,9 @@ data class InputMediaAnimation(
     /** List of special entities that appear in the caption, which can be specified instead of *[parseMode]* */
     @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
 
+    /** Pass *True*, if the caption must be shown above the message media */
+    @SerialName("show_caption_above_media") val showCaptionAboveMedia: Boolean? = null,
+
     /** Animation width */
     @SerialName("width") val width: Int? = null,
 

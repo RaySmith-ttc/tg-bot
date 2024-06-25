@@ -21,6 +21,7 @@ class DiceMessage(
     override var disableNotification: Boolean? = null
     override var replyParameters: ReplyParameters? = null
     override var protectContent: Boolean? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
@@ -32,6 +33,7 @@ class DiceMessage(
         disableNotification = disableNotification,
         protectContent = protectContent,
         replyParameters = replyParameters,
+        messageEffectId = messageEffectId,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )
 }

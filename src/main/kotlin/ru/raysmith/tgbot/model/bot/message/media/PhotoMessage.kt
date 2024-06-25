@@ -19,6 +19,9 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
+    /** Pass *True*, if the caption must be shown above the message media */
+    var showCaptionAboveMedia: Boolean? = null
+
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPhoto(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
@@ -27,9 +30,11 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
         caption = getCaptionText(),
         parseMode = parseMode,
         captionEntities = _caption?.getEntities(),
+        showCaptionAboveMedia = showCaptionAboveMedia,
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup()
     )

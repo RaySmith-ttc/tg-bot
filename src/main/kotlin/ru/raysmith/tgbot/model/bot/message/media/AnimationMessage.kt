@@ -25,6 +25,9 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
+    /** Pass *True*, if the caption must be shown above the message media */
+    var showCaptionAboveMedia: Boolean? = null
+
     override suspend fun send(chatId: ChatId, messageThreadId: Int?): Message = sendAnimation(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
@@ -37,9 +40,11 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
         caption = getCaptionText(),
         parseMode = parseMode,
         captionEntities = _caption?.getEntities(),
+        showCaptionAboveMedia = showCaptionAboveMedia,
         hasSpoiler = hasSpoiler,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

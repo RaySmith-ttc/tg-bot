@@ -33,6 +33,7 @@ class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage() {
         duration = duration,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

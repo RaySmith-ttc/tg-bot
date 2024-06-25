@@ -13,6 +13,8 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 
+// TODO move required fields to constructor
+
 /** Builder of [sendInvoice][API.sendInvoice] request */
 class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder {
     override val client: HttpClient = bot.client
@@ -32,7 +34,10 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
      * */
     var payload: String? = null
 
-    /** Payments provider token, obtained via [@Botfather](tg://BotFather) */
+    /**
+     * Payments provider token, obtained via [@Botfather](tg://BotFather).
+     * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * */
     var providerToken: String? = bot.botConfig.defaultProviderToken
 
     /**
@@ -135,7 +140,7 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
         title = title ?: "",
         description = description ?: "",
         payload = payload ?: "",
-        providerToken = providerToken ?: "",
+        providerToken = providerToken,
         currency = currency?.code ?: "",
         prices = prices?.let { Json.encodeToString(it) } ?: "",
         maxTipAmount = maxTipAmount,

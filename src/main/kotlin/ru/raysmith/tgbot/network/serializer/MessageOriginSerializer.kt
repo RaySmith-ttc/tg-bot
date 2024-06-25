@@ -20,3 +20,4 @@ object MessageOriginSerializer : JsonContentPolymorphicSerializer<MessageOrigin>
     }
 }
 
+

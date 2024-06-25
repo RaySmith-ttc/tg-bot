@@ -24,6 +24,9 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
+    /** Pass *True*, if the caption must be shown above the message media */
+    var showCaptionAboveMedia: Boolean? = null
+
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideo(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
@@ -32,6 +35,7 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
         caption = getCaptionText(),
         parseMode = parseMode,
         captionEntities = _caption?.getEntities(),
+        showCaptionAboveMedia = showCaptionAboveMedia,
         hasSpoiler = hasSpoiler,
         duration = duration,
         width = width,
@@ -40,6 +44,7 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
         supportsStreaming = supportsStreaming,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

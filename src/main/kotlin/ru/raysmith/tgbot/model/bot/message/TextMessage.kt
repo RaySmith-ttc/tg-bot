@@ -16,12 +16,6 @@ class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    /** Full text of message with entities */
-    private var messageText: MessageText? = null
-
-    /** Simple text to send the message, optionally with [parseMode] */
-    override var text: String? = null
-
     /** Link preview generation options for the message */
     var linkPreviewOptions = bot.botConfig.linkPreviewOptions
 
@@ -31,6 +25,7 @@ class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
     override var businessConnectionId: String? = null
+    override var messageEffectId: String? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendMessage(
         businessConnectionId = businessConnectionId,
@@ -42,6 +37,7 @@ class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType
         linkPreviewOptions = linkPreviewOptions,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

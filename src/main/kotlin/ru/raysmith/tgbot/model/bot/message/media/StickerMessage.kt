@@ -32,6 +32,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
         emoji = emoji,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

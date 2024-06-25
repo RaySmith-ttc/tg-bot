@@ -22,6 +22,7 @@ class VenueMessage(
     override var protectContent: Boolean? = null
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
+    override var messageEffectId: String? = null
 
     var foursquareId: String? = null
     var foursquareType: String? = null
@@ -42,6 +43,7 @@ class VenueMessage(
         googlePlaceType = googlePlaceType,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

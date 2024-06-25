@@ -23,10 +23,14 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var replyParameters: ReplyParameters? = null
 
-    /** send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action while upload files to telegram server */
+    /**
+     * send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action
+     * while upload files to telegram server
+     * */
     var sendAction = false
 
     private val inputMedia = mutableListOf<InputMediaGroup>()
@@ -59,6 +63,8 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 messageThreadId = messageThreadId,
                 media = inputMedia,
                 disableNotification = disableNotification,
+                protectContent = protectContent,
+                messageEffectId = messageEffectId,
                 replyParameters = replyParameters
             )
         } else {
@@ -83,20 +89,22 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
                 media = inputMedia,
                 disableNotification = disableNotification,
                 replyParameters = replyParameters,
+                protectContent = protectContent,
+                messageEffectId = messageEffectId,
                 inputFiles = inputFiles
             )
         }
     }
     
-    // TODO docs: not correctly work with the safeLength property when parseMode is not null. Provide hand-made safe caption
     fun photo(
         photo: InputFile, caption: String? = null, parseMode: ParseMode? = null,
-        safeTextLength: Boolean = bot.botConfig.safeTextLength, captionEntities: List<MessageEntity>? = null,
-        hasSpoiler: Boolean? = null
+        captionEntities: List<MessageEntity>? = null, hasSpoiler: Boolean? = null
     ) {
+        checkMediaTypes("photo")
         inputMedia.add(
             InputMediaPhoto(
-                applyMedia(photo), getCaption(caption, safeTextLength, parseMode), parseMode, captionEntities, hasSpoiler
+                applyMedia(photo), getCaption(caption, safeTextLength = false, parseMode), parseMode, captionEntities, 
+                hasSpoiler
             )
         )
     }
@@ -105,6 +113,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
         photo: InputFile, hasSpoiler: Boolean? = null, printNulls: Boolean = bot.botConfig.printNulls,
         safeTextLength: Boolean = bot.botConfig.safeTextLength, caption: MessageText.() -> Unit
     ) {
+        checkMediaTypes("photo")
         inputMedia.add(
             InputMediaPhoto(
                 applyMedia(photo),
@@ -117,28 +126,34 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     }
 
     fun video(
-        video: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null, parseMode: ParseMode? = null,
-        captionEntities: List<MessageEntity>? = null, width: Int? = null, height: Int? = null, duration: Int? = null,
+        video: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null,
+        parseMode: ParseMode? = null, captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null, width: Int? = null, height: Int? = null, duration: Int? = null,
         supportsStreaming: Boolean? = null, hasSpoiler: Boolean? = null
     ) {
+        checkMediaTypes("video")
         inputMedia.add(
             InputMediaVideo(
-                applyMedia(video), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode),
-                parseMode, captionEntities, width, height, duration, supportsStreaming, hasSpoiler
+                applyMedia(video), thumbnail?.let { applyMedia(it) },
+                getCaption(caption, safeTextLength = false, parseMode), parseMode, captionEntities,
+                showCaptionAboveMedia, width, height, duration, supportsStreaming, hasSpoiler
             )
         )
     }
 
     fun video(
-        video: InputFile, thumbnail: NotReusableInputFile? = null, width: Int? = null, height: Int? = null, duration: Int? = null,
-        supportsStreaming: Boolean? = null, hasSpoiler: Boolean? = null, printNulls: Boolean = bot.botConfig.printNulls,
-        safeTextLength: Boolean = bot.botConfig.safeTextLength, caption: MessageText.() -> Unit
+        video: InputFile, thumbnail: NotReusableInputFile? = null, showCaptionAboveMedia: Boolean? = null,
+        width: Int? = null, height: Int? = null, duration: Int? = null, supportsStreaming: Boolean? = null,
+        hasSpoiler: Boolean? = null, printNulls: Boolean = bot.botConfig.printNulls,
+        safeTextLength: Boolean = bot.botConfig.safeTextLength,
+        caption: MessageText.() -> Unit
     ) {
+        checkMediaTypes("video")
         inputMedia.add(
             InputMediaVideo(
                 applyMedia(video), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
-                getCaptionEntities(printNulls, safeTextLength, caption), width, height, duration, supportsStreaming,
-                hasSpoiler
+                getCaptionEntities(printNulls, safeTextLength, caption), showCaptionAboveMedia, width, height, duration,
+                supportsStreaming, hasSpoiler
             )
         )
     }
@@ -148,7 +163,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
         printNulls: Boolean = bot.botConfig.printNulls, safeTextLength: Boolean = bot.botConfig.safeTextLength,
         caption: MessageText.() -> Unit
     ) {
-        checkMediaTypes<InputMediaDocument>("document")
+        checkMediaTypes("document")
         inputMedia.add(
             InputMediaDocument(
                 applyMedia(document), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
@@ -158,28 +173,31 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     }
 
     fun document(
-        document: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null, parseMode: ParseMode? = null,
-        captionEntities: List<MessageEntity>? = null, disableContentTypeDetection: Boolean? = null
+        document: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null,
+        parseMode: ParseMode? = null, captionEntities: List<MessageEntity>? = null,
+        disableContentTypeDetection: Boolean? = null
     ) {
-        checkMediaTypes<InputMediaDocument>("document")
+        checkMediaTypes("document")
         inputMedia.add(
             InputMediaDocument(
-                applyMedia(document), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode), parseMode,
-                captionEntities, disableContentTypeDetection
+                applyMedia(document), thumbnail?.let { applyMedia(it) },
+                getCaption(caption, safeTextLength = false, parseMode), parseMode, captionEntities,
+                disableContentTypeDetection
             )
         )
     }
 
     fun audio(
-        audio: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null, parseMode: ParseMode? = null,
-        captionEntities: List<MessageEntity>? = null, duration: Int? = null, performer: String? = null,
-        title: String? = null
+        audio: InputFile, thumbnail: NotReusableInputFile? = null, caption: String? = null,
+        parseMode: ParseMode? = null, captionEntities: List<MessageEntity>? = null, duration: Int? = null,
+        performer: String? = null, title: String? = null
     ) {
-        checkMediaTypes<InputMediaAudio>("audio")
+        checkMediaTypes("audio")
         inputMedia.add(
             InputMediaAudio(
-                applyMedia(audio), thumbnail?.let { applyMedia(it) }, getCaption(caption, false, parseMode),
-                parseMode, captionEntities, duration, performer, title
+                applyMedia(audio), thumbnail?.let { applyMedia(it) },
+                getCaption(caption, safeTextLength = false, parseMode), parseMode, captionEntities, duration, performer,
+                title
             )
         )
     }
@@ -189,7 +207,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
         title: String? = null, printNulls: Boolean = bot.botConfig.printNulls,
         safeTextLength: Boolean = bot.botConfig.safeTextLength, caption: MessageText.() -> Unit
     ) {
-        checkMediaTypes<InputMediaAudio>("audio")
+        checkMediaTypes("audio")
         inputMedia.add(
             InputMediaAudio(
                 applyMedia(audio), thumbnail?.let { applyMedia(it) }, getCaption(printNulls, caption), null,
@@ -198,5 +216,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
         )
     }
 
-    private inline fun <reified T : InputMedia> checkMediaTypes(name: String) = check(inputMedia.all { it is T }) { "$name can't be mixed with other media types" }
+    private fun checkMediaTypes(type: String) = check(inputMedia.all { it.type == type }) {
+        "$type can't be mixed with other media types"
+    }
 }

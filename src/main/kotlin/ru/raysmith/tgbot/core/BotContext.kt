@@ -48,6 +48,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * of *[parseMode]*
      * @param linkPreviewOptions Link preview generation options for the message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param replyParameters Description of the message to reply to
@@ -64,6 +65,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         messageThreadId: Int? = null,
         chatId: ChatId = getChatIdOrThrow(),
@@ -71,7 +73,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     ): Message {
         return sendMessage(
             businessConnectionId, chatId, messageThreadId, text, parseMode, entities, linkPreviewOptions,
-            disableNotification, protectContent,
+            disableNotification, protectContent, messageEffectId,
             replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
@@ -161,7 +163,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): MessageId {
         return copyMessage(
-            chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, disableNotification, protectContent,
+            chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, showCaptionAboveMedia,
+            disableNotification, protectContent,
             replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
@@ -866,6 +869,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param captionEntities A JSON-serialized list of special entities that appear in the caption,
      * which can be specified instead of parseMode
+     * @param showCaptionAboveMedia Pass *True*, if the caption must be shown above the message media.
+     * Supported only for animation, photo and video messages.
      * @param linkPreviewOptions Link preview generation options for the message
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
@@ -877,12 +882,13 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         caption: String,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         linkPreviewOptions: LinkPreviewOptions? = bot.botConfig.linkPreviewOptions,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageCaption(
-            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities,
+            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities, showCaptionAboveMedia,
             keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }

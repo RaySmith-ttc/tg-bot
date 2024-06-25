@@ -118,6 +118,9 @@ data class Message(
      * */
     @SerialName("link_preview_options") val linkPreviewOptions: LinkPreviewOptions? = null,
 
+    /** Unique identifier of the message effect added to the message */
+    @SerialName("effect_id") val effectId: String? = null,
+
     /**
      * Message is an animation, information about the animation. For backward compatibility, when this field is set,
      * the *document* field will also be set
@@ -158,6 +161,9 @@ data class Message(
      * For messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption
      * */
     @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
+
+    /** True, if the caption must be shown above the message media */
+    @SerialName("show_caption_above_media") val showCaptionAboveMedia: Boolean? = null,
 
     /** *True*, if the message media is covered by a spoiler animation */
     @SerialName("has_media_spoiler") val hasMediaSpoiler: Boolean? = null,
@@ -324,6 +330,28 @@ data class Message(
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null
 
 ) : MaybeInaccessibleMessage(), ChatIdHolder {
+
+    /** Contains all unique identifiers of the message effects */
+    object Effect {
+
+        /** 🔥 */
+        const val FLAME = "5104841245755180586"
+
+        /** 👍 */
+        const val LIKE = "5107584321108051014"
+
+        /** ❤️ */
+        const val HEART = "5044134455711629726"
+
+        /** 🎉 */
+        const val TADA = "5046509860389126442"
+
+        /** 👎 */
+        const val DISLIKE = "5104858069142078462"
+
+        /** 💩 */
+        const val POO = "5046589136895476101"
+    }
 
     /** [Type][MessageType] of the message. It can be text, command or inline data */
     val type = when {

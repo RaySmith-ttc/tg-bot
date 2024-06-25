@@ -50,13 +50,16 @@ data class InlineQueryResultMpeg4Gif(
     /** List of special entities that appear in the caption, which can be specified instead of *[parseMode]* */
     @SerialName("caption_entities") val captionEntities: List<MessageEntity>? = null,
 
+    /** Pass *True*, if the caption must be shown above the message media */
+    @SerialName("show_caption_above_media") val showCaptionAboveMedia: Boolean? = null,
+
     /** [Inline keyboard](https://core.telegram.org/bots/features#inline-keyboards) attached to the message */
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null,
 
     /** Content of the message to be sent instead of the video animation */
     @SerialName("input_message_content") val inputMessageContent: InputMessageContent? = null,
 
-    ) : InlineQueryResult() {
+) : InlineQueryResult() {
 
     /** Type of the result, must be *mpeg4_gif* */
     @EncodeDefault

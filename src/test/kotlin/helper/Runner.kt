@@ -193,10 +193,10 @@ fun MessageText.setupTestMessage(message: Message) {
 //
 
 
-    entity(MessageEntityType.STRIKETHROUGH) {
-        offset = 2
-        length = currentTextLength - 2
-    }
+//    entity(MessageEntityType.STRIKETHROUGH) {
+//        offset = 2
+//        length = currentTextLength - 2
+//    }
 }
 
 val pagesData = 1..120
@@ -636,6 +636,7 @@ class Runner {
                         } else {
                             send {
                                 linkPreviewOptions = LinkPreviewOptions.DISABLED
+                                messageEffectId = Message.Effect.POO
                                 textWithEntities {
                                     setupTestMessage(message)
                                 }
@@ -1149,6 +1150,7 @@ class Runner {
                     isCommand("photo") {
                         sendPhoto {
                             photo = "files/image1.png".asResources().asTgFile()
+                            showCaptionAboveMedia = true
                             captionWithEntities {
                                 bold("Title").n()
                                 n()
@@ -1689,10 +1691,12 @@ class Runner {
                         sendMediaGroup {
                             val caption = generateSequence("") { "1234567890".random().toString() }
 
-                            photo("files/image1.png".asResources().asTgFile()) {
-                                bold("Test").n()
-                                italic("Message")
-                            }
+                            photo("files/image1.png".asResources().asTgFile(), caption = "<b>Test</b>\n<i>Message</i>", parseMode = ParseMode.HTML)
+
+//                            photo("files/image1.png".asResources().asTgFile()) {
+//                                bold("Test").n()
+//                                italic("Message")
+//                            }
                             photo("files/image1.png".asResources().asTgFile(), caption.take(1024).joinToString(""))
                             photo("files/image1.png".asResources().asTgFile(), caption.take(2000).joinToString(""))
                             photo("files/image2.jpg".asResources().asTgFile(), "<b>${caption.take(1024).joinToString("")}</b>", parseMode = ParseMode.HTML)

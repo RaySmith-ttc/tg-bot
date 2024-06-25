@@ -43,6 +43,7 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
+import ru.raysmith.tgbot.model.network.payment.stars.StarTransactions
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.sticker.*
@@ -218,6 +219,8 @@ interface API {
      * of *[parseMode]*
      * @param linkPreviewOptions Link preview generation options for the message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param replyParameters Description of the message to reply to
@@ -236,9 +239,10 @@ interface API {
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
-    ) = request<Message> {
+    ): Message = request<Message> {
         client.post("sendMessage") {
             parameter("chat_id", chatId)
             parameter("message_thread_id", messageThreadId)
@@ -248,6 +252,7 @@ interface API {
             parameter("link_preview_options", linkPreviewOptions)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -334,6 +339,8 @@ interface API {
      * @param parseMode [ParseMode] for parsing entities in the message caption.
      * @param captionEntities List of special entities that appear in message text,
      * which can be specified instead of *[parseMode]*
+     * @param showCaptionAboveMedia Pass *True*, if the caption must be shown above the message media.
+     * Ignored if a new caption isn't specified.
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
@@ -351,6 +358,7 @@ interface API {
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
         replyParameters: ReplyParameters? = null,
@@ -364,6 +372,7 @@ interface API {
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
             parameter("reply_parameters", replyParameters)
@@ -393,6 +402,7 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
@@ -445,10 +455,12 @@ interface API {
      * @param parseMode [ParseMode] for parsing entities in the photo caption.
      * @param captionEntities List of special entities that appear in message text,
      * which can be specified instead of *[parseMode]*
+     * @param showCaptionAboveMedia Pass *True*, if the caption must be shown above the message media
      * @param hasSpoiler Pass *True* if the photo needs to be covered with a spoiler animation
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
@@ -462,10 +474,12 @@ interface API {
         photo: InputFile,
         caption: String? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         hasSpoiler: Boolean? = null,
         parseMode: ParseMode? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -475,9 +489,11 @@ interface API {
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
             setMultiPartFormDataBody(
@@ -510,6 +526,7 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
@@ -530,6 +547,7 @@ interface API {
         thumbnail: NotReusableInputFile? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -544,6 +562,7 @@ interface API {
             parameter("title", title)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
             setMultiPartFormDataBody(
@@ -565,6 +584,7 @@ interface API {
         disableContentTypeDetection: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -577,6 +597,7 @@ interface API {
             parameter("disable_content_type_detection", disableContentTypeDetection)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -598,10 +619,12 @@ interface API {
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         hasSpoiler: Boolean? = null,
         supportsStreaming: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -614,10 +637,12 @@ interface API {
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("has_spoiler", hasSpoiler)
             parameter("supports_streaming", supportsStreaming)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -639,9 +664,11 @@ interface API {
         caption: String? = null,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         hasSpoiler: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -654,9 +681,11 @@ interface API {
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -677,6 +706,7 @@ interface API {
         duration: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -689,6 +719,7 @@ interface API {
             parameter("duration", duration)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -706,6 +737,7 @@ interface API {
         length: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -716,6 +748,7 @@ interface API {
             parameter("length", length)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -731,9 +764,14 @@ interface API {
      *
      * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
      * will be sent
-     * @param chatId Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+     * @param chatId Unique identifier for the target chat or username of the target channel
+     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
+     * for forum supergroups only
      * @param media A JSON-serialized array describing messages to be sent, must include 2-10 items
-     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages). Users will receive a notification with no sound.
+     * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
+     * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent messages from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * */
     suspend fun sendMediaGroup(
@@ -742,6 +780,8 @@ interface API {
         messageThreadId: Int? = null,
         media: List<InputMediaGroup>,
         disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         inputFiles: List<InputFile>? = null // TODO docs
     ) = request<List<Message>> {
@@ -750,6 +790,8 @@ interface API {
             parameter("message_thread_id", messageThreadId)
             parameter("media", media)
             parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             if (inputFiles != null) {
                 var lastInputFilesIndex = 0
@@ -784,6 +826,7 @@ interface API {
         proximityAlertRadius: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -798,6 +841,7 @@ interface API {
             parameter("proximity_alert_radius", proximityAlertRadius)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -817,6 +861,7 @@ interface API {
         googlePlaceType: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -833,6 +878,7 @@ interface API {
             parameter("google_place_type", googlePlaceType)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -848,6 +894,7 @@ interface API {
         vcard: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -860,6 +907,7 @@ interface API {
             parameter("vcard", vcard)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -885,6 +933,7 @@ interface API {
         isClosed: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -907,6 +956,7 @@ interface API {
             parameter("is_closed", isClosed)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -919,6 +969,7 @@ interface API {
         emoji: String,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -928,6 +979,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
         }
@@ -2191,6 +2243,8 @@ interface API {
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param captionEntities List of special entities that appear in the caption,
      * which can be specified instead of [parseMode]
+     * @param showCaptionAboveMedia Pass *True*, if the caption must be shown above the message media.
+     * Supported only for animation, photo and video messages.
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageCaption(
@@ -2200,6 +2254,7 @@ interface API {
         caption: String,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageCaption") {
@@ -2209,6 +2264,7 @@ interface API {
             parameter("caption", caption)
             parameter("parse_mode", parseMode)
             parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("reply_markup", replyMarkup)
         }
     }
@@ -2378,6 +2434,7 @@ interface API {
         emoji: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
@@ -2387,6 +2444,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
             setMultiPartFormDataBody(
@@ -2772,7 +2830,8 @@ interface API {
      * @param description Product description, 1-255 characters
      * @param payload Bot-defined invoice payload, 1-128 bytes.
      * This will not be displayed to the user, use for your internal processes.
-     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
+     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather).
+     * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param currency Three-letter ISO 4217 currency code, see
      * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
      * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
@@ -2817,7 +2876,7 @@ interface API {
         title: String,
         description: String,
         payload: String,
-        providerToken: String,
+        providerToken: String? = null,
         currency: String,
         prices: String,
         maxTipAmount: Int? = null,
@@ -2876,7 +2935,8 @@ interface API {
      * @param description Product description, 1-255 characters
      * @param payload Bot-defined invoice payload, 1-128 bytes.
      * This will not be displayed to the user, use for your internal processes.
-     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather)
+     * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather).
+     * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param currency Three-letter ISO 4217 currency code, see
      * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
      * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
@@ -2909,7 +2969,7 @@ interface API {
         title: String,
         description: String,
         payload: String,
-        providerToken: String,
+        providerToken: String? = null,
         currency: String,
         prices: String,
         maxTipAmount: Int? = null,
@@ -3002,6 +3062,40 @@ interface API {
             parameter("pre_checkout_query_id", preCheckoutQueryId)
             parameter("ok", ok)
             parameter("error_message", errorMessage)
+        }
+    }
+
+    /**
+     * Returns the bot's Telegram Star transactions in chronological order.
+     * On success, returns a [StarTransactions] object.
+     *
+     * @param offset Number of transactions to skip in the response
+     * @param limit The maximum number of transactions to be retrieved. Values between 1-100 are accepted.
+     * Defaults to 100.
+     * */
+    suspend fun getStarTransactions(
+        offset: Int,
+        limit: Int,
+    ) = request<StarTransactions> {
+        client.post("getStarTransactions") {
+            parameter("offset", offset)
+            parameter("limit", limit)
+        }
+    }
+
+    /**
+     * Refunds a successful payment in [Telegram Stars](https://t.me/BotNews/90). Returns *True* on success.
+     *
+     * @param userId Identifier of the user whose payment will be refunded
+     * @param telegramPaymentChargeId Telegram payment identifier
+     * */
+    suspend fun refundStarPayment(
+        userId: ChatId.ID,
+        telegramPaymentChargeId: String,
+    ) = request<Boolean> {
+        client.post("refundStarPayment") {
+            parameter("user_id", userId)
+            parameter("telegram_payment_charge_id", telegramPaymentChargeId)
         }
     }
 

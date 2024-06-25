@@ -29,6 +29,7 @@ class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb() {
         captionEntities = _caption?.getEntities(),
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

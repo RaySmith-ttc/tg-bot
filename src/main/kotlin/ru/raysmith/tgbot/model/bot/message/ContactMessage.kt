@@ -19,6 +19,7 @@ class ContactMessage(
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var protectContent: Boolean? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var replyParameters: ReplyParameters? = null
@@ -36,6 +37,7 @@ class ContactMessage(
         vcard = vcard,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

@@ -17,5 +17,6 @@ abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
     override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
 }

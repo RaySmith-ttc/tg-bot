@@ -6,7 +6,11 @@ import ru.raysmith.tgbot.utils.withSafeLength
 
 @TextMessageDsl
 abstract class TextWithEntities(private val bot: Bot, private val type: MessageTextType) {
-    private var messageText: MessageText? = null
+
+    /** Full text of message with entities */
+    protected var messageText: MessageText? = null
+
+    /** Simple text to send the message, optionally with [parseMode] */
     open var text: String? = null
     open var parseMode: ParseMode? = null
     open var safeTextLength: Boolean = bot.botConfig.safeTextLength

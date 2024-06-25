@@ -21,8 +21,11 @@ data class InputInvoiceMessageContent(
      * */
     @SerialName("payload") val payload: String,
 
-    /** Payment provider token, obtained via [@BotFather](https://t.me/botfather) */
-    @SerialName("provider_token") val providerToken: String,
+    /**
+     * Payment provider token, obtained via [@BotFather](https://t.me/botfather).
+     * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * */
+    @SerialName("provider_token") val providerToken: String? = null,
 
     /**
      * Three-letter ISO 4217 currency code,
