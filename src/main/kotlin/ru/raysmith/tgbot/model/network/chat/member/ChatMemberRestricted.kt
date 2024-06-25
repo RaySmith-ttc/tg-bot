@@ -15,7 +15,9 @@ data class ChatMemberRestricted(
     /** *True*, if the user is allowed to change the chat title, photo and other settings */
     @SerialName("is_member") val isMember: Boolean,
 
-    /** *True*, if the user is allowed to send text messages, contacts, locations and venues */
+    /**
+     * *True*, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, locations and venues
+     * */
     @SerialName("can_send_messages") val canSendMessages: Boolean,
 
     /** *True*, if the user is allowed to send audios */

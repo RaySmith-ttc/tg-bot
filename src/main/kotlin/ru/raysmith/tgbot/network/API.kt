@@ -14,6 +14,7 @@ import io.ktor.utils.io.streams.*
 import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.exceptions.BotException
+import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
 import ru.raysmith.tgbot.model.bot.BotShortDescription
@@ -48,6 +49,7 @@ import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
 import ru.raysmith.tgbot.model.network.sticker.*
 import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.model.network.updates.boost.UserChatBoosts
 import java.io.InputStream
 import java.time.ZonedDateTime
@@ -81,12 +83,29 @@ interface API {
     /**
      * Use this method to receive incoming updates using long polling
      * ([wiki](https://en.wikipedia.org/wiki/Push_technology#Long_polling)).
+     *
+     * @param offset Identifier of the first update to be returned. Must be greater by one than the highest among the
+     * identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update
+     * are returned. An update is considered confirmed as soon as [getUpdates] is called with an *offset* higher than
+     * its *update_id*. The negative offset can be specified to retrieve updates starting from -*offset* update from
+     * the end of the updates queue. All previous updates will be forgotten.
+     * @param limit Limits the number of updates to be retrieved. Values between 1-100 are accepted. Defaults to 100.
+     * @param timeout Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive,
+     * short polling should be used for testing purposes only.
+     * @param allowedUpdates A list of the update types you want your bot to receive. For example, specify
+     * [[UpdateType.MESSAGE], [UpdateType.EDITED_CHANNEL_POST], [UpdateType.CALLBACK_QUERY]] to only receive updates
+     * of these types. Specify an empty list to receive all update types except [UpdateType.CHAT_MEMBER],
+     * [UpdateType.MESSAGE_REACTION] and [UpdateType.MESSAGE_REACTION_COUNT] (default).
+     * If not specified, the previous setting will be used.
+     *
+     * > Please note that this parameter doesn't affect updates created before the call to the [getUpdates],
+     * so unwanted updates may be received for a short period of time.
      * */
     suspend fun getUpdates(
         offset: Int? = null,
         limit: Int? = null,
         timeout: Int? = null,
-        allowedUpdates: String? = null,
+        allowedUpdates: List<UpdateType>? = null,
     ) = request<List<Update>> {
         client.post("getUpdates") {
             parameter("offset", offset)
@@ -121,11 +140,13 @@ interface API {
      * @param maxConnections The maximum allowed number of simultaneous HTTPS connections to the webhook for update
      * delivery, 1-100. Defaults to 40. Use lower values to limit the load on your bot's server, and higher
      * values to increase your bot's throughput.
-     * @param allowedUpdates A JSON-serialized list of the update types you want your bot to receive.
-     * See [Update] for a complete list of available update types. Specify an empty list to receive all update
-     * types except chat_member (default). If not specified, the previous setting will be used.
+     * @param allowedUpdates A list of the update types you want your bot to receive. For example, specify
+     * [[UpdateType.MESSAGE], [UpdateType.EDITED_CHANNEL_POST], [UpdateType.CALLBACK_QUERY]] to only receive updates
+     * of these types. Specify an empty list to receive all update types except [UpdateType.CHAT_MEMBER],
+     * [UpdateType.MESSAGE_REACTION] and [UpdateType.MESSAGE_REACTION_COUNT] (default).
+     * If not specified, the previous setting will be used.
      *
-     * Please note that this parameter doesn't affect updates created before the call to the setWebhook,
+     * > Please note that this parameter doesn't affect updates created before the call to the [getUpdates],
      * so unwanted updates may be received for a short period of time.
      * @param dropPendingUpdates Pass *True* to drop all pending updates
      * @param secretToken A secret token to be sent in a header “X-Telegram-Bot-Api-Secret-Token” in every webhook
@@ -137,7 +158,7 @@ interface API {
         certificate: InputFile? = null,
         ipAddress: String? = null,
         maxConnections: Int? = null,
-        allowedUpdates: String? = null,
+        allowedUpdates: List<UpdateType>? = null,
         dropPendingUpdates: Boolean? = null,
         secretToken: String? = null,
     ) = request<Boolean> {
@@ -259,8 +280,8 @@ interface API {
     }
 
     /**
-     * Use this method to forward messages of any kind. Service messages can't be forwarded.
-     * On success, the sent [Message] is returned.
+     * Use this method to forward messages of any kind. Service messages and messages with protected content
+     * can't be forwarded. On success, the sent [Message] is returned.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
@@ -324,8 +345,9 @@ interface API {
 
     /**
      * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
-     * and invoice messages can't be copied. A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only
-     * if the value of the field [correctOptionId][Poll.correctOptionId] is known to the bot.
+     * giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz
+     * [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
+     * [correctOptionId][Poll.correctOptionId] is known to the bot.
      * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
      *
@@ -2237,7 +2259,9 @@ interface API {
 
     /**
      * Use this method to edit captions of messages. On success, if the edited message is not an inline message,
-     * the edited [Message] is returned, otherwise True is returned.
+     * the edited [Message] is returned, otherwise *True* is returned. Note that business messages that were not sent
+     * by the bot and do not contain an inline keyboard can only be edited within **48 hours** from the time they were
+     * sent.
      *
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
@@ -2279,7 +2303,9 @@ interface API {
      * only to a document for document albums and to a photo or a video otherwise.
      * When an inline message is edited, a new file can't be uploaded; use a previously uploaded file
      * via its file_id or specify a URL. On success, if the edited message is not an inline message,
-     * the edited [Message] is returned, otherwise *True* is returned.
+     * the edited [Message] is returned, otherwise *True* is returned. Note that business messages that were not sent
+     * by the bot and do not contain an inline keyboard can only be edited within **48 hours** from the time they were
+     * sent.
      *
      * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
      * be edited was sent
@@ -2353,6 +2379,8 @@ interface API {
     /**
      * Use this method to edit only the reply markup of messages. On success,
      * if the edited message is not an inline message, the edited [Message] is returned, otherwise *True* is returned.
+     * Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be
+     * edited within **48 hours** from the time they were sent.
      *
      * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
      * be edited was sent
@@ -2490,7 +2518,7 @@ interface API {
      * Use this method to get information about custom emoji stickers by their identifiers.
      * Returns an Array of [Sticker] objects.
      *
-     * @param customEmojiIds List of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
+     * @param customEmojiIds A list of custom emoji identifiers. At most 200 custom emoji identifiers can be specified.
      * */
     suspend fun getCustomEmojiStickers(
         customEmojiIds: List<String>,
@@ -2501,8 +2529,8 @@ interface API {
     }
 
     /**
-     * Use this method to upload a .PNG file with a sticker for later use in *[createNewStickerSet]* and
-     * *[addStickerToSet]* methods (can be used multiple times). Returns the uploaded File on success.
+     * Use this method to upload a .PNG file with a sticker for later use in [createNewStickerSet], [addStickerToSet],
+     * or [replaceStickerInSet] methods (the file can be used multiple times). Returns the uploaded File on success.
      *
      * @param userId User identifier of sticker file owner
      * @param sticker A file with the sticker in .WEBP, .PNG, .TGS, or .WEBM format.
@@ -2568,11 +2596,8 @@ interface API {
     }
 
     /**
-     * Use this method to add a new sticker to a set created by the bot.
-     * You must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
-     * Animated stickers can be added to animated sticker sets and only to them.
-     * Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120 stickers.
-     * Returns *True* on success.
+     * Use this method to add a new sticker to a set created by the bot. Emoji sticker sets can have up to 200 stickers.
+     * Other sticker sets can have up to 120 stickers. Returns *True* on success.
      *
      * @param userId User identifier of created sticker set owner
      * @param name Short name of sticker set, to be used in `t.me/addstickers/` URLs (e.g., animals).
@@ -2853,14 +2878,16 @@ interface API {
      * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather).
      * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param currency Three-letter ISO 4217 currency code, see
-     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
+     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies).
+     * Pass [Currency.XTR] for payments in Telegram Stars.
      * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.)
+     * delivery cost, delivery tax, bonus, etc.).
+     * Must contain exactly one item for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
      * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `maxTipAmount = 145`.
      * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
      * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
-     * Defaults to 0
+     * Defaults to 0. Not supported for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
      * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
      * The suggested tip amounts must be positive, passed in a strictly increased order and must
@@ -2876,17 +2903,23 @@ interface API {
      * @param photoSize Photo size in bytes
      * @param photoWidth Photo width
      * @param photoHeight Photo height
-     * @param needName Pass *True*, if you require the user's full name to complete the order
-     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
-     * @param needEmail Pass *True*, if you require the user's email address to complete the order
-     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
-     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
-     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
-     * @param isFlexible Pass *True*, if the final price depends on the shipping method
+     * @param needName Pass *True*, if you require the user's full name to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param needEmail Pass *True*, if you require the user's email address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
+     * @param isFlexible Pass *True*, if the final price depends on the shipping method.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
-     * @param replyParameters Description of the message to reply to
-     * message is not found
+     * @param replyParameters Description of the message to reply to message is not found
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
@@ -2958,14 +2991,16 @@ interface API {
      * @param providerToken Payments provider token, obtained via [@Botfather](tg://BotFather).
      * Pass an empty string for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param currency Three-letter ISO 4217 currency code, see
-     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
+     * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies).
+     * Pass [Currency.XTR] for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.)
+     * delivery cost, delivery tax, bonus, etc.).
+     * Must contain exactly one item for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
      * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
      * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
      * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
-     * Defaults to 0
+     * Defaults to 0. Not supported for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
      * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
      * The suggested tip amounts must be positive, passed in a strictly increased order and must
@@ -2977,13 +3012,20 @@ interface API {
      * @param photoSize Photo size in bytes
      * @param photoWidth Photo width
      * @param photoHeight Photo height
-     * @param needName Pass *True*, if you require the user's full name to complete the order
-     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order
-     * @param needEmail Pass *True*, if you require the user's email address to complete the order
-     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order
-     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to provider
-     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to provider
-     * @param isFlexible Pass *True*, if the final price depends on the shipping method
+     * @param needName Pass *True*, if you require the user's full name to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param needPhoneNumber Pass *True*, if you require the user's phone number to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param needEmail Pass *True*, if you require the user's email address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param needShippingAddress Pass *True*, if you require the user's shipping address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param sendPhoneNumberToProvider Pass *True*, if user's phone number should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param sendEmailToProvider Pass *True*, if user's email address should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * @param isFlexible Pass *True*, if the final price depends on the shipping method.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
      * */
     suspend fun createInvoiceLink(
         title: String,

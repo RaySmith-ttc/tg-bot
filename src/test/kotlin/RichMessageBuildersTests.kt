@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.network.message.MessageEntityType
 import ru.raysmith.tgbot.utils.buildHTMLString
 import ru.raysmith.tgbot.utils.buildMarkdownString
 import ru.raysmith.tgbot.utils.buildMarkdownV2String
+import ru.raysmith.tgbot.utils.n
 
 class RichMessageBuildersTests {
     
@@ -46,18 +47,18 @@ class RichMessageBuildersTests {
     @Test
     fun formatMarkdownV2String(): Unit = runBlocking {
         val markdown = buildMarkdownV2String {
-            text("2+2=4\n")
-            bold("2*2=4").text("\n")
-            strikethrough("2+2=4").text("\n")
-            italic("snake_case").text("\n")
-            text("c: ").code("code`\\").text("\n")
-            text("c: ").pre("code`\\", "unk").text("\n")
-            bold("bo").mix("ld spo", MessageEntityType.BOLD, MessageEntityType.SPOILER).bold("iler").text("\n")
-            bold("bo").mix("ld spo", MessageEntityType.SPOILER, MessageEntityType.BOLD).bold("iler").text("\n")
-            text("te[xt").text("\n")
-            spoiler("|||||").text("\n")
-            text("_*[]???()~`>#+-=|{}.!\n")
-            mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE)
+            text("2+2=4").n()
+            bold("2*2=4").n()
+            strikethrough("2+2=4").n()
+            italic("snake_case").n()
+            text("c: ").code("code`\\").n()
+            text("c: ").pre("code`\\", "unk").n()
+            bold("bo").mix("ld spo", MessageEntityType.BOLD, MessageEntityType.SPOILER).bold("iler").n()
+            bold("bo").mix("ld spo", MessageEntityType.SPOILER, MessageEntityType.BOLD).bold("iler").n()
+            text("te[xt").n()
+            spoiler("|||||").n()
+            text("_*[]???()~`>#+-=|{}.!").n()
+            mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).n()
         }
 
         val expected = """
@@ -74,7 +75,7 @@ class RichMessageBuildersTests {
             |te\[xt
             |||\|\|\|\|\|||
             |\_\*\[\]???\(\)\~\`\>\#\+\-\=\|\{\}\.\!
-            |___italic\_underline_${"\r"}__
+            |___italic\_underline_${"**"}__
         """.trimMargin()
 
         assertEquals(expected, markdown)

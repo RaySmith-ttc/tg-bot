@@ -5,7 +5,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.Message
 
-/** This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). */
+/**
+ * This object represents a custom keyboard with reply options (see Introduction to bots for details and examples).
+ * Not supported in channels and for messages sent on behalf of a Telegram Business account.
+ * */
 @Serializable
 data class ReplyKeyboardMarkup(
 
@@ -37,11 +40,11 @@ data class ReplyKeyboardMarkup(
 
     /**
      * Use this parameter if you want to show the keyboard to specific users only. Targets:
-     * - users that are &#064;mentioned in the *text* of the [Message] object;
-     * - if the bot's message is a reply (has *reply_to_message_id*), sender of the original message.
+     * - users that are @mentioned in the text of the [Message] object;
+     * - if the bot's message is a reply to a message in the same chat and forum topic, sender of the original message.
      *
-     * *Example:* A user requests to change the bot's language, bot replies to the request with a keyboard
-     * to select the new language. Other users in the group don't see the keyboard.
+     * Example: A user requests to change the bot's language, bot replies to the request with a keyboard to select the
+     * new language. Other users in the group don't see the keyboard.
      * */
     @SerialName("selective") val selective: Boolean? = null
 ) : KeyboardMarkup()

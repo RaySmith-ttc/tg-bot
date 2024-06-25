@@ -17,6 +17,7 @@ class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb() {
     override val mediaName: String = "document"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var businessConnectionId: String? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendDocument(
         businessConnectionId = businessConnectionId,

@@ -13,19 +13,19 @@ import ru.raysmith.tgbot.model.network.UsersShared
 data class KeyboardButtonRequestUsers(
 
     /**
-     * Identifier of the request, which will be received back in the [UsersShared] object.
+     * Identifier of the request, that will be received back in the [UsersShared] object.
      * Must be unique within the message
      * */
     @SerialName("request_id") val requestId: Int,
 
     /**
-     * Pass *True* to request a bot, pass *False* to request a regular user.
+     * Pass *True* to request bots, pass *False* to request regular users.
      * If not specified, no additional restrictions are applied.
      * */
     @SerialName("user_is_bot") val userIsBot: Boolean? = null,
 
     /**
-     * Pass *True* to request a premium user, pass *False* to request a non-premium user.
+     * Pass *True* to request premium users, pass *False* to request non-premium users.
      * If not specified, no additional restrictions are applied.
      * */
     @SerialName("user_is_premium") val userIsPremium: Boolean? = null,

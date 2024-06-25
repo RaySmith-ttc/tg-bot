@@ -29,5 +29,5 @@ data class SharedUser(
     @SerialName("username") val username: String? = null,
 
     /** Available sizes of the chat photo, if the photo was requested by the bot */
-    @SerialName("photo") val photo: List<PhotoSize>,
+    @SerialName("photo") val photo: List<PhotoSize>? = null,
 )

@@ -12,7 +12,8 @@ import ru.raysmith.tgbot.utils.getOrDefault
 /**
  * This object represents an incoming callback query from a callback button in an inline keyboard.
  * If the button that originated the query was attached to a message sent by the bot, the field message will be present.
- * If the button was attached to a message sent via the bot (in inline mode), the field [inlineMessageId] will be present.
+ * If the button was attached to a message sent via the bot (in inline mode), the field [inlineMessageId] will be
+ * present.
  * Exactly one of the fields data or [gameShortName] will be present.
  *
  * NOTE: After the user presses a callback button, Telegram clients will display a progress bar until you call
@@ -31,14 +32,15 @@ data class CallbackQuery(
     /** Sender */
     @SerialName("from") val from: User,
 
-    /** Message sent by the bot with the callback button that originated the query*/
+    /** Message sent by the bot with the callback button that originated the query */
     @SerialName("message") val message: MaybeInaccessibleMessage? = null,
 
     /** Identifier of the message sent via the bot in inline mode, that originated the query. */
     @SerialName("inline_message_id") val inlineMessageId: String? = null,
 
     /**
-     * Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games.
+     * Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent.
+     * Useful for high scores in games.
      * @see <a href="https://core.telegram.org/bots/api#games">games</>*/
     @SerialName("chat_instance") val chatInstance: String,
 

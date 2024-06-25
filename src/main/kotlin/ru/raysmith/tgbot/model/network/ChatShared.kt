@@ -7,7 +7,7 @@ import ru.raysmith.tgbot.model.network.keyboard.KeyboardButtonRequestChat
 import ru.raysmith.tgbot.model.network.media.PhotoSize
 
 /**
- * This object contains information about the chat whose identifier was shared with the bot using a
+ * This object contains information about a chat that was shared with the bot using a
  * [KeyboardButtonRequestChat] button.
  * */
 @Serializable

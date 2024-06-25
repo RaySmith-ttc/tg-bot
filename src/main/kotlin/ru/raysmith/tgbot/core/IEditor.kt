@@ -23,9 +23,6 @@ interface IEditor : ChatIdHolder, API, BotHolder {
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
-    /** Unique identifier of the business connection on behalf of which the message to be edited was sent */
-    var businessConnectionId: String?
-
     suspend fun editCaption(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
@@ -52,7 +49,7 @@ interface IEditor : ChatIdHolder, API, BotHolder {
         media: InputMedia,
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        businessConnectionId: String? = this.businessConnectionId,
+        businessConnectionId: String? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {

@@ -6,10 +6,11 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.model.network.message.Message
 
 /**
- * This object represents one button of the reply keyboard. For simple text buttons String can be used instead of
- * this object to specify text of the button. Optional fields *[request_contact][KeyboardButton.requestContact]*,
- * *[request_location][KeyboardButton.requestLocation]*, and *request_poll*
- * are mutually exclusive.
+ * This object represents one button of the reply keyboard. At most one of the optional fields must be used to specify
+ * type of the button. For simple text buttons, String can be used instead of this object to specify the button text.
+ *
+ * **Note:** [requestUsers] and [requestChat] options will only work in Telegram versions released after
+ * 3 February, 2023. Older clients will display *unsupported message*.
  * */
 @Serializable
 data class KeyboardButton(
@@ -20,16 +21,14 @@ data class KeyboardButton(
     @SerialName("text") val text: String,
 
     /**
-     * If specified, pressing the button will open a list of suitable users.
-     * Tapping on any user will send their identifier to the bot in a [userShared][Message.usersShared] service message.
-     * Available in private chats only.
+     * If specified, pressing the button will open a list of suitable users. Identifiers of selected users will be
+     * sent to the bot in a [users_shared][Message.usersShared] service message. Available in private chats only.
      * */
     @SerialName("request_users") val requestUsers: KeyboardButtonRequestUsers? = null,
 
     /**
-     * If specified, pressing the button will open a list of suitable chats.
-     * Tapping on a chat will send its identifier to the bot in a [chatShared][Message.chatShared] service message.
-     * Available in private chats only.
+     * If specified, pressing the button will open a list of suitable chats. Tapping on a chat will send its identifier
+     * to the bot in a [chatShared][Message.chatShared] service message. Available in private chats only.
      * */
     @SerialName("request_chat") val requestChat: KeyboardButtonRequestChat? = null,
 

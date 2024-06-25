@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ChatPermissions(
 
-    /** *True*, if the user is allowed to send text messages, contacts, locations and venues */
+    /**
+     * *True*, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, locations and venues
+     * */
     @SerialName("can_send_messages") val canSendMessages: Boolean = false,
 
     /** *True*, if the user is allowed to send audios */

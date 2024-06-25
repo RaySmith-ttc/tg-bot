@@ -170,7 +170,12 @@ fun MessageText.setupTestMessage(message: Message) {
         The last line of the expandable block quotation with the expandability mark
     """.trimIndent()).n()
 
-    text("end line")
+    text("end line").n()
+
+    mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).italic("italic").n()
+    mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).underline("underline").n()
+    mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE)
+        .mix("italic_underline", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE)
 
 
 //    text("text").n()
@@ -258,6 +263,7 @@ class Runner {
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 //        scope.launch { startWebAppServer() }
         runBlocking {
+
 //            startWebAppServer()
             val logger = LoggerFactory.getLogger("bot")
             val notifierBot = Bot(token = "5031990924:AAG-7F1QzGqybvYW1CJdhvFlFUR0s5Icw6Y")
@@ -666,6 +672,7 @@ class Runner {
                                     }
                                     row("send media group from files", "media_group_file")
                                     row("send media group from id", "media_group_id")
+                                    row("forceReply", "forceReply")
                                 }
                             }
                         }
@@ -1589,6 +1596,15 @@ class Runner {
                         }
                     }
 
+                    isCommand("forceReply") {
+                        send {
+                            text = "text"
+                            forceReplyKeyboard {
+                                inputFieldPlaceholder = "placeholder"
+                            }
+                        }
+                    }
+
                     isCommand("reply_persistent") {
                         send {
                             text = "text"
@@ -1783,6 +1799,15 @@ class Runner {
                     isDataEqual("answertest") {
                         sendAnswerVariants(MessageAction.EDIT)
                         answer()
+                    }
+
+                    isDataEqual("forceReply") {
+                        send {
+                            text = "forceReply"
+                            forceReplyKeyboard {
+                                inputFieldPlaceholder = "placeholder"
+                            }
+                        }
                     }
                 }
             }

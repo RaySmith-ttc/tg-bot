@@ -2,11 +2,15 @@ package ru.raysmith.tgbot.model.network.keyboard
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.network.API
 
 interface IKeyboardButton
-/** This object represents one button of an inline keyboard. You **must** use exactly one of the optional fields. */
+/**
+ * This object represents one button of an inline keyboard.
+ * Exactly one of the optional fields must be used to specify type of the button.
+ * */
 @Serializable
 data class InlineKeyboardButton(
 
@@ -15,11 +19,11 @@ data class InlineKeyboardButton(
 
     /**
      * HTTP or tg:// URL to be opened when the button is pressed. Links `tg://user?id=<user_id>` can be used to mention
-     * a user by their ID without using a username, if this is allowed by their privacy settings.
+     * a user by their identifier without using a username, if this is allowed by their privacy settings.
      * */
     @SerialName("url") val url: String? = null,
 
-    /** Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes */
+    /** Data to be sent in a callback query to the bot when the button is pressed, 1-64 bytes */
     @SerialName("callback_data") val callbackData: String? = null,
 
     /**
@@ -27,6 +31,7 @@ data class InlineKeyboardButton(
      * presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method
      * [answerWebAppQuery][API.answerWebAppQuery].
      * Available only in private chats between a user and the bot.
+     * Not supported for messages sent on behalf of a Telegram Business account.
      * */
     @SerialName("web_app") val webApp: WebAppInfo? = null,
 
@@ -49,12 +54,15 @@ data class InlineKeyboardButton(
      *
      * This offers a quick way for the user to open your bot in inline mode in the same chat - good
      * for selecting something from multiple options.
+     *
+     * Not supported in channels and for messages sent on behalf of a Telegram Business account.
      * */
     @SerialName("switch_inline_query_current_chat") val switchInlineQueryCurrentChat: String? = null,
 
     /**
      * f set, pressing the button will prompt the user to select one of their chats of the specified type, open that
-     * chat and insert the bot's username and the specified inline query in the input field
+     * chat and insert the bot's username and the specified inline query in the input field.
+     * Not supported in channels and for messages sent on behalf of a Telegram Business account.
      * */
     @SerialName("switch_inline_query_chosen_chat") val switchInlineQueryChosenChat: String? = null,
 
@@ -62,6 +70,7 @@ data class InlineKeyboardButton(
 
     /**
      * Specify True, to send a [Pay button](https://core.telegram.org/bots/api#payments).
+     * Substrings “⭐” and [Currency.XTR] in the buttons's text will be replaced with a Telegram Star icon.
      *
      * NOTE: This type of button **must** always be the first button in the first row.
      * */

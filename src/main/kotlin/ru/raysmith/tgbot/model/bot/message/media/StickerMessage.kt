@@ -23,6 +23,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
     override val mediaName: String = "sticker"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var replyParameters: ReplyParameters? = null
+    override var businessConnectionId: String? = null
 
     override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendSticker(
         businessConnectionId = businessConnectionId,

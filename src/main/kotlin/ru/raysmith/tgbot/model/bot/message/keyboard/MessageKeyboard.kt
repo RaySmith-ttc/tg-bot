@@ -6,10 +6,7 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
+import ru.raysmith.tgbot.model.network.keyboard.*
 
 internal object MessageKeyboardPolymorphicSerializer : JsonContentPolymorphicSerializer<MessageKeyboard>(MessageKeyboard::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MessageKeyboard> {
@@ -71,7 +68,13 @@ sealed interface MessageKeyboard {
                 }
             }
             is ReplyKeyboardRemove -> {
-                RemoveKeyboard().apply {
+                buildReplyKeyboardRemove {
+                    this.selective = keyboardMarkup.selective
+                }
+            }
+            is ForceReply -> {
+                buildForceReplyKeyboard {
+                    this.inputFieldPlaceholder = keyboardMarkup.inputFieldPlaceholder
                     this.selective = keyboardMarkup.selective
                 }
             }

@@ -14,7 +14,6 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.utils.asParameter
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.locations.LocationsDSL
@@ -33,11 +32,11 @@ import kotlin.system.measureTimeMillis
  * @param timeout Timeout in seconds for long polling. Defaults to 50.
  * Should be positive, short polling should be used for testing purposes only.
  * @param scope Coroutine scope for new updates
- * @param lastUpdateId Identifier of the first update to be returned. Must be greater by one than the highest among
- * the identifiers of previously received updates. If null, updates starting with the earliest unconfirmed update
- * are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than
- * its update_id. The negative offset can be specified to retrieve updates starting from -offset update from the end
- * of the updates queue. All previous updates will be forgotten.
+ * @param lastUpdateId Identifier of the first update to be returned. Must be greater by one than the highest among the
+ * identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update
+ * are returned. An update is considered confirmed as soon as [getUpdates] is called with an *offset* higher than
+ * its *update_id*. The negative offset can be specified to retrieve updates starting from -*offset* update from
+ * the end of the updates queue. All previous updates will be forgotten.
  * */
 class Bot(
     val token: String? = null,
@@ -242,9 +241,9 @@ class Bot(
     
             val allowedUpdates = if (isLocationsMode) {
                 (eventHandlerFactory as LocationEventHandlerFactory<*>).locationsWrapper
-                    .allowedUpdates(this).toList().asParameter()
+                    .allowedUpdates(this).toList()
             } else {
-                eventHandlerFactory.allowedUpdates.toList().asParameter()
+                eventHandlerFactory.allowedUpdates.toList()
             }
 
             while (isActive) {

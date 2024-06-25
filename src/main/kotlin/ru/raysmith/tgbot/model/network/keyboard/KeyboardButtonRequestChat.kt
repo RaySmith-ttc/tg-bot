@@ -7,7 +7,8 @@ import ru.raysmith.tgbot.model.network.chat.ChatAdministratorRights
 
 /**
  * This object defines the criteria used to request a suitable chat.
- * The identifier of the selected chat will be shared with the bot when the corresponding button is pressed.
+ * Information about the selected chat will be shared with the bot when the corresponding button is pressed.
+ * The bot will be granted requested rights in the chat if appropriate.
  * [More about requesting users »](https://core.telegram.org/bots/features#chat-and-user-selection)
  * */
 @Serializable

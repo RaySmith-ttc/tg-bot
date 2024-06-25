@@ -21,9 +21,6 @@ import ru.raysmith.tgbot.model.network.sticker.CreateNewStickerInStickerSet
 import ru.raysmith.tgbot.network.API
 import java.time.ZonedDateTime
 
-@DslMarker
-annotation class BotContextDsl
-
 // TODO remove chatId args (see deleteMessages)
 // TODO improve interface documentation
 
@@ -79,7 +76,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     }
 
     /**
-     * Use this method to forward messages of any kind. Service messages can't be forwarded. On success, the sent [Message] is returned.
+     * Use this method to forward messages of any kind. Service messages and messages with protected content
+     * can't be forwarded. On success, the sent [Message] is returned.
+     *
      * @param fromChatId Unique identifier for the chat where the original message was sent
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
@@ -128,8 +127,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
 
     /**
      * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
-     * and invoice messages can't be copied. A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only
-     * if the value of the field [correctOptionId][Poll.correctOptionId] is known to the bot.
+     * giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz
+     * [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
+     * [correctOptionId][Poll.correctOptionId] is known to the bot.
      * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
      *

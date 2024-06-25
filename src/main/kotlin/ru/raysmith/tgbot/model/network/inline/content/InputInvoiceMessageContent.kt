@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.inline.content
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 
 /** Represents the [content][InputMessageContent] of an invoice message to be sent as the result of an inline query. */
@@ -29,12 +30,14 @@ data class InputInvoiceMessageContent(
 
     /**
      * Three-letter ISO 4217 currency code,
-     * [see more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
+     * [see more on currencies](https://core.telegram.org/bots/payments#supported-currencies).
+     * Pass [Currency.XTR] for payments in [Telegram Stars](https://t.me/BotNews/90).
      * */
-    @SerialName("currency") val currency: String,
+    @SerialName("currency") val currency: Currency,
 
     /**
-     * Price breakdown, list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+     * Price breakdown, list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
+     * etc.). Must contain exactly one item for payments in [Telegram Stars](https://t.me/BotNews/90).
      * */
     @SerialName("prices") val prices: List<LabeledPrice>,
 
@@ -43,6 +46,7 @@ data class InputInvoiceMessageContent(
      * for a price of `US$ 1.45` pass `amount = 145`. See the exp parameter in
      * [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
      * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+     * Defaults to 0. Not supported for payments in [Telegram Stars](https://t.me/BotNews/90).
      * */
     @SerialName("max_tip_amount") val maxTipAmount: Int? = null,
 
@@ -71,24 +75,45 @@ data class InputInvoiceMessageContent(
     /** Photo height */
     @SerialName("photo_height") val photoHeight: Int? = null,
 
-    /** Pass *True* if you require the user's full name to complete the order */
+    /**
+     * Pass *True* if you require the user's full name to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("need_name") val needName: Boolean? = null,
 
-    /** Pass *True* if you require the user's phone number to complete the order */
+    /**
+     * Pass *True* if you require the user's phone number to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("need_phone_number") val needPhoneNumber: Boolean? = null,
 
-    /** Pass *True* if you require the user's email address to complete the order */
+    /**
+     * Pass *True* if you require the user's email address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("need_email") val needEmail: Boolean? = null,
 
-    /** Pass *True* if you require the user's shipping address to complete the order */
+    /**
+     * Pass *True* if you require the user's shipping address to complete the order.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("need_shipping_address") val needShippingAddress: Boolean? = null,
 
-    /** Pass *True* if the user's phone number should be sent to provider */
+    /**
+     * Pass *True* if the user's phone number should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("send_phone_number_to_provider") val sendPhoneNumberToProvider: Boolean? = null,
 
-    /** Pass *True* if the user's email address should be sent to provider */
+    /**
+     * Pass *True* if the user's email address should be sent to the provider.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("send_email_to_provider") val sendEmailToProvider: Boolean? = null,
 
-    /** Pass *True* if the final price depends on the shipping method */
+    /**
+     * Pass *True* if the final price depends on the shipping method.
+     * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("is_flexible") val isFlexible: Boolean? = null,
 ) : InputMessageContent()

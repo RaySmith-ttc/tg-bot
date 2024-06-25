@@ -17,7 +17,10 @@ data class Invoice(
     /** Unique bot deep-linking parameter that can be used to generate this invoice */
     @SerialName("start_parameter") val startParameter: String,
 
-    /** Three-letter ISO 4217 [currency](https://core.telegram.org/bots/payments#supported-currencies) code */
+    /**
+     * Three-letter ISO 4217 [currency](https://core.telegram.org/bots/payments#supported-currencies) code,
+     * or [Currency.XTR] for payments in [Telegram Stars](https://t.me/BotNews/90)
+     * */
     @SerialName("currency") val currency: Currency,
 
     /**

@@ -19,9 +19,8 @@ data class ChatMemberAdministrator(
     @SerialName("is_anonymous") val isAnonymous: Boolean,
 
     /**
-     * True, if the administrator can access the chat event log, chat statistics, boost list in channels, message statistics in channels,
-     * see channel members, see anonymous administrators in supergroups and ignore slow mode.
-     * Implied by any other administrator privilege
+     * True, if the administrator can access the chat event log, get boost list, see hidden supergroup and channel
+     * members, report spam messages and ignore slow mode. Implied by any other administrator privilege.
      * */
     @SerialName("can_manage_chat") val canManageChat: Boolean,
 
@@ -31,7 +30,7 @@ data class ChatMemberAdministrator(
     /** *True*, if the administrator can manage voice chats */
     @SerialName("can_manage_voice_chats") val canManageVoiceChats: Boolean,
 
-    /** *True*, if the administrator can restrict, ban or unban chat members */
+    /** *True*, if the administrator can restrict, ban or unban chat members, or access supergroup statistics */
     @SerialName("can_restrict_members") val canRestrictMembers: Boolean,
 
     /**
@@ -47,13 +46,15 @@ data class ChatMemberAdministrator(
     /** *True*, if the user is allowed to invite new users to the chat */
     @SerialName("can_invite_users") val canInviteUsers: Boolean,
 
-    /** *True*, if the administrator can post messages in the channel; channels only */
+    /**
+     * *True*, if the administrator can post messages in the channel, or access channel statistics; for channels only
+     * */
     @SerialName("can_post_messages") val canPostMessages: Boolean? = null,
 
-    /** *True*, if the administrator can edit messages of other users and can pin messages; channels only */
+    /** *True*, if the administrator can edit messages of other users and can pin messages; for channels only */
     @SerialName("can_edit_messages") val canEditMessages: Boolean? = null,
 
-    /** *True*, if the user is allowed to pin messages; groups and supergroups only */
+    /** *True*, if the user is allowed to pin messages; for groups and supergroups */
     @SerialName("can_pin_messages") val canPinMessages: Boolean? = null,
 
     /** *True*, if the administrator can post stories in the channel; channels only */
@@ -65,7 +66,7 @@ data class ChatMemberAdministrator(
     /** *True*, if the administrator can delete stories posted by other users; channels only */
     @SerialName("can_delete_stories") val canDeleteStories: Boolean? = null,
 
-    /** *True*, if the user is allowed to create, rename, close, and reopen forum topics; supergroups only */
+    /** *True*, if the user is allowed to create, rename, close, and reopen forum topics; for supergroups only */
     @SerialName("can_manage_topics") val canManageTopics: Boolean? = null,
 
     /** Custom title for this user */

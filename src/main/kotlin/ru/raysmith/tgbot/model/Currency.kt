@@ -3,6 +3,8 @@ package ru.raysmith.tgbot.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// TODO create test that verify data with https://core.telegram.org/bots/payments/currencies.json
+
 @Serializable
 enum class Currency(
     val code: String,
@@ -17,6 +19,9 @@ enum class Currency(
     val minAmount: Long,
     val maxAmount: Long
 ) {
+    // TODO text min/max values
+    @SerialName("XTR") XTR("XTR", "Telegram Stars", "⭐", "⭐", "", '.', true, true, 0, 1, Long.MAX_VALUE),
+
     @SerialName("AED") AED("AED", "United Arab Emirates Dirham", "AED", "د.إ.‏", ",", '.', true, true, 2, 367, 3672991),
     @SerialName("AFN") AFN("AFN", "Afghan Afghani", "AFN", "؋", ",", '.', true, false, 2, 8503, 85030416),
     @SerialName("ALL") ALL("ALL", "Albanian Lek", "ALL", "Lek", ".", ',', false, false, 2, 10279, 102791475),

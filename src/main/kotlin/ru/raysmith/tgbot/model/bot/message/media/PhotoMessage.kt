@@ -18,6 +18,7 @@ class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), Spolerabl
     override val mediaName: String = "photo"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var businessConnectionId: String? = null
 
     /** Pass *True*, if the caption must be shown above the message media */
     var showCaptionAboveMedia: Boolean? = null

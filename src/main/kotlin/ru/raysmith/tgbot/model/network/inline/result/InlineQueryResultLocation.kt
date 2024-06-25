@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.inline.result
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.model.bot.message.LivePeriod
 import ru.raysmith.tgbot.model.network.inline.content.InputMessageContent
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 
@@ -28,8 +29,11 @@ data class InlineQueryResultLocation(
     /** The radius of uncertainty for the location, measured in meters; 0-1500 */
     @SerialName("horizontal_accuracy") val horizontalAccuracy: Float? = null,
 
-    /** Period in seconds for which the location can be updated, should be between 60 and 86400. */
-    @SerialName("live_period") val livePeriod: Int? = null,
+    /**
+     * Period in seconds during which the location can be updated, should be between 60 and 86400 or
+     * [LivePeriod.Indefinitely] for live locations that can be edited indefinitely.
+     * */
+    @SerialName("live_period") val livePeriod: LivePeriod? = null,
 
     /**
      * For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.
@@ -57,7 +61,7 @@ data class InlineQueryResultLocation(
     /** Thumbnail height */
     @SerialName("thumbnail_height") val thumbnailHeight: Int? = null,
 
-) : InlineQueryResult() {
+    ) : InlineQueryResult() {
 
     /** Type of the result, must be *location* */
     @EncodeDefault

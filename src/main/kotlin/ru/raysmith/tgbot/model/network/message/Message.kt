@@ -56,7 +56,7 @@ data class Message(
      * */
     @SerialName("business_connection_id") val businessConnectionId: String? = null,
 
-    /** Conversation the message belongs to */
+    /** Chat the message belongs to */
     @SerialName("chat") override val chat: Chat,
 
     /** Information about the original message for forwarded messages */
@@ -69,8 +69,8 @@ data class Message(
     @SerialName("is_automatic_forward") val isAutomaticForward: Boolean? = null,
 
     /**
-     * For replies, the original message. Note that the Message object in this field will not contain further
-     * [replyToMessage] fields even if it itself is a reply.
+     * For replies in the same chat and message thread, the original message. Note that the Message object in this
+     * field will not contain further [replyToMessage] fields even if it itself is a reply.
      * */
     @SerialName("reply_to_message") val replyToMessage: Message? = null,
 
@@ -234,7 +234,7 @@ data class Message(
 
     /**
      * Specified message was pinned. Note that the Message object in this field will not contain further
-     * [replyToMessage] fields even if it is itself a reply.
+     * [replyToMessage] fields even if it itself is a reply.
      * */
     @SerialName("pinned_message") val pinnedMessage: MaybeInaccessibleMessage? = null,
 

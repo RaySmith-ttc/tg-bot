@@ -213,28 +213,28 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
         fun MessageEntity.isSameLengthAndOffset(other: MessageEntity): Boolean {
             return this.length == other.length && this.offset == other.offset
         }
-        if (parseMode == ParseMode.MARKDOWNV2 && config.verifyMarkdown2Format) {
-            entities.forEachIndexed { i, entity ->
-                if (i != 0 && i != entities.lastIndex && entity.offset + entity.length == entities[i + 1].offset &&
-                    (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (
-                        ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
-                        ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
-                    )
-                ) {
-
-                    val prev = entities[(i - 2).coerceAtLeast(0)]
-                    val next = entities[(i + 2).coerceAtMost(entities.lastIndex)]
-                    val problematicText = textString.substring(prev.offset, prev.offset + entity.length + next.length)
-
-                    throw IllegalStateException(
-                        "MarkdownV2 not allowed to append italic and underline entities in text '$problematicText'. " +
-                        "Use the mix method for append both types, append another type " +
-                        "if you try to append two italic/underline in a row, or create an HTML string instead." +
-                        "To disable this verification set verifyMarkdown2Format = false in bot config"
-                    )
-                }
-            }
-        }
+//        if (parseMode == ParseMode.MARKDOWNV2 && config.verifyMarkdown2Format) {
+//            entities.forEachIndexed { i, entity ->
+//                if (i != 0 && i != entities.lastIndex && entity.offset + entity.length == entities[i + 1].offset &&
+//                    (entity.type == MessageEntityType.ITALIC || entity.type == MessageEntityType.UNDERLINE) && (
+//                        ((entities[i - 1].type == MessageEntityType.ITALIC || entities[i - 1].type == MessageEntityType.UNDERLINE) && !entities[i - 1].isSameLengthAndOffset(entity)) ||
+//                        ((entities[i + 1].type == MessageEntityType.ITALIC || entities[i + 1].type == MessageEntityType.UNDERLINE) && !entities[i + 1].isSameLengthAndOffset(entity))
+//                    )
+//                ) {
+//
+//                    val prev = entities[(i - 2).coerceAtLeast(0)]
+//                    val next = entities[(i + 2).coerceAtMost(entities.lastIndex)]
+//                    val problematicText = textString.substring(prev.offset, prev.offset + entity.length + next.length)
+//
+//                    throw IllegalStateException(
+//                        "MarkdownV2 not allowed to append italic and underline entities in text '$problematicText'. " +
+//                        "Use the mix method for append both types, append another type " +
+//                        "if you try to append two italic/underline in a row, or create an HTML string instead." +
+//                        "To disable this verification set verifyMarkdown2Format = false in bot config"
+//                    )
+//                }
+//            }
+//        }
 
         val pathsOfEntities = mutableListOf<Int>()
         return buildString {
@@ -267,7 +267,15 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
                                         .escape(parseMode, messageEntity.type)
                                 }, parseMode
                             )
-                        }.letIf(parseMode == ParseMode.MARKDOWNV2) { it.replace("___$".toRegex(), "_${"\n"}__") }
+                        }.letIf(parseMode == ParseMode.MARKDOWNV2) {
+                            val pattern = Regex("___(.*?)___")
+
+                            pattern.replace(it) { matchResult ->
+                                "___${matchResult.groups[1]?.value}_**__"
+                            }
+
+//                            it.replace("___(?!_)".toRegex(), "_**__")
+                        }
                     )
                 }
 

@@ -16,7 +16,7 @@ class BotConfig {
 
     // TODO need business connection id by default ?
 
-    var verifyMarkdown2Format = Bot.properties.getOrDefault("verifyMarkdown2Format", "true").toBoolean()
+//    var verifyMarkdown2Format = Bot.properties.getOrDefault("verifyMarkdown2Format", "true").toBoolean()
     var safeTextLength = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
 
     /**

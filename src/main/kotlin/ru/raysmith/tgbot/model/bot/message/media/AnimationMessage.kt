@@ -24,6 +24,7 @@ class AnimationMessage(override val bot: Bot) : MediaMessageWithThumb(), Spolera
     override val mediaName: String = "animation"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var businessConnectionId: String? = null
 
     /** Pass *True*, if the caption must be shown above the message media */
     var showCaptionAboveMedia: Boolean? = null

@@ -23,6 +23,7 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
     override val mediaName: String = "video"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var businessConnectionId: String? = null
 
     /** Pass *True*, if the caption must be shown above the message media */
     var showCaptionAboveMedia: Boolean? = null
