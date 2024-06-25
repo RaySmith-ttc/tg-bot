@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot.core
 
 import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -59,7 +60,11 @@ class Bot(
 
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
-    override val client: HttpClient = token?.let { TelegramApi.defaultClient(it) } ?: TelegramApi.defaultClient()
+    private var clientBuilder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
+    override val client: HttpClient by lazy {
+        token?.let { TelegramApi.defaultClient(it, clientBuilder) }
+            ?: TelegramApi.defaultClient(builder = clientBuilder)
+    }
 
     // states
     var isActive = false
@@ -375,6 +380,11 @@ class Bot(
                 it.cancelAndJoin()
             }
         }
+    }
+
+    fun client(clientBuilder: HttpClientConfig<OkHttpConfig>.() -> Unit): Bot {
+        this.clientBuilder = clientBuilder
+        return this
     }
 }
 

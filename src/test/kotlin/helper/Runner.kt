@@ -1,5 +1,6 @@
 package helper
 
+import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -262,6 +263,16 @@ class Runner {
             val notifierBot = Bot(token = "5031990924:AAG-7F1QzGqybvYW1CJdhvFlFUR0s5Icw6Y")
 
             val bot = Bot(token = System.getenv("BOT_TOKEN")/*, lastUpdateId = -2*/)
+                .client {
+                    install(Logging) {
+                        this.level = LogLevel.INFO
+                        this.logger = object : Logger {
+                            override fun log(message: String) {
+                                TelegramApi.logger.debug(message)
+                            }
+                        }
+                    }
+                }
                 .onError { e -> logger.error(e.message, e) }
                 .onUpdate { updates ->
 //                    updates.forEach { println(it.callbackQuery?.data ?: it.message?.text) }
