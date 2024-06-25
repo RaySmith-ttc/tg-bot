@@ -1599,9 +1599,11 @@ class Runner {
                         sendMediaGroup {
                             sendAction = true
                             video("files/video1.mp4".asResources().asTgFile()) {
-                                bold("Title").n()
-                                n()
-                                text("Body")
+//                                bold("Title").n()
+//                                n()
+//                                text("Body")
+
+                                text(generateString(5000))
                             }
                             photo("AgACAgIAAxkDAAIIm2HCc8-GBzuHeX2wSbK25Pk_RK5bAAJLtjEbhJARSkZuPsUIDkxZAQADAgADcwADIwQ".asTgFile(), hasSpoiler = true)
 //                            document("files/image2.jpg".asResources().asTgFile(), "files/image2.jpg".asResources().asTgFile())

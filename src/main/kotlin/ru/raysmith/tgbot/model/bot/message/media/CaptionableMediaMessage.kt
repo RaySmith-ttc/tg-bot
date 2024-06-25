@@ -66,6 +66,11 @@ abstract class CaptionableMediaMessage :
     /** [Parse mode][ParseMode] for a simple caption text */
     var parseMode: ParseMode? = null
 
+    /** Returns the [parseMode] if entities were not used, null otherwise */
+    protected open fun getParseModeIfNeed() = if (_caption != null) null else parseMode
+
+    protected open fun getEntities() = _caption?.getEntities()
+
     private val showCaptionAboveMedia: Boolean? = null // TODO ?
     override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageCaption(
