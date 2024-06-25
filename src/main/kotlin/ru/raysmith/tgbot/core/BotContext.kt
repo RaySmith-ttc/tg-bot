@@ -832,9 +832,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to edit text and game messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
+     * @param text New text of the message, 1-4096 characters after entities parsing
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
-     * @param text New text of the message, 1-4096 characters after entities parsing
      * @param parseMode [ParseMode] for parsing entities in the message text
      * @param entities A JSON-serialized list of special entities that appear in message text,
      * which can be specified instead of parseMode
@@ -844,9 +846,10 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageText(
+        text: String,
+        businessConnectionId: String? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        text: String,
         parseMode: ParseMode? = null,
         entities: List<MessageEntity>? = null,
         linkPreviewOptions: LinkPreviewOptions? = bot.botConfig.linkPreviewOptions,
@@ -854,7 +857,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageText(
-            chatId, messageId, inlineMessageId, text, parseMode, entities, linkPreviewOptions,
+            businessConnectionId, chatId, messageId, inlineMessageId, text, parseMode, entities, linkPreviewOptions,
             keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
@@ -901,22 +904,25 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * via its file_id or specify a URL. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise *True* is returned.
      *
+     * @param media A JSON-serialized object for a new media content of the message
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if [chatId] and [messageId] are not specified. Identifier of the inline message
-     * @param media A JSON-serialized object for a new media content of the message
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
     suspend fun editMessageMedia(
+        media: InputMedia,
+        businessConnectionId: String? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        media: InputMedia,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageMedia(
-            chatId, messageId, inlineMessageId, media,
+            businessConnectionId, chatId, messageId, inlineMessageId, media,
             keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
@@ -927,6 +933,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      *
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
@@ -934,11 +942,12 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     suspend fun editMessageReplyMarkup(
         messageId: Int? = null,
         inlineMessageId: String? = null,
+        businessConnectionId: String? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageReplyMarkup(
-            chatId, messageId, inlineMessageId,
+            businessConnectionId, chatId, messageId, inlineMessageId,
             keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
@@ -947,15 +956,18 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to stop a poll which was sent by the bot. On success, the stopped [Poll] is returned
      *
      * @param messageId Identifier of the original message with the poll
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for a new message inline keyboard.
      * */
     suspend fun stopPoll(
         messageId: Int,
+        businessConnectionId: String? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Poll {
-        return stopPoll(chatId, messageId, keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup())
+        return stopPoll(businessConnectionId, chatId, messageId, keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup())
     }
 
     /**

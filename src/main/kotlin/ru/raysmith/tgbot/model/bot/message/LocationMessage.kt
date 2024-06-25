@@ -54,6 +54,7 @@ class LocationMessage(
     )
 
     suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageLiveLocation(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,
@@ -66,6 +67,7 @@ class LocationMessage(
     )
 
     suspend fun stop(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = stopMessageLiveLocation(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,

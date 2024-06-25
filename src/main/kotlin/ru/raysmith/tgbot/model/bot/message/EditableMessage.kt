@@ -30,6 +30,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
 
     override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageReplyMarkup(
+            businessConnectionId = businessConnectionId,
             chatId = chatId,
             messageId = messageId,
             inlineMessageId = inlineMessageId,

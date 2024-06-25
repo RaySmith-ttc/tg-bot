@@ -23,6 +23,9 @@ interface IEditor : ChatIdHolder, API, BotHolder {
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
+    /** Unique identifier of the business connection on behalf of which the message to be edited was sent */
+    var businessConnectionId: String?
+
     suspend fun editCaption(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
@@ -46,15 +49,16 @@ interface IEditor : ChatIdHolder, API, BotHolder {
     }
 
     suspend fun <T : InputMedia> editMedia(
-        chatId: ChatId = getChatIdOrThrow(),
+        media: InputMedia,
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        media: InputMedia,
+        businessConnectionId: String? = this.businessConnectionId,
+        chatId: ChatId = getChatIdOrThrow(),
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return CaptionableMediaMessage.instance(bot)
             .apply { inlineKeyboard(keyboard) }
-            .editMedia<T>(chatId, messageId, inlineMessageId, media)
+            .editMedia<T>(businessConnectionId, chatId, messageId, inlineMessageId, media)
     }
 
     suspend fun edit(

@@ -885,12 +885,12 @@ class Runner {
                             italic("edited")
                         }
                         runBlocking { delay(2000) }
-                        editMedia<InputMediaPhoto>(messageId = message.messageId, media = InputMediaPhoto(
+                        editMedia<InputMediaPhoto>(InputMediaPhoto(
                             media = "AgACAgIAAxkBAAI9AWOCdwVufweWJV-HNe5pkexZa83GAAKRwzEbKkIQSHYZWoXjyhFNAQADAgADcwADKwQ",
                             caption = editedMessage.caption,
                             parseMode = null,
                             captionEntities = editedMessage.captionEntities
-                        )) {
+                        ), message.messageId) {
                             row("Button", "btn")
                         }
                         runBlocking { delay(2000) }

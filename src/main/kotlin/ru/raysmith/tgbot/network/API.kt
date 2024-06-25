@@ -2198,6 +2198,8 @@ interface API {
      * Use this method to edit text and game messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
@@ -2210,6 +2212,7 @@ interface API {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageText(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2220,6 +2223,7 @@ interface API {
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageText") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2277,6 +2281,8 @@ interface API {
      * via its file_id or specify a URL. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise *True* is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
@@ -2285,6 +2291,7 @@ interface API {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageMedia(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2292,6 +2299,7 @@ interface API {
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageMedia") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2301,6 +2309,7 @@ interface API {
     }
 
     suspend fun editMessageLiveLocation(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2312,6 +2321,7 @@ interface API {
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<LiveLocationResponse> {
         client.post("editMessageLiveLocation") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2325,12 +2335,14 @@ interface API {
     }
 
     suspend fun stopMessageLiveLocation(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
         keyboardMarkup: KeyboardMarkup? = null,
     ) = request<LiveLocationResponse> {
         client.post("stopMessageLiveLocation") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2342,6 +2354,8 @@ interface API {
      * Use this method to edit only the reply markup of messages. On success,
      * if the edited message is not an inline message, the edited [Message] is returned, otherwise *True* is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
@@ -2349,12 +2363,14 @@ interface API {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageReplyMarkup(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
         replyMarkup: KeyboardMarkup? = null
     ) = request<Message> {
         client.post("editMessageReplyMarkup") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2365,16 +2381,20 @@ interface API {
     /**
      * Use this method to stop a poll which was sent by the bot. On success, the stopped [Poll] is returned
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageId Identifier of the original message with the poll
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun stopPoll(
+        businessConnectionId: String? = null,
         chatId: ChatId,
         messageId: Int,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Poll> {
         client.post("stopPoll") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("reply_markup", replyMarkup)

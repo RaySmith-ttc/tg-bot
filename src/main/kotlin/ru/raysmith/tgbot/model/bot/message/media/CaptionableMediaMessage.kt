@@ -33,6 +33,7 @@ abstract class CaptionableMediaMessage :
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
                 override var replyParameters: ReplyParameters? = null
+                override var businessConnectionId: String? = null
                 override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
                 override suspend fun editReplyMarkup(
@@ -79,14 +80,15 @@ abstract class CaptionableMediaMessage :
         )
     }
 
-    suspend fun <T : InputMedia> editMedia(chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): Message {
+    suspend fun <T : InputMedia> editMedia(businessConnectionId: String?, chatId: ChatId?, messageId: Int?, inlineMessageId: String?, media: InputMedia): Message {
         return editMessageMedia(
-            chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
+            businessConnectionId, chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
         )
     }
 
     override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
         return editMessageReplyMarkup(
+            businessConnectionId = businessConnectionId,
             chatId = chatId,
             messageId = messageId,
             inlineMessageId = inlineMessageId,
