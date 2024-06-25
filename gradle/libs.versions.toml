@@ -7,6 +7,9 @@ kotlinx-datetime = "0.4.0"
 
 ktor = "2.3.11"
 
+react = "18.3.1-pre.765"
+seskar = "3.0.0"
+
 exposed = "0.41.1"
 
 utils = "2.5.1"
@@ -61,6 +64,19 @@ ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "k
 
 ktor-network-tlsCertificates = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
 
+# Kotlin/JS wrappers
+kotlin-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "react" }
+kotlin-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "react" }
+kotlin-emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "11.11.4-pre.765" }
+
+kotlin-mui = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui", version = "5.14.5-pre.619" }
+kotlin-mui-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-material", version = "5.15.20-pre.765" }
+kotlin-mui-icons-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-icons-material", version = "5.15.20-pre.765" }
+kotlin-react-router = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router", version = "6.23.1-pre.765" }
+kotlin-react-router-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom", version = "6.23.1-pre.765" }
+kotlin-node = { module = "org.jetbrains.kotlin-wrappers:kotlin-node", version = "20.11.30-pre.765" }
+seskar-core = { module = "io.github.turansky.seskar:seskar-core", version.ref = "seskar" }
+
 # database
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
@@ -87,6 +103,9 @@ slf4j-log4j13 = { module = "org.slf4j:slf4j-log4j13", version = "1.0.1" }
 
 kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 
+# gradle
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
 # tests
 kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
@@ -100,6 +119,9 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 benManes-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+seskar = { id = "io.github.turansky.seskar", version.ref = "seskar" }
 
 [bundles]
 ktor-server = [
