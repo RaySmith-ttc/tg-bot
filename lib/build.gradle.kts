@@ -1,6 +1,9 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
+    java
+    signing
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.benManes.versions)
     alias(libs.plugins.dokka)
@@ -11,31 +14,15 @@ plugins {
 group = "ru.raysmith"
 version = "1.0.0-beta.9"
 
-//publishing {
-//    repositories {
-//        maven {
-//            name = "GitHubPackages"
-//            url = uri("https://maven.pkg.github.com/raysmith-ttc/tg-bot")
-//            credentials {
-//                username = System.getenv("GIT_USERNAME")
-//                password = System.getenv("GIT_TOKEN_PUBLISH")
-//            }
-//        }
-//    }
-//    publications {
-//        register<MavenPublication>("gpr") {
-//            from(components["java"])
-//        }
-//    }
-//}
-
-//java {
-//    withSourcesJar()
-//    withJavadocJar()
-//}
-
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
 kotlin {
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.RequiresOptIn",
@@ -47,13 +34,10 @@ kotlin {
 
     jvm {
         withJava()
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
+        withSourcesJar()
     }
 
     js(IR) {
-        useCommonJs()
         browser {
             webpackTask {
                 mainOutputFileName.set("tg-bot.js")
@@ -65,10 +49,14 @@ kotlin {
                 export = false
             }
         }
+        nodejs()
         binaries.executable()
     }
 
     sourceSets {
+        commonMain {
+
+        }
         jvmMain {
             dependencies {
                 // Kotlin
@@ -113,19 +101,49 @@ kotlin {
     }
 }
 
-//tasks {
-//    withType<Test> {
-//        useJUnitPlatform()
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
+    }
+
+//    withType<PublishToMavenRepository> {
+//        dependsOn(check)
 //    }
-//
-//    withType<DependencyUpdatesTask> {
-//        gradleReleaseChannel = "current"
-//        rejectVersionIf {
-//            val version = candidate.version
-//            val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
-//            val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-//            val isStable = stableKeyword || regex.matches(version)
-//            isStable.not()
-//        }
-//    }
-//}
+
+    withType<Jar> {
+        archiveBaseName = "tg-bot"
+    }
+
+    named<DependencyUpdatesTask>("dependencyUpdates").configure {
+        val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+        val stableList = listOf("RELEASE", "FINAL", "GA")
+
+        rejectVersionIf {
+            val stableKeyword = stableList.any { candidate.version.uppercase().contains(it) }
+            val isStable = stableKeyword || regex.matches(candidate.version)
+            isStable.not()
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/raysmith-ttc/tg-bot")
+            credentials {
+                username = System.getenv("GIT_USERNAME")
+                password = System.getenv("GIT_TOKEN_PUBLISH")
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["kotlin"])
+        }
+
+        withType<MavenPublication> {
+            artifactId = artifactId.replace("^${project.name}".toRegex(), "tg-bot")
+        }
+    }
+}

@@ -8,7 +8,11 @@ import ru.raysmith.tgbot.utils.toChatId
 interface IChat {
     val id: ChatId.ID
     val type: ChatType
+    val title: String?
     val username: String?
+    val firstName: String?
+    val lastName: String?
+    val isForum: Boolean?
 
     /**
      * Ban a user in the group, supergroup or channel
