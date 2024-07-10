@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.utils.datepicker
 
+import kotlinx.coroutines.runBlocking
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.handler.EventHandler
@@ -16,8 +17,8 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.*
 
-internal typealias DPSetting<T> = (botConfig: BotConfig, data: String?) -> T
-internal typealias DPSettingWithState<T> = (botConfig: BotConfig, data: String?, state: DatePickerState) -> T
+internal typealias DPSetting<T> = suspend (botConfig: BotConfig, data: String?) -> T
+internal typealias DPSettingWithState<T> = suspend (botConfig: BotConfig, data: String?, state: DatePickerState) -> T
 
 /**
  * Creates new datepicker instance. Use it to [register][Bot.registerDatePicker]
@@ -62,9 +63,10 @@ fun createDatePicker(
  * }
  * ```
  * */
+@Suppress("KDocUnresolvedReference")
 class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
-    var messageText: MessageText.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> text("Select a date") }
+    var messageText: suspend MessageText.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> text("Select a date") }
         private set
 
     /**
@@ -74,7 +76,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * @param data optional custom data provided when sending a message
      * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
      * */
-    fun messageText(block: MessageText.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit) { messageText = block }
+    fun messageText(block: suspend MessageText.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit) { messageText = block }
 
     /** Sets the message text builder that will be used for send a message. By default — «Select a date». */
     fun messageText(block: MessageText.() -> Unit) { messageText = {_, _, _ -> block() } }
@@ -82,7 +84,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var additionalRows: MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> }
+    var additionalRows: suspend MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> }
         private set
 
     /**
@@ -92,7 +94,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * @param data optional custom data provided when sending a message
      * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
      * */
-    fun additionalRows(block: MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit) { additionalRows = block }
+    fun additionalRows(block: suspend MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit) { additionalRows = block }
 
 
 
@@ -113,7 +115,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var timeZone: (botConfig: BotConfig, data: String?) -> ZoneId = { _, _ -> ZoneId.systemDefault() }
+    var timeZone: suspend (botConfig: BotConfig, data: String?) -> ZoneId = { _, _ -> ZoneId.systemDefault() }
         private set
 
     /**
@@ -134,7 +136,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var locale: (botConfig: BotConfig, data: String?) -> Locale = { botConfig, _ -> botConfig.locale }
+    var locale: suspend (botConfig: BotConfig, data: String?) -> Locale = { botConfig, _ -> botConfig.locale }
         private set
 
     /**
@@ -166,7 +168,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var startWithState: (botConfig: BotConfig, data: String?) -> DatePickerState = { _, _ -> DatePickerState.DAY }
+    var startWithState: suspend (botConfig: BotConfig, data: String?) -> DatePickerState = { _, _ -> DatePickerState.DAY }
         private set
 
     /**
@@ -192,7 +194,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * @param botConfig current bot config
      * @param data optional custom data provided when sending a message
      * */
-    var dates: (botConfig: BotConfig, data: String?) -> ClosedRange<LocalDate> = { _, _ -> LocalDate.of(1900, 1, 1)..LocalDate.of(2099, 12, 31) }
+    var dates: suspend (botConfig: BotConfig, data: String?) -> ClosedRange<LocalDate> = { _, _ -> LocalDate.of(1900, 1, 1)..LocalDate.of(2099, 12, 31) }
         private set
 
     /**
@@ -211,7 +213,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var yearsColumns: (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 5 }
+    var yearsColumns: suspend (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 5 }
         private set
 
     /**
@@ -227,7 +229,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var yearsRows: (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 10 }
+    var yearsRows: suspend (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 10 }
         private set
 
     /**
@@ -243,7 +245,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var monthPickerEnabled: (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
+    var monthPickerEnabled: suspend (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
         private set
 
     /** Sets whether the [DatePickerState.MONTH] view can be displayed. *true* by default */
@@ -254,7 +256,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-    var yearsPickerEnabled: (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
+    var yearsPickerEnabled: suspend (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
         private set
 
     /** Sets whether the [DatePickerState.YEAR] view can be displayed. *true* by default */
@@ -300,7 +302,7 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
             handler.apply {
                 isDataStartWith(callbackQueryPrefix) { data ->
                     val datePickerData = DatePickerData.from(data)
-                    val now by lazy { LocalDate.now(timeZone(botConfig, datePickerData.additionalData)) }
+                    val now by lazy { runBlocking { LocalDate.now(timeZone(botConfig, datePickerData.additionalData)) } }
                     when {
                         datePickerData.yearPage != null -> {
                             edit {
