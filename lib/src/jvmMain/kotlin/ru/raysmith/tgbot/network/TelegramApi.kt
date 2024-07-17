@@ -83,7 +83,8 @@ object TelegramApi {
         }
 
         install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = 5)
+            retryOnServerErrors(maxRetries = Int.MAX_VALUE)
+            retryOnException(retryOnTimeout = true)
             exponentialDelay()
         }
 
