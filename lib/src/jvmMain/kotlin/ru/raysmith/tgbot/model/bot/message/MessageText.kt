@@ -94,7 +94,7 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
     fun expandableBlockquote(text: Any?) = appendEntity(MessageEntityType.EXPANDABLE_BLOCKQUOTE, text)
 
     fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
-    fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {
+    suspend fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {
         datePicker.messageText(this, config, data, datePicker.startWithState(config, data))
     }
 

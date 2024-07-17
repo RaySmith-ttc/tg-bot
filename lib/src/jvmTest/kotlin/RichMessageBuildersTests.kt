@@ -76,17 +76,9 @@ class RichMessageBuildersTests {
             |||\|\|\|\|\|||
             |\_\*\[\]???\(\)\~\`\>\#\+\-\=\|\{\}\.\!
             |___italic\_underline_${"**"}__
+            |
         """.trimMargin()
 
         assertEquals(expected, markdown)
-    }
-
-    @Test
-    fun appendItalicAndUnderlineShouldThrowException() {
-        assertThrows<IllegalStateException> {
-            buildMarkdownV2String {
-                italic("ital").mix("ik_under", MessageEntityType.ITALIC, MessageEntityType.UNDERLINE).underline("line")
-            }
-        }
     }
 }

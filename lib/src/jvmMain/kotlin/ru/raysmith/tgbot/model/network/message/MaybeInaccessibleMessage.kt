@@ -20,4 +20,6 @@ sealed class MaybeInaccessibleMessage {
 
     /** Always 0. The field can be used to differentiate regular and inaccessible messages. */
     abstract val date: Int
+
+    fun asMessageOrNull() = this as? Message
 }

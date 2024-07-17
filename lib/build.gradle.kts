@@ -4,15 +4,15 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     java
     signing
+    `maven-publish`
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.benManes.versions)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.10"
+version = "1.0.0-beta.11"
 
 java {
     toolchain {
@@ -57,6 +57,7 @@ kotlin {
         commonMain {
 
         }
+
         jvmMain {
             dependencies {
                 // Kotlin
@@ -104,14 +105,6 @@ kotlin {
 tasks {
     withType<Test> {
         useJUnitPlatform()
-    }
-
-//    withType<PublishToMavenRepository> {
-//        dependsOn(check)
-//    }
-
-    withType<Jar> {
-        archiveBaseName = "tg-bot"
     }
 
     named<DependencyUpdatesTask>("dependencyUpdates").configure {

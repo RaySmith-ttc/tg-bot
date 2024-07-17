@@ -66,6 +66,13 @@ fun createDatePicker(
 @Suppress("KDocUnresolvedReference")
 class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
+    /**
+     * Function that can be applied to MessageText to initialize text with entities
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
+     * */
     var messageText: suspend MessageText.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> text("Select a date") }
         private set
 
@@ -83,7 +90,13 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
 
 
-
+    /**
+     * Function that can be applied to MessageInlineKeyboard to initialize keyboard
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
+     * */
     var additionalRows: suspend MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit = { _, _, _ -> }
         private set
 
@@ -96,8 +109,23 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * */
     fun additionalRows(block: suspend MessageInlineKeyboard.(botConfig: BotConfig, data: String?, state: DatePickerState) -> Unit) { additionalRows = block }
 
+    /**
+     * Adds additional keyboard rows builder
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
+     * */
+    fun additionalRows(block: suspend () -> Unit) { additionalRows = { _, _, _ -> block() } }
 
 
+
+    /**
+     * Returns additional keyboard rows position
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var additionalRowsPosition: DPSettingWithState<AdditionalRowsPosition> = { _, _, _ -> AdditionalRowsPosition.BOTTOM }
         private set
 
@@ -113,8 +141,17 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     /** Sets additional keyboard rows position — [AdditionalRowsPosition.TOP] or [AdditionalRowsPosition.BOTTOM] (by default) */
     fun additionalRowsPosition(additionalRowsPosition: AdditionalRowsPosition) { this.additionalRowsPosition = { _, _, _ -> additionalRowsPosition } }
 
+    /** Sets additional keyboard rows position — [AdditionalRowsPosition.TOP] or [AdditionalRowsPosition.BOTTOM] (by default) */
+    fun additionalRowsPosition(block: suspend () -> AdditionalRowsPosition) { this.additionalRowsPosition = { _, _, _ -> block() } }
 
 
+
+    /**
+     * Returns time zone
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var timeZone: suspend (botConfig: BotConfig, data: String?) -> ZoneId = { _, _ -> ZoneId.systemDefault() }
         private set
 
@@ -134,8 +171,21 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * */
     fun timeZone(timeZone: ZoneId) { this.timeZone = { _, _ -> timeZone } }
 
+    /**
+     * Sets time zone to determine current datetime. By default — from the bot config.
+     *
+     * @see BotConfig.locale
+     * */
+    fun timeZone(block: () -> ZoneId) { this.timeZone = { _, _ -> block() } }
 
 
+
+    /**
+     * Returns locale
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var locale: suspend (botConfig: BotConfig, data: String?) -> Locale = { botConfig, _ -> botConfig.locale }
         private set
 
@@ -150,8 +200,17 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     /** Sets locale to localize months and days of week */
     fun locale(locale: Locale) { this.locale = { _, _ -> locale } }
 
+    /** Sets locale to localize months and days of week */
+    fun locale(block: () -> Locale) { this.locale = { _, _ -> block() } }
 
 
+
+    /**
+     * Returns first day of week
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var firstDayOfWeek: DPSetting<DayOfWeek> = { c, d -> WeekFields.of(locale(c, d)).firstDayOfWeek }
         private set
 
@@ -163,11 +222,25 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * */
     fun firstDayOfWeek(block: DPSetting<DayOfWeek>) { firstDayOfWeek = block }
 
-    /** Sets first day of week. By default — from date picker locale. */
+    /**
+     * Sets first day of week. By default — from date picker locale.
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     fun firstDayOfWeek(firstDayOfWeek: DayOfWeek) { this.firstDayOfWeek = { _, _ -> firstDayOfWeek } }
 
+    /**
+     * Sets first day of week. By default — from date picker locale.
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
+    fun firstDayOfWeek(block: () -> DayOfWeek) { this.firstDayOfWeek = { _, _ -> block() } }
 
 
+
+    /** Returns the view state */
     var startWithState: suspend (botConfig: BotConfig, data: String?) -> DatePickerState = { _, _ -> DatePickerState.DAY }
         private set
 
@@ -185,6 +258,12 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * that will be applied when the date picker is sent.
      * */
     fun startWithState(startWithState: DatePickerState) { this.startWithState = { _, _ -> startWithState } }
+
+    /**
+     * Sets the view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
+     * that will be applied when the date picker is sent.
+     * */
+    fun startWithState(block: () -> DatePickerState) { this.startWithState = { _, _ -> block() } }
 
 
 
@@ -209,10 +288,19 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     fun dates(dates: ClosedRange<LocalDate>) { this.dates = { _, _ -> dates } }
 
     /** Sets dates range. 1990-01-01 — 2099-01-01 by default. */
+    fun dates(dates: () -> ClosedRange<LocalDate>) { this.dates = { _, _ -> dates() } }
+
+    /** Sets dates range. 1990-01-01 — 2099-01-01 by default. */
     fun dates(dateFrom: LocalDate, dateTo: LocalDate) { this.dates = { _, _ -> dateFrom..dateTo } }
 
 
 
+    /**
+     * Returns count of columns for [DatePickerState.YEAR] view
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var yearsColumns: suspend (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 5 }
         private set
 
@@ -227,8 +315,17 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     /** Sets count of columns for [DatePickerState.YEAR] view. 5 by default. */
     fun yearsColumns(yearsColumns: Int) { this.yearsColumns = { _, _ -> yearsColumns } }
 
+    /** Sets count of columns for [DatePickerState.YEAR] view. 5 by default. */
+    fun yearsColumns(block: () -> Int) { this.yearsColumns = { _, _ -> block() } }
 
 
+
+    /**
+     * Returns count of rows for [DatePickerState.YEAR] view
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var yearsRows: suspend (botConfig: BotConfig, data: String?) -> Int = { _, _ -> 10 }
         private set
 
@@ -243,8 +340,17 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     /** Sets count of rows for [DatePickerState.YEAR] view. 10 by default. */
     fun yearsRows(yearsRows: Int) { this.yearsRows = { _, _ -> yearsRows } }
 
+    /** Sets count of rows for [DatePickerState.YEAR] view. 10 by default. */
+    fun yearsRows(block: () -> Int) { this.yearsRows = { _, _ -> block() } }
 
 
+
+    /**
+     * Returns true if the [DatePickerState.MONTH] view can be displayed
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var monthPickerEnabled: suspend (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
         private set
 
@@ -254,8 +360,17 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
     /** Sets whether the [DatePickerState.MONTH] view can be displayed. *true* by default */
     fun monthPickerEnabled(monthPickerEnabled: Boolean) { this.monthPickerEnabled = { _, _ -> monthPickerEnabled } }
 
+    /** Sets whether the [DatePickerState.MONTH] view can be displayed. *true* by default */
+    fun monthPickerEnabled(block: () -> Boolean) { this.monthPickerEnabled = { _, _ -> block() } }
 
 
+
+    /**
+     * Returns true the [DatePickerState.YEAR] view can be displayed
+     *
+     * @param botConfig current bot config
+     * @param data optional custom data provided when sending a message
+     * */
     var yearsPickerEnabled: suspend (botConfig: BotConfig, data: String?) -> Boolean = { _, _ -> true }
         private set
 
@@ -264,6 +379,9 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
     /** Sets whether the [DatePickerState.YEAR] view can be displayed. *true* by default */
     fun yearsPickerEnabled(yearsPickerEnabled: Boolean) { this.yearsPickerEnabled = { _, _ -> yearsPickerEnabled } }
+
+    /** Sets whether the [DatePickerState.YEAR] view can be displayed. *true* by default */
+    fun yearsPickerEnabled(block: () -> Boolean) { this.yearsPickerEnabled = { _, _ -> block() } }
 
 
 
