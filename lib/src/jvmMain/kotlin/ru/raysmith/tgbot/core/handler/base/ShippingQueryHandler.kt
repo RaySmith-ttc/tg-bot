@@ -20,10 +20,11 @@ open class ShippingQueryHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = shippingQuery.from.id
-    override fun getChatIdOrThrow() = shippingQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = shippingQuery.from.id
+    override fun getChatIdOrThrow() = shippingQuery.from.id
 
     override suspend fun handle() {
         handler()

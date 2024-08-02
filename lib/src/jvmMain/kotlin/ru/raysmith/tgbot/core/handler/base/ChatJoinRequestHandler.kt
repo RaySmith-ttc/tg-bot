@@ -17,16 +17,17 @@ open class ChatJoinRequestHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = chatJoinRequest.chat.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = chatJoinRequest.chat.id
+    override fun getChatIdOrThrow() = chatJoinRequest.chat.id
 
     override suspend fun handle() {
         handler()
         handled = true
         handleLocalFeatures(handled)
     }
-
 
     suspend fun approve() = approveChatJoinRequest(chatJoinRequest.userChatId)
     suspend fun decline() = declineChatJoinRequest(chatJoinRequest.userChatId)

@@ -4,9 +4,13 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.Message
 
-class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableContent {
+class VideoMessage(
+    override val bot: Bot
+) : MediaMessageWithThumb(), SpolerableContent, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -23,12 +27,11 @@ class VideoMessage(override val bot: Bot) : MediaMessageWithThumb(), SpolerableC
     override val mediaName: String = "video"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var messageThreadId: Int? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
 
-    /** Pass *True*, if the caption must be shown above the message media */
-    var showCaptionAboveMedia: Boolean? = null
-
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVideo(
+    override suspend fun send(chatId: ChatId) = sendVideo(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

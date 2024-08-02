@@ -126,9 +126,9 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     }
 
     /**
-     * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
-     * giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz
-     * [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
+     * Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages,
+     * giveaway winners messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+     * A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
      * [correctOptionId][Poll.correctOptionId] is known to the bot.
      * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
@@ -171,11 +171,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
 
     /**
      * Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
-     * they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't
-     * be copied. A quiz poll can be copied only if the value of the field [correctOptionId][Poll.correctOptionId] is
-     * known to the bot. The method is analogous to the method [forwardMessages], but the copied messages don't have
-     * a link to the original message. Album grouping is kept for copied messages.
-     * On success, an array of [MessageId] of the sent messages is returned.
+     * they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and
+     * invoice messages can't be copied. A quiz poll can be copied only if the value of the field
+     * [correctOptionId][Poll.correctOptionId] is known to the bot. The method is analogous to the method
+     * [forwardMessages], but the copied messages don't have a link to the original message. Album grouping is kept for
+     * copied messages. On success, an array of [MessageId] of the sent messages is returned.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
@@ -866,6 +866,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Use this method to edit captions of messages. On success, if the edited message is not an inline message,
      * the edited [Message] is returned, otherwise True is returned.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
      * @param inlineMessageId Required if chatId and messageId are not specified. Identifier of the inline message
      * @param caption New caption of the message, 0-1024 characters after entities parsing
@@ -879,20 +881,21 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [MessageInlineKeyboard] builder for an inline keyboard
      * */
-    suspend fun editMessageCaption(
-        messageId: Int? = null,
-        inlineMessageId: String? = null,
+    suspend fun editMessageCaption( // TODO impl MessageText builder ?
         caption: String,
         parseMode: ParseMode? = null,
         captionEntities: List<MessageEntity>? = null,
+        businessConnectionId: String? = null,
+        messageId: Int? = null,
+        inlineMessageId: String? = null,
         showCaptionAboveMedia: Boolean? = null,
         linkPreviewOptions: LinkPreviewOptions? = bot.botConfig.linkPreviewOptions,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend MessageInlineKeyboard.() -> Unit)? = null
     ): Message {
         return editMessageCaption(
-            chatId, messageId, inlineMessageId, caption, parseMode, captionEntities, showCaptionAboveMedia,
-            keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
+            businessConnectionId, chatId, messageId, inlineMessageId, caption, parseMode, captionEntities,
+            showCaptionAboveMedia, keyboardMarkup?.let { buildInlineKeyboard { it() } }?.toMarkup()
         )
     }
 

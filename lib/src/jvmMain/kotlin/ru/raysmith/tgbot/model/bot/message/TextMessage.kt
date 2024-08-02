@@ -6,13 +6,16 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][API.sendMessage] method */
 @TextMessageDsl
-class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType.TEXT), MessageWithReplyMarkup, BotHolder {
+class TextMessage(
+    override val bot: Bot
+) : TextWithEntities(bot, MessageTextType.TEXT), MessageWithReplyMarkup, BotHolder, IMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -27,7 +30,7 @@ class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType
     override var businessConnectionId: String? = null
     override var messageEffectId: String? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendMessage(
+    override suspend fun send(chatId: ChatId) = sendMessage(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
@@ -43,6 +46,7 @@ class TextMessage(override val bot: Bot) : TextWithEntities(bot, MessageTextType
     )
 
     override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
+        businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,

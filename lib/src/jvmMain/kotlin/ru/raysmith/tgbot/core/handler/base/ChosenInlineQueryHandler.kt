@@ -14,13 +14,15 @@ open class ChosenInlineQueryHandler(
     final override val bot: Bot,
     private val handler: suspend ChosenInlineQueryHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<ChosenInlineQueryHandler> {
-    override var messageId: Int? = null
-    override var inlineMessageId: String? = null
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
+    override var messageId: Int? = null
+    override var inlineMessageId: String? = null
+
     override fun getChatId() = inlineResult.from.id
     override fun getChatIdOrThrow() = inlineResult.from.id
+
     override suspend fun handle() {
         handler()
         handled = true

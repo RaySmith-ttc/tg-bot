@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.network.serializer.FileIdOrUrlSerializer
 import java.io.File
 
-@Suppress("DEPRECATION")
 interface Streamable {
     fun input(): Input
 }

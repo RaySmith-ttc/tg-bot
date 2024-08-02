@@ -17,15 +17,16 @@ class UnknownEventHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
+    override var messageId = update.message?.messageId
+    override var inlineMessageId = update.callbackQuery?.inlineMessageId
+
+    override fun getChatId() = update.findChatId()
+
     override suspend fun handle() {
         handler()
         handled = true
         handleLocalFeatures(handled)
     }
-    override fun getChatId() = update.findChatId()
-
-    override var messageId = update.message?.messageId
-    override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(update, bot, handler).block()

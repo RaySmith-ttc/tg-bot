@@ -547,6 +547,16 @@ class Runner {
                     })
                 }
 
+                handleChannelPost {
+                    if (channelPost.text == "/paid") {
+                        sendPaidMedia {
+                            caption = "test"
+                            starCount = 1
+                            photo("files/image1.png".asResources().asTgFile())
+                        }
+                    }
+                }
+
                 if (lookPollAnswers) {
                     handlePollAnswer {
                         println("answer")
@@ -892,7 +902,7 @@ class Runner {
                             italic("edited")
                         }
                         runBlocking { delay(2000) }
-                        editMedia<InputMediaPhoto>(InputMediaPhoto(
+                        editMedia(InputMediaPhoto(
                             media = "AgACAgIAAxkBAAI9AWOCdwVufweWJV-HNe5pkexZa83GAAKRwzEbKkIQSHYZWoXjyhFNAQADAgADcwADKwQ",
                             caption = editedMessage.caption,
                             parseMode = null,

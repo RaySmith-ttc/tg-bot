@@ -344,9 +344,9 @@ interface API {
     }
 
     /**
-     * Use this method to copy messages of any kind. Service messages, giveaway messages, giveaway winners messages,
-     * giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz
-     * [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
+     * Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages,
+     * giveaway winners messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+     * A quiz [poll](https://core.telegram.org/bots/api#poll) can be copied only if the value of the field
      * [correctOptionId][Poll.correctOptionId] is known to the bot.
      * The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the
      * original message. Returns the [MessageId] of the sent message on success.
@@ -404,11 +404,11 @@ interface API {
 
     /**
      * Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
-     * they are skipped. Service messages, giveaway messages, giveaway winners messages, and invoice messages can't
-     * be copied. A quiz poll can be copied only if the value of the field [correctOptionId][Poll.correctOptionId] is
-     * known to the bot. The method is analogous to the method [forwardMessages], but the copied messages don't have
-     * a link to the original message. Album grouping is kept for copied messages.
-     * On success, an array of [MessageId] of the sent messages is returned.
+     * they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and
+     * invoice messages can't be copied. A quiz poll can be copied only if the value of the field
+     * [correctOptionId][Poll.correctOptionId] is known to the bot. The method is analogous to the method
+     * [forwardMessages], but the copied messages don't have a link to the original message. Album grouping is kept for
+     * copied messages. On success, an array of [MessageId] of the sent messages is returned.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param messageThreadId Unique identifier for the target message thread (topic) of the forum;
@@ -776,6 +776,59 @@ interface API {
             setMultiPartFormDataBody(
                 "video_note" to videoNote
             )
+        }
+    }
+
+    /**
+     * Use this method to send paid media to channel chats. On success, the sent [Message] is returned.
+     * */
+    suspend fun sendPaidMedia(
+        chatId: ChatId,
+        starCount: Int,
+        media: List<InputPaidMedia>,
+        caption: String? = null,
+        parseMode: ParseMode? = null,
+        captionEntities: List<MessageEntity>? = null,
+        showCaptionAboveMedia: Boolean? = null,
+        disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        replyParameters: ReplyParameters? = null,
+        keyboardMarkup: KeyboardMarkup? = null,
+        inputFiles: List<InputFile>? = null // TODO docs
+    ) = request<Message> {
+        client.post("sendPaidMedia") {
+            parameter("star_count", starCount)
+            parameter("chat_id", chatId)
+            parameter("media", media)
+            parameter("caption", caption)
+            parameter("caption_entities", captionEntities)
+            parameter("show_caption_above_media", showCaptionAboveMedia)
+            parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("reply_parameters", replyParameters)
+            parameter("reply_markup", keyboardMarkup)
+
+            if (inputFiles != null) {
+                var lastInputFilesIndex = 0
+                setMultiPartFormDataBody(
+                    *buildList {
+                        media.map { inputMedia ->
+                            when (inputMedia) {
+                                is InputPaidMediaPhoto -> {
+                                    add(inputMedia.media.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
+                                }
+
+                                is InputPaidMediaVideo -> {
+                                    add(inputMedia.media.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
+                                    if (inputMedia.thumbnail != null) {
+                                        add(inputMedia.thumbnail.drop(MediaRequest.attachProtocolLength) to inputFiles[lastInputFilesIndex++])
+                                    } else {}
+                                }
+                            }
+                        }
+                    }.toTypedArray()
+                )
+            }
         }
     }
 
@@ -2263,6 +2316,8 @@ interface API {
      * by the bot and do not contain an inline keyboard can only be edited within **48 hours** from the time they were
      * sent.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message to
+     * be edited was sent
      * @param chatId Required if [inlineMessageId] is not specified.
      * Unique identifier for the target chat or username of the target channel
      * @param messageId Required if [inlineMessageId] is not specified. Identifier of the message to edit
@@ -2276,6 +2331,7 @@ interface API {
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards)
      * */
     suspend fun editMessageCaption(
+        businessConnectionId: String? = null,
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
@@ -2286,6 +2342,7 @@ interface API {
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageCaption") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("chat_id", chatId)
             parameter("message_id", messageId)
             parameter("inline_message_id", inlineMessageId)
@@ -2321,7 +2378,7 @@ interface API {
         chatId: ChatId? = null,
         messageId: Int? = null,
         inlineMessageId: String? = null,
-        media: InputMedia,
+        media: InputMedia, // TODO ???
         replyMarkup: KeyboardMarkup? = null,
     ) = request<Message> {
         client.post("editMessageMedia") {

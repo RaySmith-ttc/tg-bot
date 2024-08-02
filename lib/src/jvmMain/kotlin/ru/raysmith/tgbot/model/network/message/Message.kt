@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.model.network.giveaway.GiveawayCreated
 import ru.raysmith.tgbot.model.network.giveaway.GiveawayWinners
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
+import ru.raysmith.tgbot.model.network.media.paid.PaidMediaInfo
 import ru.raysmith.tgbot.model.network.message.origin.MessageOrigin
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
@@ -133,6 +134,9 @@ data class Message(
     /** Message is a general file, information about the file */
     @SerialName("document") val document: Document? = null,
 
+    /** Message contains paid media; information about the paid media */
+    @SerialName("paid_media") val paidMedia: PaidMediaInfo? = null,
+
     /** Message is a photo, available sizes of the photo */
     @SerialName("photo") val photo: List<PhotoSize>? = null,
 
@@ -154,7 +158,7 @@ data class Message(
     /** Message is a voice message, information about the file */
     @SerialName("voice") val voice: Voice? = null,
 
-    /** Caption for the animation, audio, document, photo, video or voice, 0-1024 characters */
+    /** Caption for the animation, audio, document, paid media, photo, video or voice */
     @SerialName("caption") val caption: String? = null,
 
     /**
@@ -240,15 +244,21 @@ data class Message(
 
     /**
      * Message is an invoice for a payment, information about the invoice.
-     * @see <a href="https://core.telegram.org/bots/api#payments">More about payments »</a>
+     * [More about payments »](https://core.telegram.org/bots/api#payments)
      * */
     @SerialName("invoice") val invoice: Invoice? = null,
 
     /**
      * Message is a service message about a successful payment, information about the payment.
-     * @see <a href="https://core.telegram.org/bots/api#payments">More about payments »</a>
+     * [More about payments »](https://core.telegram.org/bots/api#payments)
      * */
     @SerialName("successful_payment") val successfulPayment: SuccessfulPayment? = null,
+
+    /**
+     * Message is a service message about a refunded payment, information about the payment.
+     * [More about payments »](https://core.telegram.org/bots/api#payments)
+     * */
+//    @SerialName("refunded_payment") val refundedPayment: RefundedPayment? = null,
 
     /** Service message: users were shared with the bot */
     @SerialName("users_shared") val usersShared: UsersShared? = null,
@@ -377,7 +387,7 @@ data class Message(
     }
 
     /** Return sent media object or null */
-    fun getMedia(): Media? = when {
+    fun getMedia(): MediaWithFile? = when {
         document != null -> document
         animation != null -> animation
         audio != null -> audio

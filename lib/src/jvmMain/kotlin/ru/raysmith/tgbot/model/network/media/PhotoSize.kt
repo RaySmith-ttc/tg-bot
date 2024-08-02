@@ -10,6 +10,6 @@ data class PhotoSize(
     @SerialName("width") val width: Int,
     @SerialName("height") val height: Int,
     @SerialName("file_size") override val fileSize: Long? = null,
-) : Media {
+) : MediaWithFile {
     override val fileName: String? = null
 }

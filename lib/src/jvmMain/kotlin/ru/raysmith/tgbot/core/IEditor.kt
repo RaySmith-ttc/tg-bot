@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.model.bot.message.MessageWithReplyMarkup
 import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
+import ru.raysmith.tgbot.model.bot.message.media.ExtendedCaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.message.InaccessibleMessage
@@ -23,14 +24,23 @@ interface IEditor : ChatIdHolder, API, BotHolder {
     /** Identifier of the inline message to be edited */
     var inlineMessageId: String?
 
+    /** Unique identifier of the business connection on behalf of which the message will be sent */
+    var businessConnectionId: String?
+
+    // TODO messageId not optional ?
+
     suspend fun editCaption(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
+        businessConnectionId: String? = this.businessConnectionId,
         caption: suspend MessageText.() -> Unit
     ): Message {
-        return CaptionableMediaMessage.instance(bot)
-            .apply { captionWithEntities(caption) }
+        return ExtendedCaptionableMediaMessage.instance(bot)
+            .apply {
+                captionWithEntities(caption)
+                this.businessConnectionId = businessConnectionId
+            }
             .edit(chatId, messageId, inlineMessageId)
     }
 
@@ -38,33 +48,45 @@ interface IEditor : ChatIdHolder, API, BotHolder {
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
+        businessConnectionId: String? = this.businessConnectionId,
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return MessageWithReplyMarkup.instance(bot)
-            .apply { inlineKeyboard(keyboard) }
+            .apply {
+                inlineKeyboard(keyboard)
+                this.businessConnectionId = businessConnectionId
+            }
             .editReplyMarkup(chatId, messageId, inlineMessageId)
     }
 
-    suspend fun <T : InputMedia> editMedia(
+    suspend fun editMedia(
         media: InputMedia,
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
-        businessConnectionId: String? = null,
+        businessConnectionId: String? = this.businessConnectionId,
         chatId: ChatId = getChatIdOrThrow(),
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
-        return CaptionableMediaMessage.instance(bot)
-            .apply { inlineKeyboard(keyboard) }
-            .editMedia<T>(businessConnectionId, chatId, messageId, inlineMessageId, media)
+        return ExtendedCaptionableMediaMessage.instance(bot)
+            .apply {
+                inlineKeyboard(keyboard)
+                this.businessConnectionId = businessConnectionId
+            }
+            .editMedia(media, chatId, messageId, inlineMessageId)
     }
 
     suspend fun edit(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
         inlineMessageId: String? = this.inlineMessageId,
+        businessConnectionId: String? = this.businessConnectionId,
         message: suspend TextMessage.() -> Unit
     ): Message {
-        return TextMessage(bot).apply { message() }
+        return TextMessage(bot)
+            .apply {
+                message()
+                this.businessConnectionId = businessConnectionId
+            }
             .edit(chatId, messageId, inlineMessageId)
     }
 

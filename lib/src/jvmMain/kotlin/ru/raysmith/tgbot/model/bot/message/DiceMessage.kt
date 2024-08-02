@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 class DiceMessage(
     val emoji: String,
     override val bot: Bot
-) : IMessage<Message>, KeyboardCreator, BotHolder {
+) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -25,7 +25,7 @@ class DiceMessage(
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendDice(
+    override suspend fun send(chatId: ChatId) = sendDice(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

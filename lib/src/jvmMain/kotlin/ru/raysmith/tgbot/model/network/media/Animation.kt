@@ -14,4 +14,4 @@ data class Animation(
     @SerialName("width") val width: Int,
     @SerialName("height") val height: Int,
     @SerialName("duration") val duration: Int,
-) : Media
+) : MediaWithFile

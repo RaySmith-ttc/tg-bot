@@ -19,10 +19,11 @@ open class CommandHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = message.chat.id
-    override fun getChatIdOrThrow() = message.chat.id
     override var messageId: Int? = message.messageId
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = message.chat.id
+    override fun getChatIdOrThrow() = message.chat.id
 
     override suspend fun handle() {
         handler()

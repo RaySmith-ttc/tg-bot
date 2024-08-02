@@ -17,9 +17,11 @@ open class MessageReactionHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = messageReaction.chat.id
     override var messageId: Int? = messageReaction.messageId
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = messageReaction.chat.id
+    override fun getChatIdOrThrow() = messageReaction.chat.id
 
     override suspend fun handle() {
         handler()

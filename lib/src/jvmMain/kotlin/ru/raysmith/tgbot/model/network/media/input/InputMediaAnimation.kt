@@ -20,8 +20,7 @@ data class InputMediaAnimation(
      * should not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
      * Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>”
      * if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
-     *
-     * @see <a href="https://core.telegram.org/bots/api#sending-files">More info on Sending Files »</a>
+     * [More info on Sending Files »](https://core.telegram.org/bots/api#sending-files)
      * */
     @SerialName("thumbnail") val thumbnail: String? = null,
 

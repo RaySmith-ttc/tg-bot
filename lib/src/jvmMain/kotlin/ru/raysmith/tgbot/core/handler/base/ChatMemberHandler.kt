@@ -24,17 +24,19 @@ open class ChatMemberHandler(
     final override val bot: Bot,
     private val handler: suspend ChatMemberHandler.() -> Unit = { }
 ) : BaseEventHandler(), BotContext<ChatMemberHandler> {
-    override fun getChatId() = chat.id
-    override fun getChatIdOrThrow() = chat.id
-    override var messageId: Int? = null
-    override var inlineMessageId: String? = null
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
+
+    override var messageId: Int? = null
+    override var inlineMessageId: String? = null
 
     constructor(chatMember: ChatMemberUpdated, bot: Bot, handler: suspend ChatMemberHandler.() -> Unit = { }) : this(
         chatMember.chat, chatMember.from, chatMember.date, chatMember.oldChatMember, chatMember.newChatMember,
         chatMember.inviteLink, bot, handler
     )
+
+    override fun getChatId() = chat.id
+    override fun getChatIdOrThrow() = chat.id
 
     override suspend fun handle() {
         handler()

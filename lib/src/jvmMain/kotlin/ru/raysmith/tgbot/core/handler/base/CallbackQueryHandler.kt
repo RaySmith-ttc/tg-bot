@@ -29,14 +29,15 @@ open class CallbackQueryHandler(
 ) : EventHandler, BaseCallbackHandler(query, bot.client), BotContext<CallbackQueryHandler> {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val localFeatures: MutableList<BotFeature> = mutableListOf()
+    protected val localFeatures: MutableList<BotFeature> = mutableListOf() // TODO add to other handlers ?
 
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
-    override fun getChatId() = query.message?.chat?.id
-    override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
+
     override var messageId: Int? = query.message?.messageId
     override var inlineMessageId: String? = query.inlineMessageId
+    @Deprecated("Always null the because business connection id cannot be obtain from the event")
+    override var businessConnectionId: String? = null
 
     companion object {
         const val HANDLER_ID = "default"
@@ -47,6 +48,9 @@ open class CallbackQueryHandler(
     init {
         localFeatures.addAll(bot.botConfig.defaultCallbackQueryHandlerFeatures.toTypedArray())
     }
+
+    override fun getChatId() = query.message?.chat?.id
+    override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
 
     override suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean) {
         if (callFirst) localFeatures.addAll(0, features.toList())

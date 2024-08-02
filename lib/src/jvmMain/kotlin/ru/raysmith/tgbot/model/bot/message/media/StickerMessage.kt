@@ -5,10 +5,12 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
-class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
+class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -23,9 +25,11 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder {
     override val mediaName: String = "sticker"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var replyParameters: ReplyParameters? = null
+    override var messageThreadId: Int? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendSticker(
+    override suspend fun send(chatId: ChatId) = sendSticker(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

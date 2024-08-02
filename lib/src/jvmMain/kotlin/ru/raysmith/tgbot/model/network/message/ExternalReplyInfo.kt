@@ -9,6 +9,7 @@ import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.giveaway.Giveaway
 import ru.raysmith.tgbot.model.network.giveaway.GiveawayWinners
 import ru.raysmith.tgbot.model.network.media.*
+import ru.raysmith.tgbot.model.network.media.paid.PaidMediaInfo
 import ru.raysmith.tgbot.model.network.message.origin.MessageOrigin
 import ru.raysmith.tgbot.model.network.sticker.Sticker
 
@@ -42,6 +43,9 @@ data class ExternalReplyInfo(
 
     /** Message is a general file, information about the file */
     @SerialName("document") val document: Document? = null,
+
+    /** Message contains paid media; information about the paid media */
+    @SerialName("paid_media") val paidMedia: PaidMediaInfo? = null,
 
     /** Message is a photo, available sizes of the photo */
     @SerialName("photo") val photo: List<PhotoSize>? = null,

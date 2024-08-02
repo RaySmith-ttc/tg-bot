@@ -10,4 +10,4 @@ data class Voice(
     @SerialName("file_name") override val fileName: String? = null,
     @SerialName("file_size") override val fileSize: Long? = null,
     @SerialName("duration") val duration: Int,
-) : Media
+) : MediaWithFile

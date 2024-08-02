@@ -14,9 +14,6 @@ interface IMessage<T> : API {
         const val MAX_POLL_OPTION_LENGTH = 100
     }
 
-    /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
-    var messageThreadId: Int?
-
     /**
      * Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
@@ -29,23 +26,36 @@ interface IMessage<T> : API {
     /** Protects the contents of the sent message from forwarding and saving */
     var protectContent: Boolean?
 
+    /** Sends message to the [chat] */
+    suspend fun send(chat: Chat): T = send(chat.id)
+
+    /** Sends message to the chat with [chatId] */
+    suspend fun send(chatId: ChatId): T
+}
+
+interface ExtendedMessage<T> : IMessage<T> {
+
+    /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
+    var messageThreadId: Int?
+
     /** Unique identifier of the message effect to be added to the message; for private chats only */
     var messageEffectId: String?
 
     /** Unique identifier of the business connection on behalf of which the message will be sent */
     var businessConnectionId: String?
 
-    /**
-     * Send message to [chat]
-     *
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-     * */
-    suspend fun send(chat: Chat, messageThreadId: Int? = null): T = send(chat.id, messageThreadId)
-
-    /**
-     * Send message to chat with [chatId]
-     *
-     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-     * */
-    suspend fun send(chatId: ChatId, messageThreadId: Int? = null): T
+//    /** Sends message to the [chat]
+//     *
+//     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+//     * */
+//    suspend fun send(chat: Chat, messageThreadId: Int? = null): T = send(chat.id, messageThreadId)
+//
+//    /**
+//     * Sends message to the chat with [chatId]
+//     *
+//     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+//     * */
+//    suspend fun send(chatId: ChatId, messageThreadId: Int? = null): T
+//
+//    override suspend fun send(chatId: ChatId): T = send(chatId, null)
 }

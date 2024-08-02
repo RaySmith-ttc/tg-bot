@@ -17,10 +17,11 @@ open class EditedChannelPostHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = channelPost.chat.id
-    override fun getChatIdOrThrow() = channelPost.chat.id
     override var messageId: Int? = channelPost.messageId
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = channelPost.chat.id
+    override fun getChatIdOrThrow() = channelPost.chat.id
 
     override suspend fun handle() {
         handler()

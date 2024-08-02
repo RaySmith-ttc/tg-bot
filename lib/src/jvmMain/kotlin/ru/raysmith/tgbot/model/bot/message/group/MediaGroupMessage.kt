@@ -5,9 +5,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.message.Message
@@ -16,7 +16,7 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.withSafeLength
 
-class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<Message>>, BotHolder {
+class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ExtendedMessage<List<Message>>, BotHolder {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -27,8 +27,9 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
     override var businessConnectionId: String? = null
     override var replyParameters: ReplyParameters? = null
 
+    // TODO see MediaMessage.sendChatAction and overrides of it
     /**
-     * send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action
+     * Send [ChatAction.UPLOAD_PHOTO], [ChatAction.UPLOAD_VIDEO] or [ChatAction.UPLOAD_DOCUMENT] action
      * while upload files to telegram server
      * */
     var sendAction = false
@@ -55,7 +56,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), IMessage<List<M
             }
             .apply(caption).getEntities()
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?): List<Message> {
+    override suspend fun send(chatId: ChatId): List<Message> {
         return if (inputFiles.isEmpty()) {
             sendMediaGroup(
                 businessConnectionId = businessConnectionId,

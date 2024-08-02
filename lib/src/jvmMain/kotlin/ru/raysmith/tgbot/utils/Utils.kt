@@ -30,6 +30,8 @@ suspend fun <T> botContext(
     override val botConfig: BotConfig = bot.botConfig
     override var messageId: Int? = update?.message?.messageId
     override var inlineMessageId: String? = update?.callbackQuery?.inlineMessageId
+    @Deprecated("Always null the because business connection id cannot be obtain from the event")
+    override var businessConnectionId: String? = null
 
     override fun getChatId(): ChatId? = withChatId ?: update?.findChatId()
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {

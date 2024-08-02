@@ -4,9 +4,11 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.Message
 
-class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb() {
+class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb(), ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -17,9 +19,11 @@ class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb() {
     override val mediaName: String = "document"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var messageThreadId: Int? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendDocument(
+    override suspend fun send(chatId: ChatId) = sendDocument(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

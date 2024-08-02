@@ -8,10 +8,10 @@ import ru.raysmith.tgbot.model.bot.message.LivePeriod
 @Serializable
 data class Location(
 
-    /** Latitude as defined by sender */
+    /** Latitude as defined by the sender */
     @SerialName("latitude") val latitude: Float,
 
-    /** Longitude as defined by sender */
+    /** Longitude as defined by the sender */
     @SerialName("longitude") val longitude: Float,
 
     /** The radius of uncertainty for the location, measured in meters; 0-1500 */

@@ -25,6 +25,7 @@ open class InlineQueryHandler(
 
     override fun getChatId() = inlineQuery.from.id
     override fun getChatIdOrThrow() = inlineQuery.from.id
+
     override suspend fun handle() {
         handler()
         handled = true

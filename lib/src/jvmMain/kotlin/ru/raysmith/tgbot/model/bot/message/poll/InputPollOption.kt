@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
 
-/** This object contains information about one answer option in a poll to send. */
+/** This object contains information about one answer option in a poll to be sent. */
 @Serializable
 data class InputPollOption(
 

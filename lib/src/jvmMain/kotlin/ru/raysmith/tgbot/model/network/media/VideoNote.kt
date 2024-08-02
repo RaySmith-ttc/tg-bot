@@ -12,4 +12,4 @@ data class VideoNote(
     @SerialName("file_size") override val fileSize: Long? = null,
     @SerialName("length") val length: Int,
     @SerialName("duration") val duration: Int,
-) : Media
+) : MediaWithFile

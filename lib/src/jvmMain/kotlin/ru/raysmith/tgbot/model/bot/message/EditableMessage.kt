@@ -11,7 +11,7 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.noimpl
 
-interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
+interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator, ExtendedMessage<Message> {
     companion object {
         internal fun instance(bot: Bot) = object : MessageWithReplyMarkup {
             override val client: HttpClient = bot.client
@@ -24,7 +24,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator {
             override var businessConnectionId: String? = null
             override var keyboardMarkup: MessageKeyboard? = null
             override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = noimpl()
-            override suspend fun send(chatId: ChatId, messageThreadId: Int?) = noimpl()
+            override suspend fun send(chatId: ChatId) = noimpl()
         }
     }
 

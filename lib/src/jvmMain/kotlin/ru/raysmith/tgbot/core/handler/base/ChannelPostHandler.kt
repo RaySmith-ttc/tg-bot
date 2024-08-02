@@ -14,19 +14,21 @@ open class ChannelPostHandler(
     final override val bot: Bot,
     private val handler: suspend ChannelPostHandler.() -> Unit = {}
 ) : BaseEventHandler(), BotContext<ChannelPostHandler> {
-    override fun getChatId() = channelPost.chat.id
-    override fun getChatIdOrThrow() = channelPost.chat.id
-    override var messageId: Int? = channelPost.messageId
-    override var inlineMessageId: String? = null
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
+
+    override var messageId: Int? = channelPost.messageId
+    override var inlineMessageId: String? = null
+
+    override fun getChatId() = channelPost.chat.id
+    override fun getChatIdOrThrow() = channelPost.chat.id
 
     override suspend fun handle() {
         handler()
         handled = true
         handleLocalFeatures(handled)
     }
-    
+
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<ChannelPostHandler>.() -> R): R {
         return ChannelPostHandler(channelPost, bot, handler).block()
     }

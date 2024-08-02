@@ -16,6 +16,10 @@ interface EventHandler : ChatIdHolder, IEditor, ISender {
 }
 
 abstract class BaseEventHandler : EventHandler {
+
+    @Deprecated("Always null the because business connection id cannot be obtain from the event")
+    override var businessConnectionId: String? = null
+    
     override var handled: Boolean = false
     protected val localFeatures: MutableList<BotFeature> = mutableListOf()
 

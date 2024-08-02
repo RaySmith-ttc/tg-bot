@@ -57,3 +57,37 @@ internal fun HttpRequestBuilder.setMultiPartFormDataBody(vararg files: Pair<Stri
         }
     ))
 }
+
+//internal fun HttpRequestBuilder.setMultiPartFormDataBody(vararg files: Pair<String, InputFile?>) {
+//    @Suppress("UNCHECKED_CAST")
+//    val filtered = files.filter { it.second != null } as List<Pair<String, InputFile>>
+//    if (filtered.isEmpty()) return
+//
+//    setBody(MultiPartFormDataContent(
+//        formData {
+//            filtered.forEach { data ->
+//                val (name, inputFile) = data
+//
+//                when (inputFile) {
+//                    is InputFile.File -> append(
+//                        name,
+//                        InputProvider { inputFile.file.inputStream().asInput() },
+//                        Headers.build {
+////                            append(HttpHeaders.ContentType, Files.probeContentType(inputFile.file.toPath()))
+//                            append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.file.name}\"")
+//                        }
+//                    )
+//
+//                    is InputFile.ByteArray -> append(name, inputFile.byteArray, Headers.build {
+//                        if (inputFile.mimeType != null) {
+//                            append(HttpHeaders.ContentType, inputFile.mimeType)
+//                        }
+//                        append(HttpHeaders.ContentDisposition, "filename=\"${inputFile.filename}\"")
+//                    })
+//
+//                    is InputFile.FileIdOrUrl -> append(name, inputFile.value)
+//                }
+//            }
+//        }
+//    ))
+//}

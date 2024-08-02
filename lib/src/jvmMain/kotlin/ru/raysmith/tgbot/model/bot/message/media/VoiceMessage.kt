@@ -4,10 +4,14 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
+import ru.raysmith.tgbot.model.network.message.Message
 
-class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage() {
+class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage(), ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
+    override var messageThreadId: Int? = null
+    override var messageEffectId: String? = null
     override val botConfig: BotConfig = bot.botConfig
 
     var voice: InputFile?
@@ -23,7 +27,7 @@ class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage() {
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
     override var businessConnectionId: String? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendVoice(
+    override suspend fun send(chatId: ChatId) = sendVoice(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

@@ -132,6 +132,12 @@ data class ChatFullInfo (
     /** Default chat member permissions, for groups and supergroups */
     @SerialName("permissions") val permissions: ChatPermissions? = null,
 
+    /**
+     * *True*, if paid media messages can be sent or forwarded to the channel chat.
+     * The field is available only for channel chats.
+     * */
+    @SerialName("can_send_paid_media") val canSendPaidMedia: Boolean? = null,
+
     /** For supergroups, the minimum allowed delay between consecutive messages sent by each unprivileged user */
     @SerialName("slow_mode_delay") val slowModeDelay: Int? = null,
 

@@ -17,9 +17,11 @@ open class PreCheckoutQueryHandler(
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override fun getChatId() = preCheckoutQuery.from.id
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
+
+    override fun getChatId() = preCheckoutQuery.from.id
+    override fun getChatIdOrThrow() = preCheckoutQuery.from.id
 
     override suspend fun handle() {
         handler()

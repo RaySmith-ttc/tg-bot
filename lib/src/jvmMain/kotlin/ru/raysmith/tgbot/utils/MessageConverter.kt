@@ -91,7 +91,7 @@ suspend fun MessageHandler.messageDocument(block: suspend (Document) -> Unit) = 
 fun MessageHandler.messageImage() = MessageConverter(message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })
 
 /** Applies a [block] to the message image (document or compressed photo) or returns null if message doesn't contain image */
-suspend fun MessageHandler.messageImage(block: suspend (Media) -> Unit) =
+suspend fun MessageHandler.messageImage(block: suspend (MediaWithFile) -> Unit) =
     (message.photo?.last() ?: message.document?.let { if (it.mimeType?.startsWith("image/") == true) it else null })?.also { block(it) }
 
 
@@ -180,7 +180,7 @@ suspend fun MessageHandler.messageDice(block: suspend (Dice) -> Unit) = message.
 fun MessageHandler.messageAnyMedia() = MessageConverter(message.getMedia())
 
 /** Applies a [block] to any message media or returns null if message doesn't contain media */
-suspend fun MessageHandler.messageAnyMedia(block: suspend (Media) -> Unit) = (
+suspend fun MessageHandler.messageAnyMedia(block: suspend (MediaWithFile) -> Unit) = (
     message.photo?.lastOrNull() ?: message.document ?: message.audio ?: message.video ?:  message.animation ?:
     message.voice ?: message.videoNote
 )?.also { block(it) }

@@ -13,15 +13,15 @@ data class Document(
     /** Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file. */
     @SerialName("file_unique_id") override val fileUniqueId: String,
 
-    /** Document thumbnail as defined by sender */
+    /** Document thumbnail as defined by the sender */
     @SerialName("thumbnail") val thumbnail: PhotoSize? = null,
 
-    /** Original filename as defined by sender */
+    /** Original filename as defined by the sender */
     @SerialName("file_name") override val fileName: String? = null,
 
-    /** MIME type of the file as defined by sender */
+    /** MIME type of the file as defined by the sender */
     @SerialName("mime_type") val mimeType: String? = null,
 
     /** File size in bytes. */
     @SerialName("file_size") override val fileSize: Long? = null
-) : Media
+) : MediaWithFile

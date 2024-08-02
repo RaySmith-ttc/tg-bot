@@ -9,7 +9,10 @@ import ru.raysmith.tgbot.model.network.User
 data class TransactionPartnerUser(
 
     /** Information about the user */
-    @SerialName("user") val user: User? = null
+    @SerialName("user") val user: User,
+
+    /** Bot-specified invoice payload */
+    @SerialName("invoice_payload") val invoicePayload: String? = null,
 ) : TransactionPartner() {
 
     /** Type of the transaction partner, always “user” */

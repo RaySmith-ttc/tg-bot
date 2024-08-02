@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 @Suppress("MemberVisibilityCanBePrivate")
 class LocationMessage(
     val latitude: Double, val longitude: Double, override val bot: Bot
-) : IMessage<Message>, KeyboardCreator, BotHolder {
+) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -36,7 +36,7 @@ class LocationMessage(
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
 
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendLocation(
+    override suspend fun send(chatId: ChatId) = sendLocation(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,

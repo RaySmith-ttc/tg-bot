@@ -7,6 +7,7 @@ import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
+import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
 import ru.raysmith.tgbot.model.bot.message.TextWithEntities
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -27,7 +28,7 @@ internal class PollOptionTextWithEntities(bot: Bot) : TextWithEntities(bot, Mess
  * */
 class PollMessage(
     override val bot: Bot,
-) : IMessage<Message>, KeyboardCreator, BotHolder {
+) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -79,7 +80,7 @@ class PollMessage(
     }
 
     /** Use this method to send a native poll. On success, the sent Message is returned. */
-    override suspend fun send(chatId: ChatId, messageThreadId: Int?) = sendPoll(
+    override suspend fun send(chatId: ChatId) = sendPoll(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
