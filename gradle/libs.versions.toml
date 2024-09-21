@@ -1,17 +1,21 @@
 [versions]
-kotlin = "1.9.0"
+kotlin = "2.0.20"
 
-kotlinx-coroutines = "1.7.1"
-kotlinx-serialization = "1.5.1"
+kotlinx-coroutines = "1.8.1"
+kotlinx-serialization = "1.6.3"
 kotlinx-datetime = "0.4.0"
 
-ktor = "2.3.4"
+ktor = "2.3.11"
+
+react = "18.3.1-pre.765"
+seskar = "3.0.0"
 
 exposed = "0.45.0"
 
-utils = "2.1.0"
+utils = "3.0.0"
 
 logback = "1.4.4"
+log4j = "2.23.1"
 slf4j = "2.0.9"
 kodein = "7.20.2"
 sentry = "6.18.1"
@@ -60,6 +64,19 @@ ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "k
 
 ktor-network-tlsCertificates = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
 
+# Kotlin/JS wrappers
+kotlin-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "react" }
+kotlin-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "react" }
+kotlin-emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "11.11.4-pre.765" }
+
+kotlin-mui = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui", version = "5.14.5-pre.619" }
+kotlin-mui-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-material", version = "5.15.20-pre.765" }
+kotlin-mui-icons-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-icons-material", version = "5.15.20-pre.765" }
+kotlin-react-router = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router", version = "6.23.1-pre.765" }
+kotlin-react-router-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom", version = "6.23.1-pre.765" }
+kotlin-node = { module = "org.jetbrains.kotlin-wrappers:kotlin-node", version = "20.11.30-pre.765" }
+seskar-core = { module = "io.github.turansky.seskar:seskar-core", version.ref = "seskar" }
+
 # database
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
 exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
@@ -76,24 +93,35 @@ raysmith-utils = { module = "ru.raysmith:utils", version.ref = "utils" }
 
 # utils
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-log4j-core = { module = "org.apache.logging.log4j:log4j-core", version = "2.20.0" }
+log4j = { module = "org.apache.logging.log4j:log4j", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 log4j-slf4j18-impl = { module = "org.apache.logging.log4j:log4j-slf4j18-impl", version = "2.18.0" }
+log4j-slf4j2-impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version = "2.23.1" }
 slf4j-reload4j = { module = "org.slf4j:slf4j-reload4j", version.ref = "slf4j" }
 slf4j-log4j13 = { module = "org.slf4j:slf4j-log4j13", version = "1.0.1" }
 
 kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 
+# gradle
+gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
 # tests
 kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-konsist = { module = "com.lemonappdev:konsist", version = "0.12.1" }
+konsist = { module = "com.lemonappdev:konsist", version = "0.15.1" }
+assertj-core = { module = "org.assertj:assertj-core", version = "3.25.3" }
 
 [plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+benManes-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+seskar = { id = "io.github.turansky.seskar", version.ref = "seskar" }
 
 [bundles]
 ktor-server = [
@@ -102,11 +130,7 @@ ktor-server = [
     "ktor-server-auth", "ktor-server-swagger", "ktor-server-openapi"
 ]
 ktor-client = [
-    "ktor-client-core", "ktor-client-js", "ktor-client-logging", "ktor-client-contentNegotiation",
-    "ktor-client-websockets", "ktor-serialization-kotlinx-json", "ktor-client-auth"
-]
-ktor-client-jvm = [
-    "ktor-client-core", "ktor-client-cio", "ktor-client-logging", "ktor-client-contentNegotiation",
+    "ktor-client-core", "ktor-client-okhttp", "ktor-client-logging", "ktor-client-contentNegotiation",
     "ktor-client-websockets", "ktor-serialization-kotlinx-json", "ktor-client-auth"
 ]
 database = ["exposed-core", "exposed-dao", "exposed-jdbc", "mysql-connector", "hikari"]

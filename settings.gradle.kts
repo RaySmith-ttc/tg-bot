@@ -2,6 +2,9 @@
 
 rootProject.name = "tg-bot"
 
+include(":lib")
+include(":webapp-app")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -15,10 +18,6 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         mavenRaySmith("utils")
-    }
-
-    versionCatalogs {
-
     }
 }
 
