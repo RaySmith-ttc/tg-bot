@@ -1,6 +1,7 @@
 ### Gradle template
 .gradle
 .idea
+.kotlin
 **/build/
 /logs
 /out
