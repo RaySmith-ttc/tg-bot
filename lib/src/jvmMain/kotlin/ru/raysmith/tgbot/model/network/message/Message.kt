@@ -16,6 +16,7 @@ import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.media.paid.PaidMediaInfo
 import ru.raysmith.tgbot.model.network.message.origin.MessageOrigin
+import ru.raysmith.tgbot.model.network.payment.RefundedPayment
 import ru.raysmith.tgbot.model.network.payment.SuccessfulPayment
 import ru.raysmith.tgbot.model.network.sticker.Sticker
 import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostAdded
@@ -258,7 +259,7 @@ data class Message(
      * Message is a service message about a refunded payment, information about the payment.
      * [More about payments »](https://core.telegram.org/bots/api#payments)
      * */
-//    @SerialName("refunded_payment") val refundedPayment: RefundedPayment? = null,
+    @SerialName("refunded_payment") val refundedPayment: RefundedPayment? = null,
 
     /** Service message: users were shared with the bot */
     @SerialName("users_shared") val usersShared: UsersShared? = null,
