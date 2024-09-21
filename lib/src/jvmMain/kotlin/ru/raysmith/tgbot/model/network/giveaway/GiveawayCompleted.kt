@@ -15,5 +15,11 @@ data class GiveawayCompleted(
     @SerialName("unclaimed_prize_count") val unclaimedPrizeCount: Int? = null,
 
     /** Message with the giveaway that was completed, if it wasn't deleted */
-    @SerialName("giveaway_message") val giveawayMessage: Message? = null
+    @SerialName("giveaway_message") val giveawayMessage: Message? = null,
+
+    /**
+     * *True*, if the giveaway is a Telegram Star giveaway.
+     * Otherwise, currently, the giveaway is a Telegram Premium giveaway.
+     * */
+    @SerialName("is_star_giveaway") val isStarGiveaway: Boolean? = null,
 )

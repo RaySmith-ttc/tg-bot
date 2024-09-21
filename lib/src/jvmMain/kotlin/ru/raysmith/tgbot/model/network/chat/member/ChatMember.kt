@@ -9,9 +9,8 @@ import ru.raysmith.tgbot.network.serializer.ChatMemberSerializer
 sealed class ChatMember {
 
     /** The member's status in the chat */
-    @SerialName("status") abstract val status: String
+    abstract val status: String
 
     /** Information about the user */
-    @SerialName("user") abstract val user: User
-
+    abstract val user: User
 }

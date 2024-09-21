@@ -54,6 +54,9 @@ data class User(
      * Returned only in [getMe][BotContext.getMe].
      * */
     @SerialName("can_connect_to_business") val canConnectToBusiness: Boolean? = null,
+
+    /** *True*, if the bot has a main Web App. Returned only in [getMe][BotContext.getMe]. */
+    @SerialName("has_main_web_app") val hasMainWebApp: Boolean? = null,
 ) {
 
     /**

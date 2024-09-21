@@ -7,8 +7,6 @@ import ru.raysmith.tgbot.model.network.User
 /** Represents a chat member that owns the chat and has all administrator privileges. */
 @Serializable
 data class ChatMemberOwner(
-    /** The member's status in the chat, always “creator” */
-    @SerialName("status") override val status: String,
     @SerialName("user") override val user: User,
 
     /** *True*, if the user's presence in the chat is hidden */
@@ -16,4 +14,8 @@ data class ChatMemberOwner(
 
     /** Custom title for this user */
     @SerialName("custom_title") val customTitle: String? = null,
-) : ChatMember()
+) : ChatMember() {
+
+    /** The member's status in the chat, always “creator” */
+    override val status: String = "creator"
+}

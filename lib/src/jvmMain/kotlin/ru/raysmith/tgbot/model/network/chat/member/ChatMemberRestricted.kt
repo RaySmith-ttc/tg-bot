@@ -7,9 +7,6 @@ import ru.raysmith.tgbot.model.network.User
 /** Represents a chat member that is under certain restrictions in the chat. Supergroups only. */
 @Serializable
 data class ChatMemberRestricted(
-    /** The member's status in the chat, always “restricted” */
-    @SerialName("status") override val status: String,
-
     @SerialName("user")  override val user: User,
 
     /** *True*, if the user is allowed to change the chat title, photo and other settings */
@@ -61,4 +58,8 @@ data class ChatMemberRestricted(
 
     /** Date when restrictions will be lifted for this user; unix time. If 0, then the user is restricted forever */
     @SerialName("until_date") val untilDate: Int,
-) : ChatMember()
+) : ChatMember() {
+
+    /** The member's status in the chat, always “restricted” */
+    override val status: String = "restricted"
+}

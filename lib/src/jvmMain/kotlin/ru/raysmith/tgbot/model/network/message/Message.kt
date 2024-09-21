@@ -33,13 +33,17 @@ data class Message(
     /** Unique identifier of a message thread to which the message belongs; for supergroups only */
     @SerialName("message_thread_id") val messageThreadId: Int? = null,
 
-    /** Sender, empty for messages sent to channels */
+    /**
+     * Sender of the message; may be empty for messages sent to channels. For backward compatibility,
+     * if the message was sent on behalf of a chat, the field contains a fake sender user in non-channel chats
+     * */
     @SerialName("from") val from: User? = null,
 
     /**
-     * Sender of the message, sent on behalf of a chat. The channel itself for channel messages. The supergroup
-     * itself for messages from anonymous group administrators. The linked channel for messages automatically
-     * forwarded to the discussion group
+     * Sender of the message when sent on behalf of a chat. For example, the supergroup itself for messages sent
+     * by its anonymous administrators or a linked channel for messages automatically forwarded to the channel's
+     * discussion group. For backward compatibility, if the message was sent on behalf of a chat, the field from
+     * contains a fake sender user in non-channel chats.
      * */
     @SerialName("sender_chat") val senderChat: Chat? = null,
 

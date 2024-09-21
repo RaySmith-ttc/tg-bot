@@ -1714,6 +1714,8 @@ class Runner {
                         setMessageReaction(messageId!!, listOf(
                             ReactionTypeEmoji("🤡")
                         ), isBig = true)
+
+                        unpinChatMessage()
                     }
 
                     isCommand("getChat") {

@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.model.network.inline.InlineQuery
 import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionCountUpdated
 import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionUpdated
+import ru.raysmith.tgbot.model.network.payment.PaidMediaPurchased
 import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
 import ru.raysmith.tgbot.model.network.payment.ShippingQuery
 import ru.raysmith.tgbot.model.network.updates.boost.ChatBoostRemoved
@@ -93,6 +94,9 @@ data class Update(
 
     /** New incoming pre-checkout query. Contains full information about checkout */
     @SerialName("pre_checkout_query") val preCheckoutQuery: PreCheckoutQuery? = null,
+
+    /** A user purchased paid media with a non-empty payload sent by the bot in a non-channel chat */
+    @SerialName("purchased_paid_media") val purchasedPaidMedia: PaidMediaPurchased? = null,
 
     /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot */
     @SerialName("poll") val poll: Poll? = null,

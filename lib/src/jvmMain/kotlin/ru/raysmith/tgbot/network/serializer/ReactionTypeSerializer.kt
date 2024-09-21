@@ -5,6 +5,7 @@ import kotlinx.serialization.json.*
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeCustomEmoji
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeEmoji
+import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypePaid
 
 object ReactionTypeSerializer : JsonContentPolymorphicSerializer<ReactionType>(ReactionType::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ReactionType> {
@@ -15,6 +16,7 @@ object ReactionTypeSerializer : JsonContentPolymorphicSerializer<ReactionType>(R
         return when(val type = typeObject.jsonPrimitive.content) {
             "emoji" -> ReactionTypeEmoji.serializer()
             "custom_emoji" -> ReactionTypeCustomEmoji.serializer()
+            "paid" -> ReactionTypePaid.serializer()
             else -> error("Unknown ReactionType type: '$type'")
         }
     }

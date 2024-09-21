@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.core
 
+import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
@@ -20,6 +21,8 @@ import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
 import ru.raysmith.tgbot.model.network.sticker.CreateNewStickerInStickerSet
 import ru.raysmith.tgbot.network.API
 import java.time.ZonedDateTime
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 // TODO remove chatId args (see deleteMessages)
 // TODO improve interface documentation
@@ -220,7 +223,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     /**
      * Use this method to change the chosen reactions on a message. Service messages can't be reacted to.
      * Automatically forwarded messages from a channel to its discussion group have the same available reactions as
-     * messages in the channel. Returns *True* on success.
+     * messages in the channel. Bots can't use paid reactions. Returns *True* on success.
      *
      * @param chatId Unique identifier for the target chat or username of the target channel
      * (in the format `@channelusername`)
@@ -228,7 +231,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * to the first non-deleted message in the group instead.
      * @param reaction A JSON-serialized list of reaction types to set on the message. Currently, as non-premium users,
      * bots can set up to one reaction per message. A custom emoji reaction can be used if it is either already present
-     * on the message or explicitly allowed by chat administrators.
+     * on the message or explicitly allowed by chat administrators. Paid reactions can't be used by bots.
      *
      * @param isBig Pass *True* to set the reaction with a big animation
      * */
@@ -476,6 +479,49 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     }
 
     /**
+     * Use this method to create a
+     * [subscription invite link](https://telegram.org/blog/superchannels-star-reactions-subscriptions#star-subscriptions)
+     * for a channel chat. The bot must have the [ChatAdministratorRights.canInviteUsers]. The link can be edited using
+     * the method editChatSubscriptionInviteLink or revoked using the method revokeChatInviteLink.
+     * Returns the new invite link as a ChatInviteLink object.
+     *
+     * @param subscriptionPeriod The duration of the subscription will be active for before the next payment.
+     * Currently, it must always be 30 days.
+     * @param subscriptionPrice The amount of Telegram Stars a user must pay initially and after each subsequent
+     * subscription period to be a member of the chat; 1-2500
+     * @param chatId Unique identifier for the target channel chat or username of the target channel
+     * @param name Invite link name; 0-32 characters
+     * */
+    suspend fun createChatSubscriptionInviteLink(
+        subscriptionPrice: Int,
+        subscriptionPeriod: Duration = 30.days,
+        name: String? = null,
+        chatId: ChatId = getChatIdOrThrow(),
+    ): ChatInviteLink {
+        return createChatSubscriptionInviteLink(
+            chatId, name, subscriptionPeriod.inWholeSeconds.toInt(), subscriptionPrice
+        )
+    }
+
+    /**
+     * Use this method to edit a subscription invite link created by the bot.
+     * The bot must have the [ChatAdministratorRights.canInviteUsers] rights.
+     * Returns the edited invite link as a [ChatInviteLink] object.
+     *
+     * @param inviteLink The invite link to edit
+     * @param name Invite link name; 0-32 characters
+     * @param chatId Unique identifier for the target channel chat or username of the target channel
+     * */
+    suspend fun editChatSubscriptionInviteLink(
+        inviteLink: String,
+        name: String? = null,
+        chatId: ChatId = getChatIdOrThrow(),
+    ): ChatInviteLink {
+        return editChatSubscriptionInviteLink(chatId, inviteLink, name)
+    }
+
+
+    /**
      * Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is
      * automatically generated. The bot must be an administrator in the chat for this to work and must have the
      * appropriate administrator rights. Returns the revoked invite link as [ChatInviteLink] object.
@@ -559,6 +605,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * the bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' administrator
      * right in a supergroup or 'can_edit_messages' administrator right in a channel. Returns *True* on success.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be pinned
      * @param messageId Identifier of a message to pin
      * @param disableNotification Pass True, if it is not necessary to send a notification to all chat members
      * about the new pinned message. Notifications are always disabled in channels and private chats.
@@ -566,10 +614,11 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * */
     suspend fun pinChatMessage(
         messageId: Int,
+        businessConnectionId: String? = null,
         disableNotification: Boolean? = null,
         chatId: ChatId = getChatIdOrThrow()
     ): Boolean {
-        return pinChatMessage(chatId, messageId, disableNotification)
+        return pinChatMessage(businessConnectionId, chatId, messageId, disableNotification)
     }
 
     /**
@@ -578,12 +627,18 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * 'can_pin_messages' administrator right in a supergroup or 'can_edit_messages' administrator right in a channel.
      * Returns *True* on success.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the message
+     * will be unpinned
      * @param messageId Identifier of a message to unpin.
      * If not specified, the most recent pinned message (by sending date) will be unpinned.
      * @param chatId Unique identifier for the target chat or username of the target channel
      * */
-    suspend fun unpinChatMessage(messageId: Int? = null, chatId: ChatId = getChatIdOrThrow()): Boolean {
-        return unpinChatMessage(chatId, messageId)
+    suspend fun unpinChatMessage(
+        businessConnectionId: String? = null,
+        messageId: Int? = null,
+        chatId: ChatId = getChatIdOrThrow()
+    ): Boolean {
+        return unpinChatMessage(businessConnectionId, chatId, messageId)
     }
 
     /**

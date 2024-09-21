@@ -33,16 +33,19 @@ interface IMessage<T> : API {
     suspend fun send(chatId: ChatId): T
 }
 
-interface ExtendedMessage<T> : IMessage<T> {
+interface BusinessMessage<T> : IMessage<T> {
+
+    /** Unique identifier of the business connection on behalf of which the message will be sent */
+    var businessConnectionId: String?
+}
+
+interface ExtendedMessage<T> : BusinessMessage<T> {
 
     /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
     var messageThreadId: Int?
 
     /** Unique identifier of the message effect to be added to the message; for private chats only */
     var messageEffectId: String?
-
-    /** Unique identifier of the business connection on behalf of which the message will be sent */
-    var businessConnectionId: String?
 
 //    /** Sends message to the [chat]
 //     *

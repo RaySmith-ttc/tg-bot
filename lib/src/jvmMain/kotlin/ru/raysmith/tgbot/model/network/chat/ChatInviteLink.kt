@@ -25,6 +25,21 @@ data class ChatInviteLink(
     /** Point in time (Unix timestamp) when the link will expire or has been expired */
     @SerialName("expire_date") val expireDate: Int? = null,
 
-    /** Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999 */
+    /**
+     * Maximum number of users that can be members of the chat simultaneously after joining the chat
+     * via this invite link; 1-99999
+     * */
     @SerialName("member_limit") val memberLimit: Int? = null,
+
+    /** Number of pending join requests created using this link */
+    @SerialName("pending_join_request_count") val pendingJoinRequestCount: Int? = null,
+
+    /** The number of seconds the subscription will be active for before the next payment */
+    @SerialName("subscription_period") val subscriptionPeriod: Int? = null,
+
+    /**
+     * The amount of Telegram Stars a user must pay initially and after each subsequent subscription period to be
+     * a member of the chat using the link
+     */
+    @SerialName("subscription_price") val subscriptionPrice: Int? = null,
 )

@@ -25,7 +25,7 @@ interface IEditor : ChatIdHolder, API, BotHolder {
     var inlineMessageId: String?
 
     /** Unique identifier of the business connection on behalf of which the message will be sent */
-    var businessConnectionId: String?
+    var businessConnectionId: String? // TODO bad design: currently propagate to events handlers where can't be obtained
 
     // TODO messageId not optional ?
 

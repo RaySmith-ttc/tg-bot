@@ -17,3 +17,13 @@ data class ReactionTypeCustomEmoji(
     override val type: String = "custom_emoji"
 
 }
+
+/** The reaction is paid. */
+@Serializable
+data object ReactionTypePaid : ReactionType() {
+
+    @EncodeDefault
+    /** Type of the reaction, always “paid” */
+    override val type: String = "paid"
+
+}

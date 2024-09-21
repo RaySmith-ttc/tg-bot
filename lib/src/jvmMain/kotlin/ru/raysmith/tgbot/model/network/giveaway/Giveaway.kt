@@ -33,4 +33,7 @@ data class Giveaway(
      * in giveaways.
      * */
     @SerialName("country_codes") val countryCodes: List<String>? = null,
+
+    /** The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only */
+    @SerialName("prize_star_count") val prizeStarCount: Int? = null,
 )

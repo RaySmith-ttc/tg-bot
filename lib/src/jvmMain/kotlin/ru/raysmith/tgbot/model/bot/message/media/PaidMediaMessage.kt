@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.BusinessMessage
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.group.MediaRequestWithCaption
@@ -17,7 +18,7 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.withSafeLength
 
-class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, BotHolder {
+class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, BotHolder, BusinessMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
     override val mediaName: String = "paid"
@@ -25,6 +26,7 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
     override var disableNotification: Boolean? = null
+    override var businessConnectionId: String? = null
     override var protectContent: Boolean? = null
     override var replyParameters: ReplyParameters? = null
 
@@ -33,10 +35,18 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
     /** The number of Telegram Stars that must be paid to buy access to the media */
     var starCount: Int = 0
 
+    /**
+     * Bot-defined paid media payload, 0-128 bytes.
+     * This will not be displayed to the user, use it for your internal processes.
+     * */
+    var payload: String? = null
+
     private suspend fun sendPaidMeda(chatId: ChatId) = sendPaidMedia(
+        businessConnectionId = businessConnectionId,
         starCount = starCount,
         chatId = chatId,
         media = inputMedia,
+        payload = payload,
         caption = getCaptionText(),
         parseMode = getParseModeIfNeed(),
         captionEntities = getEntities(),
@@ -49,24 +59,20 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
     )
     
     override suspend fun send(chatId: ChatId): Message {
-        return if (inputFiles.isEmpty()) {
-            sendPaidMeda(chatId)
-        } else {
-            if (sendChatAction) {
-                val action = when {
-                    inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
-                    inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
-                    inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
-                    else -> null
-                }
-
-                if (action != null) {
-                    sendChatAction(null, chatId, null, action)
-                }
+        if (sendChatAction && inputFiles.isNotEmpty()) {
+            val action = when {
+                inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
+                inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
+                inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
+                else -> null
             }
 
-            sendPaidMeda(chatId)
+            if (action != null) {
+                sendChatAction(null, chatId, null, action)
+            }
         }
+
+        return sendPaidMeda(chatId)
     }
 
     fun photo(
