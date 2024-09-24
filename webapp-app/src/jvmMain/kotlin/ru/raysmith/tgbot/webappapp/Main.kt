@@ -23,6 +23,8 @@ import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.network.TelegramApi
 import java.io.File
 
+private val localIp = "192.168.0.228"
+
 @OptIn(DelicateCoroutinesApi::class, ExperimentalSerializationApi::class)
 fun main() {
 
@@ -30,9 +32,10 @@ fun main() {
     val keyStore = buildKeyStore {
         certificate("sampleAlias") {
             password = "foobar"
-            domains = listOf("127.0.0.1", "0.0.0.0", "localhost", "192.168.1.194")
+            domains = listOf("127.0.0.1", "0.0.0.0", "localhost", localIp)
         }
     }
+
     keyStore.saveToFile(keyStoreFile, "123456")
 
     GlobalScope.launch {
@@ -52,7 +55,8 @@ fun main() {
                             row {
                                 button {
                                     text = "Open"
-                                    webApp = WebAppInfo("https://192.168.1.194:8443")
+//                                    webApp = WebAppInfo("https://$localIp:8443")
+                                    webApp = WebAppInfo("https://8f0a-193-34-225-122.ngrok-free.app")
                                 }
                             }
                         }
@@ -79,7 +83,8 @@ fun main() {
             keyStore = keyStore,
             keyAlias = "sampleAlias",
             keyStorePassword = { "123456".toCharArray() },
-            privateKeyPassword = { "foobar".toCharArray() }) {
+            privateKeyPassword = { "foobar".toCharArray() }
+        ) {
             port = 8443
             keyStorePath = keyStoreFile
         }

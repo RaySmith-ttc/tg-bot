@@ -18,4 +18,3 @@ sealed external interface ChatType {
         val channels: ChatType
     }
 }
-

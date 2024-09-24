@@ -3,15 +3,29 @@ package ru.raysmith.tgbot
 import web.scheduling.VoidFunction
 
 /** This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface. */
-external interface MainButton {
+external interface BottomButton {
 
-    /** Current button text. Set to *CONTINUE* by default. */
-    val text: String
+    /**
+     * *Readonly*. Type of the button. It can be either main for the [BottomButtonType.main] button
+     * or [BottomButtonType.secondary] for the secondary button.
+     * */
+    val type: BottomButtonType
 
-    /** Current button color. Set to [ThemeParams.buttonColor] by default. */
+    /**
+     * Current button text. Set to [BottomButtonText.Continue] for the main button and [BottomButtonText.Cancel] for
+     * the secondary button by default.
+     * */
+    val text: BottomButtonText
+
+    /**
+     * Current button color. Set to [ThemeParams.buttonColor] for the main button and
+     * [ThemeParams.bottomBarBgColor] for the secondary button by default.
+     * */
     val color: String
 
-    /** Current button text color. Set to [ThemeParams.buttonTextColor] by default. */
+    /** Current button text color. Set to [ThemeParams.buttonTextColor] for the main button and
+     * [ThemeParams.buttonColor] for the secondary button by default.
+     * */
     val textColor: String
 
     /** Shows whether the button is visible. Set to *false* by default. */
@@ -20,25 +34,40 @@ external interface MainButton {
     /** Shows whether the button is active. Set to *true* by default. */
     val isActive: Boolean
 
+    /**
+     * Shows whether the button has a shine effect. Set to false by default.
+     *
+     * @since Bot API 7.10
+     * */
+    val hasShineEffect: Boolean
+
+    /**
+     * Position of the secondary button. Not defined for the main button. It applies only if both the main and
+     * secondary buttons are visible. Set to [BottomButtonPosition.left] by default.
+     *
+     * @since Bot API 7.10
+     * */
+    val position: BottomButtonPosition
+
     /** *Readonly*. Shows whether the button is displaying a loading indicator. */
     val isProgressVisible: Boolean
 
     /** A method to set the button text. */
-    val setText: (text: String) -> MainButton
+    val setText: (text: String) -> BottomButton
 
     // TODO ? link to mainButtonClicked
     /**
      * A method that sets the button press event handler.
      * An alias for [Telegram.WebApp.onEvent][WebApp.onEvent]`('mainButtonClicked', callback)`
      * */
-    val onClick: (callback: VoidFunction) -> MainButton
+    val onClick: (callback: VoidFunction) -> BottomButton
 
     // TODO ? link to mainButtonClicked
     /**
      * A method that removes the button press event handler.
      * An alias for [Telegram.WebApp.onEvent][WebApp.onEvent]`('mainButtonClicked', callback)`
      * */
-    val offClick: (callback: VoidFunction) -> MainButton
+    val offClick: (callback: VoidFunction) -> BottomButton
 
     /**
      * A method to make the button visible.
@@ -47,16 +76,16 @@ external interface MainButton {
      * [attachment menu](https://core.telegram.org/bots/webapps#launching-mini-apps-from-the-attachment-menu) hides the
      * main button until the user interacts with the Mini App interface.*
      * */
-    val show: () -> MainButton
+    val show: () -> BottomButton
 
     /** A method to hide the button. */
-    val hide: () -> MainButton
+    val hide: () -> BottomButton
 
     /** A method to enable the button. */
-    val enable: () -> MainButton
+    val enable: () -> BottomButton
 
     /** A method to disable the button. */
-    val disable: () -> MainButton
+    val disable: () -> BottomButton
 
     /**
      * A method to show a loading indicator on the button.
@@ -64,12 +93,12 @@ external interface MainButton {
      * the button is disabled while the action is in progress. If the parameter `leaveActive=true` is passed,
      * the button remains enabled.
      * */
-    val showProgress: (leaveActive: Boolean) -> MainButton
+    val showProgress: (leaveActive: Boolean) -> BottomButton
 
     /** A method to hide the loading indicator. */
-    val hideProgress: () -> MainButton
+    val hideProgress: () -> BottomButton
 
     /** A method to set the button parameters */
-    val setParams: (params: MainButtonParams) -> MainButton
+    val setParams: (params: MainButtonParams) -> BottomButton
 }
 

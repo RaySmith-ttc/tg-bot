@@ -54,6 +54,15 @@ external interface ThemeParams {
     val headerBgColor: String?
 
     /**
+     * Bottom background color in the `#RRGGBB` format. Also available as the CSS variable
+     * `var(--tg-theme-bottom-bar-bg-color)`.
+     *
+     * @since Bot API 7.10
+     * */
+    @JsName("bottom_bar_bg_color")
+    val bottomBarBgColor: String?
+
+    /**
      * Accent text color in the `#RRGGBB` format. Also available as the CSS variable
      * `var(--tg-theme-accent-text-color)`.
      *

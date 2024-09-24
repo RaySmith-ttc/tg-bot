@@ -27,12 +27,22 @@ sealed external interface EventType {
         val viewportChanged: EventType
 
         /**
-         * Occurs when the [main button](https://core.telegram.org/bots/webapps#mainbutton) is pressed.
+         * Occurs when the [main button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
          *
          * *eventHandler* receives no parameters.
          * */
         @JsValue("mainButtonClicked")
         val mainButtonClicked: EventType
+
+        /**
+         * Occurs when the [secondary button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
+         *
+         * *eventHandler* receives no parameters.
+         *
+         * @since Bot API 7.10
+         * */
+        @JsValue("secondaryButtonClicked")
+        val secondaryButtonClicked: EventType
 
         /**
          * Occurs when the back button is pressed.
@@ -91,6 +101,16 @@ sealed external interface EventType {
          * */
         @JsValue("qrTextReceived")
         val qrTextReceived: EventType
+
+        /**
+         * Occurs when the QR code scanner popup is closed by the user.
+         *
+         * *eventHandler* receives no parameters
+         *
+         * @since Bot API 7.7
+         * */
+        @JsValue("scanQrPopupClosed")
+        val scanQrPopupClosed: EventType
 
         /**
          * Occurs when the [WebApp.readTextFromClipboard] method is called.

@@ -6,6 +6,8 @@ import ru.raysmith.tgbot.wrappers.CryptoJS
 import web.scheduling.VoidFunction
 import web.url.URLSearchParams
 
+
+
 external object WebApp {
 
     /**
@@ -83,37 +85,54 @@ external object WebApp {
     /** Current background color in the `#RRGGBB` format. */
     val backgroundColor: String
 
+    /** Current bottom bar color in the `#RRGGBB` format. */
+    val bottomBarColor: String
+
     /**
      * *True*, if the confirmation dialog is enabled while the user is trying to close the Mini App.
      * *False*, if the confirmation dialog is disabled.
      * */
     val isClosingConfirmationEnabled: Boolean
 
-//    /**
-//     * An object for controlling the back button which can be displayed in the header of the Mini App in the
-//     * Telegram interface.
-//     * */
-//    val BackButton: BackButton
-//
-//    /**
-//     * An object for controlling the main button, which is displayed at the bottom of the Mini App in the
-//     * Telegram interface.
-//     * */
-//    val MainButton: MainButton
-//
-//    /**
-//     * An object for controlling the Settings item in the context menu of the Mini App in the Telegram interface.
-//     * */
-//    val SettingsButton: SettingsButton
-//
-//    /** An object for controlling haptic feedback. */
-//    val HapticFeedback: HapticFeedback
-//
-//    /** An object for controlling cloud storage. */
-//    val CloudStorage: CloudStorage
-//
-//    /** An object for controlling biometrics on the device. */
-//    val BiometricManager: BiometricManager
+    /**
+     * *True*, if vertical swipes to close or minimize the Mini App are enabled. False, if vertical swipes to close or
+     * minimize the Mini App are disabled. In any case, the user will still be able to minimize and close the
+     * Mini App by swiping the Mini App's header.
+     * */
+    val isVerticalSwipesEnabled: Boolean
+
+    /**
+     * An object for controlling the back button which can be displayed in the header of the Mini App in the
+     * Telegram interface.
+     * */
+    val BackButton: BackButton
+
+    /**
+     * An object for controlling the main button, which is displayed at the bottom of the Mini App in the
+     * Telegram interface.
+     * */
+    val MainButton: BottomButton
+
+    /**
+     * An object for controlling the secondary button, which is displayed at the bottom of the Mini App in the
+     * Telegram interface.
+     * */
+    val SecondaryButton: BottomButton
+
+    /**
+     * An object for controlling the Settings item in the context menu of the Mini App in the Telegram interface.
+     * */
+    val SettingsButton: SettingsButton
+
+    /** An object for controlling haptic feedback. */
+    val HapticFeedback: HapticFeedback
+
+    /** An object for controlling cloud storage. */
+    val CloudStorage: CloudStorage
+
+    // TODO model
+    /** An object for controlling biometrics on the device. */
+    val BiometricManager: BiometricManager
 
     /**
      * Returns true if the user's app supports a version of the Bot API that is equal to or higher than the version
@@ -141,6 +160,14 @@ external object WebApp {
     val setBackgroundColor: (color: dynamic) -> Boolean // TODO type color ('bg_color' | 'secondary_bg_color' | Hex (#fff|#fffff|rgb(255,255,255)))
 
     /**
+     * A method that sets the app's bottom bar color in the `#RRGGBB` format. You can also use the keywords *bg_color*,
+     * *secondary_bg_color* and *bottom_bar_bg_color*.
+     *
+     * @since Bot API 7.10
+     * */
+    val setBottomBarColor: (color: dynamic) -> Boolean // TODO type color ('bg_color' | 'secondary_bg_color' | 'bottom_bar_bg_color' | Hex (#fff|#fffff|rgb(255,255,255))) !
+
+    /**
      * A method that enables a confirmation dialog while the user is trying to close the Mini App.
      *
      * @since Bot API 6.2
@@ -153,6 +180,22 @@ external object WebApp {
      * @since Bot API 6.2
      * */
     val disableClosingConfirmation: VoidFunction
+
+    /**
+     * A method that enables vertical swipes to close or minimize the Mini App. For user convenience, it is recommended
+     * to always enable swipes unless they conflict with the Mini App's own gestures.
+     *
+     * @since Bot API 7.7
+     * */
+    val enableVerticalSwipes: VoidFunction
+
+    /**
+     * A method that disables vertical swipes to close or minimize the Mini App. This method is useful if your Mini App
+     * uses swipe gestures that may conflict with the gestures for minimizing and closing the app.
+     *
+     * @since Bot API 7.7
+     * */
+    val disableVerticalSwipes: VoidFunction
 
     /** A method that sets the app event handler. */
     val onEvent: (eventType: EventType, eventHandler: VoidFunction) -> Unit
@@ -210,6 +253,14 @@ external object WebApp {
      * */
     val openInvoice: (url: String, callback: VoidFunction) -> Unit
 
+    /**
+     * A method that opens the native story editor with the media specified in the mediaUrl parameter as an HTTPS URL.
+     * An optional params argument of the type [StoryShareParams] describes additional sharing settings.
+     *
+     * @since Bot API 7.8
+     * */
+    val shareToStory: (mediaUrl: String, params: StoryShareParams) -> Unit
+
     // TODO link to event
     /**
      * A method that shows a native popup described by the *params* argument of the type [PopupParams].
@@ -245,6 +296,9 @@ external object WebApp {
      * with text data. If an optional *callback* parameter was passed, the *callback* function will be called and the
      * text from the QR code will be passed as the first argument. Returning *true* inside this callback function
      * causes the popup to be closed.
+     *
+     * Starting from `Bot API 7.7`, the Mini App will receive the [scanQrPopupClosed][EventType.scanQrPopupClosed] event
+     * if the user closes the native popup for scanning a QR code.
      *
      * @since Bot API 6.4
      * */

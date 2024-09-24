@@ -68,6 +68,7 @@ ktor-network-tlsCertificates = { module = "io.ktor:ktor-network-tls-certificates
 kotlin-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "react" }
 kotlin-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "react" }
 kotlin-emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "11.11.4-pre.765" }
+kotlin-cssom-core = { module = "org.jetbrains.kotlin-wrappers:kotlin-cssom-core", version = "0.0.1-pre.765" }
 
 kotlin-mui = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui", version = "5.14.5-pre.619" }
 kotlin-mui-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-material", version = "5.15.20-pre.765" }
