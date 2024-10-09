@@ -3,6 +3,7 @@ import com.lemonappdev.konsist.api.ext.list.constructors
 import com.lemonappdev.konsist.api.ext.list.functions
 import com.lemonappdev.konsist.api.ext.list.parameters
 import com.lemonappdev.konsist.api.ext.list.properties
+import com.lemonappdev.konsist.api.ext.provider.hasAnnotationOf
 import com.lemonappdev.konsist.api.ext.provider.representsTypeOf
 import com.lemonappdev.konsist.api.verify.assertTrue
 import kotlinx.serialization.SerialName
@@ -53,6 +54,37 @@ class KonsistTests {
             .functions()
             .filter { it.hasPublicOrDefaultModifier }
             .assertTrue { it.hasKDoc }
+    }
+
+    @Test
+    fun `all subclasses of sealed classes with Serializable annotations should be annotated with Serializable`() {
+        val sealedClasses = Konsist.scopeFromProject()
+            .classes()
+            .filter { it.hasSealedModifier && it.hasAnnotationOf<Serializable>() }
+
+        Konsist.scopeFromProject()
+            .classes()
+            .filter { it.parentClass in sealedClasses }
+            .assertTrue {
+                it.hasAnnotationOf<Serializable>()
+            }
+    }
+
+    @Test
+    fun `all object subclasses of sealed classes with Serializable annotations should be annotated with Serializable and explicit serializer class specified`() {
+        val sealedClasses = Konsist.scopeFromProject()
+            .classes()
+            .filter { it.hasSealedModifier && it.hasAnnotationOf<Serializable>() }
+
+        Konsist.scopeFromProject()
+            .objects()
+            .filter { it.hasProperties() && it.parentClass in sealedClasses }
+            .assertTrue {
+                it.hasAnnotationOf<Serializable>() &&
+                        it.annotations.first { it.representsTypeOf<Serializable>() }.let {
+                            it.arguments.isNotEmpty() && it.arguments.find { it.name == "with" } != null
+                        }
+            }
     }
 
 //    @Test

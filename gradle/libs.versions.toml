@@ -110,7 +110,7 @@ gradle-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-konsist = { module = "com.lemonappdev:konsist", version = "0.15.1" }
+konsist = { module = "com.lemonappdev:konsist", version = "0.16.1" }
 assertj-core = { module = "org.assertj:assertj-core", version = "3.25.3" }
 
 [plugins]

@@ -1,6 +1,13 @@
 package ru.raysmith.tgbot.network.serializer
 
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.json.*
 import ru.raysmith.tgbot.model.network.payment.stars.*
 
@@ -13,9 +20,57 @@ object TransactionPartnerSerializer : JsonContentPolymorphicSerializer<Transacti
         return when(val type = typeObject.jsonPrimitive.content) {
             "user" -> TransactionPartnerUser.serializer()
             "fragment" -> TransactionPartnerFragment.serializer()
-            "telegram_ads" -> TransactionPartnerTelegramAds.serializer()
-            "other" -> TransactionPartnerOther.serializer()
+            "telegram_ads" -> TransactionPartnerTelegramAdsSerializer
+            "other" -> TransactionPartnerOtherSerializer
             else -> error("Unknown TransactionPartner type: '$type'")
+        }
+    }
+}
+
+object TransactionPartnerTelegramAdsSerializer : KSerializer<TransactionPartnerTelegramAds> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TransactionPartnerTelegramAds") {
+        element<String>("type")
+    }
+
+    override fun deserialize(decoder: Decoder): TransactionPartnerTelegramAds {
+        check(decoder is JsonDecoder)
+        val element = decoder.decodeJsonElement()
+        check(element is JsonObject)
+
+        check(element.jsonObject["type"]?.jsonPrimitive?.content == TransactionPartnerTelegramAds.type) {
+            "RevenueWithdrawalStateFailed object should have type '${TransactionPartnerTelegramAds.type}' to deserialize"
+        }
+
+        return TransactionPartnerTelegramAds
+    }
+
+    override fun serialize(encoder: Encoder, value: TransactionPartnerTelegramAds) {
+        encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, TransactionPartnerTelegramAds.type)
+        }
+    }
+}
+
+object TransactionPartnerOtherSerializer : KSerializer<TransactionPartnerOther> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TransactionPartnerOther") {
+        element<String>("type")
+    }
+
+    override fun deserialize(decoder: Decoder): TransactionPartnerOther {
+        check(decoder is JsonDecoder)
+        val element = decoder.decodeJsonElement()
+        check(element is JsonObject)
+
+        check(element.jsonObject["type"]?.jsonPrimitive?.content == TransactionPartnerOther.type) {
+            "RevenueWithdrawalStateFailed object should have type '${TransactionPartnerOther.type}' to deserialize"
+        }
+
+        return TransactionPartnerOther
+    }
+
+    override fun serialize(encoder: Encoder, value: TransactionPartnerOther) {
+        encoder.encodeStructure(descriptor) {
+            encodeStringElement(descriptor, 0, TransactionPartnerOther.type)
         }
     }
 }

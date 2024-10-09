@@ -10,9 +10,10 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.encodeStructure
+import ru.raysmith.tgbot.network.serializer.MenuButtonCommandsSerializer
 
 /** Represents a menu button, which opens the bot's list of commands. */
-@Serializable
+@Serializable(with = MenuButtonCommandsSerializer::class)
 data object MenuButtonCommands : MenuButton() {
 
     /** Type of the button, must be *commands* */

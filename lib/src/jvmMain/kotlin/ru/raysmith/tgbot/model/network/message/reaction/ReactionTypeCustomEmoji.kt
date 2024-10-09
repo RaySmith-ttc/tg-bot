@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.network.message.reaction
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.network.serializer.ReactionTypePaidSerializer
 
 /** The reaction is based on a custom emoji. */
 @Serializable
@@ -19,7 +20,7 @@ data class ReactionTypeCustomEmoji(
 }
 
 /** The reaction is paid. */
-@Serializable
+@Serializable(with = ReactionTypePaidSerializer::class)
 data object ReactionTypePaid : ReactionType() {
 
     @EncodeDefault

@@ -239,11 +239,10 @@ interface API {
      * @param entities List of special entities that appear in message text, which can be specified instead
      * of *[parseMode]*
      * @param linkPreviewOptions Link preview generation options for the message
-     * @param protectContent Protects the contents of the sent message from forwarding and saving
-     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
-     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param keyboardMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
