@@ -592,7 +592,6 @@ class Runner {
 
                 handleMyChatMember {
                     if (newChatMember is ChatMemberMember) {
-//                        send("Я родился")
                         send(chat.id.value.toString())
                     }
                 }

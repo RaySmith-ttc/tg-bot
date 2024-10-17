@@ -93,7 +93,8 @@ kotlin {
         jsMain {
             dependencies {
                 implementation(libs.kotlin.node)
-//                implementation(libs.kotlin.react)
+//                implementation(libs.kotlin.js)
+                implementation(libs.kotlin.react)
                 implementation(libs.seskar.core)
 
                 implementation(npm("crypto-js", "^4.2.0"))

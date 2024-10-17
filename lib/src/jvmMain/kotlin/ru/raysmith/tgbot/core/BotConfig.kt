@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.core
 import ru.raysmith.tgbot.model.network.message.LinkPreviewOptions
 import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.getOrDefault
+import ru.raysmith.tgbot.utils.obtainToken
 import ru.raysmith.tgbot.utils.pagination.DefaultPaginationFetcherFactory
 import ru.raysmith.tgbot.utils.pagination.PaginationFetcherFactory
 import ru.raysmith.utils.properties.getOrNull
@@ -39,7 +40,7 @@ class BotConfig {
     var printNulls = Bot.properties.getOrDefault("printNulls", "false").toBoolean()
     var defaultProviderToken = Bot.properties?.getOrNull("providerToken")
 //    var emptyCallbackQuery = Bot.properties.getOrDefault("emptyCallbackQuery", " ") // TODO [docs] can't be obtain from  config
-    var token = Bot.properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN") ?: System.getenv("BOT_TOKEN") // TODO [stable] remove second
+    var token = obtainToken()
     
     var defaultRows: Int = Bot.properties.getOrDefault("pagination.rows", "5").toIntOrNull()
         ?: throw IllegalArgumentException("Property pagination.rows is not Int")

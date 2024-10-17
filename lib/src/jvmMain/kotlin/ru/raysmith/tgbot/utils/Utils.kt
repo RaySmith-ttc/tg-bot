@@ -9,6 +9,9 @@ import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.updates.Update
+import java.net.URLDecoder
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * Creates a bot context and executes a [block] within
@@ -56,3 +59,47 @@ internal fun createEventHandler(
 }
 
 internal fun noimpl(): Nothing = throw NotImplementedError()
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+fun Bot.verifyWebAppInitData(initData: String): Boolean {
+    val botToken = botConfig.token
+    check(botToken != null) {
+        "Token not found. Provide it with TG_BOT_TOKEN environment variable or token property"
+    }
+
+    val params = parseQueryString(initData)
+    val receivedHash = params["hash"] ?: return false
+    val dataCheckString = params
+        .filterKeys { it != "hash" }
+        .map { "${it.key}=${it.value}" }
+        .sorted()
+        .joinToString("\n")
+
+    val secretKey = hmacSha256(botToken, "WebAppData".toByteArray())
+    val computedHash = hmacSha256(dataCheckString, secretKey).joinToString("") { "%02x".format(it) }
+
+    return computedHash == receivedHash
+}
+
+private fun hmacSha256(data: String, key: ByteArray): ByteArray {
+    val mac = Mac.getInstance("HmacSHA256")
+    val secretKeySpec = SecretKeySpec(key, "HmacSHA256")
+    mac.init(secretKeySpec)
+    return mac.doFinal(data.toByteArray(Charsets.UTF_8))
+}
+
+private fun parseQueryString(query: String): Map<String, String> {
+    return query.split('&')
+        .mapNotNull {
+            val parts = it.split('=', limit = 2)
+            if (parts.size == 2) {
+                val key = URLDecoder.decode(parts[0], "UTF-8")
+                val value = URLDecoder.decode(parts[1], "UTF-8")
+                key to value
+            } else {
+                null
+            }
+        }
+        .toMap()
+}

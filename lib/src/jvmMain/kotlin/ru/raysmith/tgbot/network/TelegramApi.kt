@@ -15,6 +15,7 @@ import kotlinx.serialization.json.JsonNamingStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.utils.obtainToken
 import ru.raysmith.utils.properties.getOrNull
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -70,8 +71,7 @@ object TelegramApi {
     }
 
     fun defaultClient(
-        token: String = Bot.properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN")
-            ?: error("Can't create default http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property"),
+        token: String = obtainToken() ?: error("Can't create default http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property"),
         builder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
     ) = HttpClient(OkHttp) {
         engine {

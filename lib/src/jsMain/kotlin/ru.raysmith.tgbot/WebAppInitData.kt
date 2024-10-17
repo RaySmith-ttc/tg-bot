@@ -1,5 +1,5 @@
 package ru.raysmith.tgbot
 
-//external interface WebAppInitData {
-//
-//}
+external interface WebAppInitData {
+
+}

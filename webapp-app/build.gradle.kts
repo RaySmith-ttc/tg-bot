@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.benManes.versions)
     application
 }
 
@@ -20,7 +21,10 @@ kotlin {
             nodejs()
             webpackTask {
                 mainOutputFileName.set("webappapp.js")
-                args += listOf("--env", "TG_BOT_TOKEN=${System.getenv("TG_BOT_TOKEN")}")
+                args += listOf(
+                    "--env", "TG_BOT_TOKEN=${System.getenv("TG_BOT_TOKEN")}",
+                    "--env", "WEBAPP_GUARD_ENABLED=${System.getenv("WEBAPP_GUARD_ENABLED")?.toBoolean() ?: true}",
+                )
             }
             commonWebpackConfig {
                 cssSupport {
@@ -62,6 +66,9 @@ kotlin {
                 implementation(libs.kotlin.mui.material)
                 implementation(libs.kotlin.mui.icons.material)
                 implementation(libs.kotlin.emotion)
+
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.js)
 
                 implementation(npm("crypto-js", "^4.2.0"))
             }

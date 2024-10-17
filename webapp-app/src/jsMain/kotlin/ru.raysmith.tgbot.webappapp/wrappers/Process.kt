@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package js
 
 /**
@@ -11,4 +13,5 @@ external interface Process {
 
 external object ProcessEnvVariables {
     val TG_BOT_TOKEN: String
+    val WEBAPP_GUARD_ENABLED: Boolean
 }

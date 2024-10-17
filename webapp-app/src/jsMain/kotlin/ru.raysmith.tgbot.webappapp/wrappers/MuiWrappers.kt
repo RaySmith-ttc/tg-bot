@@ -1,4 +1,4 @@
-package ru.raysmith.tgbot.webappapp
+package ru.raysmith.tgbot.webappapp.wrappers
 
 import mui.system.SxProps
 import web.cssom.TextWrap

@@ -1,17 +1,24 @@
-package ru.raysmith.tgbot.webappapp
+package ru.raysmith.tgbot.webappapp.components
 
 import mui.icons.material.ArrowBack
 import mui.material.*
 import mui.material.styles.TypographyVariant
 import mui.system.sx
 import react.FC
-import react.Props
+import react.PropsWithChildren
 import react.dom.html.ReactHTML
+import ru.raysmith.tgbot.webappapp.hooks.usePathname
+import ru.raysmith.tgbot.webappapp.hooks.useRouter
+import ru.raysmith.tgbot.webappapp.router.Paths
+import ru.raysmith.tgbot.webappapp.wrappers.mr
 import web.cssom.number
 
-val Header = FC<Props> {
+external interface HeaderProps : PropsWithChildren
+
+val Header = FC<HeaderProps> { props ->
     val router = useRouter()
     val pathname = usePathname()
+    console.log(pathname)
 
     Box {
         sx { flexGrow = number(1.0) }
@@ -20,13 +27,13 @@ val Header = FC<Props> {
             position = AppBarPosition.fixed
 
             Toolbar {
-                IconButton {
-                    size = Size.large
-                    edge = IconButtonEdge.start
-                    color = IconButtonColor.inherit
-                    sx { mr = 2 }
+                if (pathname != Paths.root) {
+                    IconButton {
+                        size = Size.large
+                        edge = IconButtonEdge.start
+                        color = IconButtonColor.inherit
+                        sx { mr = 2 }
 
-                    if (pathname != Paths.root) {
                         ArrowBack {
                             onClick = {
                                 router.back()
@@ -41,7 +48,13 @@ val Header = FC<Props> {
                     sx { flexGrow = number(1.0) }
                     +"WebApp"
                 }
+
+                +props.children
             }
         }
+    }
+
+    Toolbar {
+
     }
 }
