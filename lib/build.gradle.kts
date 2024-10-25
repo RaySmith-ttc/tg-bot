@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.13"
+version = "1.0.0-beta.15"
 
 java {
     toolchain {

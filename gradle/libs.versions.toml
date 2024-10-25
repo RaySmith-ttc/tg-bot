@@ -5,7 +5,7 @@ kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.6.3"
 kotlinx-datetime = "0.4.0"
 
-ktor = "2.3.11"
+ktor = "3.0.0"
 
 react = "18.3.1-pre.765"
 seskar = "3.0.0"
