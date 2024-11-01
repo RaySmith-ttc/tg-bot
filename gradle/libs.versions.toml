@@ -5,10 +5,10 @@ kotlinx-coroutines = "1.9.0"
 kotlinx-serialization = "1.7.3"
 kotlinx-datetime = "0.4.0"
 
-ktor = "3.0.0-rc-2"
+ktor = "3.0.0"
 
 react = "18.3.1-pre.817"
-seskar = "3.42.0"
+seskar = "3.43.0"
 
 exposed = "0.41.1"
 

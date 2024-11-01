@@ -19,6 +19,13 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenRaySmith("utils")
     }
+
+    versionCatalogs {
+        create("kotlinWrappers") {
+            val wrappersVersion = "0.0.1-pre.820"
+            from("org.jetbrains.kotlin-wrappers:kotlin-wrappers-catalog:$wrappersVersion")
+        }
+    }
 }
 
 fun RepositoryHandler.mavenRaySmith(name: String) {

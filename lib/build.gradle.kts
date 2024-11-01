@@ -1,5 +1,12 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JsModuleKind
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     java
@@ -9,6 +16,7 @@ plugins {
     alias(libs.plugins.benManes.versions)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.seskar)
 }
 
 group = "ru.raysmith"
@@ -22,7 +30,6 @@ java {
 
 kotlin {
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.RequiresOptIn",
@@ -38,6 +45,11 @@ kotlin {
     }
 
     js(IR) {
+        compilerOptions {
+//            moduleKind = JsModuleKind.MODULE_UMD
+            target = "es2015"
+        }
+
         browser {
             webpackTask {
                 mainOutputFileName.set("tg-bot.js")
@@ -91,10 +103,10 @@ kotlin {
         }
 
         jsMain {
+
             dependencies {
-                implementation(libs.kotlin.node)
-//                implementation(libs.kotlin.js)
-                implementation(libs.kotlin.react)
+                implementation(kotlinWrappers.node)
+                implementation(kotlinWrappers.react)
                 implementation(libs.seskar.core)
 
                 implementation(npm("crypto-js", "^4.2.0"))
