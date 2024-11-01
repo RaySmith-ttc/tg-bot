@@ -1,5 +1,6 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
     java
@@ -116,6 +117,11 @@ tasks {
             val isStable = stableKeyword || regex.matches(candidate.version)
             isStable.not()
         }
+    }
+
+    register<HtmlDiffTask>("apiDiff") {
+        group = "help"
+        description = "Creates html diff pages of telegram api for last saved revision and current state"
     }
 }
 
