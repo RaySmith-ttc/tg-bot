@@ -21,11 +21,13 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ExtendedMessage
     override val botConfig: BotConfig = bot.botConfig
 
     override var messageThreadId: Int? = null
-    override var disableNotification: Boolean? = null
-    override var protectContent: Boolean? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+
+    override var disableNotification: Boolean? = null
     override var replyParameters: ReplyParameters? = null
+    override var protectContent: Boolean? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     // TODO see MediaMessage.sendChatAction and overrides of it
     /**
@@ -65,15 +67,15 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ExtendedMessage
                 media = inputMedia,
                 disableNotification = disableNotification,
                 protectContent = protectContent,
+                allowPaidBroadcast = allowPaidBroadcast,
                 messageEffectId = messageEffectId,
                 replyParameters = replyParameters
             )
         } else {
             if (sendAction) {
                 val action = when {
-                    inputMedia.all { it is InputMediaVideo } -> ChatAction.UPLOAD_VIDEO
-                    inputMedia.all { it is InputMediaPhoto } -> ChatAction.UPLOAD_PHOTO
-//                    inputMedia.all { it is InputMediaDocument } -> ChatAction.UPLOAD_DOCUMENT // redundant
+                    inputMedia.isNotEmpty() && inputMedia.all { it is InputMediaVideo } -> ChatAction.UPLOAD_VIDEO
+                    inputMedia.isNotEmpty() && inputMedia.all { it is InputMediaPhoto } -> ChatAction.UPLOAD_PHOTO
                     inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
                     else -> null
                 }
@@ -91,6 +93,7 @@ class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ExtendedMessage
                 disableNotification = disableNotification,
                 replyParameters = replyParameters,
                 protectContent = protectContent,
+                allowPaidBroadcast = allowPaidBroadcast,
                 messageEffectId = messageEffectId,
                 inputFiles = inputFiles
             )

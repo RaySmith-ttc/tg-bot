@@ -29,6 +29,7 @@ class TextMessage(
     override var protectContent: Boolean? = null
     override var businessConnectionId: String? = null
     override var messageEffectId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendMessage(
         businessConnectionId = businessConnectionId,

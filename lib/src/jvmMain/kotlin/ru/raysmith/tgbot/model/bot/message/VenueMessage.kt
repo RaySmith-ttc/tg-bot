@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
 class VenueMessage(
     val latitude: Double, val longitude: Double, val title: String, val address: String, override val bot: Bot
-) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
+) : KeyboardCreator, BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -23,6 +23,7 @@ class VenueMessage(
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var messageEffectId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     var foursquareId: String? = null
     var foursquareType: String? = null
@@ -43,6 +44,7 @@ class VenueMessage(
         googlePlaceType = googlePlaceType,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

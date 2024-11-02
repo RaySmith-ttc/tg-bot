@@ -26,6 +26,12 @@ interface IMessage<T> : API {
     /** Protects the contents of the sent message from forwarding and saving */
     var protectContent: Boolean?
 
+    /**
+     * Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars
+     * per message. The relevant Stars will be withdrawn from the bot's balance
+     * */
+    var allowPaidBroadcast: Boolean?
+
     /** Sends message to the [chat] */
     suspend fun send(chat: Chat): T = send(chat.id)
 
@@ -46,19 +52,4 @@ interface ExtendedMessage<T> : BusinessMessage<T> {
 
     /** Unique identifier of the message effect to be added to the message; for private chats only */
     var messageEffectId: String?
-
-//    /** Sends message to the [chat]
-//     *
-//     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-//     * */
-//    suspend fun send(chat: Chat, messageThreadId: Int? = null): T = send(chat.id, messageThreadId)
-//
-//    /**
-//     * Sends message to the chat with [chatId]
-//     *
-//     * @param messageThreadId Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
-//     * */
-//    suspend fun send(chatId: ChatId, messageThreadId: Int? = null): T
-//
-//    override suspend fun send(chatId: ChatId): T = send(chatId, null)
 }

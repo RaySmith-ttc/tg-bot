@@ -10,6 +10,7 @@ import ru.raysmith.tgbot.network.serializer.TransactionPartnerSerializer
  * - [TransactionPartnerUser]
  * - [TransactionPartnerFragment]
  * - [TransactionPartnerTelegramAds]
+ * - [TransactionPartnerTelegramApi]
  * - [TransactionPartnerOther]
  * */
 @Serializable(with = TransactionPartnerSerializer::class)

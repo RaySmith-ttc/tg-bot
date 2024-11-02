@@ -10,8 +10,6 @@ import ru.raysmith.tgbot.model.network.message.Message
 
 class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage(), ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
-    override var messageThreadId: Int? = null
-    override var messageEffectId: String? = null
     override val botConfig: BotConfig = bot.botConfig
 
     var voice: InputFile?
@@ -25,7 +23,10 @@ class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage(), ExtendedM
     override val mediaName: String = "audio"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
+    override var messageThreadId: Int? = null
+    override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendVoice(
         businessConnectionId = businessConnectionId,
@@ -38,6 +39,7 @@ class VoiceMessage(override val bot: Bot) : CaptionableMediaMessage(), ExtendedM
         duration = duration,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

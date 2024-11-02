@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
+import ru.raysmith.tgbot.model.network.keyboard.CopyTextButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
 import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
@@ -86,11 +87,13 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         var switchInlineQueryCurrentChat: String? = null
         var switchInlineQueryChosenChat: String? = null
         var pay: Boolean? = null
+        var copyText: CopyTextButton? = null
+
 
         override fun toKeyboardButton(): InlineKeyboardButton {
             return InlineKeyboardButton(
                 text, url, callbackData, webApp, loginUrl, switchInlineQuery, switchInlineQueryCurrentChat,
-                switchInlineQueryChosenChat, pay
+                switchInlineQueryChosenChat, copyText, pay
             )
         }
     }

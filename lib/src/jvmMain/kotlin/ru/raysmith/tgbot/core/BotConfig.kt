@@ -20,6 +20,12 @@ class BotConfig {
     var safeTextLength = Bot.properties.getOrDefault("safeTextLength", "true").toBoolean()
 
     /**
+     * Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars
+     * per message. The relevant Stars will be withdrawn from the bot's balance
+     * */
+    var allowPaidBroadcast = Bot.properties?.getOrNull("allowPaidBroadcast")?.toBoolean()
+
+    /**
      * Whether null values should display in the message text. *False by default*.
      *
      * `printNulls = true`:

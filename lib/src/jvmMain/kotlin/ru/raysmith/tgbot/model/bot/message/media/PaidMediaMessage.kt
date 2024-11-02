@@ -21,14 +21,13 @@ import ru.raysmith.tgbot.utils.withSafeLength
 class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, BotHolder, BusinessMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
+
     override val mediaName: String = "paid"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
-
-    override var disableNotification: Boolean? = null
     override var businessConnectionId: String? = null
-    override var protectContent: Boolean? = null
-    override var replyParameters: ReplyParameters? = null
+    override var allowPaidBroadcast: Boolean? = null
+    override var disableNotification: Boolean? = null
 
     private val inputMedia = mutableListOf<InputPaidMedia>()
 
@@ -53,6 +52,7 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
         showCaptionAboveMedia = showCaptionAboveMedia,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup(),
         inputFiles = inputFiles
@@ -61,8 +61,8 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
     override suspend fun send(chatId: ChatId): Message {
         if (sendChatAction && inputFiles.isNotEmpty()) {
             val action = when {
-                inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
-                inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
+                inputMedia.isNotEmpty() && inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
+                inputMedia.isNotEmpty() && inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
                 inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
                 else -> null
             }

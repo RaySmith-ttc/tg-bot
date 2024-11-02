@@ -3,36 +3,68 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Type of the entity. Can be “mention” (@username), “hashtag” (#hashtag), “cashtag” ($USD),
- * “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org),
- * “phone_number” (+1-212-555-0123),  “bold” (bold text), “italic” (italic text), “underline” (underlined text),
- * “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation),
- * “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block),
- * “text_link” (for clickable text URLs), “text_mention” (for users without usernames),
- * “custom_emoji” (for inline custom emoji stickers)
- *
- * @see <a href="https://telegram.org/blog/edit#new-mentions">New Mentions</a>
- * */
+/** Type of the entity. */
 @Serializable
 enum class MessageEntityType {
+
+    /** Example: @username */
     @SerialName("mention") MENTION,
+
+    /** Example: #hashtag or #hashtag@chatusername */
     @SerialName("hashtag") HASHTAG,
+
+    /** Example: $USD or $USD@chatusername */
     @SerialName("cashtag") CASHTAG,
+
+    /** Example: /start@jobs_bot */
     @SerialName("bot_command") BOT_COMMAND,
+
+    /** Example: https://telegram.org */
     @SerialName("url") URL,
+
+    /** Example: do-not-reply@telegram.org */
     @SerialName("email") EMAIL,
+
+    /** Example: +1-212-555-0123 */
     @SerialName("phone_number") PHONE_NUMBER,
+
+    /** **Bold text** */
     @SerialName("bold") BOLD,
+
+    /** *Italic text* */
     @SerialName("italic") ITALIC,
+
+    /** Underlined text */
     @SerialName("underline") UNDERLINE,
+
+    /** Strikethrough text */
     @SerialName("strikethrough") STRIKETHROUGH,
+
+    /** Spoiler message */
     @SerialName("spoiler") SPOILER,
-    @SerialName("code") CODE,
-    @SerialName("pre") PRE,
-    @SerialName("text_link") TEXT_LINK,
-    @SerialName("text_mention") TEXT_MENTION,
-    @SerialName("custom_emoji") CUSTOM_EMOJI,
+
+    /** Block quotation */
     @SerialName("blockquote") BLOCKQUOTE,
-    @SerialName("expandable_blockquote") EXPANDABLE_BLOCKQUOTE;
+
+    /** Collapsed-by-default block quotation */
+    @SerialName("expandable_blockquote") EXPANDABLE_BLOCKQUOTE,
+
+    /** Example: `monowidth string` */
+    @SerialName("code") CODE,
+
+    /**
+     * ```
+     * Monowidth block
+     * ```
+     * */
+    @SerialName("pre") PRE,
+
+    /** For clickable text URLs */
+    @SerialName("text_link") TEXT_LINK,
+
+    /** For users [without usernames](https://telegram.org/blog/edit#new-mentions) */
+    @SerialName("text_mention") TEXT_MENTION,
+
+    /** For inline custom emoji stickers */
+    @SerialName("custom_emoji") CUSTOM_EMOJI;
 }

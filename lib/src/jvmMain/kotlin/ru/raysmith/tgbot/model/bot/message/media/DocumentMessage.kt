@@ -22,6 +22,7 @@ class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb(), Extended
     override var messageThreadId: Int? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendDocument(
         businessConnectionId = businessConnectionId,
@@ -34,6 +35,7 @@ class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb(), Extended
         captionEntities = getEntities(),
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

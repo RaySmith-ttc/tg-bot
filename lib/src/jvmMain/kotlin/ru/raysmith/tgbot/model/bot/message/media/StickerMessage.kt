@@ -28,6 +28,8 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder, Extende
     override var messageThreadId: Int? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var protectContent: Boolean? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendSticker(
         businessConnectionId = businessConnectionId,
@@ -37,6 +39,7 @@ class StickerMessage(override val bot: Bot) : MediaMessage(), BotHolder, Extende
         emoji = emoji,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

@@ -48,6 +48,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * of *[parseMode]*
      * @param linkPreviewOptions Link preview generation options for the message
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
@@ -65,6 +67,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         messageThreadId: Int? = null,
@@ -73,7 +76,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     ): Message {
         return sendMessage(
             businessConnectionId, chatId, messageThreadId, text, parseMode, entities, linkPreviewOptions,
-            disableNotification, protectContent, messageEffectId,
+            disableNotification, protectContent, allowPaidBroadcast, messageEffectId,
             replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
@@ -146,6 +149,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param replyParameters Description of the message to reply to
      * @param chatId Unique identifier for the target chat or username of the target channel
      * @param keyboardMarkup [KeyboardCreator] builder for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
@@ -161,13 +166,14 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         showCaptionAboveMedia: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         replyParameters: ReplyParameters? = null,
         chatId: ChatId = getChatIdOrThrow(),
         keyboardMarkup: (suspend KeyboardCreator.() -> Unit)? = null
     ): MessageId {
         return copyMessage(
             chatId, messageThreadId, fromChatId, messageId, caption, parseMode, captionEntities, showCaptionAboveMedia,
-            disableNotification, protectContent,
+            disableNotification, protectContent, allowPaidBroadcast,
             replyParameters, keyboardMarkup?.let { buildKeyboard { it() } }?.toMarkup()
         )
     }
@@ -955,7 +961,7 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     }
 
     /**
-     * Use this method to edit animation, audio, document, photo, or video messages.
+     * Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages.
      * If a message is part of a message album, then it can be edited only to an audio for audio albums,
      * only to a document for document albums and to a photo or a video otherwise.
      * When an inline message is edited, a new file can't be uploaded; use a previously uploaded file

@@ -13,12 +13,11 @@ abstract class MediaMessage : IMessage<Message>, KeyboardCreator {
     protected var media: InputFile? = null
     protected abstract val mediaName: String
 
-//    override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
-//    override var messageEffectId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     /** Pass *True*, if the caption must be shown above the message media */
     var showCaptionAboveMedia: Boolean? = null // TODO ?

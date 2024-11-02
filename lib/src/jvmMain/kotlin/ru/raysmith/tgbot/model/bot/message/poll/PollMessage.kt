@@ -39,6 +39,7 @@ class PollMessage(
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     var isAnonymous: Boolean? = null
     var type: PollType? = null
@@ -102,6 +103,7 @@ class PollMessage(
         isClosed = isClosed,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

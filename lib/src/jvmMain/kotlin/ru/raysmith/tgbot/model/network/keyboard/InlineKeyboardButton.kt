@@ -66,6 +66,9 @@ data class InlineKeyboardButton(
      * */
     @SerialName("switch_inline_query_chosen_chat") val switchInlineQueryChosenChat: String? = null,
 
+    /** Description of the button that copies the specified text to the clipboard */
+    @SerialName("copy_text") val copyText: CopyTextButton? = null,
+
     // TODO [game support] add callback_game (https://core.telegram.org/bots/api#inlinekeyboardbutton)
 
     /**

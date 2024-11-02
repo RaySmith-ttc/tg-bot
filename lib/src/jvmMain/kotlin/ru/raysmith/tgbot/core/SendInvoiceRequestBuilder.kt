@@ -6,17 +6,19 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 
-// TODO move required fields to constructor
+// TODO check class (as IMessage)
 
 /** Builder of [sendInvoice][API.sendInvoice] request */
-class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder {
+class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder, IMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -119,14 +121,10 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
     /** Pass *True*, if the final price depends on the shipping method */
     var isFlexible: Boolean? = null
 
-    /**
-     * Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
-     * Users will receive a notification with no sound.
-     * */
-    var disableNotification: Boolean? = null
-
-    /** Description of the message to reply to */
-    var replyParameters: ReplyParameters? = null
+    override var disableNotification: Boolean? = null
+    override var replyParameters: ReplyParameters? = null
+    override var protectContent: Boolean? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     /**
      * Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
@@ -134,7 +132,7 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
      * */
     override var keyboardMarkup: MessageKeyboard? = null
 
-    suspend fun send(chatId: ChatId) = sendInvoice(
+    override suspend fun send(chatId: ChatId) = sendInvoice(
         chatId = chatId,
         messageThreadId = messageThreadId,
         title = title ?: "",
@@ -159,6 +157,8 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
         sendEmailToProvider = sendEmailToProvider,
         isFlexible = isFlexible,
         disableNotification = disableNotification,
+        protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
     )

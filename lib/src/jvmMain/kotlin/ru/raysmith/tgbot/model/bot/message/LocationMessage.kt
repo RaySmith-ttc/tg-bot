@@ -35,6 +35,7 @@ class LocationMessage(
     override var protectContent: Boolean? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendLocation(
         businessConnectionId = businessConnectionId,
@@ -48,6 +49,7 @@ class LocationMessage(
         proximityAlertRadius = proximityAlertRadius,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

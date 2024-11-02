@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 class ContactMessage(
     val phoneNumber: String, val firstName: String,
     override val bot: Bot
-) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
+) : KeyboardCreator, BotHolder, ExtendedMessage<Message> {
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
     override var messageThreadId: Int? = null
@@ -23,6 +23,7 @@ class ContactMessage(
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var replyParameters: ReplyParameters? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     var lastName: String? = null
     var vcard: String? = null
@@ -37,6 +38,7 @@ class ContactMessage(
         vcard = vcard,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()

@@ -27,6 +27,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb(), ExtendedMes
     override var messageThreadId: Int? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendAudio(
         businessConnectionId = businessConnectionId,
@@ -42,6 +43,7 @@ class AudioMessage(override val bot: Bot) : MediaMessageWithThumb(), ExtendedMes
         thumbnail = thumbnail,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
         replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup()

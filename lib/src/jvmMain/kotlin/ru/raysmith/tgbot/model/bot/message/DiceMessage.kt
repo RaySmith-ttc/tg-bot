@@ -24,6 +24,7 @@ class DiceMessage(
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var keyboardMarkup: MessageKeyboard? = null
+    override var allowPaidBroadcast: Boolean? = null
 
     override suspend fun send(chatId: ChatId) = sendDice(
         businessConnectionId = businessConnectionId,
@@ -32,6 +33,7 @@ class DiceMessage(
         emoji = emoji,
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         replyParameters = replyParameters,
         messageEffectId = messageEffectId,
         keyboardMarkup = keyboardMarkup?.toMarkup()

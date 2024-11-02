@@ -87,6 +87,8 @@ class KonsistTests {
             }
     }
 
+    // TODO all MediaMessage subclasses should override all fields (to javadoc works properly)
+
 //    @Test
 //    fun `all sealed serializable classes should be registered in json serializersModule`() {
 //        Konsist.scopeFromProject()

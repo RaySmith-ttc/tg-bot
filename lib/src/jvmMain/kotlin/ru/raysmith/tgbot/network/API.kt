@@ -242,6 +242,8 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param keyboardMarkup Additional interface options. Object for an
@@ -259,6 +261,7 @@ interface API {
         linkPreviewOptions: LinkPreviewOptions? = botConfig.linkPreviewOptions,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -272,6 +275,7 @@ interface API {
             parameter("link_preview_options", linkPreviewOptions)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -365,6 +369,8 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
      * [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards),
@@ -382,6 +388,7 @@ interface API {
         showCaptionAboveMedia: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
     ) = request<MessageId> {
@@ -396,6 +403,7 @@ interface API {
             parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
         }
@@ -481,6 +489,8 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
@@ -500,6 +510,7 @@ interface API {
         parseMode: ParseMode? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
@@ -514,6 +525,7 @@ interface API {
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
@@ -547,6 +559,8 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * @param replyMarkup Additional interface options. Object for an
@@ -568,6 +582,7 @@ interface API {
         thumbnail: NotReusableInputFile? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: KeyboardMarkup? = null,
@@ -583,6 +598,7 @@ interface API {
             parameter("title", title)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("protectContent", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
@@ -605,6 +621,7 @@ interface API {
         disableContentTypeDetection: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -618,6 +635,7 @@ interface API {
             parameter("disable_content_type_detection", disableContentTypeDetection)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -645,6 +663,7 @@ interface API {
         supportsStreaming: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -663,6 +682,7 @@ interface API {
             parameter("supports_streaming", supportsStreaming)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -689,6 +709,7 @@ interface API {
         hasSpoiler: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -706,6 +727,7 @@ interface API {
             parameter("has_spoiler", hasSpoiler)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -727,6 +749,7 @@ interface API {
         duration: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -740,6 +763,7 @@ interface API {
             parameter("duration", duration)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -758,6 +782,7 @@ interface API {
         length: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -769,6 +794,7 @@ interface API {
             parameter("length", length)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -794,6 +820,7 @@ interface API {
         showCaptionAboveMedia: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
         inputFiles: List<InputFile>? = null // TODO docs
@@ -808,6 +835,7 @@ interface API {
             parameter("show_caption_above_media", showCaptionAboveMedia)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
 
@@ -849,6 +877,8 @@ interface API {
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
      * @param protectContent Protects the contents of the sent messages from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param messageEffectId Unique identifier of the message effect to be added to the message; for private chats only
      * @param replyParameters Description of the message to reply to
      * */
@@ -859,6 +889,7 @@ interface API {
         media: List<InputMediaGroup>,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         inputFiles: List<InputFile>? = null // TODO docs
@@ -869,6 +900,7 @@ interface API {
             parameter("media", media)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             if (inputFiles != null) {
@@ -904,6 +936,7 @@ interface API {
         proximityAlertRadius: Int? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -919,6 +952,7 @@ interface API {
             parameter("proximity_alert_radius", proximityAlertRadius)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -939,6 +973,7 @@ interface API {
         googlePlaceType: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -956,6 +991,7 @@ interface API {
             parameter("google_place_type", googlePlaceType)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -972,6 +1008,7 @@ interface API {
         vcard: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -985,6 +1022,7 @@ interface API {
             parameter("vcard", vcard)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -1011,6 +1049,7 @@ interface API {
         isClosed: Boolean? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -1034,6 +1073,7 @@ interface API {
             parameter("is_closed", isClosed)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -1047,6 +1087,7 @@ interface API {
         emoji: String,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -1057,6 +1098,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -2417,7 +2459,7 @@ interface API {
     }
 
     /**
-     * Use this method to edit animation, audio, document, photo, or video messages.
+     * Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages.
      * If a message is part of a message album, then it can be edited only to an audio for audio albums,
      * only to a document for document albums and to a photo or a video otherwise.
      * When an inline message is edited, a new file can't be uploaded; use a previously uploaded file
@@ -2601,6 +2643,7 @@ interface API {
         emoji: String? = null,
         disableNotification: Boolean? = null,
         protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         messageEffectId: String? = null,
         replyParameters: ReplyParameters? = null,
         keyboardMarkup: KeyboardMarkup? = null,
@@ -2611,6 +2654,7 @@ interface API {
             parameter("emoji", emoji)
             parameter("disable_notification", disableNotification)
             parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("message_effect_id", messageEffectId)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", keyboardMarkup)
@@ -3038,6 +3082,9 @@ interface API {
      * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param disableNotification Sends the message [silently](https://telegram.org/blog/channels-2-0#silent-messages).
      * Users will receive a notification with no sound.
+     * @param protectContent Protects the contents of the sent message from forwarding and saving
+     * @param allowPaidBroadcast Pass True to allow up to 1000 messages per second, ignoring broadcasting limits for a
+     * fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
      * @param replyParameters Description of the message to reply to message is not found
      * @param replyMarkup Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
@@ -3067,6 +3114,8 @@ interface API {
         sendEmailToProvider: Boolean? = null,
         isFlexible: Boolean? = null,
         disableNotification: Boolean? = null,
+        protectContent: Boolean? = null,
+        allowPaidBroadcast: Boolean? = null,
         replyParameters: ReplyParameters? = null,
         replyMarkup: InlineKeyboardMarkup? = null
     ) = request<Message> {
@@ -3095,6 +3144,8 @@ interface API {
             parameter("send_email_to_provider", sendEmailToProvider)
             parameter("is_flexible", isFlexible)
             parameter("disable_notification", disableNotification)
+            parameter("protect_content", protectContent)
+            parameter("allow_paid_broadcast", allowPaidBroadcast)
             parameter("reply_parameters", replyParameters)
             parameter("reply_markup", replyMarkup)
         }

@@ -28,6 +28,7 @@ abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), Exte
                 override var messageThreadId: Int? = null
                 override var messageEffectId: String? = null
                 override var businessConnectionId: String? = null
+                override var allowPaidBroadcast: Boolean? = null
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
                 override var replyParameters: ReplyParameters? = null

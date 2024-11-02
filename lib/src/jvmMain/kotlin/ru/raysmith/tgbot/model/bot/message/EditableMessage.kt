@@ -20,6 +20,7 @@ interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator, ExtendedMes
             override var disableNotification: Boolean? = null
             override var replyParameters: ReplyParameters? = null
             override var protectContent: Boolean? = null
+            override var allowPaidBroadcast: Boolean? = null
             override var messageEffectId: String? = null
             override var businessConnectionId: String? = null
             override var keyboardMarkup: MessageKeyboard? = null

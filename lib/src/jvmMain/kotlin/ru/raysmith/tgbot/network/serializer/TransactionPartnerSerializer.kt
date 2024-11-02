@@ -21,6 +21,7 @@ object TransactionPartnerSerializer : JsonContentPolymorphicSerializer<Transacti
             "user" -> TransactionPartnerUser.serializer()
             "fragment" -> TransactionPartnerFragment.serializer()
             "telegram_ads" -> TransactionPartnerTelegramAdsSerializer
+            "telegram_api" -> TransactionPartnerTelegramApi.serializer()
             "other" -> TransactionPartnerOtherSerializer
             else -> error("Unknown TransactionPartner type: '$type'")
         }
