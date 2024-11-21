@@ -15,11 +15,17 @@ data class TransactionPartnerUser(
     /** Bot-specified invoice payload */
     @SerialName("invoice_payload") val invoicePayload: String? = null,
 
+    /** The duration of the paid subscription */
+    @SerialName("subscription_period") val subscriptionPeriod: Int? = null,
+
     /** Information about the paid media bought by the user */
     @SerialName("paid_media") val paidMedia: List<PaidMedia>? = null,
 
     /** Bot-specified paid media payload */
     @SerialName("paid_media_payload") val paidMediaPayload: String? = null,
+
+    /** The gift sent to the user by the bot */
+    @SerialName("gift") val gift: String? = null,
 ) : TransactionPartner() {
 
     /** Type of the transaction partner, always “user” */

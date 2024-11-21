@@ -3,6 +3,9 @@ package ru.raysmith.tgbot.core
 import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.IMessage
+import ru.raysmith.tgbot.model.bot.message.MessageText
+import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.keyboard.buildInlineKeyboard
@@ -12,6 +15,7 @@ import ru.raysmith.tgbot.model.network.chat.*
 import ru.raysmith.tgbot.model.network.chat.forum.ForumTopic
 import ru.raysmith.tgbot.model.network.chat.forum.IconColor
 import ru.raysmith.tgbot.model.network.chat.member.ChatMember
+import ru.raysmith.tgbot.model.network.gift.Gifts
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
 import ru.raysmith.tgbot.model.network.media.input.NotReusableInputFile
 import ru.raysmith.tgbot.model.network.menubutton.MenuButton
@@ -1092,6 +1096,26 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
         block: CreateNewStickerInStickerSet.() -> Unit
     ): Boolean {
         return CreateNewStickerInStickerSet(userId, name, title).apply(block).create()
+    }
+
+    /**
+     * Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user.
+     * Returns *True* on success.
+     *
+     * @param userId Unique identifier of the target user that will receive the gift
+     * @param giftId Identifier of the gift
+     * @param text [MessageText] builder of text that will be shown along with the gift
+     *
+     * @see [IMessage.MAX_GIFT_TEXT_LENGTH] // TODO link to limits object
+     * */
+    suspend fun sendGift(
+        userId: ChatId.ID,
+        giftId: String,
+        text: MessageText.() -> Unit
+    ): Gifts {
+        val messageText = MessageText(MessageTextType.GIFT_TEXT, botConfig).apply(text)
+
+        return sendGift(userId, giftId, messageText.getTextString(), null, messageText.getEntities())
     }
 
     /**

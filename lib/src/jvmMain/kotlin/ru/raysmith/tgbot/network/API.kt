@@ -33,6 +33,7 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
+import ru.raysmith.tgbot.model.network.gift.Gifts
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
@@ -44,6 +45,7 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButton
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.message.*
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionType
+import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.payment.stars.StarTransactions
 import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
 import ru.raysmith.tgbot.model.network.response.NetworkResponse
@@ -1186,6 +1188,26 @@ interface API {
             parameter("user_id", userId)
             parameter("offset", offset)
             parameter("limit", limit)
+        }
+    }
+
+    /**
+     * Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the
+     * Mini App method `requestEmojiStatusAccess`. Returns *True* on success.
+     * @param userId Unique identifier of the target user
+     * @param emojiStatusCustomEmojiId Custom emoji identifier of the emoji status to set. Pass an empty string to
+     * remove the status.
+     * @param emojiStatusExpirationDate Expiration date of the emoji status, if any
+     * */
+    suspend fun setUserEmojiStatus(
+        userId: ChatId.ID,
+        emojiStatusCustomEmojiId: String? = null,
+        emojiStatusExpirationDate: Int? = null,
+    ) = request<Boolean> {
+        client.post("setUserEmojiStatus") {
+            parameter("user_id", userId)
+            parameter("emoji_status_custom_emoji_id", emojiStatusCustomEmojiId)
+            parameter("emoji_status_expiration_date", emojiStatusExpirationDate)
         }
     }
 
@@ -2980,6 +3002,39 @@ interface API {
     }
 
     /**
+     * Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a [Gifts] object.
+     * */
+    suspend fun getAvailableGifts() = request<Gifts> {
+        client.post("getAvailableGifts")
+    }
+
+    /**
+     * Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user.
+     * Returns *True* on success.
+     *
+     * @param userId Unique identifier of the target user that will receive the gift
+     * @param giftId Identifier of the gift
+     * @param text Text that will be shown along with the gift; 0-255 characters
+     * @param textParseMode [ParseMode] for parsing entities in the text
+     * @param textEntities List of special entities that appear in the gift text
+     * */
+    suspend fun sendGift(
+        userId: ChatId.ID,
+        giftId: String,
+        text: String? = null,
+        textParseMode: ParseMode? = null,
+        textEntities: List<MessageEntity>? = null,
+    ) = request<Gifts> {
+        client.post("sendGift") {
+            parameter("user_id", userId)
+            parameter("gift_id", giftId)
+            parameter("text", text)
+            parameter("text_parse_mode", textParseMode)
+            parameter("text_entities", textEntities)
+        }
+    }
+
+    /**
      * Use this method to send answers to an inline query. On success, *True* is returned.
      * No more than 50 results per query are allowed.
      *
@@ -3027,6 +3082,34 @@ interface API {
         client.post("answerWebAppQuery") {
             parameter("web_app_query_id", webAppQueryId)
             parameter("result", result)
+        }
+    }
+
+    /**
+     * Stores a message that can be sent by a user of a Mini App. Returns a [PreparedInlineMessage] object.
+     *
+     * @param userId Unique identifier of the target user that can use the prepared message
+     * @param result An object describing the message to be sent
+     * @param allowUserChats Pass *True* if the message can be sent to private chats with users
+     * @param allowBotChats Pass *True* if the message can be sent to private chats with bots
+     * @param allowGroupChats Pass *True* if the message can be sent to group and supergroup chats
+     * @param allowChannelChats Pass *True* the message can be sent to channel chats
+     * */
+    suspend fun savePreparedInlineMessage(
+        userId: ChatId.ID,
+        result: InlineQueryResult,
+        allowUserChats: Boolean? = null,
+        allowBotChats: Boolean? = null,
+        allowGroupChats: Boolean? = null,
+        allowChannelChats: Boolean? = null,
+    ) = request<PreparedInlineMessage> {
+        client.post("savePreparedInlineMessage") {
+            parameter("user_id", userId)
+            parameter("result", result)
+            parameter("allow_user_chats", allowUserChats)
+            parameter("allow_bot_chats", allowBotChats)
+            parameter("allow_group_chats", allowGroupChats)
+            parameter("allow_channel_chats", allowChannelChats)
         }
     }
 
@@ -3154,6 +3237,8 @@ interface API {
     /**
      * Use this method to create a link for an invoice. Returns the created invoice link as String on success.
      *
+     * @param businessConnectionId Unique identifier of the business connection on behalf of which the link will be
+     * created. For payments in [Telegram Stars](https://t.me/BotNews/90) only.
      * @param title Product name, 1-32 characters
      * @param description Product description, 1-255 characters
      * @param payload Bot-defined invoice payload, 1-128 bytes.
@@ -3163,15 +3248,19 @@ interface API {
      * @param currency Three-letter ISO 4217 currency code, see
      * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies).
      * Pass [Currency.XTR] for payments in [Telegram Stars](https://t.me/BotNews/90).
-     * @param prices Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
-     * delivery cost, delivery tax, bonus, etc.).
+     * @param subscriptionPeriod The number of seconds the subscription will be active for before the next payment.
+     * The currency must be set to [Currency.XTR] (Telegram Stars) if the parameter is used. Currently,
+     * it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at
+     * the same time, including multiple concurrent subscriptions from the same user.
+     * @param prices Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost,
+     * delivery tax, bonus, etc.).
      * Must contain exactly one item for payments in [Telegram Stars](https://t.me/BotNews/90).
      * @param maxTipAmount The maximum accepted amount for tips in the *smallest units* of the currency
      * (integer, **not** float/double). For example, for a maximum tip of `US$ 1.45` pass `max_tip_amount = 145`.
      * See the *exp* parameter in [currencies.json](https://core.telegram.org/bots/payments/currencies.json),
      * it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
      * Defaults to 0. Not supported for payments in [Telegram Stars](https://t.me/BotNews/90).
-     * @param suggestedTipAmounts A JSON-serialized array of suggested amounts of tips in the *smallest units*
+     * @param suggestedTipAmounts An array of suggested amounts of tips in the *smallest units*
      * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
      * The suggested tip amounts must be positive, passed in a strictly increased order and must
      * not exceed *max_tip_amount*.
@@ -3198,14 +3287,16 @@ interface API {
      * Ignored for payments in [Telegram Stars](https://t.me/BotNews/90)
      * */
     suspend fun createInvoiceLink(
+        businessConnectionId: String? = null,
         title: String,
         description: String,
         payload: String,
         providerToken: String? = null,
         currency: String,
-        prices: String,
+        prices: List<LabeledPrice>? = null,
+        subscriptionPeriod: Int? = null,
         maxTipAmount: Int? = null,
-        suggestedTipAmounts: String? = null,
+        suggestedTipAmounts: List<Int>? = null,
         providerData: String? = null,
         photoUrl: String? = null,
         photoSize: Int? = null,
@@ -3220,12 +3311,14 @@ interface API {
         isFlexible: Boolean? = null,
     ) = request<NetworkResponse<String>> {
         client.post("createInvoiceLink") {
+            parameter("business_connection_id", businessConnectionId)
             parameter("title", title)
             parameter("description", description)
             parameter("payload", payload)
             parameter("provider_token", providerToken)
             parameter("currency", currency)
             parameter("prices", prices)
+            parameter("subscription_period", subscriptionPeriod)
             parameter("max_tip_amount", maxTipAmount)
             parameter("suggested_tip_amounts", suggestedTipAmounts)
             parameter("provider_data", providerData)
@@ -3328,6 +3421,28 @@ interface API {
         client.post("refundStarPayment") {
             parameter("user_id", userId)
             parameter("telegram_payment_charge_id", telegramPaymentChargeId)
+        }
+    }
+
+    /**
+     * Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.
+     * Returns *True* on success.
+     *
+     * @param userId Identifier of the user whose subscription will be edited
+     * @param telegramPaymentChargeId Telegram payment identifier for the subscription
+     * @param isCanceled Pass *True* to cancel extension of the user subscription; the subscription must be active up
+     * to the end of the current subscription period. Pass *False* to allow the user to re-enable a subscription that
+     * was previously canceled by the bot.
+     * */
+    suspend fun editUserStarSubscription(
+        userId: ChatId.ID,
+        telegramPaymentChargeId: String,
+        isCanceled: Boolean
+    ) = request<Boolean> {
+        client.post("editUserStarSubscription") {
+            parameter("user_id", userId)
+            parameter("telegram_payment_charge_id", telegramPaymentChargeId)
+            parameter("is_canceled", isCanceled)
         }
     }
 

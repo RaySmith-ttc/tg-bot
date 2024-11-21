@@ -25,6 +25,15 @@ data class SuccessfulPayment(
     /** Bot specified invoice payload */
     @SerialName("invoice_payload") val invoicePayload: String,
 
+    /** Expiration date of the subscription, in Unix time; for recurring payments only */
+    @SerialName("subscription_expiration_date") val subscriptionExpirationDate: Int? = null,
+
+    /** True, if the payment is a recurring payment for a subscription */
+    @SerialName("is_recurring") val isRecurring: Boolean? = null,
+
+    /** True, if the payment is the first payment for a subscription */
+    @SerialName("is_first_recurring") val isFirstRecurring: Boolean? = null,
+
     /** Identifier of the shipping option chosen by the user */
     @SerialName("shipping_option_id") val shippingOptionId: String? = null,
 

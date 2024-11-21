@@ -10,6 +10,9 @@ import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf
 
 // TODO docs
+//  make class abstract
+//  leave only general entities functions
+//  move all other functions to subclasses for each MessageTextType
 
 /**
  * Represents message text or caption as string with entities

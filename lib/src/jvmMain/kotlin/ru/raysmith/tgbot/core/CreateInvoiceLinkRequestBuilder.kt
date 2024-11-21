@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
+import kotlin.time.Duration
 
 // TODO move required fields to constructor
 
@@ -39,7 +40,7 @@ class CreateInvoiceLinkRequestBuilder(override val bot: Bot) : API, BotHolder {
      * */
     var currency: Currency? = null
     /**
-     * Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
+     * Price breakdown, a list of components (e.g. product price, tax, discount,
      * delivery cost, delivery tax, bonus, etc.)
      * */
     var prices: List<LabeledPrice>? = null
@@ -54,18 +55,36 @@ class CreateInvoiceLinkRequestBuilder(override val bot: Bot) : API, BotHolder {
     var maxTipAmount: Int? = null
 
     /**
-     * A JSON-serialized array of suggested amounts of tips in the *smallest units*
+     * An array of suggested amounts of tips in the *smallest units*
      * of the currency (integer, **not** float/double). At most 4 suggested tip amounts can be specified.
      * The suggested tip amounts must be positive, passed in a strictly increased order and must
      * not exceed *max_tip_amount*.
      * */
     var suggestedTipAmounts: List<Int>? = null
 
+    private var _providerData: String? = null
+
+    /**
+     * A data about the invoice, which will be shared with the payment provider.
+     * A detailed description of required fields should be provided by the payment provider.
+     *
+     * *This is an alias with the [JsonElement] type for [providerData] field*
+     * */
+    var providerDataJson: JsonElement? = null
+        set(value) {
+            _providerData = value?.let { Json.encodeToString(it) }
+            field = value
+        }
+
     /**
      * A JSON-serialized data about the invoice, which will be shared with the payment provider.
      * A detailed description of required fields should be provided by the payment provider.
      * */
-    var providerData: JsonElement? = null
+    var providerData: String? = null
+        set(value) {
+            _providerData = value?.let { Json.encodeToString(it) }
+            field = value
+        }
 
     /**
      * URL of the product photo for the invoice. Can be a photo of the goods or a marketing
@@ -103,16 +122,32 @@ class CreateInvoiceLinkRequestBuilder(override val bot: Bot) : API, BotHolder {
     /** Pass *True*, if the final price depends on the shipping method */
     var isFlexible: Boolean? = null
 
+    /**
+     * Unique identifier of the business connection on behalf of which the link will be created.
+     * For payments in [Telegram Stars](https://t.me/BotNews/90) only.
+     * */
+    var businessConnectionId: String? = null
+
+    /**
+     * The number of seconds the subscription will be active for before the next payment.
+     * The currency must be set to [Currency.XTR] (Telegram Stars) if the parameter is used. Currently,
+     * it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at
+     * the same time, including multiple concurrent subscriptions from the same user.
+     * */
+    var subscriptionPeriod: Duration? = null
+
     suspend fun send() = createInvoiceLink(
+        businessConnectionId = businessConnectionId,
         title = title ?: "",
         description = description ?: "",
         payload = payload ?: "",
         providerToken = providerToken,
         currency = currency?.code ?: "",
-        prices = prices?.let { Json.encodeToString(it) } ?: "",
+        prices = prices,
+        subscriptionPeriod = subscriptionPeriod?.inWholeSeconds?.toInt(),
         maxTipAmount = maxTipAmount,
-        suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
-        providerData = providerData?.let { Json.encodeToString(it) },
+        suggestedTipAmounts = suggestedTipAmounts,
+        providerData = _providerData,
         photoUrl = photoUrl,
         photoSize = photoSize,
         photoWidth = photoWidth,
