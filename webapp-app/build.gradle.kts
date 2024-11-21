@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
@@ -16,6 +17,9 @@ kotlin {
     }
 
     js(IR) {
+        compilerOptions {
+            target = "es2015"
+        }
         useCommonJs()
         browser {
             nodejs()
@@ -38,6 +42,12 @@ kotlin {
 
 
     sourceSets {
+        commonMain {
+            dependencies {
+                implementation(libs.raysmith.utils)
+            }
+        }
+
         jvmMain {
             dependencies {
                 implementation(projects.lib)
@@ -70,7 +80,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.js)
 
-                implementation(npm("crypto-js", "^4.2.0"))
+                implementation(npm("webpack-bundle-analyzer", "^4.10.2"))
             }
         }
     }
@@ -78,11 +88,19 @@ kotlin {
 
 tasks {
     getByName<ProcessResources>("jvmProcessResources") {
-        val webpackTask = getByName<KotlinWebpack>("jsBrowserDevelopmentWebpack")
+        val isProd = System.getenv("env") == "prod"
+        val webpackTask = getByName<KotlinWebpack>(if (isProd) "jsBrowserProductionWebpack" else "jsBrowserDevelopmentWebpack")
         dependsOn(webpackTask)
         from(File(webpackTask.outputDirectory.asFile.get(), webpackTask.mainOutputFileName.get()))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
+
+    withType<KotlinJsCompile>().configureEach {
+        compilerOptions {
+            target.set("es2015")
+        }
+    }
+
 
 //    getByName<JavaExec>("run") {
 //        classpath(getByName<Jar>("jvmJar"))

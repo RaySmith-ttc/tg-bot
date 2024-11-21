@@ -15,6 +15,7 @@ import io.ktor.server.routing.*
 import io.ktor.util.logging.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
@@ -82,15 +83,15 @@ fun main() {
             connector {
                 port = 8080
             }
-            sslConnector(
-                keyStore = keyStore,
-                keyAlias = "sampleAlias",
-                keyStorePassword = { "123456".toCharArray() },
-                privateKeyPassword = { "foobar".toCharArray() }
-            ) {
-                port = 8443
-                keyStorePath = keyStoreFile
-            }
+//            sslConnector(
+//                keyStore = keyStore,
+//                keyAlias = "sampleAlias",
+//                keyStorePassword = { "123456".toCharArray() },
+//                privateKeyPassword = { "foobar".toCharArray() }
+//            ) {
+//                port = 8443
+//                keyStorePath = keyStoreFile
+//            }
         }
     ) {
         install(CallLogging)
@@ -117,6 +118,5 @@ fun main() {
                 }
             }
         }
-    }
-        .start(wait = true)
+    }.start(wait = true)
 }

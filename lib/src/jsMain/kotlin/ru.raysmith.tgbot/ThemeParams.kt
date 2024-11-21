@@ -8,36 +8,36 @@ package ru.raysmith.tgbot
  * */
 external interface ThemeParams {
 
-    /** Background color in the `#RRGGBB` format. Also available as the CSS variable `var(--tg-theme-bg-color)`. */
+    /** Background color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeBgColor]. */
     @JsName("bg_color")
     val bgColor: String?
 
-    /** Main text color in the `#RRGGBB` format. Also available as the CSS variable `var(--tg-theme-text-color)`. */
+    /** Main text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeTextColor]. */
     @JsName("text_color")
     val textColor: String?
 
-    /** Hint text color in the `#RRGGBB` format. Also available as the CSS variable `var(--tg-theme-hint-color)`. */
+    /** Hint text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeHintColor]. */
     @JsName("hint_color")
     val hintColor: String?
 
-    /** Link text color in the `#RRGGBB` format. Also available as the CSS variable `var(--tg-theme-link-color)`. */
+    /** Link text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeLinkColor]. */
     @JsName("link_color")
     val linkColor: String?
 
-    /** Button color in the `#RRGGBB` format. Also available as the CSS variable `var(--tg-theme-button-color)`. */
+    /** Button color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeButtonColor]. */
     @JsName("button_color")
     val buttonColor: String?
 
     /**
      * Button text color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-button-text-color)`.
+     * [CssVar.tgThemeButtonTextColor].
      * */
     @JsName("button_text_color")
     val buttonTextColor: String?
 
     /**
      * Secondary background color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-secondary-bg-color)`.
+     * [CssVar.tgThemeSecondaryBgColor].
      *
      * @since Bot API 6.1
      * */
@@ -46,7 +46,7 @@ external interface ThemeParams {
 
     /**
      * Header background color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-header-bg-color)`.
+     * [CssVar.tgThemeHeaderBgColor].
      *
      * @since Bot API 7.0
      * */
@@ -55,7 +55,7 @@ external interface ThemeParams {
 
     /**
      * Bottom background color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-bottom-bar-bg-color)`.
+     * [CssVar.tgThemeBottomBarBgColor].
      *
      * @since Bot API 7.10
      * */
@@ -64,7 +64,7 @@ external interface ThemeParams {
 
     /**
      * Accent text color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-accent-text-color)`.
+     * [CssVar.tgThemeAccentTextColor].
      *
      * @since Bot API 7.0
      * */
@@ -73,7 +73,7 @@ external interface ThemeParams {
 
     /**
      * Background color for the section in the `#RRGGBB` format. It is recommended to use this in conjunction with
-     * [secondaryBgColor]. Also available as the CSS variable `var(--tg-theme-section-bg-color)`.
+     * [secondaryBgColor]. Also available as the CSS variable [CssVar.tgThemeSectionBgColor].
      *
      * @since Bot API 7.0
      * */
@@ -82,7 +82,7 @@ external interface ThemeParams {
 
     /**
      * Header text color for the section in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-section-header-text-color)`.
+     * [CssVar.tgThemeSectionHeaderTextColor].
      *
      * @since Bot API 7.0
      * */
@@ -91,7 +91,7 @@ external interface ThemeParams {
 
     /**
      * Section separator color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-section-separator-color)`.
+     * [CssVar.tgThemeSectionSeparatorColor].
      *
      * @since Bot API 7.6
      * */
@@ -100,7 +100,7 @@ external interface ThemeParams {
 
     /**
      * Subtitle text color in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-subtitle-text-color)`.
+     * [CssVar.tgThemeSubtitleTextColor].
      *
      * @since Bot API 7.0
      * */
@@ -109,7 +109,7 @@ external interface ThemeParams {
 
     /**
      * Text color for destructive actions in the `#RRGGBB` format. Also available as the CSS variable
-     * `var(--tg-theme-destructive-text-color)`.
+     * [CssVar.tgThemeDestructiveTextColor].
      *
      * @since Bot API 7.0
      * */

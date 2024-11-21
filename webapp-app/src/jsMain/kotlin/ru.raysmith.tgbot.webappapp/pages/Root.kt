@@ -10,10 +10,12 @@ import web.cssom.GridArea
 import web.cssom.px
 
 val RootPage = FC<Props> {
+
     Box {
         sx {
             gridArea = "content".unsafeCast<GridArea>()
-            padding = 30.px
+            padding = 16.px
+            paddingBottom = 80.px
         }
 
         component = ReactHTML.main

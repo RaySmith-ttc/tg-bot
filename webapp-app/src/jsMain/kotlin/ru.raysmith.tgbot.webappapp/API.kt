@@ -7,7 +7,7 @@ import io.ktor.http.*
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 
-val apiScope = MainScope()
+val mainScope = MainScope()
 
 object API {
     val client = HttpClient {

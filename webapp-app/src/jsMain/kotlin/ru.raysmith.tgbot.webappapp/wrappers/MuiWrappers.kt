@@ -1,7 +1,10 @@
+@file:Suppress("UnsafeCastFromDynamic")
+
 package ru.raysmith.tgbot.webappapp.wrappers
 
+import mui.material.InputBaseProps
+import mui.material.TextFieldProps
 import mui.system.SxProps
-import web.cssom.TextWrap
 
 inline var SxProps<*>.py: dynamic
     get() = asDynamic().py
@@ -68,8 +71,15 @@ inline var SxProps<*>.my: dynamic
     set(value) {
         asDynamic().my = value
     }
-inline var SxProps<*>.textWrap: TextWrap
-    get() = asDynamic().textWrap
+
+inline var TextFieldProps.InputProps: InputBaseProps
+    get() = asDynamic().InputProps
     set(value) {
-        asDynamic().textWrap = value
+        asDynamic().InputProps = value
+    }
+
+inline var InputBaseProps.shrink: Boolean
+    get() = asDynamic().shrink
+    set(value) {
+        asDynamic().shrink = value
     }
