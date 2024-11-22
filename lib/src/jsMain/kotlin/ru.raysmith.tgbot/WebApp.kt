@@ -35,6 +35,12 @@ external interface WebAppProps {
 //    /** An object containing the current theme settings used in the Telegram app. */
     val themeParams: ThemeParams
 
+    /**
+     * *True*, if the Mini App is currently active. *False*, if the Mini App is minimized.
+     * @since Bot API 8.0
+     * */
+    val isActive: Boolean
+
     // TODO link to expand
     /**
      * *True*, if the Mini App is expanded to the maximum available height. False, if the Mini App occupies part of
@@ -98,6 +104,29 @@ external interface WebAppProps {
     val isVerticalSwipesEnabled: Boolean
 
     /**
+     * *True*, if the Mini App is currently being displayed in fullscreen mode.
+     * */
+    val isFullscreen: Boolean
+
+    /**
+     * *True*, if the Mini App’s orientation is currently locked.
+     * *False*, if orientation changes freely based on the device’s rotation.
+     * */
+    val isOrientationLocked : Boolean
+
+    /**
+     * An object representing the device's safe area insets, accounting for system UI elements like notches or
+     * navigation bars.
+     * */
+    val safeAreaInset: SafeAreaInset
+
+    /**
+     * An object representing the safe area for displaying content within the app, free from overlapping
+     * Telegram UI elements.
+     * */
+    val contentSafeAreaInset: ContentSafeAreaInset
+
+    /**
      * An object for controlling the back button which can be displayed in the header of the Mini App in the
      * Telegram interface.
      * */
@@ -126,9 +155,20 @@ external interface WebAppProps {
     /** An object for controlling cloud storage. */
     val CloudStorage: CloudStorage
 
-    // TODO model
     /** An object for controlling biometrics on the device. */
     val BiometricManager: BiometricManager
+
+    /** An object for accessing accelerometer data on the device. */
+    val Accelerometer: Accelerometer
+
+    /** An object for accessing device orientation data on the device. */
+    val DeviceOrientation: DeviceOrientation
+
+    /** An object for accessing gyroscope data on the device. */
+    val Gyroscope: Gyroscope
+
+    /** An object for controlling location on the device. */
+    val LocationManager: LocationManager
 
     /**
      * Returns true if the user's app supports a version of the Bot API that is equal to or higher than the version
@@ -157,7 +197,7 @@ external interface WebAppProps {
 
     /**
      * A method that sets the app's bottom bar color in the `#RRGGBB` format. You can also use the keywords *bg_color*,
-     * *secondary_bg_color* and *bottom_bar_bg_color*.
+     * *secondary_bg_color* and *bottom_bar_bg_color*. This color is also applied to the navigation bar on Android.
      *
      * @since Bot API 7.10
      * */
@@ -193,6 +233,63 @@ external interface WebAppProps {
      * */
     val disableVerticalSwipes: VoidFunction
 
+    /**
+     * A method that requests opening the Mini App in fullscreen mode. Although the header is transparent in fullscreen
+     * mode, it is recommended that the Mini App sets the header color using the setHeaderColor method.
+     * This color helps determine a contrasting color for the status bar and other UI controls.
+     *
+     * @since Bot API 8.0
+     * */
+    val requestFullscreen: VoidFunction
+
+    /**
+     * A method that requests exiting fullscreen mode.
+     *
+     * @since Bot API 8.0
+     * */
+    val exitFullscreen: VoidFunction
+
+    /**
+     * A method that locks the Mini App’s orientation to its current mode (either portrait or landscape). Once locked,
+     * the orientation remains fixed, regardless of device rotation. This is useful if a stable orientation is needed
+     * during specific interactions.
+     *
+     * @since Bot API 8.0
+     * */
+    val lockOrientation: VoidFunction
+
+    /**
+     * A method that unlocks the Mini App’s orientation, allowing it to follow the device's rotation freely. Use this to
+     * restore automatic orientation adjustments based on the device orientation.
+     *
+     * @since Bot API 8.0
+     * */
+    val unlockOrientation: VoidFunction
+
+    /**
+     * A method that prompts the user to add the Mini App to the home screen. After successfully adding the icon, the
+     * [EventType.homeScreenAdded] event will be triggered if supported by the device. Note that if the device cannot
+     * determine the installation status, the event may not be received even if the icon has been added.
+     *
+     * @since Bot API 8.0
+     * */
+    val addToHomeScreen: VoidFunction
+
+    /**
+     * A method that checks if adding to the home screen is supported and if the Mini App has already been added.
+     * If an optional callback parameter is provided, the callback function will be called with a single argument
+     * status, which is a string indicating the home screen status. Possible values for status are:
+     * - [HomeScreenStatus.unsupported] – the feature is not supported, and it is not possible to add the icon to the
+     * home screen,
+     * - [HomeScreenStatus.unknown] – the feature is supported, and the icon can be added, but it is not possible to
+     * determine if the icon has already been added,
+     * - [HomeScreenStatus.added] – the icon has already been added to the home screen,
+     * - [HomeScreenStatus.missed] – the icon has not been added to the home screen.
+     *
+     * @since Bot API 8.0
+     * */
+    val checkHomeScreenStatus: (callback: (status: HomeScreenStatus) -> Unit) -> Unit
+
     /** A method that sets the app event handler. */
     val onEvent: (eventType: EventType, eventHandler: (dynamic) -> Unit) -> Unit
 
@@ -201,8 +298,8 @@ external interface WebAppProps {
 
     /**
      * A method used to send data to the bot. When this method is called, a service message is sent to the bot
-     * containing the data *data* of the length up to 4096 bytes, and the Mini App is closed.
-     * See the field *web_app_data* in the class [Message](https://core.telegram.org/bots/api#message).
+     * containing the data `data` of the length up to 4096 bytes, and the Mini App is closed.
+     * See the field `webAppData` in the class [Message](https://core.telegram.org/bots/api#message).
      *
      * *This method is only available for Mini Apps launched via a
      * [Keyboard button](https://core.telegram.org/bots/webapps#keyboard-button-mini-apps).*
@@ -212,14 +309,14 @@ external interface WebAppProps {
     /**
      * A method that inserts the bot's username and the specified inline query in the current chat's
      * input field. Query may be empty, in which case only the bot's username will be inserted.
-     * If an optional *chooseChatTypes* parameter was passed, the client prompts the user to choose a specific chat,
+     * If an optional `chooseChatTypes` parameter was passed, the client prompts the user to choose a specific chat,
      * then opens that chat and inserts the bot's username and the specified inline query in the input field.
      * You can specify which types of chats the user will be able to choose from. It can be one or more of the
-     * following types: *users*, *bots*, *groups*, *channels*.
+     * following types: [InlineQueryChatType.users], [InlineQueryChatType.bots], [InlineQueryChatType.bots], [InlineQueryChatType.channels].
      *
      * @since Bot API 6.7
      * */
-    val switchInlineQuery: (query: String, chooseChatTypes: List<ChatType>) -> Unit
+    val switchInlineQuery: (query: String, chooseChatTypes: List<InlineQueryChatType>) -> Unit
 
     /**
      * A method that opens a link in an external browser. The Mini App will *not* be closed.
@@ -242,7 +339,7 @@ external interface WebAppProps {
     // TODO link to event
     /**
      * A method that opens an invoice using the link url. The Mini App will receive the event
-     * *invoiceClosed* when the invoice is closed. If an optional *callback* parameter was passed, the *callback*
+     * *invoiceClosed* when the invoice is closed. If an optional `callback` parameter was passed, the `callback`
      * function will be called and the invoice status will be passed as the first argument.
      *
      * @since Bot API 6.1
@@ -257,11 +354,52 @@ external interface WebAppProps {
      * */
     val shareToStory: (mediaUrl: String, params: StoryShareParams) -> Unit
 
+    /**
+     * A method that opens a dialog allowing the user to share a message provided by the bot.
+     * If an optional `callback` parameter is provided, the `callback` function will be called with a boolean as the first
+     * argument, indicating whether the message was successfully sent. The message id passed to this method must belong
+     * to a [PreparedInlineMessage] previously obtained via the Bot API method [savePreparedInlineMessage].
+     *
+     * @since Bot API 8.0
+     * */
+    val shareMessage: (msgId: String, callback: (sent: Boolean) -> Unit) -> Unit
+
+    /**
+     * A method that opens a dialog allowing the user to set the specified custom emoji as their status.
+     * An optional params argument of type EmojiStatusParams specifies additional settings, such as duration.
+     * If an optional `callback` parameter is provided, the `callback` function will be called with a boolean as the first
+     * argument, indicating whether the status was set.
+     *
+     * @since Bot API 8.0
+     * */
+    val setEmojiStatus: (
+        customEmojiId: String, params: EmojiStatusParams, callback: (isStatusSet: Boolean) -> Unit
+    ) -> Unit
+
+    /**
+     * A method that shows a native popup requesting permission for the bot to manage user's emoji status.
+     * If an optional `callback` parameter was passed, the `callback` function will be called when the popup is closed and
+     * the first argument will be a boolean indicating whether the user granted this access.
+     *
+     * @since Bot API 8.0
+     * */
+    val requestEmojiStatusAccess: (callback: (granted: Boolean) -> Unit) -> Unit
+
+    /**
+     * A method that displays a native popup prompting the user to download a file specified by the params argument of
+     * type [DownloadFileParams]. If an optional `callback` parameter is provided, the `callback` function will be called
+     * when the popup is closed, with the first argument as a boolean indicating whether the user accepted the
+     * download request.
+     *
+     * @since Bot API 8.0
+     * */
+    val downloadFile: (params: DownloadFileParams, callback: (granted: Boolean) -> Unit) -> Unit
+
     // TODO link to event
     /**
      * A method that shows a native popup described by the *params* argument of the type [PopupParams].
-     * The Mini App will receive the event *popupClosed* when the popup is closed. If an optional *callback* parameter
-     * was passed, the *callback* function will be called and the field id of the pressed button will be passed as
+     * The Mini App will receive the event *popupClosed* when the popup is closed. If an optional `callback` parameter
+     * was passed, the `callback` function will be called and the field id of the pressed button will be passed as
      * the first argument.
      *
      * @since Bot API 6.2
@@ -269,8 +407,8 @@ external interface WebAppProps {
     val showPopup: (params: PopupParams, callback: VoidFunction) -> Unit
 
     /**
-     * A method that shows *message* in a simple alert with a 'Close' button. If an optional *callback* parameter was
-     * passed, the *callback* function will be called when the popup is closed.
+     * A method that shows *message* in a simple alert with a 'Close' button. If an optional `callback` parameter was
+     * passed, the `callback` function will be called when the popup is closed.
      *
      * @since Bot API 6.2
      * */
@@ -278,7 +416,7 @@ external interface WebAppProps {
 
     /**
      * A method that shows *message* in a simple confirmation window with 'OK' and 'Cancel' buttons. If an optional
-     * *callback* parameter was passed, the *callback* function will be called when the popup is closed and the first
+     * `callback` parameter was passed, the `callback` function will be called when the popup is closed and the first
      * argument will be a boolean indicating whether the user pressed the 'OK' button.
      *
      * @since Bot API 6.2
@@ -289,7 +427,7 @@ external interface WebAppProps {
     /**
      * A method that shows a native popup for scanning a QR code described by the *params* argument of the type
      * [ScanQrPopupParams]. The Mini App will receive the event *qrTextReceived* every time the scanner catches a code
-     * with text data. If an optional *callback* parameter was passed, the *callback* function will be called and the
+     * with text data. If an optional `callback` parameter was passed, the `callback` function will be called and the
      * text from the QR code will be passed as the first argument. Returning *true* inside this callback function
      * causes the popup to be closed.
      *
@@ -310,7 +448,7 @@ external interface WebAppProps {
 
     /**
      * A method that requests text from the clipboard. The Mini App will receive the event *clipboardTextReceived*.
-     * If an optional *callback* parameter was passed, the *callback* function will be called and the text from the
+     * If an optional `callback` parameter was passed, the `callback` function will be called and the text from the
      * clipboard will be passed as the first argument.
      *
      * *Note: this method can be called only for Mini Apps launched from the attachment menu and only in response to
@@ -321,7 +459,7 @@ external interface WebAppProps {
 
     /**
      * A method that shows a native popup requesting permission for the bot to send messages to the user.
-     * If an optional *callback* parameter was passed, the *callback* function will be called when the popup is closed
+     * If an optional `callback` parameter was passed, the `callback` function will be called when the popup is closed
      * and the first argument will be a boolean indicating whether the user granted this access.
      *
      * @since Bot API 6.9
@@ -329,8 +467,8 @@ external interface WebAppProps {
     val requestWriteAccess: (callback: VoidFunction) -> Unit
 
     /**
-     * A method that shows a native popup prompting the user for their phone number. If an optional *callback* parameter
-     * was passed, the *callback* function will be called when the popup is closed and the first argument will be a
+     * A method that shows a native popup prompting the user for their phone number. If an optional `callback` parameter
+     * was passed, the `callback` function will be called when the popup is closed and the first argument will be a
      * boolean indicating whether the user shared its phone number.
      *
      * @since Bot API 6.9
@@ -365,6 +503,7 @@ external object WebApp : WebAppProps {
     override val platform: String
     override val colorScheme: ColorScheme
     override val themeParams: ThemeParams
+    override val isActive: Boolean
     override val isExpanded: Boolean
     override val viewportHeight: Float
     override val viewportStableHeight: Float
@@ -373,6 +512,10 @@ external object WebApp : WebAppProps {
     override val bottomBarColor: String
     override val isClosingConfirmationEnabled: Boolean
     override val isVerticalSwipesEnabled: Boolean
+    override val isFullscreen: Boolean
+    override val isOrientationLocked: Boolean
+    override val safeAreaInset: SafeAreaInset
+    override val contentSafeAreaInset: ContentSafeAreaInset
     override val BackButton: BackButton
     override val MainButton: BottomButton
     override val SecondaryButton: BottomButton
@@ -380,6 +523,10 @@ external object WebApp : WebAppProps {
     override val HapticFeedback: HapticFeedback
     override val CloudStorage: CloudStorage
     override val BiometricManager: BiometricManager
+    override val Accelerometer: Accelerometer
+    override val DeviceOrientation: DeviceOrientation
+    override val Gyroscope: Gyroscope
+    override val LocationManager: LocationManager
     override val isVersionAtLeast: (version: String) -> Boolean
     override val setHeaderColor: (color: dynamic) -> Boolean
     override val setBackgroundColor: (color: dynamic) -> Boolean
@@ -388,14 +535,24 @@ external object WebApp : WebAppProps {
     override val disableClosingConfirmation: VoidFunction
     override val enableVerticalSwipes: VoidFunction
     override val disableVerticalSwipes: VoidFunction
+    override val requestFullscreen: VoidFunction
+    override val exitFullscreen: VoidFunction
+    override val lockOrientation: VoidFunction
+    override val unlockOrientation: VoidFunction
+    override val addToHomeScreen: VoidFunction
+    override val checkHomeScreenStatus: (callback: (status: HomeScreenStatus) -> Unit) -> Unit
     override val onEvent: (eventType: EventType, eventHandler: (dynamic) -> Unit) -> Unit
     override val offEvent: (eventType: EventType, eventHandler: (dynamic) -> Unit) -> Unit
     override val sendData: (data: String) -> Unit
-    override val switchInlineQuery: (query: String, chooseChatTypes: List<ChatType>) -> Unit
+    override val switchInlineQuery: (query: String, chooseChatTypes: List<InlineQueryChatType>) -> Unit
     override val openLink: (url: String, options: OpenLinkOptions) -> Unit
     override val openTelegramLink: (url: String) -> Unit
     override val openInvoice: (url: String, callback: VoidFunction) -> Unit
     override val shareToStory: (mediaUrl: String, params: StoryShareParams) -> Unit
+    override val shareMessage: (msgId: String, callback: (sent: Boolean) -> Unit) -> Unit
+    override val setEmojiStatus: (customEmojiId: String, params: EmojiStatusParams, callback: (isStatusSet: Boolean) -> Unit) -> Unit
+    override val requestEmojiStatusAccess: (callback: (granted: Boolean) -> Unit) -> Unit
+    override val downloadFile: (params: DownloadFileParams, callback: (granted: Boolean) -> Unit) -> Unit
     override val showPopup: (params: PopupParams, callback: VoidFunction) -> Unit
     override val showAlert: (message: String, callback: VoidFunction) -> Unit
     override val showConfirm: (message: String, callback: VoidFunction) -> Unit

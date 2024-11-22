@@ -5,16 +5,20 @@ import seskar.js.JsValue
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface ChatType {
     companion object {
-        @JsValue("users")
-        val users: ChatType
 
-        @JsValue("bots")
-        val bots: ChatType
+        @JsValue("sender")
+        val sender: ChatType
 
-        @JsValue("groups")
-        val groups: ChatType
+        @JsValue("private")
+        val private: ChatType
 
-        @JsValue("channels")
-        val channels: ChatType
+        @JsValue("group")
+        val group: ChatType
+
+        @JsValue("supergroup")
+        val supergroup: ChatType
+
+        @JsValue("channel")
+        val channel: ChatType
     }
 }

@@ -10,50 +10,36 @@ external interface BiometricManager {
 
     /**
      * Shows whether biometrics object is initialized.
-     *
-     * @since Bot API 7.2
      */
     val isInited: Boolean
 
     /**
      * Shows whether biometrics is available on the current device.
-     *
-     * @since Bot API 7.2
      */
     val isBiometricAvailable: Boolean
 
     /**
      * The type of biometrics currently available on the device.
-     *
-     * @since Bot API 7.2
      */
     val biometricType: BiometricType
 
     /**
      * Shows whether permission to use biometrics has been requested.
-     *
-     * @since Bot API 7.2
      */
     val isAccessRequested: Boolean
 
     /**
      * Shows whether permission to use biometrics has been granted.
-     *
-     * @since Bot API 7.2
      */
     val isAccessGranted: Boolean
 
     /**
      * Shows whether the token is saved in secure storage on the device.
-     *
-     * @since Bot API 7.2
      */
     val isBiometricTokenSaved: Boolean
 
     /**
      * A unique device identifier that can be used to match the token to the device.
-     *
-     * @since Bot API 7.2
      */
     val deviceId: String
 

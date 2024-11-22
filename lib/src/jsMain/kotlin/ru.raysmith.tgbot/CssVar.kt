@@ -4,6 +4,7 @@ import web.cssom.CustomPropertyName
 import web.cssom.`var`
 
 object CssVar {
+
     /** --tg-viewport-height */
     fun <T : Any> tgViewportHeight() = `var`<T>(CustomPropertyName("--tg-viewport-height"))
 
@@ -57,4 +58,28 @@ object CssVar {
 
     /** --tg-theme-destructive-text-color */
     fun <T : Any> tgThemeDestructiveTextColor() = `var`<T>(CustomPropertyName("--tg-theme-destructive-text-color"))
+
+    /** --tg-safe-area-inset-top */
+    fun <T : Any> tgSafeAreaInsetTop() = `var`<T>(CustomPropertyName("--tg-safe-area-inset-top"))
+
+    /** --tg-safe-area-inset-bottom */
+    fun <T : Any> tgSafeAreaInsetBottom() = `var`<T>(CustomPropertyName("--tg-safe-area-inset-bottom"))
+
+    /** --tg-safe-area-inset-left */
+    fun <T : Any> tgSafeAreaInsetLeft() = `var`<T>(CustomPropertyName("--tg-safe-area-inset-left"))
+
+    /** --tg-safe-area-inset-right */
+    fun <T : Any> tgSafeAreaInsetRight() = `var`<T>(CustomPropertyName("--tg-safe-area-inset-right"))
+
+    /** --tg-content-safe-area-inset-top */
+    fun <T : Any> tgContentSafeAreaInsetTop() = `var`<T>(CustomPropertyName("--tg-content-safe-area-inset-top"))
+
+    /** --tg-content-safe-area-inset-bottom */
+    fun <T : Any> tgContentSafeAreaInsetBottom() = `var`<T>(CustomPropertyName("--tg-content-safe-area-inset-bottom"))
+
+    /** --tg-content-safe-area-inset-left */
+    fun <T : Any> tgContentSafeAreaInsetLeft() = `var`<T>(CustomPropertyName("--tg-content-safe-area-inset-left"))
+
+    /** --tg-content-safe-area-inset-right */
+    fun <T : Any> tgContentSafeAreaInsetRight() = `var`<T>(CustomPropertyName("--tg-content-safe-area-inset-right"))
 }
