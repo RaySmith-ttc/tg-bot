@@ -1,10 +1,8 @@
 package ru.raysmith.tgbot.webappapp.provider
 
 import js.objects.jso
-import mui.material.AppBarProps
-import mui.material.ButtonProps
-import mui.material.CssBaseline
-import mui.material.LinkProps
+import mui.material.*
+import mui.material.styles.PaletteColor
 import mui.material.styles.createTheme
 import mui.system.sx
 import react.FC
@@ -25,14 +23,6 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                             color = tgTheme.linkColor
                         }
                     }
-                    MuiButton = jso {
-                        defaultProps = jso<ButtonProps> {
-                            sx {
-                                backgroundColor = tgTheme.buttonColor
-                                color = tgTheme.buttonTextColor
-                            }
-                        }
-                    }
                     MuiAppBar = jso {
                         defaultProps = jso<AppBarProps> {
                             sx {
@@ -43,6 +33,7 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                     }
                 }
                 palette = jso {
+                    mode = tgTheme.colorScheme.unsafeCast<PaletteMode>()
                     background = jso {
                         default = tgTheme.bgColor.unsafeCast<String>()
                         paper = tgTheme.secondaryBgColor.unsafeCast<String>()
@@ -51,6 +42,15 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                         primary = tgTheme.textColor ?: Color.currentcolor
                     }
                     divider = tgTheme.hintColor.unsafeCast<String>()
+                    primary = jso {
+                        main = tgTheme.buttonColor.unsafeCast<PaletteColor>()
+                    }
+                    secondary = jso {
+                        main = tgTheme.accentTextColor.unsafeCast<PaletteColor>()
+                    }
+                    error = jso {
+                        main = tgTheme.destructiveTextColor.unsafeCast<PaletteColor>()
+                    }
                 }
             } else jso {}
         )

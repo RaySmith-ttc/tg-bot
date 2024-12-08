@@ -11,11 +11,10 @@ import react.*
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.hooks.useBiometric
 import ru.raysmith.tgbot.webappapp.OnClick
-import ru.raysmith.tgbot.webappapp.mainScope
 import ru.raysmith.tgbot.webappapp.components.FullPageLoading
-import ru.raysmith.tgbot.webappapp.components.BottomAppBar
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTextField
+import ru.raysmith.tgbot.webappapp.mainScope
 import ru.raysmith.tgbot.webappapp.wrappers.mt
 import ru.raysmith.utils.uuid
 
@@ -85,10 +84,6 @@ val BiometricPage = FC<Props> {
         backButton.show()
     }
 
-    BottomAppBar {
-
-    }
-
     if (!inited) {
         FullPageLoading {}
         return@FC
@@ -136,12 +131,12 @@ val BiometricPage = FC<Props> {
 
             DataDisplayTextField {
                 label = ReactNode("biometricType")
-                value = ReactNode(biometric.biometricType.toString())
+                value = Typography.create { +biometric.biometricType.toString() }
             }
 
             DataDisplayTextField {
                 label = ReactNode("deviceId")
-                value = ReactNode(biometric.deviceId)
+                value = Typography.create { +biometric.deviceId }
                 copyToClipboard = true
             }
         }

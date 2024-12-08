@@ -15,9 +15,9 @@ module.exports = env => {
         },
     });
 
-    config.plugins.push(new BundleAnalyzerPlugin({
-        analyzerPort: 8888
-    }));
+    // config.plugins.push(new BundleAnalyzerPlugin({
+    //     analyzerPort: 8888
+    // }));
 
     return config
 };

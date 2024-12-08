@@ -7,4 +7,5 @@ object Paths {
     val biometric = "/biometric"
     val hapticFeedback = "/hapticFeedback"
     val theme = "/theme"
+    val state = "/state"
 }

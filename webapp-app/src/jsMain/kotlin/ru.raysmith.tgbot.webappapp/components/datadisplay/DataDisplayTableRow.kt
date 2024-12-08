@@ -7,26 +7,24 @@ import react.FC
 import react.Props
 import react.PropsWithChildren
 import react.ReactNode
-import web.cssom.WhiteSpace
-import web.cssom.WordWrap
-import web.cssom.pct
+import web.cssom.*
 
 external interface BaseInfoPageProps : PropsWithChildren {
     var title: String
     var value: ReactNode
+    var bigTitleWidth: Boolean?
 }
 
 val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
     TableRow {
         sx {
-            width = 50.pct
             wordWrap = WordWrap.breakWord
             whiteSpace = WhiteSpace.normal
         }
 
         TableCell {
             sx {
-                width = 50.pct
+                width = if (props.bigTitleWidth == true) 75.pct else 50.pct
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
             }
@@ -37,17 +35,17 @@ val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
         }
         TableCell {
             sx {
-                width = 50.pct
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
             }
             Stack {
                 direction = responsive(StackDirection.row)
                 spacing = responsive(1)
-                
-                Typography {
-                    +props.value
+                sx {
+                    justifyItems = JustifyItems.center
                 }
+
+                +props.value
 
                 +props.children
             }

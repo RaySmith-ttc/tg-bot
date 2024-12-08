@@ -1,10 +1,7 @@
 package ru.raysmith.tgbot.webappapp.pages.theme
 
 import js.objects.Object
-import mui.material.FormControlLabel
-import mui.material.Switch
-import mui.material.Table
-import mui.material.TableBody
+import mui.material.*
 import react.FC
 import react.Props
 import react.ReactNode
@@ -23,7 +20,6 @@ val ThemePage = FC<Props> {
     val settings = useSettingsContext()
 
     BaseSubPageLayout {
-
         FormControlLabel {
             label = ReactNode("Use telegram theme")
             control = Switch.create {
@@ -39,7 +35,7 @@ val ThemePage = FC<Props> {
             TableBody {
                 DataDisplayTableRow {
                     title = "colorScheme"
-                    value = ReactNode(tp.colorScheme.toString())
+                    value = Typography.create { +tp.colorScheme.toString() }
                 }
 
                 Object.keys(tp).filter { it != "colorScheme" }.forEach {

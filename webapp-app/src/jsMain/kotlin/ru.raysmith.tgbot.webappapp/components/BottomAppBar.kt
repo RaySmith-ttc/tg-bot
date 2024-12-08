@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.webappapp.components
 import kotlinx.browser.window
 import mui.icons.material.ArrowBack
 import mui.material.*
+import mui.material.Size
 import mui.material.styles.TypographyVariant
 import mui.system.sx
 import react.FC
@@ -14,19 +15,19 @@ import ru.raysmith.tgbot.webappapp.hooks.usePathname
 import ru.raysmith.tgbot.webappapp.hooks.useRouter
 import ru.raysmith.tgbot.webappapp.router.Paths
 import ru.raysmith.tgbot.webappapp.wrappers.mr
-import web.cssom.Auto
-import web.cssom.PaddingBottom
-import web.cssom.number
+import web.cssom.*
 import web.dom.Element
 
 external interface HeaderProps : PropsWithChildren
 
-val BottomAppBar = FC<HeaderProps> { props ->
+val AppBar = FC<HeaderProps> { props ->
     val router = useRouter()
     val pathname = usePathname()
     val viewport = useViewport()
 
-    if (viewport.isExpanded) return@FC
+    if (viewport.isExpanded) {
+        return@FC
+    }
 
     Box {
         sx {

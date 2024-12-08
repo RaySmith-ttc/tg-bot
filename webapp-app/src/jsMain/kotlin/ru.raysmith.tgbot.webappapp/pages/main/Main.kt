@@ -9,12 +9,11 @@ import mui.system.PropsWithSx
 import mui.system.responsive
 import mui.system.sx
 import react.*
+import ru.raysmith.tgbot.CssVar
 import ru.raysmith.tgbot.hooks.useViewport
 import ru.raysmith.tgbot.webApp
-import ru.raysmith.tgbot.webappapp.components.BottomAppBar
 import ru.raysmith.tgbot.webappapp.components.RouterLink
 import ru.raysmith.tgbot.webappapp.router.Paths
-import ru.raysmith.tgbot.webappapp.wrappers.mr
 import ru.raysmith.tgbot.webappapp.wrappers.mt
 import ru.raysmith.tgbot.webappapp.wrappers.pt
 import web.cssom.*
@@ -46,34 +45,17 @@ val MainPage = FC<Props> {
         webApp.BackButton.hide()
     }
 
-    BottomAppBar {
-        Tooltip {
-            title = ReactNode("Verification Info")
-            placement = TooltipPlacement.bottom
-
-            IconButton {
-                onClick = {
-                    showVerificationInfo = true
-                }
-
-                VerificationButton {}
-            }
+    VerificationButton {
+        sx {
+            position = Position.absolute
+            top = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()} + ${theme.spacing(2)})".unsafeCast<Top>()
+            pt = 8.px
+            right = theme.spacing(2)
+            color = theme.palette.primary.main
+            zIndex = integer(1)
         }
-    }
-
-    if (viewport.isStateStable && viewport.isExpanded) {
-        VerificationButton {
-            sx {
-                position = Position.absolute
-                top = theme.spacing(2)
-                pt = 8.px
-                right = theme.spacing(2)
-                color = theme.palette.primary.main
-                zIndex = integer(1)
-            }
-            onClick = {
-                showVerificationInfo = true
-            }
+        onClick = {
+            showVerificationInfo = true
         }
     }
 
@@ -113,12 +95,21 @@ val MainPage = FC<Props> {
             href = Paths.theme
             startIcon = Palette.create()
         }
+
+        SubPageButton {
+            +"State"
+            href = Paths.state
+            startIcon = Traffic.create()
+        }
     }
 
     VerificationDialog {
         open = showVerificationInfo
         onClose = { _, _ -> showVerificationInfo = false }
         onOkButtonClick = { showVerificationInfo = false }
+        sx {
+            mt = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()})"
+        }
     }
 }
 

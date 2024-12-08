@@ -10,7 +10,6 @@ import ru.raysmith.tgbot.HapticFeedbackStyle
 import ru.raysmith.tgbot.HapticFeedbackType
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.hooks.useHapticFeedback
-import ru.raysmith.tgbot.webappapp.components.BottomAppBar
 import web.cssom.AlignItems
 import web.cssom.px
 
@@ -20,10 +19,6 @@ val HapticFeedbackPage = FC<Props> {
 
     useEffectOnce {
         backButton.show()
-    }
-
-    BottomAppBar {
-
     }
 
     Stack {

@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.webappapp.pages.biometric.BiometricPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
 import ru.raysmith.tgbot.webappapp.pages.RootPage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
+import ru.raysmith.tgbot.webappapp.pages.state.StatePage
 import ru.raysmith.tgbot.webappapp.pages.theme.ThemePage
 import ru.raysmith.tgbot.webappapp.pages.viewport.ViewportPage
 
@@ -20,8 +21,7 @@ val Router = FC<PropsWithChildren> { props ->
     val backButton = useBackButton()
 
     RouterProvider {
-
-        val r = createBrowserRouter(arrayOf(
+        val router = createBrowserRouter(arrayOf(
             jso {
                 path = Paths.root
                 element = RootPage.create()
@@ -50,15 +50,19 @@ val Router = FC<PropsWithChildren> { props ->
                         path = Paths.theme
                         element = ThemePage.create()
                     },
+                    jso {
+                        path = Paths.state
+                        element = StatePage.create()
+                    },
                 )
             }
         ))
 
-        router = r
+        this.router = router
 
         useEffectOnce {
             backButton.onClick {
-                r.navigate(-1)
+                router.navigate(-1)
             }
         }
         +props
