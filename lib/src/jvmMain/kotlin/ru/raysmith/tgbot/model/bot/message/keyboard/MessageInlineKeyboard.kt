@@ -34,7 +34,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         callbackQueryPrefix: String,
         page: Int = Pagination.PAGE_FIRST,
         setup: suspend Pagination<T>.() -> Unit = {},
-        createButtons: suspend Row.(item: T) -> Unit
+        createButtons: suspend Row.(item: T) -> Unit = {}
     ) {
         Pagination.create(bot, data, callbackQueryPrefix, page, setup, createButtons)
             .setupMarkup(this@MessageInlineKeyboard)

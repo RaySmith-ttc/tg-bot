@@ -43,6 +43,7 @@ class Bot(
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     private var lastUpdateId: Int? = null,
+    val useTestServer: Boolean = false
 ) : API {
 
     init {
@@ -61,8 +62,8 @@ class Bot(
     private var blockingSelector: ((Update) -> Any?)? = null
     private var clientBuilder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
     override val client: HttpClient by lazy {
-        token?.let { TelegramApi.defaultClient(it, clientBuilder) }
-            ?: TelegramApi.defaultClient(builder = clientBuilder)
+        token?.let { TelegramApi.defaultClient(it, useTestServer, clientBuilder) }
+            ?: TelegramApi.defaultClient(useTestServer = useTestServer, builder = clientBuilder)
     }
 
     // states

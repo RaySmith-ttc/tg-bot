@@ -5,6 +5,7 @@ package ru.raysmith.tgbot.network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.api.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -3221,8 +3222,13 @@ interface API {
     // TODO [docs]
     suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
 
+    // TODO test
     suspend fun downloadFile(file: File) = request<InputStream> {
-        client.get("${TelegramApi.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
+        val isTestServerPluginInstalled = client.pluginOrNull(TelegramTestServer) != null
+        val token = client.plugin(Token).token
+        val testPath = if (isTestServerPluginInstalled) "test/" else ""
+
+        client.get("/file/bot$token/$testPath${file.path!!}") {
             unauthenticated()
         }
     }

@@ -93,14 +93,13 @@ class MessageText(val type: MessageTextType, val config: BotConfig) {
     fun blockquote(text: Any?) = appendEntity(MessageEntityType.BLOCKQUOTE, text)
     fun expandableBlockquote(text: Any?) = appendEntity(MessageEntityType.EXPANDABLE_BLOCKQUOTE, text)
 
-    fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, null, null, types = types)
+//    fun mix(text: Any?, vararg types: MessageEntityType) = mix(text, *types, null)
     suspend fun datePickerMessageText(datePicker: DatePicker, data: String? = null) {
         datePicker.messageText(this, config, data, datePicker.startWithState(config, data))
     }
 
     fun mix(
-        text: Any?, url: String? = null, language: String? = null, user: User? = null, customEmojiId: String? = null,
-        vararg types: MessageEntityType
+        text: Any?, vararg types: MessageEntityType, url: String? = null, language: String? = null, user: User? = null, customEmojiId: String? = null,
     ): MessageText {
         if (!printNulls && text == null) return this
 

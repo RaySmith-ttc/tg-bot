@@ -10,6 +10,7 @@ import mui.system.sx
 import react.*
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.hooks.useBiometric
+import ru.raysmith.tgbot.webApp
 import ru.raysmith.tgbot.webappapp.OnClick
 import ru.raysmith.tgbot.webappapp.components.FullPageLoading
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
@@ -97,7 +98,31 @@ val BiometricPage = FC<Props> {
         return@FC
     }
 
-    if (!biometric.isAccessGranted) {
+    if (!biometric.isAccessGranted || granted == false) {
+        if (!biometric.isAccessRequested) {
+            Stack {
+                spacing = responsive(0.5)
+
+                Alert {
+                    +"Please allow the bot to use biometry"
+                    severity = AlertColor.warning.unsafeCast<String>()
+                }
+
+                Button {
+                    +"Allow"
+                    fullWidth = true
+                    size = Size.large
+                    startIcon = Settings.create()
+                    onClick = {
+                        biometric.requestAccess(jso { reason = "Some reason" }) { res ->
+                            granted = res
+                        }
+                    }
+                }
+            }
+            return@FC
+        }
+
         Stack {
             spacing = responsive(0.5)
 
@@ -177,6 +202,7 @@ val BiometricPage = FC<Props> {
         }
     }
 
+    println(webApp.BiometricManager)
     if (biometric.isBiometricAvailable) {
 
         Stack {

@@ -46,8 +46,11 @@ kotlin {
 
     js(IR) {
         compilerOptions {
-//            moduleKind = JsModuleKind.MODULE_UMD
             target = "es2015"
+            freeCompilerArgs.addAll (
+                "-Xsuppress-warning=NESTED_CLASS_IN_EXTERNAL_INTERFACE",
+                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
+            )
         }
 
         browser {
