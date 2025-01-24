@@ -13,6 +13,7 @@ interface IMessage<T> : API {
         const val MAX_POLL_EXPLANATION_LENGTH = 200
         const val MAX_POLL_OPTION_LENGTH = 100
         const val MAX_GIFT_TEXT_LENGTH = 255
+        const val MAX_LENGTH_VERIFY_USER_DESCRIPTION = 70
     }
 
     /**

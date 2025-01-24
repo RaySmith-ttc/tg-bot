@@ -38,7 +38,7 @@ data class InlineQueryResultGif(
     /** Unique identifier for this result, 1-64 Bytes */
     @SerialName("id") val id: String,
 
-    /** A valid URL for the GIF file. File size must not exceed 1MB */
+    /** A valid URL for the GIF file */
     @SerialName("gif_url") val photoUrl: String,
 
     /** Width of the GIF */

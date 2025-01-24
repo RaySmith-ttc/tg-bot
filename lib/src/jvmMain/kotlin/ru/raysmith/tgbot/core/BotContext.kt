@@ -1104,6 +1104,8 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
      *
      * @param userId Unique identifier of the target user that will receive the gift
      * @param giftId Identifier of the gift
+     * @param payForUpgrade Pass *True* to pay for the gift upgrade from the bot's balance, thereby making the upgrade
+     * free for the receiver
      * @param text [MessageText] builder of text that will be shown along with the gift
      *
      * @see [IMessage.MAX_GIFT_TEXT_LENGTH] // TODO link to limits object
@@ -1111,11 +1113,12 @@ interface BotContext<T : EventHandler> : ISender, IEditor {
     suspend fun sendGift(
         userId: ChatId.ID,
         giftId: String,
+        payForUpgrade: Boolean? = null,
         text: MessageText.() -> Unit
     ): Gifts {
         val messageText = MessageText(MessageTextType.GIFT_TEXT, botConfig).apply(text)
 
-        return sendGift(userId, giftId, messageText.getTextString(), null, messageText.getEntities())
+        return sendGift(userId, giftId, payForUpgrade, messageText.getTextString(), null, messageText.getEntities())
     }
 
     /**

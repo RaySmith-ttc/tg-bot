@@ -25,9 +25,6 @@ data class InlineQueryResultArticle(
     /** URL of the result */
     @SerialName("url") val url: String? = null,
 
-    /** Pass *True* if you don't want the URL to be shown in the message */
-    @SerialName("hide_url") val hideUrl: Boolean? = null,
-
     /** Short description of the result */
     @SerialName("description") val description: String? = null,
 

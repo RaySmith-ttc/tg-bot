@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.network.serializer.TransactionPartnerSerializer
  * Currently, it can be one of
  *
  * - [TransactionPartnerUser]
+ * - [TransactionPartnerAffiliateProgram]
  * - [TransactionPartnerFragment]
  * - [TransactionPartnerTelegramAds]
  * - [TransactionPartnerTelegramApi]

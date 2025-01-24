@@ -20,7 +20,7 @@ data class InlineQueryResultMpeg4Gif(
     /** Unique identifier for this result, 1-64 Bytes */
     @SerialName("id") val id: String,
 
-    /** A valid URL for the MPEG4 file. File size must not exceed 1MB */
+    /** A valid URL for the MPEG4 file */
     @SerialName("mpeg4_url") val mpeg4Url: String,
 
     /** Video width */

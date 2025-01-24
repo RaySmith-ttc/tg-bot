@@ -6,7 +6,7 @@ import ru.raysmith.tgbot.model.network.chat.background.fill.BackgroundFill
 import ru.raysmith.tgbot.model.network.media.Document
 
 /**
- * The background is a PNG or TGV (gzipped subset of SVG with MIME type “application/x-tgwallpattern”) pattern to be
+ * The background is a .PNG or .TGV (gzipped subset of SVG with MIME type “application/x-tgwallpattern”) pattern to be
  * combined with the background fill chosen by the user.
  * */
 @Serializable
