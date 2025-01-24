@@ -34,6 +34,7 @@ import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
 import ru.raysmith.tgbot.model.network.gift.Gifts
+import ru.raysmith.tgbot.model.network.inline.PreparedInlineMessage
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
