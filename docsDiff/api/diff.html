@@ -157,396 +157,153 @@ To learn how to create…">
        <blockquote>
         <p>Subscribe to <a href="https://t.me/botnews">@BotNews</a> to be the first to know about the latest updates and join the discussion in <a href="https://t.me/bottalk">@BotTalk</a></p>
        </blockquote>
-       <h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>
-        <ins class="diffins">November 17, 2024</ins></h4>
+       <h4><a class="anchor" name="january-1-2025" href="#january-1-2025"><i class="anchor-icon"></i></a>
+        <ins class="diffins">January 1, 2025</ins></h4>
        <p><strong>
-         <ins class="diffins">Bot API 8.0</ins></strong></p>
-       <blockquote>
-        <p>
-         <ins class="diffins">Bot API 8.0 introduces</ins><strong>
-          <ins class="diffins">10 powerful new features</ins></strong>
-         <ins class="diffins">for Mini Apps - including the ability to enter</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">
-          <ins class="diffins">full-screen mode</ins></a>
-         <ins class="diffins">, launch from</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">
-          <ins class="diffins">home screen shortcuts</ins></a>
-         <ins class="diffins">, offer</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#subscription-plans">
-          <ins class="diffins">subscription plans</ins></a>
-         <ins class="diffins">and more. Check out all the details in our dedicated</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more">
-          <ins class="diffins">blog</ins></a>
-         <ins class="diffins">and Mini App</ins><a href="https://core.telegram.org/bots/webapps">
-          <ins class="diffins">documentation</ins></a>
-         <ins class="diffins">.</ins></p>
-       </blockquote>
-       <p><strong>
-         <ins class="diffins">Star Subscriptions</ins></strong></p>
+         <ins class="diffins">Bot API 8.2</ins></strong></p>
        <ul>
         <li>
-         <ins class="diffins">Bots now support</ins><strong>
-          <ins class="diffins">paid subscriptions</ins></strong>
-         <ins class="diffins">powered by</ins><a href="https://telegram.org/blog/telegram-stars">
-          <ins class="diffins">Telegram Stars</ins></a>
-         <ins class="diffins">-</ins><strong>
-          <ins class="diffins">monetizing their efforts</ins></strong>
-         <ins class="diffins">with multiple tiers of content and features.</ins></li>
-        <li>
-         <ins class="diffins">Added the parameter</ins><em>
-          <ins class="diffins">subscription_period</ins></em>
-         <ins class="diffins">to the method</ins><a href="#createinvoicelink">
-          <ins class="diffins">createInvoiceLink</ins></a>
-         <ins class="diffins">to support the creation of links that are billed periodically.</ins></li>
-        <li>
-         <ins class="diffins">Added the parameter</ins><em>
-          <ins class="diffins">business_connection_id</ins></em>
-         <ins class="diffins">to the method</ins><a href="#createinvoicelink">
-          <ins class="diffins">createInvoiceLink</ins></a>
-         <ins class="diffins">to support the creation of invoice links on behalf of business accounts.</ins></li>
-        <li>
-         <ins class="diffins">Added the fields</ins><em>
-          <ins class="diffins">subscription_expiration_date</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">is_recurring</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">is_first_recurring</ins></em>
-         <ins class="diffins">to the class</ins><a href="#successfulpayment">
-          <ins class="diffins">SuccessfulPayment</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><a href="#edituserstarsubscription">
-          <ins class="diffins">editUserStarSubscription</ins></a>
+         <ins class="diffins">Added the methods</ins><a href="#verifyuser">
+          <ins class="diffins">verifyUser</ins></a>
+         <ins class="diffins">,</ins><a href="#verifychat">
+          <ins class="diffins">verifyChat</ins></a>
+         <ins class="diffins">,</ins><a href="#removeuserverification">
+          <ins class="diffins">removeUserVerification</ins></a>
+         <ins class="diffins">and</ins><a href="#removechatverification">
+          <ins class="diffins">removeChatVerification</ins></a>
+         <ins class="diffins">, allowing bots to manage</ins><a href="https://telegram.org/verify#third-party-verification">
+          <ins class="diffins">verifications on behalf of an organization</ins></a>
          <ins class="diffins">.</ins></li>
         <li>
          <ins class="diffins">Added the field</ins><em>
-          <ins class="diffins">subscription_period</ins></em>
-         <ins class="diffins">to the class</ins><a href="#transactionpartneruser">
-          <ins class="diffins">TransactionPartnerUser</ins></a>
-         <ins class="diffins">.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Full-screen Mode</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Mini Apps are now able to</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">
-          <ins class="diffins">become full-screen</ins></a>
-         <ins class="diffins">in both portrait and</ins><strong>
-          <ins class="diffins">landscape mode</ins></strong>
-         <ins class="diffins">- allowing them to host</ins><strong>
-          <ins class="diffins">more games</ins></strong>
-         <ins class="diffins">, play</ins><strong>
-          <ins class="diffins">widescreen media</ins></strong>
-         <ins class="diffins">and support</ins><strong>
-          <ins class="diffins">immersive</ins></strong>
-         <ins class="diffins">user experiences.</ins></li>
-        <li>
-         <ins class="diffins">Added the methods</ins><em>
-          <ins class="diffins">requestFullscreen</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">exitFullscreen</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to toggle full-screen mode.</ins></li>
-        <li>
-         <ins class="diffins">Added the fields</ins><em>
-          <ins class="diffins">safeAreaInset</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">contentSafeAreaInset</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">, allowing Mini Apps to ensure that their content properly respects the device's safe area margins.</ins></li>
-        <li>
-         <ins class="diffins">Further added the fields</ins><em>
-          <ins class="diffins">isActive</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">isFullscreen</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">activated</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">deactivated</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">safeAreaChanged</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">contentSafeAreaChanged</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">fullscreenChanged</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">fullscreenFailed</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Homescreen Shortcuts</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Mini Apps can now be accessed via</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">
-          <ins class="diffins">direct shortcuts</ins></a>
-         <ins class="diffins">added to the</ins><strong>
-          <ins class="diffins">home screen</ins></strong>
-         <ins class="diffins">of mobile devices.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">addToHomeScreen</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to create a shortcut for users to add to their home screens.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">checkHomeScreenStatus</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to determine the status and support of the home screen shortcut for the Mini App on the current device.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">homeScreenAdded</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">homeScreenChecked</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Emoji Status</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Mini Apps can now prompt users to set their</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#emoji-status">
-          <ins class="diffins">emoji status</ins></a>
-         <ins class="diffins">- or request access to later sync it automatically with in-game badges, third-party APIs and more.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><a href="#setuseremojistatus">
-          <ins class="diffins">setUserEmojiStatus</ins></a>
-         <ins class="diffins">. The user must allow the bot to manage their emoji status.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">setEmojiStatus</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to let users manually confirm a custom emoji as their new status via a native dialog.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">requestEmojiStatusAccess</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">for obtaining permission to later update a user's emoji status via the Bot API method</ins><a href="#setuseremojistatus">
-          <ins class="diffins">setUserEmojiStatus</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">emojiStatusSet</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">emojiStatusFailed</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">emojiStatusAccessRequested</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Media Sharing and File Downloads</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Users can now</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#media-sharing">
-          <ins class="diffins">share media</ins></a>
-         <ins class="diffins">directly from Mini Apps - sending</ins><strong>
-          <ins class="diffins">referral codes</ins></strong>
-         <ins class="diffins">, custom memes, artwork and more to</ins><strong>
-          <ins class="diffins">any chat</ins></strong>
-         <ins class="diffins">or posting them</ins><a href="https://telegram.org/blog/w3-browser-mini-app-store#sharing-from-mini-apps-to-stories">
-          <ins class="diffins">as a story</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the class</ins><a href="#preparedinlinemessage">
-          <ins class="diffins">PreparedInlineMessage</ins></a>
-         <ins class="diffins">and the method</ins><a href="#savepreparedinlinemessage">
-          <ins class="diffins">savePreparedInlineMessage</ins></a>
-         <ins class="diffins">, allowing bots to suggest users to send a specific message from a Mini App via the method</ins><a href="https://core.telegram.org/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">shareMessage</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">shareMessage</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to share media from Mini Apps to Telegram chats.</ins></li>
-        <li>
-         <ins class="diffins">Added the method</ins><em>
-          <ins class="diffins">downloadFile</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">, introducing support for a</ins><strong>
-          <ins class="diffins">native popup</ins></strong>
-         <ins class="diffins">that prompts users to download files from the Mini App.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">shareMessageSent</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">shareMessageFailed</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">fileDownloadRequested</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Geolocation Access</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Mini Apps can now request</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#geolocation-access">
-          <ins class="diffins">geolocation access</ins></a>
-         <ins class="diffins">to users, allowing them to build virtually any location-based service, from</ins><strong>
-          <ins class="diffins">games</ins></strong>
-         <ins class="diffins">with dynamic points of interest to</ins><strong>
-          <ins class="diffins">interactive maps</ins></strong>
-         <ins class="diffins">for events.</ins></li>
-        <li>
-         <ins class="diffins">Added the field</ins><em>
-          <ins class="diffins">LocationManager</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">locationManagerUpdated</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">locationRequested</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Device Motion Tracking</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Mini Apps can now track detailed</ins><a href="https://telegram.org/blog/fullscreen-miniapps-and-more#device-motion-tracking">
-          <ins class="diffins">device motion data</ins></a>
-         <ins class="diffins">, allowing them to implement better productivity tools, immersive</ins><strong>
-          <ins class="diffins">VR experiences</ins></strong>
-         <ins class="diffins">and more.</ins></li>
-        <li>
-         <ins class="diffins">Added the fields</ins><em>
-          <ins class="diffins">isOrientationLocked</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">Accelerometer</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">DeviceOrientation</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">Gyroscope</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Added the methods</ins><em>
-          <ins class="diffins">lockOrientation</ins></em>
-         <ins class="diffins">and</ins><em>
-          <ins class="diffins">unlockOrientation</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#initializing-mini-apps">
-          <ins class="diffins">WebApp</ins></a>
-         <ins class="diffins">to control the screen orientation.</ins></li>
-        <li>
-         <ins class="diffins">Added the</ins><a href="/bots/webapps#events-available-for-mini-apps">
-          <ins class="diffins">events</ins></a><em>
-          <ins class="diffins">accelerometerStarted</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">accelerometerStopped</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">accelerometerChanged</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">accelerometerFailed</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">deviceOrientationStarted</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">deviceOrientationStopped</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">deviceOrientationChanged</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">deviceOrientationFailed</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">gyroscopeStarted</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">gyroscopeStopped</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">gyroscopeChanged</ins></em>
-         <ins class="diffins">,</ins><em>
-          <ins class="diffins">gyroscopeFailed</ins></em>
-         <ins class="diffins">for Mini Apps.</ins></li>
-       </ul>
-       <p><strong>
-         <ins class="diffins">Gifts</ins></strong></p>
-       <ul>
-        <li>
-         <ins class="diffins">Bots can now send</ins><a href="https://telegram.org/blog/gifts-verification-platform#gifts">
-          <ins class="diffins">Paid Gifts</ins></a>
-         <ins class="diffins">to users in exchange for Telegram Stars.</ins></li>
-        <li>
-         <ins class="diffins">Added the classes</ins><a href="#gift">
+          <ins class="diffins">upgrade_star_count</ins></em>
+         <ins class="diffins">to the class</ins><a href="#gift">
           <ins class="diffins">Gift</ins></a>
-         <ins class="diffins">and</ins><a href="#gifts">
-          <ins class="diffins">Gifts</ins></a>
-         <ins class="diffins">and the method</ins><a href="#getavailablegifts">
-          <ins class="diffins">getAvailableGifts</ins></a>
-         <ins class="diffins">, allowing bots to get all gifts available for sending.</ins></li>
+         <ins class="diffins">.</ins></li>
         <li>
-         <ins class="diffins">Added the method</ins><a href="#sendgift">
+         <ins class="diffins">Added the parameter</ins><em>
+          <ins class="diffins">pay_for_upgrade</ins></em>
+         <ins class="diffins">to the method</ins><a href="#sendgift">
           <ins class="diffins">sendGift</ins></a>
-         <ins class="diffins">, allowing bots to send gifts to users.</ins></li>
+         <ins class="diffins">.</ins></li>
+        <li>
+         <ins class="diffins">Removed the field</ins><em>
+          <ins class="diffins">hide_url</ins></em>
+         <ins class="diffins">from the class</ins><a href="#inlinequeryresultarticle">
+          <ins class="diffins">InlineQueryResultArticle</ins></a>
+         <ins class="diffins">. Pass an empty string as</ins><em>
+          <ins class="diffins">url</ins></em>
+         <ins class="diffins">instead.</ins></li>
+       </ul>
+       <h4><a class="anchor" name="december-4-2024" href="#december-4-2024"><i class="anchor-icon"></i></a>
+        <ins class="diffins">December 4, 2024</ins></h4>
+       <p><strong>
+         <ins class="diffins">Bot API 8.1</ins></strong></p>
+       <ul>
         <li>
          <ins class="diffins">Added the field</ins><em>
-          <ins class="diffins">gift</ins></em>
+          <ins class="diffins">nanostar_amount</ins></em>
+         <ins class="diffins">to the class</ins><a href="#startransaction">
+          <ins class="diffins">StarTransaction</ins></a>
+         <ins class="diffins">.</ins></li>
+        <li>
+         <ins class="diffins">Added the class</ins><a href="#transactionpartneraffiliateprogram">
+          <ins class="diffins">TransactionPartnerAffiliateProgram</ins></a>
+         <ins class="diffins">for transactions pertaining to incoming affiliate commissions.</ins></li>
+        <li>
+         <ins class="diffins">Added the class</ins><a href="#affiliateinfo">
+          <ins class="diffins">AffiliateInfo</ins></a>
+         <ins class="diffins">and the field</ins><em>
+          <ins class="diffins">affiliate</ins></em>
          <ins class="diffins">to the class</ins><a href="#transactionpartneruser">
           <ins class="diffins">TransactionPartnerUser</ins></a>
-         <ins class="diffins">.</ins></li>
+         <ins class="diffins">, allowing bots to identify the relevant affiliate in transactions with an affiliate commission.</ins></li>
        </ul>
-       <p><strong>
-         <ins class="diffins">Loading Screen Customization</ins></strong></p>
+       <h4><a class="anchor" name="november-17-2024" href="#november-17-2024"><i class="anchor-icon"></i></a>November 17, 2024</h4>
+       <p><strong>Bot API 8.0</strong></p>
+       <blockquote>
+        <p>Bot API 8.0 introduces <strong>10 powerful new features</strong> for Mini Apps - including the ability to enter <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">full-screen mode</a>, launch from <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">home screen shortcuts</a>, offer <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#subscription-plans">subscription plans</a> and more. Check out all the details in our dedicated <a href="https://telegram.org/blog/fullscreen-miniapps-and-more">blog</a> and Mini App <a href="https://core.telegram.org/bots/webapps">documentation</a>.</p>
+       </blockquote>
+       <p><strong>Star Subscriptions</strong></p>
        <ul>
-        <li>
-         <ins class="diffins">Mini Apps can customize their loading screen, adding</ins><strong>
-          <ins class="diffins">their own icon</ins></strong>
-         <ins class="diffins">and</ins><strong>
-          <ins class="diffins">specific colors</ins></strong>
-         <ins class="diffins">for light and dark themes.</ins></li>
-        <li>
-         <ins class="diffins">You can access these customization settings in</ins><a href="https://t.me/botfather">
-          <ins class="diffins">@BotFather</ins></a>
-         <ins class="diffins">via</ins><em>
-          <ins class="diffins">/mybots &gt; Select Bot &gt; Bot Settings &gt; Configure Mini App &gt; Enable Mini App</ins></em></li>
+        <li>Bots now support <strong>paid subscriptions</strong> powered by <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> - <strong>monetizing their efforts</strong> with multiple tiers of content and features.</li>
+        <li>Added the parameter <em>subscription_period</em> to the method <a href="#createinvoicelink">createInvoiceLink</a> to support the creation of links that are billed periodically.</li>
+        <li>Added the parameter <em>business_connection_id</em> to the method <a href="#createinvoicelink">createInvoiceLink</a> to support the creation of invoice links on behalf of business accounts.</li>
+        <li>Added the fields <em>subscription_expiration_date</em>, <em>is_recurring</em> and <em>is_first_recurring</em> to the class <a href="#successfulpayment">SuccessfulPayment</a>.</li>
+        <li>Added the method <a href="#edituserstarsubscription">editUserStarSubscription</a>.</li>
+        <li>Added the field <em>subscription_period</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>.</li>
        </ul>
-       <p><strong>
-         <ins class="diffins">Hardware-specific Optimizations</ins></strong></p>
+       <p><strong>Full-screen Mode</strong></p>
        <ul>
-        <li>
-         <ins class="diffins">Mini Apps running on Android can now receive</ins><a href="/bots/webapps#additional-data-in-user-agent">
-          <ins class="diffins">basic information</ins></a>
-         <ins class="diffins">about a device's processing hardware, allowing them to</ins><strong>
-          <ins class="diffins">optimize user experience</ins></strong>
-         <ins class="diffins">based on the device's capabilities.</ins></li>
-        <li>
-         <ins class="diffins">This information includes the OS, App and SDK's respective versions as well as the device's model and performance class.</ins></li>
+        <li>Mini Apps are now able to <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#full-screen-mode">become full-screen</a> in both portrait and <strong>landscape mode</strong> - allowing them to host <strong>more games</strong>, play <strong>widescreen media</strong> and support <strong>immersive</strong> user experiences.</li>
+        <li>Added the methods <em>requestFullscreen</em> and <em>exitFullscreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to toggle full-screen mode.</li>
+        <li>Added the fields <em>safeAreaInset</em> and <em>contentSafeAreaInset</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>, allowing Mini Apps to ensure that their content properly respects the device's safe area margins.</li>
+        <li>Further added the fields <em>isActive</em> and <em>isFullscreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>activated</em>, <em>deactivated</em>, <em>safeAreaChanged</em>, <em>contentSafeAreaChanged</em>, <em>fullscreenChanged</em> and <em>fullscreenFailed</em> for Mini Apps.</li>
        </ul>
-       <p><strong>
-         <ins class="diffins">General</ins></strong></p>
+       <p><strong>Homescreen Shortcuts</strong></p>
        <ul>
-        <li>
-         <ins class="diffins">Added the field</ins><em>
-          <ins class="diffins">photo_url</ins></em>
-         <ins class="diffins">to the class</ins><a href="/bots/webapps#webappuser">
-          <ins class="diffins">WebAppUser</ins></a>
-         <ins class="diffins">for all bots, allowing Mini Apps to access a user's profile photo if their privacy settings allow for it.</ins></li>
-        <li>
-         <ins class="diffins">Third parties (e.g., Mini App builders) that receive or process data on behalf of Mini Apps are now able to</ins><a href="/bots/webapps#validating-data-for-third-party-use">
-          <ins class="diffins">validate it</ins></a>
-         <ins class="diffins">without knowing the App's</ins><a href="/bots/tutorial#obtain-your-bot-token">
-          <ins class="diffins">bot token</ins></a>
-         <ins class="diffins">.</ins></li>
-        <li>
-         <ins class="diffins">Debugging</ins><a href="/bots/webapps#debug-mode-for-mini-apps">
-          <ins class="diffins">options</ins></a>
-         <ins class="diffins">have been expanded to include full support for</ins><strong>
-          <ins class="diffins">iOS devices</ins></strong>
-         <ins class="diffins">. You can use these tools to find app-specific issues in your Mini App.</ins></li>
+        <li>Mini Apps can now be accessed via <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#home-screen-shortcuts">direct shortcuts</a> added to the <strong>home screen</strong> of mobile devices.</li>
+        <li>Added the method <em>addToHomeScreen</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to create a shortcut for users to add to their home screens.</li>
+        <li>Added the method <em>checkHomeScreenStatus</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to determine the status and support of the home screen shortcut for the Mini App on the current device.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>homeScreenAdded</em> and <em>homeScreenChecked</em> for Mini Apps.</li>
+       </ul>
+       <p><strong>Emoji Status</strong></p>
+       <ul>
+        <li>Mini Apps can now prompt users to set their <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#emoji-status">emoji status</a> - or request access to later sync it automatically with in-game badges, third-party APIs and more.</li>
+        <li>Added the method <a href="#setuseremojistatus">setUserEmojiStatus</a>. The user must allow the bot to manage their emoji status.</li>
+        <li>Added the method <em>setEmojiStatus</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to let users manually confirm a custom emoji as their new status via a native dialog.</li>
+        <li>Added the method <em>requestEmojiStatusAccess</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> for obtaining permission to later update a user's emoji status via the Bot API method <a href="#setuseremojistatus">setUserEmojiStatus</a>.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>emojiStatusSet</em>, <em>emojiStatusFailed</em> and <em>emojiStatusAccessRequested</em> for Mini Apps.</li>
+       </ul>
+       <p><strong>Media Sharing and File Downloads</strong></p>
+       <ul>
+        <li>Users can now <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#media-sharing">share media</a> directly from Mini Apps - sending <strong>referral codes</strong>, custom memes, artwork and more to <strong>any chat</strong> or posting them <a href="https://telegram.org/blog/w3-browser-mini-app-store#sharing-from-mini-apps-to-stories">as a story</a>.</li>
+        <li>Added the class <a href="#preparedinlinemessage">PreparedInlineMessage</a> and the method <a href="#savepreparedinlinemessage">savePreparedInlineMessage</a>, allowing bots to suggest users to send a specific message from a Mini App via the method <a href="https://core.telegram.org/bots/webapps#initializing-mini-apps">shareMessage</a>.</li>
+        <li>Added the method <em>shareMessage</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to share media from Mini Apps to Telegram chats.</li>
+        <li>Added the method <em>downloadFile</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>, introducing support for a <strong>native popup</strong> that prompts users to download files from the Mini App.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>shareMessageSent</em>, <em>shareMessageFailed</em> and <em>fileDownloadRequested</em> for Mini Apps.</li>
+       </ul>
+       <p><strong>Geolocation Access</strong></p>
+       <ul>
+        <li>Mini Apps can now request <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#geolocation-access">geolocation access</a> to users, allowing them to build virtually any location-based service, from <strong>games</strong> with dynamic points of interest to <strong>interactive maps</strong> for events.</li>
+        <li>Added the field <em>LocationManager</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>locationManagerUpdated</em> and <em>locationRequested</em> for Mini Apps.</li>
+       </ul>
+       <p><strong>Device Motion Tracking</strong></p>
+       <ul>
+        <li>Mini Apps can now track detailed <a href="https://telegram.org/blog/fullscreen-miniapps-and-more#device-motion-tracking">device motion data</a>, allowing them to implement better productivity tools, immersive <strong>VR experiences</strong> and more.</li>
+        <li>Added the fields <em>isOrientationLocked</em>, <em>Accelerometer</em>, <em>DeviceOrientation</em> and <em>Gyroscope</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
+        <li>Added the methods <em>lockOrientation</em> and <em>unlockOrientation</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a> to control the screen orientation.</li>
+        <li>Added the <a href="/bots/webapps#events-available-for-mini-apps">events</a> <em>accelerometerStarted</em>, <em>accelerometerStopped</em>, <em>accelerometerChanged</em>, <em>accelerometerFailed</em>, <em>deviceOrientationStarted</em>, <em>deviceOrientationStopped</em>, <em>deviceOrientationChanged</em>, <em>deviceOrientationFailed</em>, <em>gyroscopeStarted</em>, <em>gyroscopeStopped</em>, <em>gyroscopeChanged</em>, <em>gyroscopeFailed</em> for Mini Apps.</li>
+       </ul>
+       <p><strong>Gifts</strong></p>
+       <ul>
+        <li>Bots can now send <a href="https://telegram.org/blog/gifts-verification-platform#gifts">Paid Gifts</a> to users in exchange for Telegram Stars.</li>
+        <li>Added the classes <a href="#gift">Gift</a> and <a href="#gifts">Gifts</a> and the method <a href="#getavailablegifts">getAvailableGifts</a>, allowing bots to get all gifts available for sending.</li>
+        <li>Added the method <a href="#sendgift">sendGift</a>, allowing bots to send gifts to users.</li>
+        <li>Added the field <em>gift</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a>.</li>
+       </ul>
+       <p><strong>Loading Screen Customization</strong></p>
+       <ul>
+        <li>Mini Apps can customize their loading screen, adding <strong>their own icon</strong> and <strong>specific colors</strong> for light and dark themes.</li>
+        <li>You can access these customization settings in <a href="https://t.me/botfather">@BotFather</a> via <em>/mybots &gt; Select Bot &gt; Bot Settings &gt; Configure Mini App &gt; Enable Mini App</em></li>
+       </ul>
+       <p><strong>Hardware-specific Optimizations</strong></p>
+       <ul>
+        <li>Mini Apps running on Android can now receive <a href="/bots/webapps#additional-data-in-user-agent">basic information</a> about a device's processing hardware, allowing them to <strong>optimize user experience</strong> based on the device's capabilities.</li>
+        <li>This information includes the OS, App and SDK's respective versions as well as the device's model and performance class.</li>
+       </ul>
+       <p><strong> General </strong></p>
+       <ul>
+        <li>Added the field <em>photo_url</em> to the class <a href="/bots/webapps#webappuser">WebAppUser</a> for all bots, allowing Mini Apps to access a user's profile photo if their privacy settings allow for it.</li>
+        <li>Third parties (e.g., Mini App builders) that receive or process data on behalf of Mini Apps are now able to <a href="/bots/webapps#validating-data-for-third-party-use">validate it</a> without knowing the App's <a href="/bots/tutorial#obtain-your-bot-token">bot token</a>.</li>
+        <li>Debugging <a href="/bots/webapps#debug-mode-for-mini-apps">options</a> have been expanded to include full support for <strong>iOS devices</strong>. You can use these tools to find app-specific issues in your Mini App.</li>
        </ul>
        <hr>
        <blockquote>
-        <p><strong>
-          <ins class="diffins"><img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"> WARNING! <img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"></ins></strong><br>
-         <ins class="diffins">Starting December 1, 2024 messages with video that are sent, copied or forwarded to groups and channels with a sufficiently large audience can be automatically scheduled by the server until the respective video is reencoded. Such messages will have 0 as their message identifier and can't be used before they are actually sent.</ins></p>
+        <p><strong><img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"> WARNING! <img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"></strong><br>
+          Starting December 1, 2024 messages with video that are sent, copied or forwarded to groups and channels with a sufficiently large audience can be automatically scheduled by the server until the respective video is reencoded. Such messages will have 0 as their message identifier and can't be used before they are actually sent.</p>
        </blockquote>
        <h4><a class="anchor" name="october-31-2024" href="#october-31-2024"><i class="anchor-icon"></i></a>October 31, 2024</h4>
        <p><strong>Bot API 7.11</strong></p>
@@ -562,94 +319,121 @@ To learn how to create…">
         <p><strong><img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"> WARNING! <img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"></strong><br>
           Starting December 1, 2024 messages with video that are sent, copied or forwarded to groups and channels with a sufficiently large audience can be automatically scheduled by the server until the respective video is reencoded. Such messages will have 0 as their message identifier and can't be used before they are actually sent.</p>
        </blockquote>
-       <h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>September 6, 2024</h4>
-       <p><strong>Bot API 7.10</strong></p>
-       <ul>
-        <li>Added updates about purchased paid media, represented by the class <a href="#paidmediapurchased">PaidMediaPurchased</a> and the field <em>purchased_paid_media</em> in the class <a href="#update">Update</a>.</li>
-        <li>Added the ability to specify a payload in <a href="#sendpaidmedia">sendPaidMedia</a> that is received back by the bot in <a href="#transactionpartneruser">TransactionPartnerUser</a> and <em>purchased_paid_media</em> updates.</li>
-        <li>Added the field <em>prize_star_count</em> to the classes <a href="#giveawaycreated">GiveawayCreated</a>, <a href="#giveaway">Giveaway</a>, <a href="#giveawaywinners">GiveawayWinners</a> and <a href="#chatboostsourcegiveaway">ChatBoostSourceGiveaway</a>.</li>
-        <li>Added the field <em>is_star_giveaway</em> to the class <a href="#giveawaycompleted">GiveawayCompleted</a>.</li>
-        <li>Added the field <em>SecondaryButton</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
-        <li>Added the event <em>secondaryButtonClicked</em> for Mini Apps.</li>
-        <li>Added the field <em>bottomBarColor</em> and the method <em>setBottomBarColor</em> to the class <a href="/bots/webapps#initializing-mini-apps">WebApp</a>.</li>
-        <li>Added the field <em>bottom_bar_bg_color</em> to the class <a href="/bots/webapps#themeparams">ThemeParams</a>.</li>
-       </ul>
-       <h4><a class="anchor" name="august-14-2024" href="#august-14-2024"><i class="anchor-icon"></i></a>August 14, 2024</h4>
-       <p><strong>Bot API 7.9</strong></p>
-       <ul>
-        <li>Added support for <a href="https://telegram.org/blog/superchannels-star-reactions-subscriptions#super-channels">Super Channels</a>, allowing received channel messages to have users or other channels as their senders.</li>
-        <li>Added the ability to send paid media to any chat.</li>
-        <li>Added the parameter <em>business_connection_id</em> to the method <a href="#sendpaidmedia">sendPaidMedia</a>, allowing bots to send paid media on behalf of a business account.</li>
-        <li>Added the field <em>paid_media</em> to the class <a href="#transactionpartneruser">TransactionPartnerUser</a> for transactions involving paid media.</li>
-        <li>Added the fields <em>subscription_period</em> and <em>subscription_price</em> to the class <a href="#chatinvitelink">ChatInviteLink</a>.</li>
-        <li>Added the method <a href="#createchatsubscriptioninvitelink">createChatSubscriptionInviteLink</a>, allowing bots to create subscription invite links.</li>
-        <li>Added the method <a href="#editchatsubscriptioninvitelink">editChatSubscriptionInviteLink</a>, allowing bots to edit the <em>name</em> of subscription invite links.</li>
-        <li>Added the field <em>until_date</em> to the class <a href="#chatmembermember">ChatMemberMember</a> for members with an active subscription.</li>
-        <li>Added support for paid reactions and the class <a href="#reactiontypepaid">ReactionTypePaid</a>
-         <del class="diffdel">.</del></li>
-       </ul>
-       <h4><a class="anchor" name="july-31-2024" href="#july-31-2024"><i class="anchor-icon"></i></a>
-        <del class="diffdel">July 31, 2024</del></h4>
+       <h4><a class="anchor" name="september-6-2024" href="#september-6-2024"><i class="anchor-icon"></i></a>
+        <del class="diffdel">September 6, 2024</del></h4>
        <p><strong>
-         <del class="diffdel">Bot API 7.8</del></strong></p>
+         <del class="diffdel">Bot API 7.10</del></strong></p>
        <ul>
         <li>
-         <del class="diffdel">Added the option for bots to set a</del><a href="/bots/webapps#launching-the-main-mini-app">
-          <del class="diffdel">Main Mini App</del></a>
-         <del class="diffdel">, which can be previewed and launched directly from a button in the bot's profile or a link.</del></li>
+         <del class="diffdel">Added updates about purchased paid media, represented by the class</del><a href="#paidmediapurchased">
+          <del class="diffdel">PaidMediaPurchased</del></a>
+         <del class="diffdel">and the field</del><em>
+          <del class="diffdel">purchased_paid_media</del></em>
+         <del class="diffdel">in the class</del><a href="#update">
+          <del class="diffdel">Update</del></a>
+         <del class="diffdel">.</del></li>
         <li>
-         <del class="diffdel">Added the method</del><em>
-          <del class="diffdel">shareToStory</del></em>
+         <del class="diffdel">Added the ability to specify a payload in</del><a href="#sendpaidmedia">
+          <del class="diffdel">sendPaidMedia</del></a>
+         <del class="diffdel">that is received back by the bot in</del><a href="#transactionpartneruser">
+          <del class="diffdel">TransactionPartnerUser</del></a>
+         <del class="diffdel">and</del><em>
+          <del class="diffdel">purchased_paid_media</del></em>
+         <del class="diffdel">updates.</del></li>
+        <li>
+         <del class="diffdel">Added the field</del><em>
+          <del class="diffdel">prize_star_count</del></em>
+         <del class="diffdel">to the classes</del><a href="#giveawaycreated">
+          <del class="diffdel">GiveawayCreated</del></a>
+         <del class="diffdel">,</del><a href="#giveaway">
+          <del class="diffdel">Giveaway</del></a>
+         <del class="diffdel">,</del><a href="#giveawaywinners">
+          <del class="diffdel">GiveawayWinners</del></a>
+         <del class="diffdel">and</del><a href="#chatboostsourcegiveaway">
+          <del class="diffdel">ChatBoostSourceGiveaway</del></a>
+         <del class="diffdel">.</del></li>
+        <li>
+         <del class="diffdel">Added the field</del><em>
+          <del class="diffdel">is_star_giveaway</del></em>
+         <del class="diffdel">to the class</del><a href="#giveawaycompleted">
+          <del class="diffdel">GiveawayCompleted</del></a>
+         <del class="diffdel">.</del></li>
+        <li>
+         <del class="diffdel">Added the field</del><em>
+          <del class="diffdel">SecondaryButton</del></em>
+         <del class="diffdel">to the class</del><a href="/bots/webapps#initializing-mini-apps">
+          <del class="diffdel">WebApp</del></a>
+         <del class="diffdel">.</del></li>
+        <li>
+         <del class="diffdel">Added the event</del><em>
+          <del class="diffdel">secondaryButtonClicked</del></em>
+         <del class="diffdel">for Mini Apps.</del></li>
+        <li>
+         <del class="diffdel">Added the field</del><em>
+          <del class="diffdel">bottomBarColor</del></em>
+         <del class="diffdel">and the method</del><em>
+          <del class="diffdel">setBottomBarColor</del></em>
          <del class="diffdel">to the class</del><a href="/bots/webapps#initializing-mini-apps">
           <del class="diffdel">WebApp</del></a>
          <del class="diffdel">.</del></li>
         <li>
          <del class="diffdel">Added the field</del><em>
-          <del class="diffdel">has_main_web_app</del></em>
-         <del class="diffdel">to the class</del><a href="#user">
-          <del class="diffdel">User</del></a>
-         <del class="diffdel">, which is returned in the response to</del><a href="#getme">
-          <del class="diffdel">getMe</del></a>
+          <del class="diffdel">bottom_bar_bg_color</del></em>
+         <del class="diffdel">to the class</del><a href="/bots/webapps#themeparams">
+          <del class="diffdel">ThemeParams</del></a>
          <del class="diffdel">.</del></li>
+       </ul>
+       <h4><a class="anchor" name="august-14-2024" href="#august-14-2024"><i class="anchor-icon"></i></a>
+        <del class="diffdel">August 14, 2024</del></h4>
+       <p><strong>
+         <del class="diffdel">Bot API 7.9</del></strong></p>
+       <ul>
+        <li>
+         <del class="diffdel">Added support for</del><a href="https://telegram.org/blog/superchannels-star-reactions-subscriptions#super-channels">
+          <del class="diffdel">Super Channels</del></a>
+         <del class="diffdel">, allowing received channel messages to have users or other channels as their senders.</del></li>
+        <li>
+         <del class="diffdel">Added the ability to send paid media to any chat.</del></li>
         <li>
          <del class="diffdel">Added the parameter</del><em>
           <del class="diffdel">business_connection_id</del></em>
-         <del class="diffdel">to the methods</del><a href="#pinchatmessage">
-          <del class="diffdel">pinChatMessage</del></a>
-         <del class="diffdel">and</del><a href="#unpinchatmessage">
-          <del class="diffdel">unpinChatMessage</del></a>
-         <del class="diffdel">, allowing bots to manage pinned messages on behalf of a business account.</del></li>
-       </ul>
-       <h4><a class="anchor" name="july-7-2024" href="#july-7-2024"><i class="anchor-icon"></i></a>
-        <del class="diffdel">July 7, 2024</del></h4>
-       <p><strong>
-         <del class="diffdel">Bot API 7.7</del></strong></p>
-       <ul>
-        <li>
-         <del class="diffdel">Added the class</del><a href="#refundedpayment">
-          <del class="diffdel">RefundedPayment</del></a>
-         <del class="diffdel">, containing information about a refunded payment.</del></li>
+         <del class="diffdel">to the method</del><a href="#sendpaidmedia">
+          <del class="diffdel">sendPaidMedia</del></a>
+         <del class="diffdel">, allowing bots to send paid media on behalf of a business account.</del></li>
         <li>
          <del class="diffdel">Added the field</del><em>
-          <del class="diffdel">refunded_payment</del></em>
-         <del class="diffdel">to the class</del><a href="#message">
-          <del class="diffdel">Message</del></a>
-         <del class="diffdel">, describing a service message about a refunded payment.</del></li>
+          <del class="diffdel">paid_media</del></em>
+         <del class="diffdel">to the class</del><a href="#transactionpartneruser">
+          <del class="diffdel">TransactionPartnerUser</del></a>
+         <del class="diffdel">for transactions involving paid media.</del></li>
         <li>
-         <del class="diffdel">Added the field</del><em>
-          <del class="diffdel">isVerticalSwipesEnabled</del></em>
-         <del class="diffdel">and the methods</del><em>
-          <del class="diffdel">enableVerticalSwipes</del></em>
-         <del class="diffdel">,</del><em>
-          <del class="diffdel">disableVerticalSwipes</del></em>
-         <del class="diffdel">to the class</del><a href="/bots/webapps#initializing-mini-apps">
-          <del class="diffdel">WebApp</del></a>
+         <del class="diffdel">Added the fields</del><em>
+          <del class="diffdel">subscription_period</del></em>
+         <del class="diffdel">and</del><em>
+          <del class="diffdel">subscription_price</del></em>
+         <del class="diffdel">to the class</del><a href="#chatinvitelink">
+          <del class="diffdel">ChatInviteLink</del></a>
          <del class="diffdel">.</del></li>
         <li>
-         <del class="diffdel">Added the</del><a href="/bots/webapps#events-available-for-mini-apps">
-          <del class="diffdel">event</del></a><em>
-          <del class="diffdel">scanQrPopupClosed</del></em>
-         <del class="diffdel">for Mini Apps</del>.</li>
+         <del class="diffdel">Added the method</del><a href="#createchatsubscriptioninvitelink">
+          <del class="diffdel">createChatSubscriptionInviteLink</del></a>
+         <del class="diffdel">, allowing bots to create subscription invite links.</del></li>
+        <li>
+         <del class="diffdel">Added the method</del><a href="#editchatsubscriptioninvitelink">
+          <del class="diffdel">editChatSubscriptionInviteLink</del></a>
+         <del class="diffdel">, allowing bots to edit the</del><em>
+          <del class="diffdel">name</del></em>
+         <del class="diffdel">of subscription invite links.</del></li>
+        <li>
+         <del class="diffdel">Added the field</del><em>
+          <del class="diffdel">until_date</del></em>
+         <del class="diffdel">to the class</del><a href="#chatmembermember">
+          <del class="diffdel">ChatMemberMember</del></a>
+         <del class="diffdel">for members with an active subscription.</del></li>
+        <li>
+         <del class="diffdel">Added support for paid reactions and the class</del><a href="#reactiontypepaid">
+          <del class="diffdel">ReactionTypePaid</del></a>
+         <del class="diffdel">.</del></li>
        </ul>
        <p><strong><a href="/bots/api-changelog">See earlier changes »</a></strong></p>
        <h3><a class="anchor" name="authorizing-your-bot" href="#authorizing-your-bot"><i class="anchor-icon"></i></a>Authorizing your bot</h3>
@@ -860,7 +644,8 @@ To learn how to create…">
           <td>Array of String</td>
           <td>Optional</td>
           <td>A JSON-serialized list of the update types you want your bot to receive. For example, specify <code>["message", "edited_channel_post", "callback_query"]</code> to only receive updates of these types. See <a href="#update">Update</a> for a complete list of available update types. Specify an empty list to receive all update types except <em>chat_member</em>, <em>message_reaction</em>, and <em>message_reaction_count</em> (default). If not specified, the previous setting will be used.<br><br>
-            Please note that this parameter doesn't affect updates created before the call to the getUpdates, so unwanted updates may be received for a short period of time.</td>
+            Please note that this parameter doesn't affect updates created before the call to 
+           <del class="diffdel">the</del>getUpdates, so unwanted updates may be received for a short period of time.</td>
          </tr>
         </tbody>
        </table>
@@ -868,7 +653,13 @@ To learn how to create…">
         <p><strong>Notes</strong><br><strong>1.</strong> This method will not work if an outgoing webhook is set up.<br><strong>2.</strong> In order to avoid getting duplicate updates, recalculate <em>offset</em> after each server response.</p>
        </blockquote>
        <h4><a class="anchor" name="setwebhook" href="#setwebhook"><i class="anchor-icon"></i></a>setWebhook</h4>
-       <p>Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized <a href="#update">Update</a>. In case of an unsuccessful request, we will give up after a reasonable amount of attempts. Returns <em>True</em> on success.</p>
+       <p>Use this method to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized <a href="#update">Update</a>. In case of an unsuccessful request
+        <ins class="diffins">(a request with response</ins><a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">
+         <ins class="diffins">HTTP status code</ins></a>
+        <ins class="diffins">different from</ins><code>
+         <ins class="diffins">2XY</ins></code>
+        <ins class="diffins">)</ins>, we will
+        <ins class="diffins">repeat the request and</ins> give up after a reasonable amount of attempts. Returns <em>True</em> on success.</p>
        <p>If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter <em>secret_token</em>. If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.</p>
        <table class="table">
         <thead>
@@ -3301,7 +3092,9 @@ To learn how to create…">
         </tbody>
        </table>
        <h4><a class="anchor" name="backgroundtypepattern" href="#backgroundtypepattern"><i class="anchor-icon"></i></a>BackgroundTypePattern</h4>
-       <p>The background is a PNG or TGV (gzipped subset of SVG with MIME type “application/x-tgwallpattern”) pattern to be combined with the background fill chosen by the user.</p>
+       <p>The background is a 
+        <ins class="diffins">.</ins>PNG or 
+        <ins class="diffins">.</ins>TGV (gzipped subset of SVG with MIME type “application/x-tgwallpattern”) pattern to be combined with the background fill chosen by the user.</p>
        <table class="table">
         <thead>
          <tr>
@@ -6524,7 +6317,11 @@ To learn how to create…">
        <p><strong>Sending by URL</strong></p>
        <ul>
         <li>When sending by URL the target file must have the correct MIME type (e.g., audio/mpeg for <a href="#sendaudio">sendAudio</a>, etc.).</li>
-        <li>In <a href="#senddocument">sendDocument</a>, sending by URL will currently only work for <strong>GIF</strong>, <strong>PDF</strong> and <strong>ZIP</strong> files.</li>
+        <li>In <a href="#senddocument">sendDocument</a>, sending by URL will currently only work for <strong>
+          <del class="diffmod">GIF</del></strong>
+         <del class="diffmod">,</del><strong>
+          <ins class="diffmod">.</ins>PDF</strong> and <strong>
+          <ins class="diffins">.</ins>ZIP</strong> files.</li>
         <li>To use <a href="#sendvoice">sendVoice</a>, the file must have the type audio/ogg and be no more than 1MB in size. 1-20MB voice notes will be sent as files.</li>
         <li>Other configurations may work but we can't guarantee that they will.</li>
        </ul>
@@ -8711,57 +8508,35 @@ To learn how to create…">
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="setuseremojistatus" href="#setuseremojistatus"><i class="anchor-icon"></i></a>
-        <ins class="diffins">setUserEmojiStatus</ins></h4>
-       <p>
-        <ins class="diffins">Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the Mini App method</ins><a href="/bots/webapps#initializing-mini-apps">
-         <ins class="diffins">requestEmojiStatusAccess</ins></a>
-        <ins class="diffins">. Returns</ins><em>
-         <ins class="diffins">True</ins></em>
-        <ins class="diffins">on success.</ins></p>
+       <h4><a class="anchor" name="setuseremojistatus" href="#setuseremojistatus"><i class="anchor-icon"></i></a>setUserEmojiStatus</h4>
+       <p>Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the Mini App method <a href="/bots/webapps#initializing-mini-apps">requestEmojiStatusAccess</a>. Returns <em>True</em> on success.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Parameter</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Required</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">user_id</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">Unique identifier of the target user</ins></td>
+          <td>user_id</td>
+          <td>Integer</td>
+          <td>Yes</td>
+          <td>Unique identifier of the target user</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">emoji_status_custom_emoji_id</ins></td>
-          <td>
-           <ins class="diffins">String</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Custom emoji identifier of the emoji status to set. Pass an empty string to remove the status.</ins></td>
+          <td>emoji_status_custom_emoji_id</td>
+          <td>String</td>
+          <td>Optional</td>
+          <td>Custom emoji identifier of the emoji status to set. Pass an empty string to remove the status.</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">emoji_status_expiration_date</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Expiration date of the emoji status, if any</ins></td>
+          <td>emoji_status_expiration_date</td>
+          <td>Integer</td>
+          <td>Optional</td>
+          <td>Expiration date of the emoji status, if any</td>
          </tr>
         </tbody>
        </table>
@@ -11091,7 +10866,8 @@ To learn how to create…">
          <tr>
           <td>format</td>
           <td>String</td>
-          <td>Format of the added sticker, must be one of “static” for a <strong>.WEBP</strong> or <strong>.PNG</strong> image, “animated” for a <strong>.TGS</strong> animation, “video” for a <strong>WEBM</strong> video</td>
+          <td>Format of the added sticker, must be one of “static” for a <strong>.WEBP</strong> or <strong>.PNG</strong> image, “animated” for a <strong>.TGS</strong> animation, “video” for a <strong>
+            <ins class="diffins">.</ins>WEBM</strong> video</td>
          </tr>
          <tr>
           <td>emoji_list</td>
@@ -11560,13 +11336,15 @@ To learn how to create…">
           <td>thumbnail</td>
           <td><a href="#inputfile">InputFile</a> or String</td>
           <td>Optional</td>
-          <td>A <strong>.WEBP</strong> or <strong>.PNG</strong> image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a <strong>.TGS</strong> animation with a thumbnail up to 32 kilobytes in size (see <a href="/stickers#animation-requirements"></a><a href="https://core.telegram.org/stickers#animation-requirements">https://core.telegram.org/stickers#animation-requirements</a> for animated sticker technical requirements), or a <strong>WEBM</strong> video with the thumbnail up to 32 kilobytes in size; see <a href="/stickers#video-requirements"></a><a href="https://core.telegram.org/stickers#video-requirements">https://core.telegram.org/stickers#video-requirements</a> for video sticker technical requirements. Pass a <em>file_id</em> as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.</td>
+          <td>A <strong>.WEBP</strong> or <strong>.PNG</strong> image with the thumbnail, must be up to 128 kilobytes in size and have a width and height of exactly 100px, or a <strong>.TGS</strong> animation with a thumbnail up to 32 kilobytes in size (see <a href="/stickers#animation-requirements"></a><a href="https://core.telegram.org/stickers#animation-requirements">https://core.telegram.org/stickers#animation-requirements</a> for animated sticker technical requirements), or a <strong>
+            <ins class="diffins">.</ins>WEBM</strong> video with the thumbnail up to 32 kilobytes in size; see <a href="/stickers#video-requirements"></a><a href="https://core.telegram.org/stickers#video-requirements">https://core.telegram.org/stickers#video-requirements</a> for video sticker technical requirements. Pass a <em>file_id</em> as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. <a href="#sending-files">More information on Sending Files »</a>. Animated and video sticker set thumbnails can't be uploaded via HTTP URL. If omitted, then the thumbnail is dropped and the first sticker is used as the thumbnail.</td>
          </tr>
          <tr>
           <td>format</td>
           <td>String</td>
           <td>Yes</td>
-          <td>Format of the thumbnail, must be one of “static” for a <strong>.WEBP</strong> or <strong>.PNG</strong> image, “animated” for a <strong>.TGS</strong> animation, or “video” for a <strong>WEBM</strong> video</td>
+          <td>Format of the thumbnail, must be one of “static” for a <strong>.WEBP</strong> or <strong>.PNG</strong> image, “animated” for a <strong>.TGS</strong> animation, or “video” for a <strong>
+            <ins class="diffins">.</ins>WEBM</strong> video</td>
          </tr>
         </tbody>
        </table>
@@ -11616,103 +11394,135 @@ To learn how to create…">
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="gift" href="#gift"><i class="anchor-icon"></i></a>
-        <ins class="diffins">Gift</ins></h4>
-       <p>
-        <ins class="diffins">This object represents a gift that can be sent by the bot.</ins></p>
+       <h4><a class="anchor" name="gift" href="#gift"><i class="anchor-icon"></i></a>Gift</h4>
+       <p>This object represents a gift that can be sent by the bot.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Field</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">id</ins></td>
-          <td>
-           <ins class="diffins">String</ins></td>
-          <td>
-           <ins class="diffins">Unique identifier of the gift</ins></td>
+          <td>id</td>
+          <td>String</td>
+          <td>Unique identifier of the gift</td>
+         </tr>
+         <tr>
+          <td>sticker</td>
+          <td><a href="#sticker">Sticker</a></td>
+          <td>The sticker that represents the gift</td>
+         </tr>
+         <tr>
+          <td>star_count</td>
+          <td>Integer</td>
+          <td>The number of Telegram Stars that must be paid to send the sticker</td>
          </tr>
          <tr>
           <td>
-           <ins class="diffins">sticker</ins></td>
-          <td><a href="#sticker">
-            <ins class="diffins">Sticker</ins></a></td>
-          <td>
-           <ins class="diffins">The sticker that represents the gift</ins></td>
-         </tr>
-         <tr>
-          <td>
-           <ins class="diffins">star_count</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">The number of Telegram Stars that must be paid to send the sticker</ins></td>
-         </tr>
-         <tr>
-          <td>
-           <ins class="diffins">total_count</ins></td>
+           <ins class="diffins">upgrade_star_count</ins></td>
           <td>
            <ins class="diffins">Integer</ins></td>
           <td><em>
             <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. The total number of the gifts of this type that can be sent; for limited gifts only</ins></td>
+           <ins class="diffins">. The number of Telegram Stars that must be paid to upgrade the gift to a unique one</ins></td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">remaining_count</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td><em>
-            <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. The number of remaining gifts of this type that can be sent; for limited gifts only</ins></td>
+          <td>total_count</td>
+          <td>Integer</td>
+          <td><em>Optional</em>. The total number of the gifts of this type that can be sent; for limited gifts only</td>
+         </tr>
+         <tr>
+          <td>remaining_count</td>
+          <td>Integer</td>
+          <td><em>Optional</em>. The number of remaining gifts of this type that can be sent; for limited gifts only</td>
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="gifts" href="#gifts"><i class="anchor-icon"></i></a>
-        <ins class="diffins">Gifts</ins></h4>
-       <p>
-        <ins class="diffins">This object represent a list of gifts.</ins></p>
+       <h4><a class="anchor" name="gifts" href="#gifts"><i class="anchor-icon"></i></a>Gifts</h4>
+       <p>This object represent a list of gifts.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Field</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">gifts</ins></td>
-          <td>
-           <ins class="diffins">Array of</ins><a href="#gift">
-            <ins class="diffins">Gift</ins></a></td>
-          <td>
-           <ins class="diffins">The list of gifts</ins></td>
+          <td>gifts</td>
+          <td>Array of <a href="#gift">Gift</a></td>
+          <td>The list of gifts</td>
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="getavailablegifts" href="#getavailablegifts"><i class="anchor-icon"></i></a>
-        <ins class="diffins">getAvailableGifts</ins></h4>
+       <h4><a class="anchor" name="getavailablegifts" href="#getavailablegifts"><i class="anchor-icon"></i></a>getAvailableGifts</h4>
+       <p>Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a <a href="#gifts">Gifts</a> object.</p>
+       <h4><a class="anchor" name="sendgift" href="#sendgift"><i class="anchor-icon"></i></a>sendGift</h4>
+       <p>Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user. Returns <em>True</em> on success.</p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <td>user_id</td>
+          <td>Integer</td>
+          <td>Yes</td>
+          <td>Unique identifier of the target user that will receive the gift</td>
+         </tr>
+         <tr>
+          <td>gift_id</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>Identifier of the gift</td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">pay_for_upgrade</ins></td>
+          <td>
+           <ins class="diffins">Boolean</ins></td>
+          <td>
+           <ins class="diffins">Optional</ins></td>
+          <td>
+           <ins class="diffins">Pass</ins><em>
+            <ins class="diffins">True</ins></em>
+           <ins class="diffins">to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver</ins></td>
+         </tr>
+         <tr>
+          <td>text</td>
+          <td>String</td>
+          <td>Optional</td>
+          <td>Text that will be shown along with the gift; 0-255 characters</td>
+         </tr>
+         <tr>
+          <td>text_parse_mode</td>
+          <td>String</td>
+          <td>Optional</td>
+          <td>Mode for parsing entities in the text. See <a href="#formatting-options">formatting options</a> for more details. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</td>
+         </tr>
+         <tr>
+          <td>text_entities</td>
+          <td>Array of <a href="#messageentity">MessageEntity</a></td>
+          <td>Optional</td>
+          <td>A JSON-serialized list of special entities that appear in the gift text. It can be specified instead of <em>text_parse_mode</em>. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</td>
+         </tr>
+        </tbody>
+       </table>
+       <h4><a class="anchor" name="verifyuser" href="#verifyuser"><i class="anchor-icon"></i></a>
+        <ins class="diffins">verifyUser</ins></h4>
        <p>
-        <ins class="diffins">Returns the list of gifts that can be sent by the bot to users. Requires no parameters. Returns a</ins><a href="#gifts">
-         <ins class="diffins">Gifts</ins></a>
-        <ins class="diffins">object.</ins></p>
-       <h4><a class="anchor" name="sendgift" href="#sendgift"><i class="anchor-icon"></i></a>
-        <ins class="diffins">sendGift</ins></h4>
-       <p>
-        <ins class="diffins">Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user. Returns</ins><em>
+        <ins class="diffins">Verifies a user</ins><a href="https://telegram.org/verify#third-party-verification">
+         <ins class="diffins">on behalf of the organization</ins></a>
+        <ins class="diffins">which is represented by the bot. Returns</ins><em>
          <ins class="diffins">True</ins></em>
         <ins class="diffins">on success.</ins></p>
        <table class="table">
@@ -11737,52 +11547,133 @@ To learn how to create…">
           <td>
            <ins class="diffins">Yes</ins></td>
           <td>
-           <ins class="diffins">Unique identifier of the target user that will receive the gift</ins></td>
+           <ins class="diffins">Unique identifier of the target user</ins></td>
          </tr>
          <tr>
           <td>
-           <ins class="diffins">gift_id</ins></td>
+           <ins class="diffins">custom_description</ins></td>
           <td>
            <ins class="diffins">String</ins></td>
+          <td>
+           <ins class="diffins">Optional</ins></td>
+          <td>
+           <ins class="diffins">Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.</ins></td>
+         </tr>
+        </tbody>
+       </table>
+       <h4><a class="anchor" name="verifychat" href="#verifychat"><i class="anchor-icon"></i></a>
+        <ins class="diffins">verifyChat</ins></h4>
+       <p>
+        <ins class="diffins">Verifies a chat</ins><a href="https://telegram.org/verify#third-party-verification">
+         <ins class="diffins">on behalf of the organization</ins></a>
+        <ins class="diffins">which is represented by the bot. Returns</ins><em>
+         <ins class="diffins">True</ins></em>
+        <ins class="diffins">on success.</ins></p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>
+           <ins class="diffins">Parameter</ins></th>
+          <th>
+           <ins class="diffins">Type</ins></th>
+          <th>
+           <ins class="diffins">Required</ins></th>
+          <th>
+           <ins class="diffins">Description</ins></th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <td>
+           <ins class="diffins">chat_id</ins></td>
+          <td>
+           <ins class="diffins">Integer or String</ins></td>
           <td>
            <ins class="diffins">Yes</ins></td>
           <td>
-           <ins class="diffins">Identifier of the gift</ins></td>
+           <ins class="diffins">Unique identifier for the target chat or username of the target channel (in the format</ins><code>
+            <ins class="diffins">@channelusername</ins></code>
+           <ins class="diffins">)</ins></td>
          </tr>
          <tr>
           <td>
-           <ins class="diffins">text</ins></td>
+           <ins class="diffins">custom_description</ins></td>
           <td>
            <ins class="diffins">String</ins></td>
           <td>
            <ins class="diffins">Optional</ins></td>
           <td>
-           <ins class="diffins">Text that will be shown along with the gift; 0-255 characters</ins></td>
+           <ins class="diffins">Custom description for the verification; 0-70 characters. Must be empty if the organization isn't allowed to provide a custom verification description.</ins></td>
          </tr>
+        </tbody>
+       </table>
+       <h4><a class="anchor" name="removeuserverification" href="#removeuserverification"><i class="anchor-icon"></i></a>
+        <ins class="diffins">removeUserVerification</ins></h4>
+       <p>
+        <ins class="diffins">Removes verification from a user who is currently verified</ins><a href="https://telegram.org/verify#third-party-verification">
+         <ins class="diffins">on behalf of the organization</ins></a>
+        <ins class="diffins">represented by the bot. Returns</ins><em>
+         <ins class="diffins">True</ins></em>
+        <ins class="diffins">on success.</ins></p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>
+           <ins class="diffins">Parameter</ins></th>
+          <th>
+           <ins class="diffins">Type</ins></th>
+          <th>
+           <ins class="diffins">Required</ins></th>
+          <th>
+           <ins class="diffins">Description</ins></th>
+         </tr>
+        </thead>
+        <tbody>
          <tr>
           <td>
-           <ins class="diffins">text_parse_mode</ins></td>
+           <ins class="diffins">user_id</ins></td>
           <td>
-           <ins class="diffins">String</ins></td>
+           <ins class="diffins">Integer</ins></td>
           <td>
-           <ins class="diffins">Optional</ins></td>
+           <ins class="diffins">Yes</ins></td>
           <td>
-           <ins class="diffins">Mode for parsing entities in the text. See</ins><a href="#formatting-options">
-            <ins class="diffins">formatting options</ins></a>
-           <ins class="diffins">for more details. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</ins></td>
+           <ins class="diffins">Unique identifier of the target user</ins></td>
          </tr>
+        </tbody>
+       </table>
+       <h4><a class="anchor" name="removechatverification" href="#removechatverification"><i class="anchor-icon"></i></a>
+        <ins class="diffins">removeChatVerification</ins></h4>
+       <p>
+        <ins class="diffins">Removes verification from a chat that is currently verified</ins><a href="https://telegram.org/verify#third-party-verification">
+         <ins class="diffins">on behalf of the organization</ins></a>
+        <ins class="diffins">represented by the bot. Returns</ins><em>
+         <ins class="diffins">True</ins></em>
+        <ins class="diffins">on success.</ins></p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>
+           <ins class="diffins">Parameter</ins></th>
+          <th>
+           <ins class="diffins">Type</ins></th>
+          <th>
+           <ins class="diffins">Required</ins></th>
+          <th>
+           <ins class="diffins">Description</ins></th>
+         </tr>
+        </thead>
+        <tbody>
          <tr>
           <td>
-           <ins class="diffins">text_entities</ins></td>
+           <ins class="diffins">chat_id</ins></td>
           <td>
-           <ins class="diffins">Array of</ins><a href="#messageentity">
-            <ins class="diffins">MessageEntity</ins></a></td>
+           <ins class="diffins">Integer or String</ins></td>
           <td>
-           <ins class="diffins">Optional</ins></td>
+           <ins class="diffins">Yes</ins></td>
           <td>
-           <ins class="diffins">A JSON-serialized list of special entities that appear in the gift text. It can be specified instead of</ins><em>
-            <ins class="diffins">text_parse_mode</ins></em>
-           <ins class="diffins">. Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.</ins></td>
+           <ins class="diffins">Unique identifier for the target chat or username of the target channel (in the format</ins><code>
+            <ins class="diffins">@channelusername</ins></code>
+           <ins class="diffins">)</ins></td>
          </tr>
         </tbody>
        </table>
@@ -11979,9 +11870,15 @@ To learn how to create…">
           <td><em>Optional</em>. URL of the result</td>
          </tr>
          <tr>
-          <td>hide_url</td>
-          <td>Boolean</td>
-          <td><em>Optional</em>. Pass <em>True</em> if you don't want the URL to be shown in the message</td>
+          <td>
+           <del class="diffdel">hide_url</del></td>
+          <td>
+           <del class="diffdel">Boolean</del></td>
+          <td><em>
+            <del class="diffdel">Optional</del></em>
+           <del class="diffdel">. Pass</del><em>
+            <del class="diffdel">True</del></em>
+           <del class="diffdel">if you don't want the URL to be shown in the message</del></td>
          </tr>
          <tr>
           <td>description</td>
@@ -12112,7 +12009,8 @@ To learn how to create…">
          <tr>
           <td>gif_url</td>
           <td>String</td>
-          <td>A valid URL for the GIF file. File size must not exceed 1MB</td>
+          <td>A valid URL for the GIF file
+           <del class="diffdel">. File size must not exceed 1MB</del></td>
          </tr>
          <tr>
           <td>gif_width</td>
@@ -12200,7 +12098,8 @@ To learn how to create…">
          <tr>
           <td>mpeg4_url</td>
           <td>String</td>
-          <td>A valid URL for the MPEG4 file. File size must not exceed 1MB</td>
+          <td>A valid URL for the MPEG4 file
+           <del class="diffdel">. File size must not exceed 1MB</del></td>
          </tr>
          <tr>
           <td>mpeg4_width</td>
@@ -13687,127 +13586,76 @@ To learn how to create…">
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="savepreparedinlinemessage" href="#savepreparedinlinemessage"><i class="anchor-icon"></i></a>
-        <ins class="diffins">savePreparedInlineMessage</ins></h4>
-       <p>
-        <ins class="diffins">Stores a message that can be sent by a user of a Mini App. Returns a</ins><a href="#preparedinlinemessage">
-         <ins class="diffins">PreparedInlineMessage</ins></a>
-        <ins class="diffins">object.</ins></p>
+       <h4><a class="anchor" name="savepreparedinlinemessage" href="#savepreparedinlinemessage"><i class="anchor-icon"></i></a>savePreparedInlineMessage</h4>
+       <p>Stores a message that can be sent by a user of a Mini App. Returns a <a href="#preparedinlinemessage">PreparedInlineMessage</a> object.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Parameter</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Required</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">user_id</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">Unique identifier of the target user that can use the prepared message</ins></td>
+          <td>user_id</td>
+          <td>Integer</td>
+          <td>Yes</td>
+          <td>Unique identifier of the target user that can use the prepared message</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">result</ins></td>
-          <td><a href="#inlinequeryresult">
-            <ins class="diffins">InlineQueryResult</ins></a></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">A JSON-serialized object describing the message to be sent</ins></td>
+          <td>result</td>
+          <td><a href="#inlinequeryresult">InlineQueryResult</a></td>
+          <td>Yes</td>
+          <td>A JSON-serialized object describing the message to be sent</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">allow_user_chats</ins></td>
-          <td>
-           <ins class="diffins">Boolean</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Pass</ins><em>
-            <ins class="diffins">True</ins></em>
-           <ins class="diffins">if the message can be sent to private chats with users</ins></td>
+          <td>allow_user_chats</td>
+          <td>Boolean</td>
+          <td>Optional</td>
+          <td>Pass <em>True</em> if the message can be sent to private chats with users</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">allow_bot_chats</ins></td>
-          <td>
-           <ins class="diffins">Boolean</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Pass</ins><em>
-            <ins class="diffins">True</ins></em>
-           <ins class="diffins">if the message can be sent to private chats with bots</ins></td>
+          <td>allow_bot_chats</td>
+          <td>Boolean</td>
+          <td>Optional</td>
+          <td>Pass <em>True</em> if the message can be sent to private chats with bots</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">allow_group_chats</ins></td>
-          <td>
-           <ins class="diffins">Boolean</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Pass</ins><em>
-            <ins class="diffins">True</ins></em>
-           <ins class="diffins">if the message can be sent to group and supergroup chats</ins></td>
+          <td>allow_group_chats</td>
+          <td>Boolean</td>
+          <td>Optional</td>
+          <td>Pass <em>True</em> if the message can be sent to group and supergroup chats</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">allow_channel_chats</ins></td>
-          <td>
-           <ins class="diffins">Boolean</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Pass</ins><em>
-            <ins class="diffins">True</ins></em>
-           <ins class="diffins">if the message can be sent to channel chats</ins></td>
+          <td>allow_channel_chats</td>
+          <td>Boolean</td>
+          <td>Optional</td>
+          <td>Pass <em>True</em> if the message can be sent to channel chats</td>
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="preparedinlinemessage" href="#preparedinlinemessage"><i class="anchor-icon"></i></a>
-        <ins class="diffins">PreparedInlineMessage</ins></h4>
-       <p>
-        <ins class="diffins">Describes an inline message to be sent by a user of a Mini App.</ins></p>
+       <h4><a class="anchor" name="preparedinlinemessage" href="#preparedinlinemessage"><i class="anchor-icon"></i></a>PreparedInlineMessage</h4>
+       <p>Describes an inline message to be sent by a user of a Mini App.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Field</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">id</ins></td>
-          <td>
-           <ins class="diffins">String</ins></td>
-          <td>
-           <ins class="diffins">Unique identifier of the prepared message</ins></td>
+          <td>id</td>
+          <td>String</td>
+          <td>Unique identifier of the prepared message</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">expiration_date</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Expiration date of the prepared message, in Unix time. Expired prepared messages can no longer be used</ins></td>
+          <td>expiration_date</td>
+          <td>Integer</td>
+          <td>Expiration date of the prepared message, in Unix time. Expired prepared messages can no longer be used</td>
          </tr>
         </tbody>
        </table>
@@ -14014,16 +13862,10 @@ To learn how to create…">
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">business_connection_id</ins></td>
-          <td>
-           <ins class="diffins">String</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">Unique identifier of the business connection on behalf of which the link will be created. For payments in</ins><a href="https://t.me/BotNews/90">
-            <ins class="diffins">Telegram Stars</ins></a>
-           <ins class="diffins">only.</ins></td>
+          <td>business_connection_id</td>
+          <td>String</td>
+          <td>Optional</td>
+          <td>Unique identifier of the business connection on behalf of which the link will be created. For payments in <a href="https://t.me/BotNews/90">Telegram Stars</a> only.</td>
          </tr>
          <tr>
           <td>title</td>
@@ -14059,18 +13901,14 @@ To learn how to create…">
           <td>prices</td>
           <td>Array of <a href="#labeledprice">LabeledPrice</a></td>
           <td>Yes</td>
-          <td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>
-           <ins class="diffins">.</ins></td>
+          <td>Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.). Must contain exactly one item for payments in <a href="https://t.me/BotNews/90">Telegram Stars</a>.</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">subscription_period</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Optional</ins></td>
-          <td>
-           <ins class="diffins">The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user</ins>.</td>
+          <td>subscription_period</td>
+          <td>Integer</td>
+          <td>Optional</td>
+          <td>The number of seconds the subscription will be active for before the next payment. The currency must be set to “XTR” (Telegram Stars) if the parameter is used. Currently, it must always be 2592000 (30 days) if specified. Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user.
+           <ins class="diffins">Subscription price must no exceed 2500 Telegram Stars.</ins></td>
          </tr>
          <tr>
           <td>max_tip_amount</td>
@@ -14192,7 +14030,11 @@ To learn how to create…">
           <td>error_message</td>
           <td>String</td>
           <td>Optional</td>
-          <td>Required if <em>ok</em> is <em>False</em>. Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.</td>
+          <td>Required if <em>ok</em> is <em>False</em>. Error message in human readable form that explains why it is impossible to complete the order (e.g. 
+           <del class="diffmod">"</del>
+           <ins class="diffmod">“</ins>Sorry, delivery to your desired address is unavailable
+           <del class="diffmod">'</del>
+           <ins class="diffmod">”</ins>). Telegram will display this message to the user.</td>
          </tr>
         </tbody>
        </table>
@@ -14280,59 +14122,35 @@ To learn how to create…">
          </tr>
         </tbody>
        </table>
-       <h4><a class="anchor" name="edituserstarsubscription" href="#edituserstarsubscription"><i class="anchor-icon"></i></a>
-        <ins class="diffins">editUserStarSubscription</ins></h4>
-       <p>
-        <ins class="diffins">Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Returns</ins><em>
-         <ins class="diffins">True</ins></em>
-        <ins class="diffins">on success.</ins></p>
+       <h4><a class="anchor" name="edituserstarsubscription" href="#edituserstarsubscription"><i class="anchor-icon"></i></a>editUserStarSubscription</h4>
+       <p>Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Returns <em>True</em> on success.</p>
        <table class="table">
         <thead>
          <tr>
-          <th>
-           <ins class="diffins">Parameter</ins></th>
-          <th>
-           <ins class="diffins">Type</ins></th>
-          <th>
-           <ins class="diffins">Required</ins></th>
-          <th>
-           <ins class="diffins">Description</ins></th>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
          </tr>
         </thead>
         <tbody>
          <tr>
-          <td>
-           <ins class="diffins">user_id</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">Identifier of the user whose subscription will be edited</ins></td>
+          <td>user_id</td>
+          <td>Integer</td>
+          <td>Yes</td>
+          <td>Identifier of the user whose subscription will be edited</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">telegram_payment_charge_id</ins></td>
-          <td>
-           <ins class="diffins">String</ins></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">Telegram payment identifier for the subscription</ins></td>
+          <td>telegram_payment_charge_id</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>Telegram payment identifier for the subscription</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">is_canceled</ins></td>
-          <td>
-           <ins class="diffins">Boolean</ins></td>
-          <td>
-           <ins class="diffins">Yes</ins></td>
-          <td>
-           <ins class="diffins">Pass</ins><em>
-            <ins class="diffins">True</ins></em>
-           <ins class="diffins">to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass</ins><em>
-            <ins class="diffins">False</ins></em>
-           <ins class="diffins">to allow the user to re-enable a subscription that was previously canceled by the bot.</ins></td>
+          <td>is_canceled</td>
+          <td>Boolean</td>
+          <td>Yes</td>
+          <td>Pass <em>True</em> to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period. Pass <em>False</em> to allow the user to re-enable a subscription that was previously canceled by the bot.</td>
          </tr>
         </tbody>
        </table>
@@ -14502,7 +14320,8 @@ To learn how to create…">
         </tbody>
        </table>
        <h4><a class="anchor" name="successfulpayment" href="#successfulpayment"><i class="anchor-icon"></i></a>SuccessfulPayment</h4>
-       <p>This object contains basic information about a successful payment.</p>
+       <p>This object contains basic information about a successful payment.
+        <ins class="diffins">Note that if the buyer initiates a chargeback with the relevant payment provider following this transaction, the funds may be debited from your balance. This is outside of Telegram's control.</ins></p>
        <table class="table">
         <thead>
          <tr>
@@ -14528,31 +14347,19 @@ To learn how to create…">
           <td>Bot-specified invoice payload</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">subscription_expiration_date</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td><em>
-            <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. Expiration date of the subscription, in Unix time; for recurring payments only</ins></td>
+          <td>subscription_expiration_date</td>
+          <td>Integer</td>
+          <td><em>Optional</em>. Expiration date of the subscription, in Unix time; for recurring payments only</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">is_recurring</ins></td>
-          <td>
-           <ins class="diffins">True</ins></td>
-          <td><em>
-            <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. True, if the payment is a recurring payment for a subscription</ins></td>
+          <td>is_recurring</td>
+          <td>True</td>
+          <td><em>Optional</em>. True, if the payment is a recurring payment for a subscription</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">is_first_recurring</ins></td>
-          <td>
-           <ins class="diffins">True</ins></td>
-          <td><em>
-            <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. True, if the payment is the first payment for a subscription</ins></td>
+          <td>is_first_recurring</td>
+          <td>True</td>
+          <td><em>Optional</em>. True, if the payment is the first payment for a subscription</td>
          </tr>
          <tr>
           <td>shipping_option_id</td>
@@ -14789,10 +14596,73 @@ To learn how to create…">
          </tr>
         </tbody>
        </table>
+       <h4><a class="anchor" name="affiliateinfo" href="#affiliateinfo"><i class="anchor-icon"></i></a>
+        <ins class="diffins">AffiliateInfo</ins></h4>
+       <p>
+        <ins class="diffins">Contains information about the affiliate that received a commission via this transaction.</ins></p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>
+           <ins class="diffins">Field</ins></th>
+          <th>
+           <ins class="diffins">Type</ins></th>
+          <th>
+           <ins class="diffins">Description</ins></th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <td>
+           <ins class="diffins">affiliate_user</ins></td>
+          <td><a href="#user">
+            <ins class="diffins">User</ins></a></td>
+          <td><em>
+            <ins class="diffins">Optional</ins></em>
+           <ins class="diffins">. The bot or the user that received an affiliate commission if it was received by a bot or a user</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">affiliate_chat</ins></td>
+          <td><a href="#chat">
+            <ins class="diffins">Chat</ins></a></td>
+          <td><em>
+            <ins class="diffins">Optional</ins></em>
+           <ins class="diffins">. The chat that received an affiliate commission if it was received by a chat</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">commission_per_mille</ins></td>
+          <td>
+           <ins class="diffins">Integer</ins></td>
+          <td>
+           <ins class="diffins">The number of Telegram Stars received by the affiliate for each 1000 Telegram Stars received by the bot from referred users</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">amount</ins></td>
+          <td>
+           <ins class="diffins">Integer</ins></td>
+          <td>
+           <ins class="diffins">Integer amount of Telegram Stars received by the affiliate from the transaction, rounded to 0; can be negative for refunds</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">nanostar_amount</ins></td>
+          <td>
+           <ins class="diffins">Integer</ins></td>
+          <td><em>
+            <ins class="diffins">Optional</ins></em>
+           <ins class="diffins">. The number of 1/1000000000 shares of Telegram Stars received by the affiliate; from -999999999 to 999999999; can be negative for refunds</ins></td>
+         </tr>
+        </tbody>
+       </table>
        <h4><a class="anchor" name="transactionpartner" href="#transactionpartner"><i class="anchor-icon"></i></a>TransactionPartner</h4>
        <p>This object describes the source of a transaction, or its recipient for outgoing transactions. Currently, it can be one of</p>
        <ul>
         <li><a href="#transactionpartneruser">TransactionPartnerUser</a></li>
+        <li><a href="#transactionpartneraffiliateprogram">
+          <ins class="diffins">TransactionPartnerAffiliateProgram</ins></a></li>
         <li><a href="#transactionpartnerfragment">TransactionPartnerFragment</a></li>
         <li><a href="#transactionpartnertelegramads">TransactionPartnerTelegramAds</a></li>
         <li><a href="#transactionpartnertelegramapi">TransactionPartnerTelegramApi</a></li>
@@ -14820,18 +14690,23 @@ To learn how to create…">
           <td>Information about the user</td>
          </tr>
          <tr>
+          <td>
+           <ins class="diffins">affiliate</ins></td>
+          <td><a href="#affiliateinfo">
+            <ins class="diffins">AffiliateInfo</ins></a></td>
+          <td><em>
+            <ins class="diffins">Optional</ins></em>
+           <ins class="diffins">. Information about the affiliate that received a commission via this transaction</ins></td>
+         </tr>
+         <tr>
           <td>invoice_payload</td>
           <td>String</td>
           <td><em>Optional</em>. Bot-specified invoice payload</td>
          </tr>
          <tr>
-          <td>
-           <ins class="diffins">subscription_period</ins></td>
-          <td>
-           <ins class="diffins">Integer</ins></td>
-          <td><em>
-            <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. The duration of the paid subscription</ins></td>
+          <td>subscription_period</td>
+          <td>Integer</td>
+          <td><em>Optional</em>. The duration of the paid subscription</td>
          </tr>
          <tr>
           <td>paid_media</td>
@@ -14844,13 +14719,54 @@ To learn how to create…">
           <td><em>Optional</em>. Bot-specified paid media payload</td>
          </tr>
          <tr>
+          <td>gift</td>
           <td>
-           <ins class="diffins">gift</ins></td>
+           <del class="diffmod">String</del><a href="#gift">
+            <ins class="diffmod">Gift</ins></a></td>
+          <td><em>Optional</em>. The gift sent to the user by the bot</td>
+         </tr>
+        </tbody>
+       </table>
+       <h4><a class="anchor" name="transactionpartneraffiliateprogram" href="#transactionpartneraffiliateprogram"><i class="anchor-icon"></i></a>
+        <ins class="diffins">TransactionPartnerAffiliateProgram</ins></h4>
+       <p>
+        <ins class="diffins">Describes the affiliate program that issued the affiliate commission received via this transaction.</ins></p>
+       <table class="table">
+        <thead>
+         <tr>
+          <th>
+           <ins class="diffins">Field</ins></th>
+          <th>
+           <ins class="diffins">Type</ins></th>
+          <th>
+           <ins class="diffins">Description</ins></th>
+         </tr>
+        </thead>
+        <tbody>
+         <tr>
+          <td>
+           <ins class="diffins">type</ins></td>
           <td>
            <ins class="diffins">String</ins></td>
+          <td>
+           <ins class="diffins">Type of the transaction partner, always “affiliate_program”</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">sponsor_user</ins></td>
+          <td><a href="#user">
+            <ins class="diffins">User</ins></a></td>
           <td><em>
             <ins class="diffins">Optional</ins></em>
-           <ins class="diffins">. The gift sent to the user by the bot</ins></td>
+           <ins class="diffins">. Information about the bot that sponsored the affiliate program</ins></td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">commission_per_mille</ins></td>
+          <td>
+           <ins class="diffins">Integer</ins></td>
+          <td>
+           <ins class="diffins">The number of Telegram Stars received by the bot for each 1000 Telegram Stars received by the affiliate program sponsor from referred users</ins></td>
          </tr>
         </tbody>
        </table>
@@ -14937,7 +14853,8 @@ To learn how to create…">
         </tbody>
        </table>
        <h4><a class="anchor" name="startransaction" href="#startransaction"><i class="anchor-icon"></i></a>StarTransaction</h4>
-       <p>Describes a Telegram Star transaction.</p>
+       <p>Describes a Telegram Star transaction.
+        <ins class="diffins">Note that if the buyer initiates a chargeback with the payment provider from whom they acquired Stars (e.g., Apple, Google) following this transaction, the refunded Stars will be deducted from the bot's balance. This is outside of Telegram's control.</ins></p>
        <table class="table">
         <thead>
          <tr>
@@ -14955,7 +14872,18 @@ To learn how to create…">
          <tr>
           <td>amount</td>
           <td>Integer</td>
-          <td>Number of Telegram Stars transferred by the transaction</td>
+          <td>
+           <del class="diffmod">Number</del>
+           <ins class="diffmod">Integer amount</ins> of Telegram Stars transferred by the transaction</td>
+         </tr>
+         <tr>
+          <td>
+           <ins class="diffins">nanostar_amount</ins></td>
+          <td>
+           <ins class="diffins">Integer</ins></td>
+          <td><em>
+            <ins class="diffins">Optional</ins></em>
+           <ins class="diffins">. The number of 1/1000000000 shares of Telegram Stars transferred by the transaction; from 0 to 999999999</ins></td>
          </tr>
          <tr>
           <td>date</td>
@@ -15794,13 +15722,18 @@ To learn how to create…">
       <h5><a href="//telegram.org/blog">Blog</a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="//telegram.org/apps">Apps</a></h5>
+      <h5><a href="//telegram.org/press">
+        <del class="diffmod">Apps</del>
+        <ins class="diffmod">Press</ins></a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="/">Platform</a></h5>
+      <h5><a href="//telegram.org/moderation">
+        <del class="diffmod">Platform</del></a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="//telegram.org/press">Press</a></h5>
+      <h5><a href="//telegram.org/press">
+        <del class="diffmod">Press</del>
+        <ins class="diffmod">Moderation</ins></a></h5>
      </div>
     </div>
    </div>
