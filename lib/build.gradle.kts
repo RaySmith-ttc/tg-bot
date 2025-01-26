@@ -48,7 +48,6 @@ kotlin {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.addAll (
-                "-Xsuppress-warning=NESTED_CLASS_IN_EXTERNAL_INTERFACE",
                 "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
             )
         }
@@ -111,8 +110,6 @@ kotlin {
                 implementation(kotlinWrappers.node)
                 implementation(kotlinWrappers.react)
                 implementation(libs.seskar.core)
-
-                implementation(npm("crypto-js", "^4.2.0"))
             }
         }
     }

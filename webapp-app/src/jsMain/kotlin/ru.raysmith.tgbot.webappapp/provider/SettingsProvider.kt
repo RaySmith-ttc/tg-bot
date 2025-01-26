@@ -18,7 +18,7 @@ external interface SettingsProviderProps : SettingsContextProps, PropsWithChildr
 // ---------------------------------------------------------------------------------------------------------------------
 
 val SettingsContext = createContext<SettingsContextProps>()
-fun useSettingsContext(): SettingsContextProps = useContext(SettingsContext)
+fun useSettingsContext(): SettingsContextProps = use(SettingsContext)
     ?: error("useSettingsContext must be use inside SettingsProvider")
 
 // ---------------------------------------------------------------------------------------------------------------------

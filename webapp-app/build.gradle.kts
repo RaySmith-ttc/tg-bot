@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.benManes.versions)
+    alias(libs.plugins.seskar)
     application
 }
 
@@ -20,7 +21,6 @@ kotlin {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.apply {
-                add("-Xsuppress-warning=NESTED_CLASS_IN_EXTERNAL_INTERFACE")
                 add("-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
             }
         }
@@ -71,15 +71,13 @@ kotlin {
                 implementation(projects.lib)
                 implementation(libs.kotlinx.coroutines.core)
 
-                implementation(libs.kotlin.react)
-                implementation(libs.kotlin.react.dom)
-                implementation(libs.kotlin.react.router)
-                implementation(libs.kotlin.react.router.dom)
-                implementation(libs.kotlin.node)
-
-                implementation(libs.kotlin.mui.material)
-                implementation(libs.kotlin.mui.icons.material)
-                implementation(libs.kotlin.emotion)
+                implementation(kotlinWrappers.react)
+                implementation(kotlinWrappers.reactDom)
+                implementation(kotlinWrappers.reactRouter)
+                implementation(kotlinWrappers.node)
+                implementation(kotlinWrappers.mui.material)
+                implementation(kotlinWrappers.mui.iconsMaterial)
+                implementation(kotlinWrappers.emotion)
 
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.js)

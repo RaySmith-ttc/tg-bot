@@ -1,14 +1,14 @@
 [versions]
-kotlin = "2.0.20"
+kotlin = "2.1.0"
 
-kotlinx-coroutines = "1.9.0"
+kotlinx-coroutines = "1.10.1"
 kotlinx-serialization = "1.7.3"
 kotlinx-datetime = "0.4.0"
 
-ktor = "3.0.1"
+ktor = "3.0.3"
 
 react = "18.3.1-pre.817"
-seskar = "3.43.0"
+seskar = "3.81.0"
 
 exposed = "0.41.1"
 
@@ -65,19 +65,6 @@ ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.
 
 ktor-network-tlsCertificates = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
 
-# Kotlin/JS wrappers
-kotlin-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "react" }
-kotlin-js = { module = "org.jetbrains.kotlin-wrappers:kotlin-js", version = "1.0.0-pre.817" }
-kotlin-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "react" }
-kotlin-emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version = "11.13.3-pre.817" }
-kotlin-cssom-core = { module = "org.jetbrains.kotlin-wrappers:kotlin-cssom-core", version = "0.0.1-pre.765" }
-
-kotlin-mui = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui", version = "5.14.5-pre.619" }
-kotlin-mui-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-material", version = "5.16.7-pre.817" }
-kotlin-mui-icons-material = { module = "org.jetbrains.kotlin-wrappers:kotlin-mui-icons-material", version = "5.16.7-pre.817" }
-kotlin-react-router = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router", version = "6.26.2-pre.817" }
-kotlin-react-router-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router-dom", version = "6.26.2-pre.817" }
-kotlin-node = { module = "org.jetbrains.kotlin-wrappers:kotlin-node", version = "22.5.4-pre.817" }
 seskar-core = { module = "io.github.turansky.seskar:seskar-core", version.ref = "seskar" }
 
 # database
