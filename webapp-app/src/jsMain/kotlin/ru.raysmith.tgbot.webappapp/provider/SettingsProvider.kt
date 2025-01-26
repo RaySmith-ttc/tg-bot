@@ -4,10 +4,13 @@ import js.objects.Object
 import js.objects.jso
 import react.*
 import ru.raysmith.tgbot.webappapp.hooks.useLocalStorage
+import web.cssom.Color
 
 external interface SettingsContextProps : Props {
     var useTgTheme: Boolean
     var setToggleUseTgTheme: (Boolean) -> Unit
+    var backgroundColor: String?
+    var setBackgroundColor: (Color) -> Unit
 }
 
 external interface SettingsProviderProps : SettingsContextProps, PropsWithChildren
@@ -29,6 +32,10 @@ val SettingsProvider = FC<SettingsProviderProps> { props ->
         settings.update("useTgTheme", value)
     }
 
+    val setBackgroundColor = { color: Color ->
+        settings.update("backgroundColor", color)
+    }
+
     SettingsContext.Provider {
         value = useMemo(
             settings.reset,
@@ -38,6 +45,7 @@ val SettingsProvider = FC<SettingsProviderProps> { props ->
             jso {
                 Object.assign(this, settings.state)
                 this.setToggleUseTgTheme = setToggleUseTgTheme
+                this.setBackgroundColor = setBackgroundColor
             }
         }
 

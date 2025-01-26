@@ -16,6 +16,7 @@ fun useViewport(): ViewportHookType {
     var isStateStable by useState(true)
     var isFullscreen by useState(webApp.isFullscreen)
     var fullscreenFailed by useState<FullscreenFailedType?>(null)
+    var isOrientationLocked by useState(webApp.isOrientationLocked)
 
     val enableVerticalSwipes = {
         webApp.enableVerticalSwipes()
@@ -41,6 +42,16 @@ fun useViewport(): ViewportHookType {
 
     val exitFullscreen = {
         webApp.exitFullscreen()
+    }
+
+    val lockOrientation = {
+        webApp.lockOrientation()
+        isOrientationLocked = true
+    }
+
+    val unlockOrientation = {
+        webApp.unlockOrientation()
+        isOrientationLocked = false
     }
 
     useEffectOnce {
@@ -70,6 +81,7 @@ fun useViewport(): ViewportHookType {
         isStateStable,
         isFullscreen,
         fullscreenFailed,
+        isOrientationLocked,
     ) {
         jso {
             this.viewportHeight = viewportHeight
@@ -85,6 +97,9 @@ fun useViewport(): ViewportHookType {
             this.fullscreenFailedClear = fullscreenFailedClear
             this.requestFullscreen = requestFullscreen
             this.exitFullscreen = exitFullscreen
+            this.isOrientationLocked = isOrientationLocked
+            this.lockOrientation = lockOrientation
+            this.unlockOrientation = unlockOrientation
         }
     }
 }
@@ -195,4 +210,27 @@ external interface ViewportHookType {
      * @since Bot API 8.0
      * */
     var exitFullscreen: VoidFunction
+
+    /**
+     * *True*, if the Mini App’s orientation is currently locked.
+     * *False*, if orientation changes freely based on the device’s rotation.
+     * */
+    var isOrientationLocked : Boolean
+
+    /**
+     * A method that locks the Mini App’s orientation to its current mode (either portrait or landscape). Once locked,
+     * the orientation remains fixed, regardless of device rotation. This is useful if a stable orientation is needed
+     * during specific interactions.
+     *
+     * @since Bot API 8.0
+     * */
+    var lockOrientation: VoidFunction
+
+    /**
+     * A method that unlocks the Mini App’s orientation, allowing it to follow the device's rotation freely. Use this to
+     * restore automatic orientation adjustments based on the device orientation.
+     *
+     * @since Bot API 8.0
+     * */
+    var unlockOrientation: VoidFunction
 }

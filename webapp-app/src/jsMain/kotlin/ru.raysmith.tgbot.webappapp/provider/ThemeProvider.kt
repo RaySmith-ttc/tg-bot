@@ -35,7 +35,7 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                 palette = jso {
                     mode = tgTheme.colorScheme.unsafeCast<PaletteMode>()
                     background = jso {
-                        default = tgTheme.bgColor.unsafeCast<String>()
+                        default = settings.backgroundColor ?: tgTheme.backgroundColor.unsafeCast<String>()
                         paper = tgTheme.secondaryBgColor.unsafeCast<String>()
                     }
                     text = jso {

@@ -25,25 +25,20 @@ import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.verifyWebAppInitData
-import java.io.File
+import java.net.InetAddress
 
-private val localIp = "192.168.0.228"
+private val localIp by lazy {
+    InetAddress.getLocalHost().hostAddress
+}
 
-val bot = Bot()
+private val port = System.getenv("PORT")?.toInt() ?: 8080
+private val host = System.getenv("HOST") ?: "http://$localIp:$port"
+
+val bot = Bot(useTestServer = System.getenv("TEST_SERVER") == "true")
     .onError { Bot.logger.error(it) }
 
 @OptIn(DelicateCoroutinesApi::class, ExperimentalSerializationApi::class)
 fun main() {
-    val keyStoreFile = File("build/keystore.jks")
-    val keyStore = buildKeyStore {
-        certificate("sampleAlias") {
-            password = "foobar"
-            domains = listOf("127.0.0.1", "0.0.0.0", "localhost", localIp)
-        }
-    }
-
-    keyStore.saveToFile(keyStoreFile, "123456")
-
     GlobalScope.launch {
         val prettyPrintJson = Json(TelegramApi.json) {
             prettyPrint = true
@@ -59,7 +54,7 @@ fun main() {
                             row {
                                 button {
                                     text = "Open"
-                                    webApp = WebAppInfo(System.getenv("HOST") ?: "https://$localIp:8443")
+                                    webApp = WebAppInfo(host)
                                 }
                             }
                         }
@@ -80,17 +75,8 @@ fun main() {
     embeddedServer(Netty,
         configure = {
             connector {
-                port = 8080
+                port = ru.raysmith.tgbot.webappapp.port
             }
-//            sslConnector(
-//                keyStore = keyStore,
-//                keyAlias = "sampleAlias",
-//                keyStorePassword = { "123456".toCharArray() },
-//                privateKeyPassword = { "foobar".toCharArray() }
-//            ) {
-//                port = 8443
-//                keyStorePath = keyStoreFile
-//            }
         }
     ) {
         install(CallLogging)

@@ -130,7 +130,7 @@ seskar = { id = "io.github.turansky.seskar", version.ref = "seskar" }
 ktor-server = [
     "ktor-client-core", "ktor-server-statusPages", "ktor-server-netty", "ktor-server-contentNegotiation",
     "ktor-server-websockets", "ktor-server-cors-jvm", "ktor-server-callLogging-jvm", "ktor-serialization-kotlinx-json",
-    "ktor-server-auth", "ktor-server-swagger", "ktor-server-openapi", "ktor-server-compression"
+    "ktor-server-auth", "ktor-server-compression"
 ]
 ktor-client = [
     "ktor-client-core", "ktor-client-okhttp", "ktor-client-logging", "ktor-client-contentNegotiation",

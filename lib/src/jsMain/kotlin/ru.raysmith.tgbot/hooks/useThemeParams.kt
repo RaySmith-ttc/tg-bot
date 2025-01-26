@@ -26,6 +26,21 @@ fun useThemeParams(): ThemeParamsHookType {
         }
     }
 
+    val setHeaderColor = { color: Color ->
+        webApp.setHeaderColor(color)
+        headerColor = webApp.headerColor
+    }
+
+    val setBackgroundColor = { color: Color ->
+        webApp.setBackgroundColor(color)
+        backgroundColor = webApp.backgroundColor
+    }
+
+    val setBottomBarColor = { color: Color ->
+        webApp.setBottomBarColor(color)
+        bottomBarColor = webApp.bottomBarColor
+    }
+
     return useMemo(
         colorScheme,
         themeParams,
@@ -35,24 +50,27 @@ fun useThemeParams(): ThemeParamsHookType {
     ) {
         jso {
             this.colorScheme = colorScheme
-            this.bgColor = themeParams.bgColor.unsafeCast<Color>()
-            this.textColor = themeParams.textColor.unsafeCast<Color>()
-            this.hintColor = themeParams.hintColor.unsafeCast<Color>()
-            this.linkColor = themeParams.linkColor.unsafeCast<Color>()
-            this.buttonColor = themeParams.buttonColor.unsafeCast<Color>()
-            this.buttonTextColor = themeParams.buttonTextColor.unsafeCast<Color>()
-            this.secondaryBgColor = themeParams.secondaryBgColor.unsafeCast<Color>()
-            this.headerBgColor = themeParams.headerBgColor.unsafeCast<Color>()
-            this.bottomBarBgColor = themeParams.bottomBarBgColor.unsafeCast<Color>()
-            this.accentTextColor = themeParams.accentTextColor.unsafeCast<Color>()
-            this.sectionBgColor = themeParams.sectionBgColor.unsafeCast<Color>()
-            this.sectionHeaderTextColor = themeParams.sectionHeaderTextColor.unsafeCast<Color>()
-            this.sectionSeparatorColor = themeParams.sectionSeparatorColor.unsafeCast<Color>()
-            this.subtitleTextColor = themeParams.subtitleTextColor.unsafeCast<Color>()
-            this.destructiveTextColor = themeParams.destructiveTextColor.unsafeCast<Color>()
-            this.headerColor = headerColor.unsafeCast<Color>()
-            this.backgroundColor = backgroundColor.unsafeCast<Color>()
-            this.bottomBarColor = bottomBarColor.unsafeCast<Color>()
+            this.bgColor = themeParams.bgColor
+            this.textColor = themeParams.textColor
+            this.hintColor = themeParams.hintColor
+            this.linkColor = themeParams.linkColor
+            this.buttonColor = themeParams.buttonColor
+            this.buttonTextColor = themeParams.buttonTextColor
+            this.secondaryBgColor = themeParams.secondaryBgColor
+            this.headerBgColor = themeParams.headerBgColor
+            this.bottomBarBgColor = themeParams.bottomBarBgColor
+            this.accentTextColor = themeParams.accentTextColor
+            this.sectionBgColor = themeParams.sectionBgColor
+            this.sectionHeaderTextColor = themeParams.sectionHeaderTextColor
+            this.sectionSeparatorColor = themeParams.sectionSeparatorColor
+            this.subtitleTextColor = themeParams.subtitleTextColor
+            this.destructiveTextColor = themeParams.destructiveTextColor
+            this.headerColor = headerColor
+            this.backgroundColor = backgroundColor
+            this.bottomBarColor = bottomBarColor
+            this.setHeaderColor = setHeaderColor
+            this.setBackgroundColor = setBackgroundColor
+            this.setBottomBarColor = setBottomBarColor
         }
     }
 }
@@ -165,4 +183,31 @@ external interface ThemeParamsHookType {
 
     /** Current bottom bar color in the `#RRGGBB` format. */
     var bottomBarColor: Color
+
+    /**
+     * A method that sets the app header color in the `#RRGGBB` format. You can also use keywords *bg_color* and
+     * *secondary_bg_color*.
+     *
+     * Up to `Bot API 6.9` You can only pass [bgColor] or [secondaryBgColor] as a color or *bg_color*,
+     * *secondary_bg_color* keywords.
+     *
+     * @since Bot API 6.1
+     * */
+    var setHeaderColor: (color: Color) -> Unit
+
+    /**
+     * A method that sets the app background color in the `#RRGGBB` format. You can also use keywords *bg_color* and
+     * *secondary_bg_color*.
+     *
+     * @since Bot API 6.1
+     * */
+    var setBackgroundColor: (color: Color) -> Unit
+
+    /**
+     * A method that sets the app's bottom bar color in the `#RRGGBB` format. You can also use the keywords *bg_color*,
+     * *secondary_bg_color* and *bottom_bar_bg_color*. This color is also applied to the navigation bar on Android.
+     *
+     * @since Bot API 7.10
+     * */
+    var setBottomBarColor: (color: Color) -> Unit
 }

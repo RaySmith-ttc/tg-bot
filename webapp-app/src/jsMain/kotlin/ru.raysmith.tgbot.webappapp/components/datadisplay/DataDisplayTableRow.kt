@@ -17,16 +17,12 @@ external interface BaseInfoPageProps : PropsWithChildren {
 
 val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
     TableRow {
-        sx {
-            wordWrap = WordWrap.breakWord
-            whiteSpace = WhiteSpace.normal
-        }
-
         TableCell {
             sx {
                 width = if (props.bigTitleWidth == true) 75.pct else 50.pct
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
+                overflowWrap = OverflowWrap.anywhere
             }
 
             Typography {
@@ -37,6 +33,7 @@ val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
             sx {
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
+                overflowWrap = OverflowWrap.anywhere
             }
             Stack {
                 direction = responsive(StackDirection.row)

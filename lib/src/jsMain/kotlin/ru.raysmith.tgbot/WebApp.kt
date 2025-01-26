@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot
 
 import js.objects.jso
+import web.cssom.Color
 import web.scheduling.VoidFunction
 
 external interface WebAppProps {
@@ -82,13 +83,13 @@ external interface WebAppProps {
     val viewportStableHeight: Float
 
     /** Current header color in the `#RRGGBB` format. */
-    val headerColor: String
+    val headerColor: Color
 
     /** Current background color in the `#RRGGBB` format. */
-    val backgroundColor: String
+    val backgroundColor: Color
 
     /** Current bottom bar color in the `#RRGGBB` format. */
-    val bottomBarColor: String
+    val bottomBarColor: Color
 
     /**
      * *True*, if the confirmation dialog is enabled while the user is trying to close the Mini App.
@@ -174,18 +175,19 @@ external interface WebAppProps {
      * Returns true if the user's app supports a version of the Bot API that is equal to or higher than the version
      * passed as the parameter.
      * */
-    val isVersionAtLeast: (version: String) -> Boolean // TODO type version
+    val isVersionAtLeast: (version: String) -> Boolean
 
     /**
      * A method that sets the app header color in the `#RRGGBB` format. You can also use keywords *bg_color* and
      * *secondary_bg_color*.
      *
-     * Up to `Bot API 6.9` You can only pass *Telegram.WebApp.themeParams.bg_color* or
-     * *Telegram.WebApp.themeParams.secondary_bg_color* as a color or *bg_color*, *secondary_bg_color* keywords.
+     * Up to `Bot API 6.9` You can only pass [Telegram.WebApp.ThemeParams.bgColor][ThemeParams.bgColor] or
+     * [Telegram.WebApp.ThemeParams.secondaryBgColor][ThemeParams.secondaryBgColor] as a color or *bg_color*,
+     * *secondary_bg_color* keywords.
      *
      * @since Bot API 6.1
      * */
-    val setHeaderColor: (color: dynamic) -> Boolean // TODO type color ('bg_color' | 'secondary_bg_color' | Hex (#fff|#fffff|rgb(255,255,255)))
+    val setHeaderColor: (color: Color ) -> Unit
 
     /**
      * A method that sets the app background color in the `#RRGGBB` format. You can also use keywords *bg_color* and
@@ -193,7 +195,7 @@ external interface WebAppProps {
      *
      * @since Bot API 6.1
      * */
-    val setBackgroundColor: (color: dynamic) -> Boolean // TODO type color ('bg_color' | 'secondary_bg_color' | Hex (#fff|#fffff|rgb(255,255,255)))
+    val setBackgroundColor: (color: Color) -> Unit
 
     /**
      * A method that sets the app's bottom bar color in the `#RRGGBB` format. You can also use the keywords *bg_color*,
@@ -201,7 +203,7 @@ external interface WebAppProps {
      *
      * @since Bot API 7.10
      * */
-    val setBottomBarColor: (color: dynamic) -> Boolean // TODO type color ('bg_color' | 'secondary_bg_color' | 'bottom_bar_bg_color' | Hex (#fff|#fffff|rgb(255,255,255))) !
+    val setBottomBarColor: (color: Color) -> Unit
 
     /**
      * A method that enables a confirmation dialog while the user is trying to close the Mini App.
@@ -507,9 +509,9 @@ external object WebApp : WebAppProps {
     override val isExpanded: Boolean
     override val viewportHeight: Float
     override val viewportStableHeight: Float
-    override val headerColor: String
-    override val backgroundColor: String
-    override val bottomBarColor: String
+    override val headerColor: Color
+    override val backgroundColor: Color
+    override val bottomBarColor: Color
     override val isClosingConfirmationEnabled: Boolean
     override val isVerticalSwipesEnabled: Boolean
     override val isFullscreen: Boolean
@@ -528,9 +530,9 @@ external object WebApp : WebAppProps {
     override val Gyroscope: Gyroscope
     override val LocationManager: LocationManager
     override val isVersionAtLeast: (version: String) -> Boolean
-    override val setHeaderColor: (color: dynamic) -> Boolean
-    override val setBackgroundColor: (color: dynamic) -> Boolean
-    override val setBottomBarColor: (color: dynamic) -> Boolean
+    override val setHeaderColor: (color: Color) -> Unit
+    override val setBackgroundColor: (color: Color) -> Unit
+    override val setBottomBarColor: (color: Color) -> Unit
     override val enableClosingConfirmation: VoidFunction
     override val disableClosingConfirmation: VoidFunction
     override val enableVerticalSwipes: VoidFunction

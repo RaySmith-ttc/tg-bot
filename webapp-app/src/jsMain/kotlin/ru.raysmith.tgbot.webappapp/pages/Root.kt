@@ -17,7 +17,6 @@ val RootPage = FC<Props> {
         sx {
             gridArea = "content".unsafeCast<GridArea>()
             padding = 16.px
-            paddingBottom = 80.px
             mt = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()})"
         }
 
