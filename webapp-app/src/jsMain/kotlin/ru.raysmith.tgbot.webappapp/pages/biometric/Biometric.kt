@@ -124,7 +124,7 @@ val BiometricPage = FC<Props> {
         }
 
         Stack {
-            spacing = responsive(0.5)
+            spacing = responsive(2)
 
             Alert {
                 +"The bot does not have permission for biometry. Go to the settings and grant permission to use it."

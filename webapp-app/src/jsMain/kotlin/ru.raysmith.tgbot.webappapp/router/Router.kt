@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.webappapp.pages.biometric.BiometricPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
 import ru.raysmith.tgbot.webappapp.pages.RootPage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
+import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
 import ru.raysmith.tgbot.webappapp.pages.state.StatePage
 import ru.raysmith.tgbot.webappapp.pages.theme.ThemePage
 import ru.raysmith.tgbot.webappapp.pages.viewport.ViewportPage
@@ -53,6 +54,10 @@ val Router = FC<PropsWithChildren> { props ->
                     jso {
                         path = Paths.state
                         element = StatePage.create()
+                    },
+                    jso {
+                        path = Paths.homeSceenIntegration
+                        element = HomeScreenIntegrationPage.create()
                     },
                 )
             }

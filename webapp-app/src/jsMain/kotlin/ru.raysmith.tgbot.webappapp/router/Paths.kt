@@ -8,4 +8,5 @@ object Paths {
     val hapticFeedback = "/hapticFeedback"
     val theme = "/theme"
     val state = "/state"
+    val homeSceenIntegration = "/homescreen"
 }

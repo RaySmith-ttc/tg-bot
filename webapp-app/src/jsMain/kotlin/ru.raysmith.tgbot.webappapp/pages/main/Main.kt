@@ -101,6 +101,12 @@ val MainPage = FC<Props> {
             href = Paths.state
             startIcon = Traffic.create()
         }
+
+        SubPageButton {
+            +"Home Screen Integration"
+            href = Paths.homeSceenIntegration
+            startIcon = AddToHomeScreen.create()
+        }
     }
 
     VerificationDialog {
