@@ -9,4 +9,5 @@ object Paths {
     val theme = "/theme"
     val state = "/state"
     val homeSceenIntegration = "/homescreen"
+    val backButton = "/backButton"
 }

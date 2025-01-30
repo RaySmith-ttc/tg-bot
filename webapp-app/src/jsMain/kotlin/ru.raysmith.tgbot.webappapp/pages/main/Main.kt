@@ -107,6 +107,12 @@ val MainPage = FC<Props> {
             href = Paths.homeSceenIntegration
             startIcon = AddToHomeScreen.create()
         }
+
+        SubPageButton {
+            +"Back button"
+            href = Paths.backButton
+            startIcon = ArrowBack.create()
+        }
     }
 
     VerificationDialog {

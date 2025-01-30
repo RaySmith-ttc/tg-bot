@@ -585,6 +585,5 @@ fun WebApp.switchInlineQuery(query: String) = switchInlineQuery(query, undefined
  * *Note that this method can be called only in response to user interaction with the Mini App interface
  * (e.g. a click inside the Mini App or on the main button)*
  * */
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 fun WebApp.openLink(url: String, options: (OpenLinkOptions.() -> Unit)? = undefined) =
-    openLink(url, options?.let { jso(it) } ?: undefined.asDynamic() as OpenLinkOptions)
+    openLink(url, options?.let { jso(it) } ?: undefined.asDynamic().unsafeCast<OpenLinkOptions>())

@@ -8,7 +8,7 @@ kotlinx-datetime = "0.4.0"
 ktor = "3.0.3"
 
 react = "18.3.1-pre.817"
-seskar = "3.81.0"
+seskar = "3.82.0"
 
 exposed = "0.41.1"
 
@@ -107,7 +107,7 @@ assertj-core = { module = "org.assertj:assertj-core", version = "3.26.3" }
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-benManes-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
+benManes-versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
