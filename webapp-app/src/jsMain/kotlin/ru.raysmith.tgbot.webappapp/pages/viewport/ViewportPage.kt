@@ -22,16 +22,14 @@ val ViewportPage = FC<Props> {
     val insets = useInsets()
 
     BaseSubPageLayout {
+        title = "Viewport"
         Stack {
             spacing = responsive(1)
-
-            sx {
-                alignItems = AlignItems.center
-            }
+            sx { alignItems = AlignItems.center }
 
             Typography {
                 +"Viewport"
-                variant = TypographyVariant.h5
+                variant = TypographyVariant.h6
             }
 
             Table {
@@ -115,7 +113,7 @@ val ViewportPage = FC<Props> {
 
             Typography {
                 +"Insets"
-                variant = TypographyVariant.h5
+                variant = TypographyVariant.h6
             }
 
             Table {

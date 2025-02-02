@@ -14,6 +14,7 @@ val StatePage = FC {
     val state = useWebAppState()
 
     BaseSubPageLayout {
+        title = "App state"
         Table {
             TableBody {
                 DataDisplayTableRow {

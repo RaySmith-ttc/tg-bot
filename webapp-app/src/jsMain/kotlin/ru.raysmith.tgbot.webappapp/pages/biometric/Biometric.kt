@@ -16,30 +16,17 @@ import ru.raysmith.tgbot.webappapp.components.FullPageLoading
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTextField
 import ru.raysmith.tgbot.webappapp.mainScope
+import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import ru.raysmith.tgbot.webappapp.wrappers.mt
 import ru.raysmith.utils.uuid
 
 val BiometricPage = FC<Props> {
-
     val biometric = useBiometric()
     val backButton = useBackButton()
 
     var inited by useState(biometric.isInited)
     var snackbar by useState(false)
     var snackbarMessage by useState("")
-//    var logs by useState(listOf<String>())
-//
-//    val log = useCallback(logs) { str: String ->
-//        logs = logs.toMutableList().apply {
-//            add(str)
-//        }
-//    }
-//
-//    val logAll = useCallback(logs) { strs: List<String> ->
-//        logs = logs.toMutableList().apply {
-//            addAll(strs)
-//        }
-//    }
 
     var granted by useState<Boolean?>(null)
     var auth by useState<Boolean?>(null)
@@ -90,29 +77,132 @@ val BiometricPage = FC<Props> {
         return@FC
     }
 
-    if (!biometric.isBiometricAvailable) {
-        Alert {
-            +"BiometricManager not available on this device. To access the features on this page, use a device with a fingerprint scanner or face-base biometric"
-            severity = AlertColor.warning.unsafeCast<String>()
+    BaseSubPageLayout {
+        title = "Biometric"
+        if (!biometric.isBiometricAvailable) {
+            Alert {
+                +"BiometricManager not available on this device. To access the features on this page, use a device with a fingerprint scanner or face-base biometric"
+                severity = AlertColor.warning.unsafeCast<String>()
+            }
+            return@BaseSubPageLayout
         }
-        return@FC
-    }
 
-    if (!biometric.isAccessGranted || granted == false) {
-        if (!biometric.isAccessRequested) {
+        if (!biometric.isAccessGranted || granted == false) {
+            if (!biometric.isAccessRequested) {
+                Stack {
+                    spacing = responsive(0.5)
+
+                    Alert {
+                        +"Please allow the bot to use biometry"
+                        severity = AlertColor.warning.unsafeCast<String>()
+                    }
+
+                    Button {
+                        +"Allow"
+                        fullWidth = true
+                        size = Size.large
+                        startIcon = Settings.create()
+                        onClick = {
+                            biometric.requestAccess(jso { reason = "Some reason" }) { res ->
+                                granted = res
+                            }
+                        }
+                    }
+                }
+                return@BaseSubPageLayout
+            }
+
             Stack {
-                spacing = responsive(0.5)
+                spacing = responsive(2)
 
                 Alert {
-                    +"Please allow the bot to use biometry"
+                    +"The bot does not have permission for biometry. Go to the settings and grant permission to use it."
                     severity = AlertColor.warning.unsafeCast<String>()
                 }
 
                 Button {
-                    +"Allow"
+                    +"Biometric Settings"
                     fullWidth = true
                     size = Size.large
                     startIcon = Settings.create()
+                    onClick = {
+                        biometric.openSettings()
+                    }
+                }
+            }
+            return@BaseSubPageLayout
+        }
+
+        Stack {
+            DataDisplayCheckbox {
+                label = "isInited"
+                checked = biometric.isInited
+            }
+
+            Stack {
+                spacing = responsive(2)
+                sx { mt = 2 }
+
+                DataDisplayTextField {
+                    label = ReactNode("biometricType")
+                    value = Typography.create { +biometric.biometricType.toString() }
+                }
+
+                DataDisplayTextField {
+                    label = ReactNode("deviceId")
+                    value = Typography.create { +biometric.deviceId }
+                    copyToClipboard = true
+                }
+            }
+
+            DataDisplayCheckbox {
+                label = "isAccessRequested"
+                checked = biometric.isAccessRequested
+            }
+
+            DataDisplayCheckbox {
+                label = "isAccessGranted"
+                checked = biometric.isAccessGranted
+            }
+
+            DataDisplayCheckbox {
+                label = "isBiometricTokenSaved"
+                checked = biometric.isBiometricTokenSaved
+            }
+
+            DataDisplayTextField {
+                label = ReactNode("token")
+                value = token ?: ""
+            }
+
+            Stack {
+                spacing = responsive(0.5)
+                direction = responsive(StackDirection.row)
+
+                Button {
+                    +"Save token"
+                    onClick = onTokenSave
+                }
+
+                Button {
+                    +"Reset token"
+                    onClick = onTokenReset
+                }
+            }
+        }
+
+        if (biometric.isBiometricAvailable) {
+
+            Stack {
+                direction = responsive(StackDirection.row)
+
+                DataDisplayCheckbox {
+                    label = "Access granted"
+                    checked = granted ?: false
+                }
+
+                Button {
+                    +"Request"
                     onClick = {
                         biometric.requestAccess(jso { reason = "Some reason" }) { res ->
                             granted = res
@@ -120,132 +210,31 @@ val BiometricPage = FC<Props> {
                     }
                 }
             }
-            return@FC
-        }
 
-        Stack {
-            spacing = responsive(2)
-
-            Alert {
-                +"The bot does not have permission for biometry. Go to the settings and grant permission to use it."
-                severity = AlertColor.warning.unsafeCast<String>()
-            }
-
-            Button {
-                +"Biometric Settings"
-                fullWidth = true
-                size = Size.large
-                startIcon = Settings.create()
-                onClick = {
-                    biometric.openSettings()
+            Stack {
+                direction = responsive(StackDirection.row)
+                DataDisplayCheckbox {
+                    label = "Authenticated"
+                    checked = auth ?: false
                 }
-            }
-        }
-        return@FC
-    }
 
-    Stack {
-        DataDisplayCheckbox {
-            label = "isInited"
-            checked = biometric.isInited
-        }
-
-        Stack {
-            spacing = responsive(2)
-            sx { mt = 2 }
-
-            DataDisplayTextField {
-                label = ReactNode("biometricType")
-                value = Typography.create { +biometric.biometricType.toString() }
-            }
-
-            DataDisplayTextField {
-                label = ReactNode("deviceId")
-                value = Typography.create { +biometric.deviceId }
-                copyToClipboard = true
-            }
-        }
-
-        DataDisplayCheckbox {
-            label = "isAccessRequested"
-            checked = biometric.isAccessRequested
-        }
-
-        DataDisplayCheckbox {
-            label = "isAccessGranted"
-            checked = biometric.isAccessGranted
-        }
-
-        DataDisplayCheckbox {
-            label = "isBiometricTokenSaved"
-            checked = biometric.isBiometricTokenSaved
-        }
-
-        DataDisplayTextField {
-            label = ReactNode("token")
-            value = token ?: ""
-        }
-
-        Stack {
-            spacing = responsive(0.5)
-            direction = responsive(StackDirection.row)
-
-            Button {
-                +"Save token"
-                onClick = onTokenSave
-            }
-
-            Button {
-                +"Reset token"
-                onClick = onTokenReset
-            }
-        }
-    }
-
-    println(webApp.BiometricManager)
-    if (biometric.isBiometricAvailable) {
-
-        Stack {
-            direction = responsive(StackDirection.row)
-
-            DataDisplayCheckbox {
-                label = "Access granted"
-                checked = granted ?: false
-            }
-
-            Button {
-                +"Request"
-                onClick = {
-                    biometric.requestAccess(jso { reason = "Some reason" }) { res ->
-                        granted = res
+                Button {
+                    +"Authenticate"
+                    onClick = {
+                        biometric.authenticate(jso { reason = "Some reason" }) { res, t ->
+                            auth = res
+                            token = t
+                        }
                     }
                 }
             }
         }
 
-        Stack {
-            direction = responsive(StackDirection.row)
-            DataDisplayCheckbox {
-                label = "Authenticated"
-                checked = auth ?: false
-            }
-
-            Button {
-                +"Authenticate"
-                onClick = {
-                    biometric.authenticate(jso { reason = "Some reason" }) { res, t ->
-                        auth = res
-                        token = t
-                    }
-                }
-            }
+        Snackbar {
+            open = snackbar
+            onClose = { _, _ -> snackbar = false }
+            message = ReactNode(snackbarMessage)
+            autoHideDuration = 3000
         }
-    }
-
-    Snackbar {
-        open = snackbar
-        onClose = { _, _ -> snackbar = false }
-        message = ReactNode(snackbarMessage)
-        autoHideDuration = 3000
     }
 }

@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 
 val BaseInfoPage = FC<Props> {
     BaseSubPageLayout {
+        title = "Base info"
         Table {
             TableBody {
                 DataDisplayTableRow {

@@ -6,6 +6,7 @@ import react.*
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
+import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.prompts.alert
 
 external interface BBProps : Props {
@@ -24,58 +25,61 @@ val BackButtonPage = FC<BBProps> { props ->
         bb.show()
     }
 
-    Stack {
-        direction = responsive(StackDirection.column)
-        spacing = responsive(2)
-
-        Table {
-            TableBody {
-                DataDisplayTableRow {
-                    title = "isVisible"
-                    value = DataDisplayCheckbox.create { checked = bb.isVisible }
-                }
-            }
-        }
-
+    BaseSubPageLayout {
+        title = "Back button"
         Stack {
-            direction = responsive(StackDirection.row)
+            direction = responsive(StackDirection.column)
             spacing = responsive(2)
 
-            Button {
-                this.onClick = {
-                    bb.onClick(onClick)
-                    props.setIsBackButtonDefaultOnClickEnabled(false)
+            Table {
+                TableBody {
+                    DataDisplayTableRow {
+                        title = "isVisible"
+                        value = DataDisplayCheckbox.create { checked = bb.isVisible }
+                    }
                 }
-                +"onClick"
             }
 
-            Button {
-                this.onClick = {
-                    bb.offClick(onClick)
-                    props.setIsBackButtonDefaultOnClickEnabled(true)
+            Stack {
+                direction = responsive(StackDirection.row)
+                spacing = responsive(2)
+
+                Button {
+                    this.onClick = {
+                        bb.onClick(onClick)
+                        props.setIsBackButtonDefaultOnClickEnabled(false)
+                    }
+                    +"onClick"
                 }
-                +"offClick"
+
+                Button {
+                    this.onClick = {
+                        bb.offClick(onClick)
+                        props.setIsBackButtonDefaultOnClickEnabled(true)
+                    }
+                    +"offClick"
+                }
             }
-        }
 
-        Stack {
-            direction = responsive(StackDirection.row)
-            spacing = responsive(2)
+            Stack {
+                direction = responsive(StackDirection.row)
+                spacing = responsive(2)
 
-            Button {
-                disabled = bb.isVisible
-                this.onClick = {
-                    bb.show()
+                Button {
+                    disabled = bb.isVisible
+                    this.onClick = {
+                        bb.show()
+                    }
+                    +"Show"
                 }
-                +"Show"
-            }
 
-            Button {
-                disabled = !bb.isVisible
-                this.onClick = {
-                    bb.hide()
+                Button {
+                    disabled = !bb.isVisible
+                    this.onClick = {
+                        bb.hide()
+                    }
+                    +"Hide"
                 }
-                +"Hide"
             }
         }
     }

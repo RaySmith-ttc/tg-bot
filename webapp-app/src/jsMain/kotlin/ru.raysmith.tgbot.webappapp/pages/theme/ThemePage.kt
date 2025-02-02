@@ -22,6 +22,7 @@ val ThemePage = FC<Props> {
     val tpKeys = Object.keys(tp).filter { it != "colorScheme" }.filter { jsTypeOf(tp.asDynamic()[it]) == "string" }
 
     BaseSubPageLayout {
+        title = "Theme"
         Stack {
             direction = responsive(StackDirection.column)
             spacing = responsive(2)

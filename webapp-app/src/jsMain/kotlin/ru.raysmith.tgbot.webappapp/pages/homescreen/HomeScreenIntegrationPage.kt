@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.EventType
 import ru.raysmith.tgbot.HomeScreenStatus
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.webApp
+import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 
 val HomeScreenIntegrationPage = FC<Props> {
     val backButton = useBackButton()
@@ -26,46 +27,49 @@ val HomeScreenIntegrationPage = FC<Props> {
         }
     }
 
-    when(status) {
-        HomeScreenStatus.unsupported -> {
-            Alert {
-                +"The feature is not supported, and it is not possible to add the icon to the home screen"
-                severity = AlertColor.error.unsafeCast<String>()
-            }
-        }
-        HomeScreenStatus.unknown -> {
-            Alert {
-                +"The feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added"
-                severity = AlertColor.info.unsafeCast<String>()
-            }
-        }
-        HomeScreenStatus.added -> {
-            Alert {
-                +"The icon has already been added to the home screen"
-                severity = AlertColor.success.unsafeCast<String>()
-            }
-        }
-        HomeScreenStatus.missed -> {
-            Stack {
-                direction = responsive(StackDirection.column)
-                spacing = responsive(2)
-
+    BaseSubPageLayout {
+        title = "Home screen integration"
+        when(status) {
+            HomeScreenStatus.unsupported -> {
                 Alert {
-                    +"The icon has not been added to the home screen"
-                    severity = AlertColor.warning.unsafeCast<String>()
+                    +"The feature is not supported, and it is not possible to add the icon to the home screen"
+                    severity = AlertColor.error.unsafeCast<String>()
                 }
+            }
+            HomeScreenStatus.unknown -> {
+                Alert {
+                    +"The feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added"
+                    severity = AlertColor.info.unsafeCast<String>()
+                }
+            }
+            HomeScreenStatus.added -> {
+                Alert {
+                    +"The icon has already been added to the home screen"
+                    severity = AlertColor.success.unsafeCast<String>()
+                }
+            }
+            HomeScreenStatus.missed -> {
+                Stack {
+                    direction = responsive(StackDirection.column)
+                    spacing = responsive(2)
 
-                Button {
-                    +"Add to home screen"
-                    fullWidth = true
-                    size = Size.large
-                    startIcon = AddToHomeScreen.create()
-                    onClick = {
-                        webApp.addToHomeScreen()
+                    Alert {
+                        +"The icon has not been added to the home screen"
+                        severity = AlertColor.warning.unsafeCast<String>()
+                    }
+
+                    Button {
+                        +"Add to home screen"
+                        fullWidth = true
+                        size = Size.large
+                        startIcon = AddToHomeScreen.create()
+                        onClick = {
+                            webApp.addToHomeScreen()
+                        }
                     }
                 }
             }
+            else -> {}
         }
-        else -> {}
     }
 }
