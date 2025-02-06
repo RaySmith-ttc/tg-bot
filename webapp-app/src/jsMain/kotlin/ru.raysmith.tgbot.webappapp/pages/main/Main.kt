@@ -119,6 +119,12 @@ val MainPage = FC<Props> {
             href = Paths.bottomButtons
             startIcon = SmartButton.create()
         }
+
+        SubPageButton {
+            +"Settings button"
+            href = Paths.settingsButton
+            startIcon = Settings.create()
+        }
     }
 
     VerificationDialog {

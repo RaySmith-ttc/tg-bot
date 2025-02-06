@@ -1,25 +1,20 @@
-package ru.raysmith.tgbot.webappapp.pages.backbutton
+package ru.raysmith.tgbot.webappapp.pages.settingsbutton
 
 import mui.material.*
 import mui.system.responsive
 import react.FC
 import react.create
-import react.useEffectOnce
-import ru.raysmith.tgbot.hooks.useBackButton
+import ru.raysmith.tgbot.hooks.useSettingsButton
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.prompts.alert
 
-val BackButtonPage = FC<BBProps> { props ->
-    val backButton = useBackButton()
+val SettingsButtonPage = FC {
+    val settingsButton = useSettingsButton()
 
     val onClick = {
-        alert("Back button pressed. Press offClick to prevent this alert.")
-    }
-
-    useEffectOnce {
-        backButton.show()
+        alert("Settings button pressed")
     }
 
     BaseSubPageLayout {
@@ -32,24 +27,24 @@ val BackButtonPage = FC<BBProps> { props ->
                 TableBody {
                     DataDisplayTableRow {
                         title = "isVisible"
-                        value = DataDisplayCheckbox.create { checked = backButton.isVisible }
+                        value = DataDisplayCheckbox.create { checked = settingsButton.isVisible }
 
                         Stack {
                             direction = responsive(StackDirection.row)
                             spacing = responsive(2)
 
                             Button {
-                                disabled = backButton.isVisible
+                                disabled = settingsButton.isVisible
                                 this.onClick = {
-                                    backButton.show()
+                                    settingsButton.show()
                                 }
                                 +"Show"
                             }
 
                             Button {
-                                disabled = !backButton.isVisible
+                                disabled = !settingsButton.isVisible
                                 this.onClick = {
-                                    backButton.hide()
+                                    settingsButton.hide()
                                 }
                                 +"Hide"
                             }
@@ -64,16 +59,14 @@ val BackButtonPage = FC<BBProps> { props ->
 
                 Button {
                     this.onClick = {
-                        backButton.onClick(onClick)
-                        props.setIsBackButtonDefaultOnClickEnabled(false)
+                        settingsButton.onClick(onClick)
                     }
                     +"onClick"
                 }
 
                 Button {
                     this.onClick = {
-                        backButton.offClick(onClick)
-                        props.setIsBackButtonDefaultOnClickEnabled(true)
+                        settingsButton.offClick(onClick)
                     }
                     +"offClick"
                 }

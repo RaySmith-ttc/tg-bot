@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.webappapp.pages.backbutton.BackButtonPage
 import ru.raysmith.tgbot.webappapp.pages.bottombutton.BottomButtonsPage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
+import ru.raysmith.tgbot.webappapp.pages.settingsbutton.SettingsButtonPage
 import ru.raysmith.tgbot.webappapp.pages.state.StatePage
 import ru.raysmith.tgbot.webappapp.pages.theme.ThemePage
 import ru.raysmith.tgbot.webappapp.pages.viewport.ViewportPage
@@ -68,8 +69,8 @@ val Router = FC<PropsWithChildren> { props ->
                     }
                 },
                 jso {
-                    path = Paths.bottomButtons
-                    element = BottomButtonsPage.create()
+                    path = Paths.settingsButton
+                    element = SettingsButtonPage.create()
                 },
             )
         }
