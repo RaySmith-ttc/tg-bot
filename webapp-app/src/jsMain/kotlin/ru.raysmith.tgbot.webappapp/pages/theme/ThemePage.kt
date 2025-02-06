@@ -7,6 +7,8 @@ import react.*
 import ru.raysmith.tgbot.hooks.useThemeParams
 import ru.raysmith.tgbot.webappapp.camelCaseToSnakeCase
 import ru.raysmith.tgbot.webappapp.capitalize
+import ru.raysmith.tgbot.webappapp.components.ColorBlock
+import ru.raysmith.tgbot.webappapp.components.DefaultValuesHintAlert
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.decapitalize
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
@@ -38,9 +40,7 @@ val ThemePage = FC<Props> {
                 }
             }
 
-            Divider {
-
-            }
+            Divider()
 
             Table {
                 TableBody {
@@ -63,9 +63,7 @@ val ThemePage = FC<Props> {
                 }
             }
 
-            Divider {
-
-            }
+            Divider()
 
             ColorSelect {
                 label = "Header color via ThemeParams"
@@ -108,9 +106,7 @@ val ThemePage = FC<Props> {
                 }
             }
 
-            Divider {
-
-            }
+            Divider()
 
             ColorSelect {
                 key = "3"
@@ -154,6 +150,8 @@ val ThemePage = FC<Props> {
                     +"bottom_bar_bg_color"
                 }
             }
+
+            DefaultValuesHintAlert()
         }
     }
 }

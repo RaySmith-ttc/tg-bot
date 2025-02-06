@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.HapticFeedbackType
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
+/** This hook controls haptic feedback. */
 fun useHapticFeedback(): HapticFeedbackHookType {
 
     val impactOccurred: (style: HapticFeedbackStyle) -> Unit = {

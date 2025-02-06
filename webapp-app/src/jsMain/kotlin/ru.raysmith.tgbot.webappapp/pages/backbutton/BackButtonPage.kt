@@ -2,16 +2,14 @@ package ru.raysmith.tgbot.webappapp.pages.backbutton
 
 import mui.material.*
 import mui.system.responsive
-import react.*
+import react.FC
+import react.create
+import react.useEffectOnce
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.prompts.alert
-
-external interface BBProps : Props {
-    var setIsBackButtonDefaultOnClickEnabled: (value: Boolean) -> Unit
-}
 
 val BackButtonPage = FC<BBProps> { props ->
     val bb = useBackButton()
@@ -36,6 +34,27 @@ val BackButtonPage = FC<BBProps> { props ->
                     DataDisplayTableRow {
                         title = "isVisible"
                         value = DataDisplayCheckbox.create { checked = bb.isVisible }
+
+                        Stack {
+                            direction = responsive(StackDirection.row)
+                            spacing = responsive(2)
+
+                            Button {
+                                disabled = bb.isVisible
+                                this.onClick = {
+                                    bb.show()
+                                }
+                                +"Show"
+                            }
+
+                            Button {
+                                disabled = !bb.isVisible
+                                this.onClick = {
+                                    bb.hide()
+                                }
+                                +"Hide"
+                            }
+                        }
                     }
                 }
             }
@@ -58,27 +77,6 @@ val BackButtonPage = FC<BBProps> { props ->
                         props.setIsBackButtonDefaultOnClickEnabled(true)
                     }
                     +"offClick"
-                }
-            }
-
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(2)
-
-                Button {
-                    disabled = bb.isVisible
-                    this.onClick = {
-                        bb.show()
-                    }
-                    +"Show"
-                }
-
-                Button {
-                    disabled = !bb.isVisible
-                    this.onClick = {
-                        bb.hide()
-                    }
-                    +"Hide"
                 }
             }
         }

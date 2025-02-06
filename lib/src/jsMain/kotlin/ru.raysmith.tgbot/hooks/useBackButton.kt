@@ -6,6 +6,9 @@ import react.useState
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
+/**
+ * This hook controls the back button, which can be displayed in the header of the Mini App in the Telegram interface.
+ * */
 fun useBackButton(): BackButtonHookType {
     var isVisible by useState(webApp.BackButton.isVisible)
 

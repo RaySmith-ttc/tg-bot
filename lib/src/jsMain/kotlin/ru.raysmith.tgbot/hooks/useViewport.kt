@@ -8,6 +8,11 @@ import ru.raysmith.tgbot.*
 import ru.raysmith.tgbot.events.ViewportChangedEvent
 import web.scheduling.VoidFunction
 
+/**
+ * This hook provides information about the current state of the viewport.
+ *
+ * @see useInsets
+ * */
 fun useViewport(): ViewportHookType {
     var viewportHeight by useState(webApp.viewportHeight)
     var viewportStableHeight by useState(webApp.viewportStableHeight)

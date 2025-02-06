@@ -7,6 +7,9 @@ import ru.raysmith.tgbot.events.ViewportChangedEvent
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
+/**
+ * This hook provides information and control over the state of the App.
+ * */
 fun useWebAppState(): WebAppStateHookType {
     var isActive by useState(webApp.isActive)
     var isClosingConfirmationEnabled by useState(webApp.isClosingConfirmationEnabled)

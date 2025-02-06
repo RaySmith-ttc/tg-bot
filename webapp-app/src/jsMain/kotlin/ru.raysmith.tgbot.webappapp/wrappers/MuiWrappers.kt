@@ -16,7 +16,7 @@ inline var SxProps<*>.pr: dynamic
     set(value) {
         asDynamic().pr = value
     }
-inline var SxProps<*>.pl: Number
+inline var SxProps<*>.pl: dynamic
     get() = asDynamic().pl
     set(value) {
         asDynamic().pl = value
@@ -36,7 +36,7 @@ inline var SxProps<*>.mx: dynamic
     set(value) {
         asDynamic().mx = value
     }
-inline var SxProps<*>.pb: Number
+inline var SxProps<*>.pb: dynamic
     get() = asDynamic().pb
     set(value) {
         asDynamic().pb = value

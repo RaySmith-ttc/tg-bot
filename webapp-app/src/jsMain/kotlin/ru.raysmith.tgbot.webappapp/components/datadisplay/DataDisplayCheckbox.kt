@@ -11,7 +11,11 @@ import react.FC
 import react.ReactNode
 import react.create
 import ru.raysmith.tgbot.webappapp.other
+import ru.raysmith.tgbot.webappapp.wrappers.ml
+import ru.raysmith.tgbot.webappapp.wrappers.pl
+import ru.raysmith.tgbot.webappapp.wrappers.pr
 import web.cssom.important
+import web.cssom.px
 
 external interface DataDisplayCheckboxProps : CheckboxProps {
     var label: String?
@@ -25,6 +29,7 @@ val DataDisplayCheckbox = FC<DataDisplayCheckboxProps> { props ->
         onChange = { _, _ -> }
         sx {
             color = important(theme.palette.text.secondary)
+            pl = 0.px
 
             +props.sx
         }

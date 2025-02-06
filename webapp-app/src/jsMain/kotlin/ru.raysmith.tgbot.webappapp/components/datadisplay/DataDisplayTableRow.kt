@@ -7,6 +7,8 @@ import react.FC
 import react.Props
 import react.PropsWithChildren
 import react.ReactNode
+import ru.raysmith.tgbot.webappapp.wrappers.pb
+import ru.raysmith.tgbot.webappapp.wrappers.pt
 import web.cssom.*
 
 external interface BaseInfoPageProps : PropsWithChildren {
@@ -23,6 +25,10 @@ val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
                 overflowWrap = OverflowWrap.anywhere
+                if (props.children != null) {
+                    borderBottom = None.none
+                    pb = 0.5
+                }
             }
 
             Typography {
@@ -34,15 +40,31 @@ val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
                 overflowWrap = OverflowWrap.anywhere
+                if (props.children != null) {
+                    borderBottom = None.none
+                    pb = 1
+                }
             }
             Stack {
                 direction = responsive(StackDirection.row)
                 spacing = responsive(1)
                 sx {
                     justifyItems = JustifyItems.center
+                    alignItems = AlignItems.center
                 }
 
                 +props.value
+            }
+        }
+    }
+
+    if (props.children != null) {
+        TableRow {
+            TableCell {
+                colSpan = 2
+                sx {
+                    pt = 0.5
+                }
 
                 +props.children
             }

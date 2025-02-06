@@ -8,6 +8,15 @@ import ru.raysmith.tgbot.*
 import ru.raysmith.tgbot.events.ViewportChangedEvent
 import web.scheduling.VoidFunction
 
+/**
+ * This hook provides:
+ * - the system-defined safe area insets, providing padding values to ensure content remains within
+ * visible boundaries, avoiding overlap with system UI elements like notches or navigation bars.
+ * - the content-defined safe area insets, providing padding values to ensure content remains within visible boundaries,
+ * avoiding overlap with Telegram UI elements.
+ *
+ * @see useViewport
+ * */
 fun useInsets(): InsetsHookType {
     var safeArea by useState(webApp.safeAreaInset)
     var contentSafeArea by useState(webApp.contentSafeAreaInset)

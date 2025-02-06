@@ -1,5 +1,7 @@
 package ru.raysmith.tgbot
 
+import web.cssom.Color
+
 /** An object containing one or several fields that need to be changed */
 external interface MainButtonParams {
 
@@ -7,11 +9,22 @@ external interface MainButtonParams {
     var text: String
 
     /** button color */
-    var color: String
+    var color: Color
 
     /** button text color */
     @JsName("text_color")
-    var textColor: String
+    var textColor: Color
+
+    /**
+     * enable shine effect
+     *
+     * @since Bot API 7.10
+     * */
+    @JsName("has_shine_effect")
+    var hasShineEffect: Color
+
+    /** position of the secondary button */
+    var position: BottomButtonPosition
 
     /** enable the button */
     @JsName("is_active")

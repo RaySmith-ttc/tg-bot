@@ -10,6 +10,7 @@ import ru.raysmith.tgbot.webappapp.pages.biometric.BiometricPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
 import ru.raysmith.tgbot.webappapp.pages.RootPage
 import ru.raysmith.tgbot.webappapp.pages.backbutton.BackButtonPage
+import ru.raysmith.tgbot.webappapp.pages.bottombutton.BottomButtonsPage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
 import ru.raysmith.tgbot.webappapp.pages.state.StatePage
@@ -65,6 +66,10 @@ val Router = FC<PropsWithChildren> { props ->
                             isBackButtonDefaultOnClickEnabled = value
                         }
                     }
+                },
+                jso {
+                    path = Paths.bottomButtons
+                    element = BottomButtonsPage.create()
                 },
             )
         }

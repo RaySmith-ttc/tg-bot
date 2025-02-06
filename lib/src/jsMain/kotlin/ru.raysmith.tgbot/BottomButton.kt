@@ -55,17 +55,17 @@ external interface BottomButton {
     /** A method to set the button text. */
     val setText: (text: String) -> BottomButton
 
-    // TODO ? link to mainButtonClicked
     /**
      * A method that sets the button press event handler.
-     * An alias for [Telegram.WebApp.onEvent][WebApp.onEvent]`('mainButtonClicked', callback)`
+     * An alias for [WebApp.onEvent][WebApp.onEvent]`(`[EventType.mainButtonClicked]`, callback)` or
+     *  [WebApp.onEvent][WebApp.onEvent]`(`[EventType.secondaryButtonClicked]`, callback)`
      * */
     val onClick: (callback: VoidFunction) -> BottomButton
 
-    // TODO ? link to mainButtonClicked
     /**
      * A method that removes the button press event handler.
-     * An alias for [Telegram.WebApp.onEvent][WebApp.onEvent]`('mainButtonClicked', callback)`
+     * An alias for [WebApp.onEvent][WebApp.onEvent]`(`[EventType.mainButtonClicked]`, callback)` or
+     * [WebApp.onEvent][WebApp.onEvent]`(`[EventType.secondaryButtonClicked]`, callback)`
      * */
     val offClick: (callback: VoidFunction) -> BottomButton
 

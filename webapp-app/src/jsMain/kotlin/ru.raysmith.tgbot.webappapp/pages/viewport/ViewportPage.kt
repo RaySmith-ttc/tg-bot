@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.hooks.useViewport
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
+import ru.raysmith.tgbot.webappapp.wrappers.pt
 import web.cssom.AlignItems
 import web.cssom.atrule.orientation
 
@@ -30,6 +31,7 @@ val ViewportPage = FC<Props> {
             Typography {
                 +"Viewport"
                 variant = TypographyVariant.h6
+                sx { pt = 2 }
             }
 
             Table {
@@ -101,7 +103,7 @@ val ViewportPage = FC<Props> {
                     }
                     DataDisplayTableRow {
                         title = "fullscreenFailed"
-                        value = Typography.create { +viewport.fullscreenFailed?.toString() }
+                        value = Typography.create { +viewport.fullscreenFailed.toString() }
 
                         Stack {
                             direction = responsive(StackDirection.row)
@@ -114,6 +116,7 @@ val ViewportPage = FC<Props> {
             Typography {
                 +"Insets"
                 variant = TypographyVariant.h6
+                sx { pt = 2 }
             }
 
             Table {

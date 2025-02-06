@@ -113,6 +113,12 @@ val MainPage = FC<Props> {
             href = Paths.backButton
             startIcon = ArrowBack.create()
         }
+
+        SubPageButton {
+            +"Bottom buttons"
+            href = Paths.bottomButtons
+            startIcon = SmartButton.create()
+        }
     }
 
     VerificationDialog {

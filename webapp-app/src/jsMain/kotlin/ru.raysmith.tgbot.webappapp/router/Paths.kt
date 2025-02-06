@@ -10,4 +10,5 @@ object Paths {
     val state = "/state"
     val homeSceenIntegration = "/homescreen"
     val backButton = "/backButton"
+    val bottomButtons = "/bottomButtons"
 }

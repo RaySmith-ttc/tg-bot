@@ -7,6 +7,7 @@ import react.useState
 import ru.raysmith.tgbot.*
 import web.cssom.Color
 
+/** This hook contains the user's current theme settings */
 fun useThemeParams(): ThemeParamsHookType {
 
     var colorScheme by useState(webApp.colorScheme)

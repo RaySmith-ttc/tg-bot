@@ -4,6 +4,10 @@ import js.objects.Object
 import js.objects.jso
 import react.Props
 
+// TODO add to ru.raysmith:utils
+/**
+ * const {propOne, propTwo, ...[other]} = props;
+ * */
 fun Props.other(vararg prop: String): Props {
     val res = jso<Props> {}
     

@@ -21,7 +21,7 @@ kotlin {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.apply {
-                add("-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+//                add("-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
             }
         }
         useCommonJs()

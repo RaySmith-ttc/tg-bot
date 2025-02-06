@@ -1,12 +1,10 @@
-package ru.raysmith.tgbot.webappapp.pages.theme
+package ru.raysmith.tgbot.webappapp.components
 
-import emotion.react.css
 import mui.material.Paper
 import mui.system.Box
 import mui.system.sx
 import react.FC
 import react.Props
-import react.dom.html.ReactHTML
 import web.cssom.BackgroundColor
 import web.cssom.px
 

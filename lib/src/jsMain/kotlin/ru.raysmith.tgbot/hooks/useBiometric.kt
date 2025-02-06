@@ -5,6 +5,10 @@ import react.*
 import ru.raysmith.tgbot.*
 import web.scheduling.VoidFunction
 
+/**
+ * This hook controls biometrics on the device.
+ * Before the first use of this object, it needs to be initialized using the init method.
+ * */
 fun useBiometric(): BiometricHookType {
     @Suppress("LocalVariableName")
     var BiometricManager by useState(webApp.BiometricManager)

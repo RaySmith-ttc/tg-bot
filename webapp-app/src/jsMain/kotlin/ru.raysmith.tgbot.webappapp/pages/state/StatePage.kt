@@ -27,10 +27,7 @@ val StatePage = FC {
 
                     Stack {
                         spacing = responsive(1)
-                        direction = responsive(
-                            Breakpoint.xs to StackDirection.column,
-                            Breakpoint.sm to StackDirection.row,
-                        )
+                        direction = responsive(StackDirection.row)
 
                         Button {
                             +"Enable"

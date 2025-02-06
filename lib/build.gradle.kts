@@ -48,7 +48,7 @@ kotlin {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.addAll (
-                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
+//                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
             )
         }
 
