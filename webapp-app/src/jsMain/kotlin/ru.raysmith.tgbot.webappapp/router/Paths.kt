@@ -12,4 +12,5 @@ object Paths {
     val backButton = "/backButton"
     val bottomButtons = "/bottomButtons"
     val settingsButton = "/settingsButton"
+    val cloud = "/cloud"
 }

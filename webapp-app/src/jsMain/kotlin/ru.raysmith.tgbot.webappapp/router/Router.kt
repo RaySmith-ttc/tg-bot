@@ -11,6 +11,7 @@ import ru.raysmith.tgbot.webappapp.pages.main.MainPage
 import ru.raysmith.tgbot.webappapp.pages.RootPage
 import ru.raysmith.tgbot.webappapp.pages.backbutton.BackButtonPage
 import ru.raysmith.tgbot.webappapp.pages.bottombutton.BottomButtonsPage
+import ru.raysmith.tgbot.webappapp.pages.cloud.CloudStoragePage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
 import ru.raysmith.tgbot.webappapp.pages.settingsbutton.SettingsButtonPage
@@ -71,6 +72,14 @@ val Router = FC<PropsWithChildren> { props ->
                 jso {
                     path = Paths.settingsButton
                     element = SettingsButtonPage.create()
+                },
+                jso {
+                    path = Paths.bottomButtons
+                    element = BottomButtonsPage.create()
+                },
+                jso {
+                    path = Paths.cloud
+                    element = CloudStoragePage.create()
                 },
             )
         }

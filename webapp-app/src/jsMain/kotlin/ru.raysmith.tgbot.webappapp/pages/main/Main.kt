@@ -125,6 +125,12 @@ val MainPage = FC<Props> {
             href = Paths.settingsButton
             startIcon = Settings.create()
         }
+
+        SubPageButton {
+            +"Cloud storage"
+            href = Paths.cloud
+            startIcon = Cloud.create()
+        }
     }
 
     VerificationDialog {
