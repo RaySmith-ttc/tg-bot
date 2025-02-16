@@ -83,6 +83,14 @@ val Router = FC<PropsWithChildren> { props ->
                     path = Paths.cloud
                     element = CloudStoragePage.create()
                 },
+                jso {
+                    path = Paths.accelerometer
+                    element = AccelerometerPage.create()
+                },
+                jso {
+                    path = Paths.deviceOrientation
+                    element = DeviceOrientationPage.create()
+                },
             )
         }
     ))

@@ -11,16 +11,16 @@ external interface Accelerometer {
     val isStarted: Boolean
 
     /** The current acceleration in the X-axis, measured in m/s². */
-    val x: Float
+    val x: Float?
 
     /** The current acceleration in the Y-axis, measured in m/s². */
-    val y: Float
+    val y: Float?
 
     /** The current acceleration in the Z-axis, measured in m/s². */
-    val z: Float
+    val z: Float?
 
     /**
-     * Starts tracking accelerometer data using params of type AccelerometerStartParams.
+     * Starts tracking accelerometer data using params of type [AccelerometerStartParams].
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called with a boolean indicating whether tracking was successfully started.
      *

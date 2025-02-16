@@ -14,13 +14,13 @@ external interface DeviceOrientation {
     val absolute: Boolean
 
     /** The rotation around the Z-axis, measured in radians. */
-    val alpha: Float
+    val alpha: Float?
 
     /** The rotation around the X-axis, measured in radians. */
-    val beta: Float
+    val beta: Float?
 
     /** The rotation around the Y-axis, measured in radians. */
-    val gamma: Float
+    val gamma: Float?
 
     /**
      * Starts tracking device orientation data using params of type DeviceOrientationStartParams.

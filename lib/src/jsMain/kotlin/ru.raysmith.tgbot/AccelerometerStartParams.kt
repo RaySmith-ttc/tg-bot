@@ -9,5 +9,5 @@ external interface AccelerometerStartParams {
      * so the actual tracking frequency may differ from the specified value.
      * */
     @JsName("refresh_rate")
-    val refreshRate: Int?
+    var refreshRate: Int?
 }
