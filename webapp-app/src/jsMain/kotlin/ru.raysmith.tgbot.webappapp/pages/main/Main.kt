@@ -141,6 +141,12 @@ val MainPage = FC<Props> {
             href = Paths.deviceOrientation
             startIcon = ScreenRotation.create()
         }
+
+        SubPageButton {
+            +"Gyroscope"
+            href = Paths.gyroscope
+            startIcon = ThreeSixty.create()
+        }
     }
 
     VerificationDialog {

@@ -12,6 +12,7 @@ import ru.raysmith.tgbot.webappapp.pages.base.BaseInfoPage
 import ru.raysmith.tgbot.webappapp.pages.biometric.BiometricPage
 import ru.raysmith.tgbot.webappapp.pages.bottombutton.BottomButtonsPage
 import ru.raysmith.tgbot.webappapp.pages.cloud.CloudStoragePage
+import ru.raysmith.tgbot.webappapp.pages.gyroscope.GyroscopePage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
@@ -90,6 +91,10 @@ val Router = FC<PropsWithChildren> { props ->
                 jso {
                     path = Paths.deviceOrientation
                     element = DeviceOrientationPage.create()
+                },
+                jso {
+                    path = Paths.gyroscope
+                    element = GyroscopePage.create()
                 },
             )
         }
