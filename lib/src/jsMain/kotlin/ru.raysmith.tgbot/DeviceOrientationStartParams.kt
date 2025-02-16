@@ -11,7 +11,7 @@ external interface DeviceOrientationStartParams {
      * so the actual tracking frequency may differ from the specified value.
      */
     @JsName("refresh_rate")
-    val refreshRate: Int?
+    var refreshRate: Int?
 
     /**
      * Pass *true* to receive absolute orientation data, allowing you to determine the device's attitude relative to
@@ -23,5 +23,5 @@ external interface DeviceOrientationStartParams {
      * to determine whether the data provided is absolute or relative.
      */
     @JsName("need_absolute")
-    val needAbsolute: Boolean?
+    var needAbsolute: Boolean?
 }

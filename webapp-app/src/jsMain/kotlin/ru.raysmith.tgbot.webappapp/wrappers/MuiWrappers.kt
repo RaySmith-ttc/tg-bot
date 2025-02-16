@@ -26,6 +26,11 @@ inline var SxProps<*>.p: dynamic
     set(value) {
         asDynamic().p = value
     }
+inline var SxProps<*>.px: dynamic
+    get() = asDynamic().px
+    set(value) {
+        asDynamic().px = value
+    }
 inline var SxProps<*>.m: dynamic
     get() = asDynamic().m
     set(value) {

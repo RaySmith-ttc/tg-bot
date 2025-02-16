@@ -52,6 +52,9 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                         main = tgTheme.destructiveTextColor.unsafeCast<PaletteColor>()
                     }
                 }
+                typography = jso {
+                    fontSize = 12
+                }
             } else jso {}
         )
         CssBaseline {}

@@ -11,13 +11,13 @@ external interface Gyroscope {
     val isStarted: Boolean
 
     /** The current rotation rate around the X-axis, measured in rad/s. */
-    val x: Float
+    val x: Float?
 
     /** The current rotation rate around the Y-axis, measured in rad/s. */
-    val y: Float
+    val y: Float?
 
     /** The current rotation rate around the Z-axis, measured in rad/s. */
-    val z: Float
+    val z: Float?
 
     /**
      * Starts tracking gyroscope data using params of type GyroscopeStartParams.

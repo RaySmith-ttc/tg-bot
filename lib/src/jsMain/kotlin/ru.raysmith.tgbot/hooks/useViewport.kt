@@ -37,11 +37,8 @@ fun useViewport(): ViewportHookType {
         webApp.expand()
     }
 
-    val fullscreenFailedClear = {
-        fullscreenFailed = null
-    }
-
     val requestFullscreen = {
+        fullscreenFailed = null
         webApp.requestFullscreen()
     }
 
@@ -99,7 +96,6 @@ fun useViewport(): ViewportHookType {
             this.expand = expand
             this.isFullscreen = isFullscreen
             this.fullscreenFailed = fullscreenFailed
-            this.fullscreenFailedClear = fullscreenFailedClear
             this.requestFullscreen = requestFullscreen
             this.exitFullscreen = exitFullscreen
             this.isOrientationLocked = isOrientationLocked
@@ -186,19 +182,13 @@ external interface ViewportHookType {
     var isFullscreen: Boolean
 
     /**
-     * Not null if a request to enter fullscreen mode fails. You can set this value to null with [fullscreenFailedClear]
-     * method.
+     * Not null if a request to enter fullscreen mode fails.
      *
      * Possible values:
      * - [FullscreenFailedType.UNSUPPORTED] – Fullscreen mode is not supported on this device or platform.
      * - [FullscreenFailedType.ALREADY_FULLSCREEN] – The Mini App is already in fullscreen mode.
-     *
-     * @since Bot API 8.0
      */
     var fullscreenFailed: FullscreenFailedType?
-
-    /** Sets [fullscreenFailed] value to null. */
-    var fullscreenFailedClear: VoidFunction
 
     /**
      * A method that requests opening the Mini App in fullscreen mode. Although the header is transparent in fullscreen

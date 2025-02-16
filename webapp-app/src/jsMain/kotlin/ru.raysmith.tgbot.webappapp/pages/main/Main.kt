@@ -38,7 +38,6 @@ val VerificationButton = FC<VerificationButtonProps> { props ->
 
 val MainPage = FC<Props> {
     var showVerificationInfo by useState(false)
-    val viewport = useViewport()
     val theme = useTheme<Theme>()
 
     useEffectOnce {
@@ -48,8 +47,7 @@ val MainPage = FC<Props> {
     VerificationButton {
         sx {
             position = Position.absolute
-            top = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()} + ${theme.spacing(2)})".unsafeCast<Top>()
-            pt = 8.px
+            pt = theme.spacing(1)
             right = theme.spacing(2)
             color = theme.palette.primary.main
             zIndex = integer(1)
@@ -130,6 +128,18 @@ val MainPage = FC<Props> {
             +"Cloud storage"
             href = Paths.cloud
             startIcon = Cloud.create()
+        }
+
+        SubPageButton {
+            +"Accelerometer"
+            href = Paths.accelerometer
+            startIcon = ViewInAr.create()
+        }
+
+        SubPageButton {
+            +"Device orientation"
+            href = Paths.deviceOrientation
+            startIcon = ScreenRotation.create()
         }
     }
 

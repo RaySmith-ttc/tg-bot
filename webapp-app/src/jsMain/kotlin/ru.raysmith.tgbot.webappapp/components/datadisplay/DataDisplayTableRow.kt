@@ -14,14 +14,12 @@ import web.cssom.*
 external interface BaseInfoPageProps : PropsWithChildren {
     var title: String
     var value: ReactNode
-    var bigTitleWidth: Boolean?
 }
 
 val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
     TableRow {
         TableCell {
             sx {
-                width = if (props.bigTitleWidth == true) 75.pct else 50.pct
                 wordWrap = WordWrap.breakWord
                 whiteSpace = WhiteSpace.normal
                 overflowWrap = OverflowWrap.anywhere

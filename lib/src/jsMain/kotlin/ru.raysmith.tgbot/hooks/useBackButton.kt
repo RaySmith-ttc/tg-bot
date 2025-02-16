@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.hooks
 import js.objects.jso
 import react.useMemo
 import react.useState
+import ru.raysmith.tgbot.copyOf
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
@@ -10,27 +11,27 @@ import web.scheduling.VoidFunction
  * This hook controls the back button, which can be displayed in the header of the Mini App in the Telegram interface.
  * */
 fun useBackButton(): BackButtonHookType {
-    var isVisible by useState(webApp.BackButton.isVisible)
+    var backButton by useState(webApp.BackButton)
 
     val onClick: (callback: VoidFunction) -> Unit = { callback: VoidFunction ->
-        webApp.BackButton.onClick(callback)
+        backButton = copyOf(webApp.BackButton.onClick(callback))
     }
 
     val offClick: (callback: VoidFunction) -> Unit = { callback: VoidFunction ->
-        webApp.BackButton.offClick(callback)
+        backButton = copyOf(webApp.BackButton.offClick(callback))
     }
 
     val show = {
-        isVisible = webApp.BackButton.show().isVisible
+        backButton = copyOf(webApp.BackButton.show())
     }
 
     val hide = {
-        isVisible = webApp.BackButton.hide().isVisible
+        backButton = copyOf(webApp.BackButton.hide())
     }
 
-    return useMemo(isVisible) {
+    return useMemo(backButton) {
         jso {
-            this.isVisible = isVisible
+            this.isVisible = backButton.isVisible
             this.onClick = onClick
             this.offClick = offClick
             this.show = show
