@@ -2,6 +2,8 @@ package ru.raysmith.tgbot.webappapp.pages.orientation
 
 import js.objects.jso
 import mui.material.*
+import mui.material.styles.Theme
+import mui.material.styles.useTheme
 import mui.system.responsive
 import mui.system.sx
 import react.FC
@@ -10,12 +12,12 @@ import react.create
 import react.useState
 import ru.raysmith.tgbot.DeviceOrientationFailedType
 import ru.raysmith.tgbot.hooks.useDeviceOrientation
+import ru.raysmith.tgbot.webappapp.components.ControlsPaper
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.cssom.pct
 
-// TODO lockOrientation, unlockOrientation
 val DeviceOrientationPage = FC {
     val deviceOrientation = useDeviceOrientation()
     var needAbsolute by useState(false)
@@ -53,46 +55,75 @@ val DeviceOrientationPage = FC {
                             title = "gamma"
                             value = Typography.create { +deviceOrientation.gamma.toString().take(16) }
                         }
+                        DataDisplayTableRow {
+                            title = "isOrientationLocked"
+                            value = DataDisplayCheckbox.create { checked = deviceOrientation.isOrientationLocked }
+
+                            ToggleButtonGroup {
+                                value = deviceOrientation.isOrientationLocked
+                                exclusive = true
+                                size = Size.small
+                                onChange = { _, value ->
+                                    if (value.unsafeCast<Boolean>()) {
+                                        deviceOrientation.lockOrientation()
+                                    } else {
+                                        deviceOrientation.unlockOrientation()
+                                    }
+                                }
+
+                                ToggleButton {
+                                    value = true
+                                    +"Lock"
+                                }
+
+                                ToggleButton {
+                                    value = false
+                                    +"Unlock"
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            FormControlLabel {
-                label = ReactNode("Absolute")
-                control = Checkbox.create {
-                    disabled = deviceOrientation.isStarted
-                    checked = needAbsolute
-                    onChange = { _, checked ->
-                        needAbsolute = checked
-                    }
-                }
-            }
-
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(1)
-                sx { width = 100.pct }
-
-                Button {
-                    +"Start"
-                    sx { width = 100.pct }
-                    size = Size.large
-                    disabled = deviceOrientation.isStarted
-                    onClick = {
-                        deviceOrientation.start(jso { refreshRate = 100; this.needAbsolute = needAbsolute }) {
-                            console.log("isTrackingStarted: $it")
+            ControlsPaper {
+                FormControlLabel {
+                    label = ReactNode("Absolute")
+                    control = Checkbox.create {
+                        disabled = deviceOrientation.isStarted
+                        checked = needAbsolute
+                        onChange = { _, checked ->
+                            needAbsolute = checked
                         }
                     }
                 }
 
-                Button {
-                    +"Stop"
+                Stack {
+                    direction = responsive(StackDirection.row)
+                    spacing = responsive(1)
                     sx { width = 100.pct }
-                    size = Size.large
-                    disabled = !deviceOrientation.isStarted
-                    onClick = {
-                        deviceOrientation.stop {
-                            console.log("isTrackingStopped: $it")
+
+                    Button {
+                        +"Start"
+                        sx { width = 100.pct }
+                        size = Size.large
+                        disabled = deviceOrientation.isStarted
+                        onClick = {
+                            deviceOrientation.start(jso { refreshRate = 100; this.needAbsolute = needAbsolute }) {
+                                console.log("isTrackingStarted: $it")
+                            }
+                        }
+                    }
+
+                    Button {
+                        +"Stop"
+                        sx { width = 100.pct }
+                        size = Size.large
+                        disabled = !deviceOrientation.isStarted
+                        onClick = {
+                            deviceOrientation.stop {
+                                console.log("isTrackingStopped: $it")
+                            }
                         }
                     }
                 }

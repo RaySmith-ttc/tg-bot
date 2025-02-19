@@ -59,7 +59,8 @@ sealed external interface EventType {
         /**
          * Occurs when the safe area for content changes (e.g., due to orientation change or screen adjustments).
          *
-         * *eventHandler* receives no parameters. The current inset values can be accessed via `this.contentSafeAreaInset`.
+         * *eventHandler* receives no parameters. The current inset values can be accessed via
+         * `this.contentSafeAreaInset`.
          *
          * @since Bot API 8.0
          */
@@ -258,10 +259,12 @@ sealed external interface EventType {
         /**
          * Occurs after checking the home screen status.
          *
-         * *eventHandler* receives an object with the field `status`, which is a string indicating the current home screen status.
+         * *eventHandler* receives an object with the field `status`, which is a string indicating the current home
+         * screen status.
          * Possible values for `status` are:
          * - `unsupported` – the feature is not supported, and it is not possible to add the icon to the home screen,
-         * - `unknown` – the feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added,
+         * - `unknown` – the feature is supported, and the icon can be added, but it is not possible to determine if the
+         * icon has already been added,
          * - `added` – the icon has already been added to the home screen,
          * - `missed` – the icon has not been added to the home screen.
          *
@@ -294,7 +297,8 @@ sealed external interface EventType {
         /**
          * Occurs with the specified frequency after calling the start method, sending the current accelerometer data.
          *
-         * *eventHandler* receives no parameters. The current acceleration values can be received via `this.x`, `this.y`, and `this.z` respectively.
+         * *eventHandler* receives no parameters. The current acceleration values can be received via `this.x`,
+         * `this.y`, and `this.z` respectively.
          *
          * @since Bot API 8.0
          */
@@ -336,7 +340,8 @@ sealed external interface EventType {
         /**
          * Occurs with the specified frequency after calling the start method, sending the current orientation data.
          *
-         * *eventHandler* receives no parameters. The current device orientation values can be received via `this.alpha`, `this.beta`, and `this.gamma` respectively.
+         * *eventHandler* receives no parameters. The current device orientation values can be received via
+         * `this.alpha`, `this.beta`, and `this.gamma` respectively.
          *
          * @since Bot API 8.0
          */
@@ -378,7 +383,8 @@ sealed external interface EventType {
         /**
          * Occurs with the specified frequency after calling the start method, sending the current gyroscope data.
          *
-         * *eventHandler* receives no parameters. The current rotation rates can be received via `this.x`, `this.y`, and `this.z` respectively.
+         * *eventHandler* receives no parameters. The current rotation rates can be received via `this.x`, `this.y`, and
+         * `this.z` respectively.
          *
          * @since Bot API 8.0
          */
@@ -410,7 +416,8 @@ sealed external interface EventType {
         /**
          * Occurs when location data is requested.
          *
-         * *eventHandler* receives an object with the single field `locationData` of type [LocationData], containing the current location information.
+         * *eventHandler* receives an object with the single field `locationData` of type [LocationData], containing the
+         * current location information.
          *
          * @since Bot API 8.0
          */

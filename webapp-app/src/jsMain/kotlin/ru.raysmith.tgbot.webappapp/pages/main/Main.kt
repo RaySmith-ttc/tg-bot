@@ -147,6 +147,12 @@ val MainPage = FC<Props> {
             href = Paths.gyroscope
             startIcon = ThreeSixty.create()
         }
+
+        SubPageButton {
+            +"Location manager"
+            href = Paths.location
+            startIcon = LocationOn.create()
+        }
     }
 
     VerificationDialog {

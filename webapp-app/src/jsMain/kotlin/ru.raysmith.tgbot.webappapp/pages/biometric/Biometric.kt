@@ -82,7 +82,7 @@ val BiometricPage = FC<Props> {
         if (!biometric.isBiometricAvailable) {
             Alert {
                 +"BiometricManager not available on this device. To access the features on this page, use a device with a fingerprint scanner or face-base biometric"
-                severity = AlertColor.warning.unsafeCast<String>()
+                severity = AlertColor.error.unsafeCast<String>()
             }
             return@BaseSubPageLayout
         }
@@ -121,7 +121,7 @@ val BiometricPage = FC<Props> {
                 }
 
                 Button {
-                    +"Biometric Settings"
+                    +"Open settings"
                     fullWidth = true
                     size = Size.large
                     startIcon = Settings.create()

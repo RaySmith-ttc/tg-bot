@@ -1,14 +1,19 @@
 package ru.raysmith.tgbot.webappapp.provider
 
+import csstype.PropertiesBuilder
 import js.objects.jso
-import mui.material.*
+import mui.material.CssBaseline
+import mui.material.LinkProps
+import mui.material.PaletteMode
 import mui.material.styles.PaletteColor
 import mui.material.styles.createTheme
-import mui.system.sx
 import react.FC
 import react.PropsWithChildren
 import ru.raysmith.tgbot.hooks.useThemeParams
+import web.cssom.Border
 import web.cssom.Color
+import web.cssom.LineStyle
+import web.cssom.px
 
 val ThemeProvider = FC<PropsWithChildren> { props ->
     val settings = useSettingsContext()
@@ -23,11 +28,12 @@ val ThemeProvider = FC<PropsWithChildren> { props ->
                             color = tgTheme.linkColor
                         }
                     }
-                    MuiAppBar = jso {
-                        defaultProps = jso<AppBarProps> {
-                            sx {
-                                backgroundColor = tgTheme.headerBgColor
-                                color = tgTheme.headerColor
+                    MuiTableCell = jso {
+                        styleOverrides = jso {
+                            root = jso<PropertiesBuilder> {
+                                if (tgTheme.hintColor != null) {
+                                    borderBottom = Border(1.px, LineStyle.solid, tgTheme.hintColor!!)
+                                }
                             }
                         }
                     }

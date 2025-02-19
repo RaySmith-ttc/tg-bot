@@ -16,4 +16,5 @@ object Paths {
     val accelerometer = "/accelerometer"
     val deviceOrientation = "/deviceOrientation"
     val gyroscope = "/gyroscope"
+    val location = "/location"
 }

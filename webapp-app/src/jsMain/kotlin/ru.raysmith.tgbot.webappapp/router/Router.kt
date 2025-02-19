@@ -15,6 +15,7 @@ import ru.raysmith.tgbot.webappapp.pages.cloud.CloudStoragePage
 import ru.raysmith.tgbot.webappapp.pages.gyroscope.GyroscopePage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
+import ru.raysmith.tgbot.webappapp.pages.location.LocationManagerPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
 import ru.raysmith.tgbot.webappapp.pages.orientation.DeviceOrientationPage
 import ru.raysmith.tgbot.webappapp.pages.settingsbutton.SettingsButtonPage
@@ -95,6 +96,10 @@ val Router = FC<PropsWithChildren> { props ->
                 jso {
                     path = Paths.gyroscope
                     element = GyroscopePage.create()
+                },
+                jso {
+                    path = Paths.location
+                    element = LocationManagerPage.create()
                 },
             )
         }
