@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.webappapp.components
 import kotlinx.browser.window
 import mui.icons.material.ArrowBack
 import mui.material.*
-import mui.material.Size
 import mui.material.styles.TypographyVariant
 import mui.system.sx
 import react.FC
@@ -15,7 +14,10 @@ import ru.raysmith.tgbot.webappapp.hooks.usePathname
 import ru.raysmith.tgbot.webappapp.hooks.useRouter
 import ru.raysmith.tgbot.webappapp.router.Paths
 import ru.raysmith.tgbot.webappapp.wrappers.mr
-import web.cssom.*
+import web.cssom.Auto
+import web.cssom.PaddingBottom
+import web.cssom.number
+import web.cssom.px
 import web.dom.Element
 
 external interface HeaderProps : PropsWithChildren
@@ -45,13 +47,12 @@ val AppBar = FC<HeaderProps> { props ->
                 position = AppBarPosition.fixed
                 sx {
                     top = Auto.auto
-                    bottom = "calc(100vh - ${CssVar.tgViewportHeight<dynamic>()})".unsafeCast<PaddingBottom>()
+                    bottom = "calc(100vh - ${CssVar.tgViewportHeight(0.px)})".unsafeCast<PaddingBottom>()
                 }
 
                 Toolbar {
                     if (!viewport.isExpanded && pathname != Paths.root) {
                         IconButton {
-                            size = Size.large
                             edge = IconButtonEdge.start
                             color = IconButtonColor.inherit
                             sx { mr = 2 }

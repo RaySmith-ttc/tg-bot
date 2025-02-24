@@ -10,7 +10,6 @@ import mui.system.responsive
 import mui.system.sx
 import react.*
 import ru.raysmith.tgbot.CssVar
-import ru.raysmith.tgbot.hooks.useViewport
 import ru.raysmith.tgbot.webApp
 import ru.raysmith.tgbot.webappapp.components.RouterLink
 import ru.raysmith.tgbot.webappapp.router.Paths
@@ -160,7 +159,7 @@ val MainPage = FC<Props> {
         onClose = { _, _ -> showVerificationInfo = false }
         onOkButtonClick = { showVerificationInfo = false }
         sx {
-            mt = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()})"
+            mt = "calc(${CssVar.tgContentSafeAreaInsetTop(0.px)} + ${CssVar.tgSafeAreaInsetTop(0.px)})"
         }
     }
 }

@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -13,6 +14,7 @@ application {
 }
 
 kotlin {
+    jvmToolchain(17)
     jvm {
         withJava()
     }
@@ -39,6 +41,12 @@ kotlin {
                     enabled.set(true)
                 }
                 export = false
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        add(project.rootDir.path)
+                        add(project.projectDir.path)
+                    }
+                }
             }
         }
         binaries.executable()

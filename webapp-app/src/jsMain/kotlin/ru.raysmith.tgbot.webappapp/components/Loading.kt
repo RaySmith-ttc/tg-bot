@@ -5,21 +5,23 @@ import mui.material.CircularProgress
 import mui.material.CircularProgressProps
 import mui.system.sx
 import react.FC
-import ru.raysmith.tgbot.CssVar
+import ru.raysmith.tgbot.webappapp.wrappers.mt
 import web.cssom.AlignItems
 import web.cssom.Display
 import web.cssom.JustifyContent
 
-val FullPageLoading = FC<CircularProgressProps> { props ->
+val Loading = FC<CircularProgressProps> { props ->
     Box {
         sx {
-            height = CssVar.tgViewportHeight()
             display = Display.flex
             justifyContent = JustifyContent.center
             alignItems = AlignItems.center
         }
 
         CircularProgress {
+            sx {
+                mt = 2
+            }
             +props
         }
     }

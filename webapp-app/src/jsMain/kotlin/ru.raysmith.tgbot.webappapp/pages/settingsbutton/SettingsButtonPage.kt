@@ -5,6 +5,9 @@ import mui.system.responsive
 import react.FC
 import react.create
 import ru.raysmith.tgbot.hooks.useSettingsButton
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
+import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
@@ -18,7 +21,7 @@ val SettingsButtonPage = FC {
     }
 
     BaseSubPageLayout {
-        title = "Back button"
+        title = "Settings button"
         Stack {
             direction = responsive(StackDirection.column)
             spacing = responsive(2)
@@ -29,46 +32,34 @@ val SettingsButtonPage = FC {
                         title = "isVisible"
                         value = DataDisplayCheckbox.create { checked = settingsButton.isVisible }
 
-                        Stack {
-                            direction = responsive(StackDirection.row)
-                            spacing = responsive(2)
-
-                            Button {
-                                disabled = settingsButton.isVisible
-                                this.onClick = {
-                                    settingsButton.show()
-                                }
-                                +"Show"
-                            }
-
-                            Button {
-                                disabled = !settingsButton.isVisible
-                                this.onClick = {
-                                    settingsButton.hide()
-                                }
-                                +"Hide"
-                            }
+                        ToggleButtonsGroupControl {
+                            value = settingsButton.isVisible
+                            items = mapOf(
+                                ("Show" to true) to { settingsButton.show() },
+                                ("Hide" to false) to { settingsButton.hide() }
+                            )
                         }
                     }
                 }
             }
 
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(2)
+            ControlsPaperStack {
+                title = "Custom onClick"
 
                 Button {
+                    +"onClick"
+                    applyControlButtonStyle()
                     this.onClick = {
                         settingsButton.onClick(onClick)
                     }
-                    +"onClick"
                 }
 
                 Button {
+                    +"offClick"
+                    applyControlButtonStyle()
                     this.onClick = {
                         settingsButton.offClick(onClick)
                     }
-                    +"offClick"
                 }
             }
         }

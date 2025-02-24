@@ -1,7 +1,10 @@
 package ru.raysmith.tgbot.webappapp.pages.location
 
 import mui.icons.material.Settings
-import mui.material.*
+import mui.material.Alert
+import mui.material.AlertColor
+import mui.material.Button
+import mui.material.Typography
 import mui.material.styles.TypographyVariant
 import mui.system.Stack
 import mui.system.StackDirection
@@ -11,6 +14,7 @@ import react.FC
 import react.create
 import react.useEffectOnce
 import ru.raysmith.tgbot.hooks.useLocationManager
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
@@ -76,8 +80,7 @@ val LocationManagerPage = FC {
 
                     Button {
                         +"Open settings"
-                        fullWidth = true
-                        size = Size.large
+                        applyControlButtonStyle()
                         startIcon = Settings.create()
                         onClick = {
                             locationManager.openSettings()
@@ -102,7 +105,6 @@ val LocationManagerPage = FC {
 
                 Button {
                     +"Update"
-                    size = Size.large
                     disabled = !locationManager.isInited
                     onClick = {
                         locationManager.getLocation(null)

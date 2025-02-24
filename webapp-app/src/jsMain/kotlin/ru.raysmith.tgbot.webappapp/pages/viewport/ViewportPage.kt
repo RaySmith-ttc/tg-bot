@@ -2,21 +2,20 @@ package ru.raysmith.tgbot.webappapp.pages.viewport
 
 import mui.material.*
 import mui.material.styles.TypographyVariant
-import mui.system.Breakpoint
 import mui.system.responsive
 import mui.system.sx
 import react.FC
 import react.Props
-import react.ReactNode
 import react.create
 import ru.raysmith.tgbot.hooks.useInsets
 import ru.raysmith.tgbot.hooks.useViewport
+import ru.raysmith.tgbot.webappapp.components.ButtonsGroupControl
+import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import ru.raysmith.tgbot.webappapp.wrappers.pt
 import web.cssom.AlignItems
-import web.cssom.atrule.orientation
 
 val ViewportPage = FC<Props> {
     val viewport = useViewport()
@@ -50,15 +49,14 @@ val ViewportPage = FC<Props> {
                     }
                     DataDisplayTableRow {
                         title = "isVerticalSwipesEnabled"
-                        value = Switch.create {
-                            checked = viewport.isVerticalSwipesEnabled
-                            onClick = {
-                                if (viewport.isVerticalSwipesEnabled) {
-                                    viewport.disableVerticalSwipes()
-                                } else {
-                                    viewport.enableVerticalSwipes()
-                                }
-                            }
+                        value = DataDisplayCheckbox.create { checked = viewport.isVerticalSwipesEnabled }
+
+                        ToggleButtonsGroupControl {
+                            value = viewport.isVerticalSwipesEnabled
+                            items = mapOf(
+                                ("Enable" to true) to { viewport.enableVerticalSwipes() },
+                                ("Disable" to false) to { viewport.disableVerticalSwipes() }
+                            )
                         }
                     }
                     DataDisplayTableRow {
@@ -77,18 +75,11 @@ val ViewportPage = FC<Props> {
                         title = "isFullscreen"
                         value = DataDisplayCheckbox.create { checked = viewport.isFullscreen }
 
-                        Button {
-                            +"Request"
-                            onClick = {
-                                viewport.requestFullscreen()
-                            }
-                        }
-
-                        Button {
-                            +"Exit"
-                            onClick = {
-                                viewport.exitFullscreen()
-                            }
+                        ButtonsGroupControl {
+                            items = mapOf(
+                                "Request" to { viewport.requestFullscreen() },
+                                "Exit" to { viewport.exitFullscreen() }
+                            )
                         }
                     }
                     DataDisplayTableRow {

@@ -2,21 +2,19 @@ package ru.raysmith.tgbot.webappapp.pages.orientation
 
 import js.objects.jso
 import mui.material.*
-import mui.material.styles.Theme
-import mui.material.styles.useTheme
 import mui.system.responsive
-import mui.system.sx
 import react.FC
 import react.ReactNode
 import react.create
 import react.useState
 import ru.raysmith.tgbot.DeviceOrientationFailedType
 import ru.raysmith.tgbot.hooks.useDeviceOrientation
-import ru.raysmith.tgbot.webappapp.components.ControlsPaper
+import ru.raysmith.tgbot.webappapp.components.ButtonsControl
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
+import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
-import web.cssom.pct
 
 val DeviceOrientationPage = FC {
     val deviceOrientation = useDeviceOrientation()
@@ -30,7 +28,7 @@ val DeviceOrientationPage = FC {
 
             if (deviceOrientation.failed != null) {
                 Alert {
-                    +when(deviceOrientation.failed!!.error) {
+                    +when (deviceOrientation.failed!!.error) {
                         DeviceOrientationFailedType.UNSUPPORTED -> "Device orientation tracking is not supported on this device or platform"
                         else -> "Unknown error"
                     }
@@ -59,35 +57,21 @@ val DeviceOrientationPage = FC {
                             title = "isOrientationLocked"
                             value = DataDisplayCheckbox.create { checked = deviceOrientation.isOrientationLocked }
 
-                            ToggleButtonGroup {
+                            ToggleButtonsGroupControl {
                                 value = deviceOrientation.isOrientationLocked
-                                exclusive = true
-                                size = Size.small
-                                onChange = { _, value ->
-                                    if (value.unsafeCast<Boolean>()) {
-                                        deviceOrientation.lockOrientation()
-                                    } else {
-                                        deviceOrientation.unlockOrientation()
-                                    }
-                                }
-
-                                ToggleButton {
-                                    value = true
-                                    +"Lock"
-                                }
-
-                                ToggleButton {
-                                    value = false
-                                    +"Unlock"
-                                }
+                                items = mapOf(
+                                    ("Lock" to true) to { deviceOrientation.lockOrientation() },
+                                    ("Unlock" to false) to { deviceOrientation.unlockOrientation() }
+                                )
                             }
                         }
                     }
                 }
             }
 
-            ControlsPaper {
-                FormControlLabel {
+            ControlsPaperStack {
+                title = "Tracking controls"
+                header = FormControlLabel.create {
                     label = ReactNode("Absolute")
                     control = Checkbox.create {
                         disabled = deviceOrientation.isStarted
@@ -98,32 +82,16 @@ val DeviceOrientationPage = FC {
                     }
                 }
 
-                Stack {
-                    direction = responsive(StackDirection.row)
-                    spacing = responsive(1)
-                    sx { width = 100.pct }
-
-                    Button {
-                        +"Start"
-                        sx { width = 100.pct }
-                        size = Size.large
-                        disabled = deviceOrientation.isStarted
-                        onClick = {
-                            deviceOrientation.start(jso { refreshRate = 100; this.needAbsolute = needAbsolute }) {
-                                console.log("isTrackingStarted: $it")
-                            }
+                ButtonsControl {
+                    value = deviceOrientation.isStarted
+                    onStart = {
+                        deviceOrientation.start(jso { refreshRate = 100; this.needAbsolute = needAbsolute }) {
+                            console.log("isTrackingStarted: $it")
                         }
                     }
-
-                    Button {
-                        +"Stop"
-                        sx { width = 100.pct }
-                        size = Size.large
-                        disabled = !deviceOrientation.isStarted
-                        onClick = {
-                            deviceOrientation.stop {
-                                console.log("isTrackingStopped: $it")
-                            }
+                    onStop = {
+                        deviceOrientation.stop {
+                            console.log("isTrackingStopped: $it")
                         }
                     }
                 }
@@ -131,3 +99,4 @@ val DeviceOrientationPage = FC {
         }
     }
 }
+

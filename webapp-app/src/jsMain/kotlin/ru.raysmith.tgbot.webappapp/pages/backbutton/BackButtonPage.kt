@@ -6,6 +6,9 @@ import react.FC
 import react.create
 import react.useEffectOnce
 import ru.raysmith.tgbot.hooks.useBackButton
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
+import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
@@ -34,48 +37,36 @@ val BackButtonPage = FC<BBProps> { props ->
                         title = "isVisible"
                         value = DataDisplayCheckbox.create { checked = backButton.isVisible }
 
-                        Stack {
-                            direction = responsive(StackDirection.row)
-                            spacing = responsive(2)
-
-                            Button {
-                                disabled = backButton.isVisible
-                                this.onClick = {
-                                    backButton.show()
-                                }
-                                +"Show"
-                            }
-
-                            Button {
-                                disabled = !backButton.isVisible
-                                this.onClick = {
-                                    backButton.hide()
-                                }
-                                +"Hide"
-                            }
+                        ToggleButtonsGroupControl {
+                            value = backButton.isVisible
+                            items = mapOf(
+                                ("Show" to true) to { backButton.show() },
+                                ("Hide" to false) to { backButton.hide() }
+                            )
                         }
                     }
                 }
             }
 
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(2)
+            ControlsPaperStack {
+                title = "Custom onClick"
 
                 Button {
+                    +"onClick"
+                    applyControlButtonStyle()
                     this.onClick = {
                         backButton.onClick(onClick)
                         props.setIsBackButtonDefaultOnClickEnabled(false)
                     }
-                    +"onClick"
                 }
 
                 Button {
+                    +"offClick"
+                    applyControlButtonStyle()
                     this.onClick = {
                         backButton.offClick(onClick)
                         props.setIsBackButtonDefaultOnClickEnabled(true)
                     }
-                    +"offClick"
                 }
             }
         }

@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.hooks.useThemeParams
 import ru.raysmith.tgbot.webappapp.camelCaseToSnakeCase
 import ru.raysmith.tgbot.webappapp.capitalize
 import ru.raysmith.tgbot.webappapp.components.ColorBlock
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.DefaultValuesHintAlert
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.decapitalize
@@ -25,45 +26,42 @@ val ThemePage = FC<Props> {
 
     BaseSubPageLayout {
         title = "Theme"
-        Stack {
-            direction = responsive(StackDirection.column)
-            spacing = responsive(2)
 
-            FormControlLabel {
-                label = ReactNode("Use telegram theme")
-                control = Switch.create {
-                    checked = settings.useTgTheme
-                    onChange = { _, checked ->
-                        println(checked)
-                        settings.setToggleUseTgTheme(checked)
-                    }
+        FormControlLabel {
+            label = ReactNode("Use telegram theme")
+            control = Switch.create {
+                checked = settings.useTgTheme
+                onChange = { _, checked ->
+                    println(checked)
+                    settings.setToggleUseTgTheme(checked)
                 }
             }
+        }
 
-            Divider()
+        Table {
+            TableBody {
+                DataDisplayTableRow {
+                    title = "colorScheme"
+                    value = Typography.create { +tp.colorScheme.toString() }
+                }
 
-            Table {
-                TableBody {
+                tpKeys.forEach {
                     DataDisplayTableRow {
-                        title = "colorScheme"
-                        value = Typography.create { +tp.colorScheme.toString() }
-                    }
-
-                    tpKeys.forEach {
-                        DataDisplayTableRow {
-                            title = it
-                            value = ColorBlock.create {
-                                backgroundColor =
-                                    tp.asDynamic()[it.split("_").joinToString("") { w -> w.capitalize() }.decapitalize()]
-                                        ?.unsafeCast<BackgroundColor>()
-                                        ?: NamedColor.transparent
-                            }
+                        title = it
+                        value = ColorBlock.create {
+                            backgroundColor =
+                                tp.asDynamic()[it.split("_").joinToString("") { w -> w.capitalize() }.decapitalize()]
+                                    ?.unsafeCast<BackgroundColor>()
+                                    ?: NamedColor.transparent
                         }
                     }
                 }
             }
+        }
 
-            Divider()
+        ControlsPaperStack {
+            direction = responsive(StackDirection.column)
+            spacing = responsive(2)
 
             ColorSelect {
                 label = "Header color via ThemeParams"
@@ -105,8 +103,11 @@ val ThemePage = FC<Props> {
                     tp.setHeaderColor(NamedColor.white)
                 }
             }
+        }
 
-            Divider()
+        ControlsPaperStack {
+            direction = responsive(StackDirection.column)
+            spacing = responsive(2)
 
             ColorSelect {
                 key = "3"
@@ -151,8 +152,10 @@ val ThemePage = FC<Props> {
                 }
             }
 
-            DefaultValuesHintAlert()
+
         }
+
+        DefaultValuesHintAlert()
     }
 }
 

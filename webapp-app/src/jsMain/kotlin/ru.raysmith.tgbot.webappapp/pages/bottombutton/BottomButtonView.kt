@@ -1,9 +1,10 @@
 package ru.raysmith.tgbot.webappapp.pages.bottombutton
 
 import js.objects.jso
+import mui.icons.material.FormatColorFill
+import mui.icons.material.FormatColorText
+import mui.icons.material.TextFields
 import mui.material.*
-import mui.system.Stack
-import mui.system.StackDirection
 import mui.system.responsive
 import mui.system.sx
 import react.FC
@@ -13,10 +14,14 @@ import ru.raysmith.tgbot.BottomButtonPosition
 import ru.raysmith.tgbot.BottomButtonType
 import ru.raysmith.tgbot.hooks.BottomButtonHookType
 import ru.raysmith.tgbot.webappapp.components.ColorBlock
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
+import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.utils.generateRandomString
-import web.cssom.*
+import web.cssom.AlignItems
+import web.cssom.BackgroundColor
 
 external interface BottomButtonViewProps : Props {
     var button: BottomButtonHookType
@@ -44,29 +49,25 @@ val BottomButtonView = FC<BottomButtonViewProps> { props ->
             DataDisplayTableRow {
                 title = "isVisible"
                 value = DataDisplayCheckbox.create { checked = props.button.isVisible }
-                Switch {
-                    checked = props.button.isVisible
-                    onClick = {
-                        if (props.button.isVisible) {
-                            props.button.hide()
-                        } else {
-                            props.button.show()
-                        }
-                    }
+
+                ToggleButtonsGroupControl {
+                    value = props.button.isVisible
+                    items = mapOf(
+                        ("Show" to true) to { props.button.show() },
+                        ("Hide" to false) to { props.button.hide() }
+                    )
                 }
             }
             DataDisplayTableRow {
                 title = "isActive"
                 value = DataDisplayCheckbox.create { checked = props.button.isActive }
-                Switch {
-                    checked = props.button.isActive
-                    onClick = {
-                        if (props.button.isActive) {
-                            props.button.disable()
-                        } else {
-                            props.button.enable()
-                        }
-                    }
+
+                ToggleButtonsGroupControl {
+                    value = props.button.isActive
+                    items = mapOf(
+                        ("Enable" to true) to { props.button.enable() },
+                        ("Disable" to false) to { props.button.disable() }
+                    )
                 }
             }
             DataDisplayTableRow {
@@ -78,45 +79,14 @@ val BottomButtonView = FC<BottomButtonViewProps> { props ->
                 value = Typography.create { +props.button.position.toString() }
 
                 if (props.button.type == BottomButtonType.secondary) {
-                    Stack {
-                        direction = responsive(StackDirection.row)
-                        spacing = responsive(1)
-
-                        Button {
-                            +"Top"
-                            onClick = {
-                                props.button.setParams(jso {
-                                    position = BottomButtonPosition.top
-                                })
-                            }
-                        }
-
-                        Button {
-                            +"Left"
-                            onClick = {
-                                props.button.setParams(jso {
-                                    position = BottomButtonPosition.left
-                                })
-                            }
-                        }
-
-                        Button {
-                            +"Right"
-                            onClick = {
-                                props.button.setParams(jso {
-                                    position = BottomButtonPosition.right
-                                })
-                            }
-                        }
-
-                        Button {
-                            +"Bottom"
-                            onClick = {
-                                props.button.setParams(jso {
-                                    position = BottomButtonPosition.bottom
-                                })
-                            }
-                        }
+                    ToggleButtonsGroupControl {
+                        value = props.button.position
+                        items = mapOf(
+                            ("Top" to BottomButtonPosition.top) to { props.button.setParams(jso { position = BottomButtonPosition.top }) },
+                            ("Left" to BottomButtonPosition.left) to { props.button.setParams(jso { position = BottomButtonPosition.left }) },
+                            ("Right" to BottomButtonPosition.right) to { props.button.setParams(jso { position = BottomButtonPosition.right }) },
+                            ("Bottom" to BottomButtonPosition.bottom) to { props.button.setParams(jso { position = BottomButtonPosition.bottom }) }
+                        )
                     }
                 }
             }
@@ -124,57 +94,56 @@ val BottomButtonView = FC<BottomButtonViewProps> { props ->
                 title = "isProgressVisible"
                 value = DataDisplayCheckbox.create { checked = props.button.isProgressVisible }
 
-                Stack {
-                    direction = responsive(StackDirection.row)
-                    spacing = responsive(1)
-
-                    Button {
-                        +"Show"
-                        onClick = {
-                            props.button.showProgress(false)
-                        }
+                ToggleButtonsGroupControl {
+                    value = when {
+                        props.button.isProgressVisible && props.button.isActive -> 1
+                        props.button.isProgressVisible -> 2
+                        else -> 3
                     }
-
-                    Button {
-                        +"Show and leave active"
-                        onClick = {
-                            props.button.showProgress(true)
-                        }
-                    }
-
-                    Button {
-                        +"Hide"
-                        onClick = {
-                            props.button.hideProgress()
-                        }
-                    }
+                    items = mapOf(
+                        ("Show and leave active" to 1) to { props.button.showProgress(true) },
+                        ("Show" to 2) to { props.button.showProgress(false) },
+                        ("Hide" to 3) to { props.button.hideProgress() }
+                    )
                 }
             }
         }
     }
 
-    Button {
-        +"Set random text"
-        onClick = {
-            props.button.setText(generateRandomString(8, ('a'..'z').toList()))
-        }
-    }
+    ControlsPaperStack {
+        title = "Custom colors"
+        direction = responsive(StackDirection.column)
+        sx { alignItems = AlignItems.flexStart }
 
-    Button {
-        +"Set random color"
-        onClick = {
-            props.button.setParams(jso {
-                color = getRandomColor()
-            })
+        Button {
+            +"Set random text"
+            applyControlButtonStyle()
+            startIcon = TextFields.create()
+            onClick = {
+                props.button.setText(generateRandomString(8, ('a'..'z').toList()))
+            }
         }
-    }
 
-    Button {
-        +"Set random text color"
-        onClick = {
-            props.button.setParams(jso {
-                textColor = getRandomColor()
-            })
+        Button {
+            +"Set random color"
+            applyControlButtonStyle()
+            startIcon = FormatColorFill.create()
+            onClick = {
+                props.button.setParams(jso {
+                    color = getRandomColor()
+                })
+            }
+        }
+
+        Button {
+            +"Set random text color"
+            applyControlButtonStyle()
+            startIcon = FormatColorText.create()
+            onClick = {
+                props.button.setParams(jso {
+                    textColor = getRandomColor()
+                })
+            }
         }
     }
 }

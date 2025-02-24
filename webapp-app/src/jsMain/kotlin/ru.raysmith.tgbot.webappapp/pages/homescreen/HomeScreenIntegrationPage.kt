@@ -8,6 +8,7 @@ import ru.raysmith.tgbot.EventType
 import ru.raysmith.tgbot.HomeScreenStatus
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.webApp
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 
 val HomeScreenIntegrationPage = FC<Props> {
@@ -60,8 +61,7 @@ val HomeScreenIntegrationPage = FC<Props> {
 
                     Button {
                         +"Add to home screen"
-                        fullWidth = true
-                        size = Size.large
+                        applyControlButtonStyle()
                         startIcon = AddToHomeScreen.create()
                         onClick = {
                             webApp.addToHomeScreen()

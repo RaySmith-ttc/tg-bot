@@ -7,12 +7,14 @@ import react.useReducer
 import ru.raysmith.tgbot.BuiltinImplementation
 import ru.raysmith.tgbot.hooks.CloudStorageHookState
 import ru.raysmith.tgbot.hooks.useCloudStorage
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
+import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.cssom.OverflowWrap
 import web.cssom.WhiteSpace
 import web.cssom.WordWrap
 
-private val ADDING_BATCH = "Adding 10 items".unsafeCast<CloudStorageHookState>()
+private val ADDING_BATCH = "Adding 10 items...".unsafeCast<CloudStorageHookState>()
 
 @OptIn(BuiltinImplementation::class)
 val CloudStoragePage = FC {
@@ -20,6 +22,7 @@ val CloudStoragePage = FC {
     val (waitAddingBatch, dispatch) = useReducer({ state: Int, action: Int -> state + action }, 0)
 
     BaseSubPageLayout {
+        title = "Cloud storage"
 
         Typography {
             +"State: ${if (waitAddingBatch > 0) ADDING_BATCH else cloudStorage.state}"
@@ -55,26 +58,31 @@ val CloudStoragePage = FC {
             }
         }
 
-        Button {
-            +"Add 10 items"
-            onClick = {
-                val lastId = cloudStorage.items.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
+        ControlsPaperStack {
+            title = "Items controls"
+            Button {
+                +"Add 10 items"
+                applyControlButtonStyle()
+                onClick = {
+                    val lastId = cloudStorage.items.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
 
-                dispatch(10)
-                repeat(10) {
-                    cloudStorage.setItem((it + lastId + 1).toString(), "value${it + lastId}") { error, isStored ->
-                        println("CloudStoragePage.setItem: error = [${error}], isStored = [${isStored}]")
-                        dispatch(-1)
+                    dispatch(10)
+                    repeat(10) {
+                        cloudStorage.setItem((it + lastId + 1).toString(), "value${it + lastId}") { error, isStored ->
+                            println("CloudStoragePage.setItem: error = [${error}], isStored = [${isStored}]")
+                            dispatch(-1)
+                        }
                     }
                 }
             }
-        }
 
-        Button {
-            +"Delete all items"
-            onClick = {
-                cloudStorage.removeItems(cloudStorage.items.keys) { error, isRemoved ->
-                    println("CloudStoragePage.removeItems: error = [${error}], isRemoved = [${isRemoved}]")
+            Button {
+                +"Delete all items"
+                applyControlButtonStyle()
+                onClick = {
+                    cloudStorage.removeItems(cloudStorage.items.keys) { error, isRemoved ->
+                        println("CloudStoragePage.removeItems: error = [${error}], isRemoved = [${isRemoved}]")
+                    }
                 }
             }
         }

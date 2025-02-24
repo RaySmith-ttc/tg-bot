@@ -12,3 +12,6 @@ fun String.decapitalize() = replaceFirstChar { it.lowercase() }
 fun String.camelCaseToSnakeCase(): String {
     return this.replace(Regex("([a-z])([A-Z]+)"), "$1_$2").lowercase()
 }
+
+fun <T> T?.isNullOrUndefined() = this == null || this == undefined
+fun <T> T?.isNotNullOrUndefined() = !isNullOrUndefined()

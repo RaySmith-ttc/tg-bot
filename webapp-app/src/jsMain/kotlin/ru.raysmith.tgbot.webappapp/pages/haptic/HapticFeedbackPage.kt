@@ -1,8 +1,6 @@
 package ru.raysmith.tgbot.webappapp.pages.haptic
 
-import mui.material.*
-import mui.system.responsive
-import mui.system.sx
+import mui.material.Orientation
 import react.FC
 import react.Props
 import react.useEffectOnce
@@ -10,9 +8,8 @@ import ru.raysmith.tgbot.HapticFeedbackStyle
 import ru.raysmith.tgbot.HapticFeedbackType
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.hooks.useHapticFeedback
+import ru.raysmith.tgbot.webappapp.components.ButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
-import web.cssom.AlignItems
-import web.cssom.px
 
 val HapticFeedbackPage = FC<Props> {
     val fh = useHapticFeedback()
@@ -24,73 +21,32 @@ val HapticFeedbackPage = FC<Props> {
 
     BaseSubPageLayout {
         title = "Haptic feedback"
-        Stack {
-            spacing = responsive(1)
-            sx {
-                alignItems = AlignItems.center
-            }
 
-            Stack {
-                sx {
-                    alignItems = AlignItems.center
-                }
+        ButtonsGroupControl {
+            orientation = Orientation.vertical
+            items = mapOf(
+                "light" to { fh.impactOccurred(HapticFeedbackStyle.light) },
+                "medium" to { fh.impactOccurred(HapticFeedbackStyle.medium) },
+                "heavy" to { fh.impactOccurred(HapticFeedbackStyle.heavy) },
+                "rigid" to { fh.impactOccurred(HapticFeedbackStyle.rigid) },
+                "soft" to { fh.impactOccurred(HapticFeedbackStyle.soft) },
+            )
+        }
 
-                ButtonGroup {
-                    variant = ButtonGroupVariant.contained
+        ButtonsGroupControl {
+            orientation = Orientation.vertical
+            items = mapOf(
+                "error" to { fh.notificationOccurred(HapticFeedbackType.error) },
+                "success" to { fh.notificationOccurred(HapticFeedbackType.success) },
+                "warning" to { fh.notificationOccurred(HapticFeedbackType.warning) },
+            )
+        }
 
-                    Button {
-                        +"light"
-                        onClick = { fh.impactOccurred(HapticFeedbackStyle.light) }
-                    }
-                    Button {
-                        +"medium"
-                        onClick = { fh.impactOccurred(HapticFeedbackStyle.medium) }
-                    }
-                    Button {
-                        +"heavy"
-                        onClick = { fh.impactOccurred(HapticFeedbackStyle.heavy) }
-                    }
-                }
-
-                ButtonGroup {
-                    variant = ButtonGroupVariant.contained
-
-                    Button {
-                        +"rigid"
-                        sx { borderTopLeftRadius = 0.px }
-                        onClick = { fh.impactOccurred(HapticFeedbackStyle.rigid) }
-                    }
-                    Button {
-                        +"soft"
-                        sx { borderTopRightRadius = 0.px }
-                        onClick = { fh.impactOccurred(HapticFeedbackStyle.soft) }
-                    }
-                }
-            }
-
-            ButtonGroup {
-                variant = ButtonGroupVariant.contained
-
-                Button {
-                    +"error"
-                    onClick = { fh.notificationOccurred(HapticFeedbackType.error) }
-                }
-                Button {
-                    +"success"
-                    onClick = { fh.notificationOccurred(HapticFeedbackType.success) }
-                }
-                Button {
-                    +"warning"
-                    onClick = { fh.notificationOccurred(HapticFeedbackType.warning) }
-                }
-            }
-
-            Button {
-                +"Selection changed"
-                variant = ButtonVariant.contained
-                onClick = { fh.selectionChanged() }
-            }
+        ButtonsGroupControl {
+            orientation = Orientation.vertical
+            items = mapOf(
+                "Selection changed" to { fh.selectionChanged() }
+            )
         }
     }
-
 }

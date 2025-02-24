@@ -9,10 +9,11 @@ import react.Props
 import react.dom.html.ReactHTML
 import react.router.Outlet
 import ru.raysmith.tgbot.CssVar
+import ru.raysmith.tgbot.webappapp.wrappers.mb
 import ru.raysmith.tgbot.webappapp.wrappers.mt
-import ru.raysmith.tgbot.webappapp.wrappers.pb
-import ru.raysmith.tgbot.webappapp.wrappers.px
+import ru.raysmith.tgbot.webappapp.wrappers.mx
 import web.cssom.GridArea
+import web.cssom.px
 
 val RootPage = FC<Props> {
     val theme = useTheme<Theme>()
@@ -20,9 +21,9 @@ val RootPage = FC<Props> {
     Box {
         sx {
             gridArea = "content".unsafeCast<GridArea>()
-            pb = theme.spacing(2)
-            px = theme.spacing(2)
-            mt = "calc(${CssVar.tgContentSafeAreaInsetTop<dynamic>()} + ${CssVar.tgSafeAreaInsetTop<dynamic>()} + ${theme.spacing(2)})"
+            mx = theme.spacing(2)
+            mt = "calc(${CssVar.tgContentSafeAreaInsetTop(0.px)} + ${CssVar.tgSafeAreaInsetTop(0.px)} + ${theme.spacing(2)})"
+            mb = theme.spacing(2)
         }
 
         component = ReactHTML.main

@@ -1,19 +1,23 @@
 package ru.raysmith.tgbot.webappapp.pages.gyroscope
 
 import js.objects.jso
-import mui.material.*
+import mui.material.Alert
+import mui.material.AlertColor
+import mui.material.Stack
+import mui.material.Typography
 import mui.system.responsive
 import mui.system.sx
 import react.FC
 import react.create
 import ru.raysmith.tgbot.GyroscopeFailedType
 import ru.raysmith.tgbot.hooks.useGyroscope
+import ru.raysmith.tgbot.webappapp.components.ButtonsControl
+import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.cssom.AlignItems
-import web.cssom.pct
 
 val GyroscopePage = FC {
     val gyroscope = useGyroscope()
@@ -54,29 +58,16 @@ val GyroscopePage = FC {
                 }
             }
 
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(1)
-                sx { width = 100.pct }
-
-                Button {
-                    +"Start"
-                    sx { width = 100.pct }
-                    size = Size.large
-                    disabled = gyroscope.isStarted
-                    onClick = {
+            ControlsPaperStack {
+                title = "Tracking controls"
+                ButtonsControl {
+                    value = gyroscope.isStarted
+                    onStart = {
                         gyroscope.start(jso { refreshRate = 100 }) {
                             console.log("isTrackingStarted: $it")
                         }
                     }
-                }
-
-                Button {
-                    +"Stop"
-                    sx { width = 100.pct }
-                    size = Size.large
-                    disabled = !gyroscope.isStarted
-                    onClick = {
+                    onStop = {
                         gyroscope.stop {
                             console.log("isTrackingStopped: $it")
                         }
