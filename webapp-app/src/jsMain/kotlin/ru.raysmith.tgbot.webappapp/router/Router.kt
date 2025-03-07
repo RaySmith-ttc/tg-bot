@@ -17,6 +17,7 @@ import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
 import ru.raysmith.tgbot.webappapp.pages.location.LocationManagerPage
 import ru.raysmith.tgbot.webappapp.pages.main.MainPage
+import ru.raysmith.tgbot.webappapp.pages.nativeui.NativeInterfacesPage
 import ru.raysmith.tgbot.webappapp.pages.orientation.DeviceOrientationPage
 import ru.raysmith.tgbot.webappapp.pages.settingsbutton.SettingsButtonPage
 import ru.raysmith.tgbot.webappapp.pages.state.StatePage
@@ -100,6 +101,10 @@ val Router = FC<PropsWithChildren> { props ->
                 jso {
                     path = Paths.location
                     element = LocationManagerPage.create()
+                },
+                jso {
+                    path = Paths.nativeInterfaces
+                    element = NativeInterfacesPage.create()
                 },
             )
         }

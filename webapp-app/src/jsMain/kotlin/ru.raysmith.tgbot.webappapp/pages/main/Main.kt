@@ -152,6 +152,12 @@ val MainPage = FC<Props> {
             href = Paths.location
             startIcon = LocationOn.create()
         }
+
+        SubPageButton {
+            +"Native interfaces"
+            href = Paths.nativeInterfaces
+            startIcon = QrCodeScanner.create()
+        }
     }
 
     VerificationDialog {
