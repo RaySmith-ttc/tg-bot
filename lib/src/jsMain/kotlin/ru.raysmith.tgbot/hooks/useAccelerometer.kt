@@ -5,6 +5,7 @@ import react.useEffectOnce
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.events.EventType
 
 /**
  * This hook provides access to accelerometer data on the device.
@@ -22,7 +23,7 @@ fun useAccelerometer(): AccelerometerHookType {
         }
     }
 
-    val onChange: (dynamic) -> Unit = {
+    val onChange = {
         accelerometer = copyOf(webApp.Accelerometer)
     }
 

@@ -5,6 +5,7 @@ import react.useEffectOnce
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.events.EventType
 
 /**
  * This hook provides access to gyroscope data on the device.
@@ -22,7 +23,7 @@ fun useGyroscope(): GyroscopeHookType {
         }
     }
 
-    val onChange: (dynamic) -> Unit = {
+    val onChange = {
         gyroscope = copyOf(webApp.Gyroscope)
     }
 

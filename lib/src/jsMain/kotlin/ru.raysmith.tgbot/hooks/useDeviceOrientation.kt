@@ -5,6 +5,7 @@ import react.useEffectOnce
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.events.EventType
 import web.scheduling.VoidFunction
 
 /**
@@ -18,12 +19,12 @@ fun useDeviceOrientation(): DeviceOrientationHookType {
     var failed by useState<DeviceOrientationFailed?>(null)
 
     useEffectOnce {
-        webApp.onEvent(EventType.deviceOrientationFailed) { payload: DeviceOrientationFailed ->
+        webApp.onEvent(EventType.deviceOrientationFailed) { payload ->
             failed = payload
         }
     }
 
-    val onChange: (dynamic) -> Unit = {
+    val onChange = {
         deviceOrientation = copyOf(webApp.DeviceOrientation)
     }
 

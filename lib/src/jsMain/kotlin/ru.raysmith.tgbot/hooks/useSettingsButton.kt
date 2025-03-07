@@ -3,31 +3,32 @@ package ru.raysmith.tgbot.hooks
 import js.objects.jso
 import react.useMemo
 import react.useState
+import ru.raysmith.tgbot.copyOf
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
 fun useSettingsButton(): SettingsButtonHookType {
-    var isVisible by useState(webApp.SettingsButton.isVisible)
+    var settingsButton by useState(webApp.SettingsButton)
 
     val onClick: (callback: VoidFunction) -> Unit = { callback: VoidFunction ->
-        webApp.SettingsButton.onClick(callback)
+        settingsButton = copyOf(webApp.SettingsButton.onClick(callback))
     }
 
     val offClick: (callback: VoidFunction) -> Unit = { callback: VoidFunction ->
-        webApp.SettingsButton.offClick(callback)
+        settingsButton = copyOf(webApp.SettingsButton.offClick(callback))
     }
 
     val show = {
-        isVisible = webApp.SettingsButton.show().isVisible
+        settingsButton = copyOf(webApp.SettingsButton.show())
     }
 
     val hide = {
-        isVisible = webApp.SettingsButton.hide().isVisible
+        settingsButton = copyOf(webApp.SettingsButton.hide())
     }
 
-    return useMemo(isVisible) {
+    return useMemo(settingsButton) {
         jso {
-            this.isVisible = isVisible
+            this.isVisible = settingsButton.isVisible
             this.onClick = onClick
             this.offClick = offClick
             this.show = show

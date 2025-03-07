@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot
 
+import ru.raysmith.tgbot.events.EventType
 import web.scheduling.VoidFunction
 
 /** This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface. */

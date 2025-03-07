@@ -4,9 +4,10 @@ import js.objects.jso
 import react.useEffectOnce
 import react.useMemo
 import react.useState
-import ru.raysmith.tgbot.*
-import ru.raysmith.tgbot.events.ViewportChangedEvent
-import web.scheduling.VoidFunction
+import ru.raysmith.tgbot.ContentSafeAreaInset
+import ru.raysmith.tgbot.SafeAreaInset
+import ru.raysmith.tgbot.events.EventType
+import ru.raysmith.tgbot.webApp
 
 /**
  * This hook provides:

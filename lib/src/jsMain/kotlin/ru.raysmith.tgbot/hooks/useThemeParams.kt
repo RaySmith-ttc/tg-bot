@@ -4,7 +4,10 @@ import js.objects.jso
 import react.useEffectOnce
 import react.useMemo
 import react.useState
-import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.ColorScheme
+import ru.raysmith.tgbot.CssVar
+import ru.raysmith.tgbot.events.EventType
+import ru.raysmith.tgbot.webApp
 import web.cssom.Color
 
 /** This hook contains the user's current theme settings */

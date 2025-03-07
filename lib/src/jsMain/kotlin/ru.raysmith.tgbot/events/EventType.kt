@@ -1,9 +1,12 @@
-package ru.raysmith.tgbot
+package ru.raysmith.tgbot.events
 
+import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.hooks.*
 import seskar.js.JsValue
+import web.scheduling.VoidFunction
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-sealed external interface EventType {
+sealed external interface EventType<T> {
     companion object {
 
         /**
@@ -12,9 +15,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useWebAppState
          */
         @JsValue("activated")
-        val activated: EventType
+        val activated: EventType<VoidFunction>
 
         /**
          * Occurs when the Mini App becomes inactive (e.g., minimized or moved to an inactive tab).
@@ -22,29 +26,32 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useWebAppState
          */
         @JsValue("deactivated")
-        val deactivated: EventType
+        val deactivated: EventType<VoidFunction>
 
         /**
          * Occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
          *
          * *eventHandler* receives no parameters, new theme settings and color scheme can be received via
          * `this.themeParams` and `this.colorScheme` respectively.
+         *
+         * @see useThemeParams
          * */
         @JsValue("themeChanged")
-        val themeChanged: EventType
+        val themeChanged: EventType<VoidFunction>
 
         /**
          * Occurs when the visible section of the Mini App is changed.
          *
-         * *eventHandler* receives an object with the single field *isStateStable*. If *isStateStable* is true, the
-         * resizing of the Mini App is finished. If it is false, the resizing is ongoing (the user is expanding or
-         * collapsing the Mini App or an animated object is playing).
+         * *eventHandler* receives an [ViewportChanged] object.
          * The current value of the visible section’s height is available in `this.viewportHeight`.
+         *
+         * @see useViewport
          * */
         @JsValue("viewportChanged")
-        val viewportChanged: EventType
+        val viewportChanged: EventType<(ViewportChanged) -> Unit>
 
         /**
          * Occurs when the device's safe area insets change (e.g., due to orientation change or screen adjustments).
@@ -52,9 +59,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters. The current inset values can be accessed via `this.safeAreaInset`.
          *
          * @since Bot API 8.0
+         * @see useInsets
          */
         @JsValue("safeAreaChanged")
-        val safeAreaChanged: EventType
+        val safeAreaChanged: EventType<VoidFunction>
 
         /**
          * Occurs when the safe area for content changes (e.g., due to orientation change or screen adjustments).
@@ -63,17 +71,20 @@ sealed external interface EventType {
          * `this.contentSafeAreaInset`.
          *
          * @since Bot API 8.0
+         * @see useInsets
          */
         @JsValue("contentSafeAreaChanged")
-        val contentSafeAreaChanged: EventType
+        val contentSafeAreaChanged: EventType<VoidFunction>
 
         /**
          * Occurs when the [main button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
          *
          * *eventHandler* receives no parameters.
+         *
+         * @see useBottomButton
          * */
         @JsValue("mainButtonClicked")
-        val mainButtonClicked: EventType
+        val mainButtonClicked: EventType<VoidFunction>
 
         /**
          * Occurs when the [secondary button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
@@ -81,9 +92,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 7.10
+         * @see useBottomButton
          * */
         @JsValue("secondaryButtonClicked")
-        val secondaryButtonClicked: EventType
+        val secondaryButtonClicked: EventType<VoidFunction>
 
         /**
          * Occurs when the back button is pressed.
@@ -91,9 +103,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 6.1
+         * @see useBackButton
          * */
         @JsValue("backButtonClicked")
-        val backButtonClicked: EventType
+        val backButtonClicked: EventType<VoidFunction>
 
         /**
          * Occurs when the Settings item in context menu is pressed.
@@ -101,47 +114,41 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 6.1
+         * @see useSettingsButton
          * */
         @JsValue("settingsButtonClicked")
-        val settingsButtonClicked: EventType
+        val settingsButtonClicked: EventType<VoidFunction>
 
         /**
          * Occurs when the opened invoice is closed.
          *
-         * *eventHandler* receives an object with the two fields: url – invoice link provided and status –
-         * one of the invoice statuses:
-         * - `paid` – invoice was paid successfully,
-         * - `cancelled` – user closed this invoice without paying,
-         * - `failed` – user tried to pay, but the payment was failed,
-         * - `pending` – the payment is still processing. The bot will receive a service message about a
-         * [successful payment](https://core.telegram.org/bots/api#successfulpayment) when the payment is
-         * successfully paid.
+         * *eventHandler* receives an [InvoiceClosed] object.
          *
          * @since Bot API 6.1
          * */
         @JsValue("invoiceClosed")
-        val invoiceClosed: EventType
+        val invoiceClosed: EventType<(InvoiceClosed) -> Unit>
 
         /**
          * Occurs when the opened popup is closed.
          *
-         * *eventHandler* receives an object with the single field `button_id` – the value of the field `id` of the
-         * pressed button. If no buttons were pressed, the field `button_id` will be `null`.
+         * *eventHandler* receives an [PopupClosed].
+         * If no buttons were pressed, the field [PopupClosed.buttonId] will be `null`.
          *
          * @since Bot API 6.2
          * */
         @JsValue("popupClosed")
-        val popupClosed: EventType
+        val popupClosed: EventType<(PopupClosed) -> Unit>
 
         /**
          * Occurs when the QR code scanner catches a code with text data.
          *
-         * *eventHandler* receives an object with the single field data containing text data from the QR code.
+         * *eventHandler* receives an [QrTextReceived] object.
          *
          * @since Bot API 6.4
          * */
         @JsValue("qrTextReceived")
-        val qrTextReceived: EventType
+        val qrTextReceived: EventType<(QrTextReceived) -> Unit>
 
         /**
          * Occurs when the QR code scanner popup is closed by the user.
@@ -151,43 +158,37 @@ sealed external interface EventType {
          * @since Bot API 7.7
          * */
         @JsValue("scanQrPopupClosed")
-        val scanQrPopupClosed: EventType
+        val scanQrPopupClosed: EventType<VoidFunction>
 
         /**
          * Occurs when the [WebApp.readTextFromClipboard] method is called.
          *
-         * *eventHandler* receives an object with the single field data containing text `data` from the clipboard.
-         * If the clipboard contains non-text data, the field `data` will be an empty string.
-         * If the Mini App has no access to the clipboard, the field `data` will be `null`.
+         * *eventHandler* receives an [ClipboardTextReceived] object.
          *
          * @since Bot API 6.4
          * */
         @JsValue("clipboardTextReceived")
-        val clipboardTextReceived: EventType
+        val clipboardTextReceived: EventType<(ClipboardTextReceived) -> Unit>
 
         /**
          * Occurs when the write permission was requested.
          *
-         * *eventHandler* receives an object with the single field `status` containing one of the statuses:
-         * - `allowed` – user granted write permission to the bot,
-         * - `cancelled` – user declined this request.
+         * *eventHandler* receives an [WriteAccessRequested] object.
          *
          * @since Bot API 6.9
          * */
         @JsValue("writeAccessRequested")
-        val writeAccessRequested: EventType
+        val writeAccessRequested: EventType<(WriteAccessRequested) -> Unit>
 
         /**
          * Occurs when the user's phone number was requested.
          *
-         * *eventHandler* receives an object with the single field `status` containing one of the statuses:
-         * - `sent` – user shared their phone number with the bot,
-         * - `cancelled` – user declined this request.
+         * *eventHandler* receives an [ContactRequested] object.
          *
          * @since Bot API 6.9
          * */
         @JsValue("contactRequested")
-        val contactRequested: EventType
+        val contactRequested: EventType<(ContactRequested) -> Unit>
 
         /**
          * Occurs whenever [BiometricManager] object is changed.
@@ -195,56 +196,54 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 7.2
+         * @see useBiometric
          * */
         @JsValue("biometricManagerUpdated")
-        val biometricManagerUpdated: EventType
+        val biometricManagerUpdated: EventType<VoidFunction>
 
         /**
          * Occurs whenever biometric authentication was requested.
          *
-         * *eventHandler* receives an object with the field `isAuthenticated` containing a boolean indicating whether
-         * the user was authenticated successfully. If `isAuthenticated` is true, the field `biometricToken` will
-         * contain the biometric token stored in secure storage on the device.
+         * *eventHandler* receives an [BiometricAuthRequested] object.
          *
          * @since Bot API 7.2
+         * @see useBiometric
          * */
         @JsValue("biometricAuthRequested")
-        val biometricAuthRequested: EventType
+        val biometricAuthRequested: EventType<(BiometricAuthRequested) -> Unit> // TODO test
 
         /**
          * Occurs whenever the biometric token was updated.
          *
-         * *eventHandler* receives an object with the single field `isUpdated`, containing a boolean indicating whether
-         * the token was updated.
+         * *eventHandler* receives an [BiometricTokenUpdated] object.
          *
          * @since Bot API 7.2
+         * @see useBiometric
          * */
         @JsValue("biometricTokenUpdated")
-        val biometricTokenUpdated: EventType
-
+        val biometricTokenUpdated: EventType<(BiometricTokenUpdated) -> Unit>
 
         /**
          * Occurs whenever the Mini App enters or exits fullscreen mode.
          *
-         * *eventHandler* receives no parameters. The current fullscreen state can be checked via `this.isFullscreen`.
+         * *eventHandler* receives no parameters. The current fullscreen state can be checked via [WebApp.isFullscreen].
          *
          * @since Bot API 8.0
+         * @see useViewport
          */
         @JsValue("fullscreenChanged")
-        val fullscreenChanged: EventType
+        val fullscreenChanged: EventType<VoidFunction>
 
-        /**
+            /**
          * Occurs if a request to enter fullscreen mode fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – Fullscreen mode is not supported on this device or platform.
-         * - `ALREADY_FULLSCREEN` – The Mini App is already in fullscreen mode.
+         * *eventHandler* receives an [FullscreenFailed] object.
          *
          * @since Bot API 8.0
+         * @see useViewport
          */
         @JsValue("fullscreenFailed")
-        val fullscreenFailed: EventType
+        val fullscreenFailed: EventType<(FullscreenFailed) -> Unit>
 
         /**
          * Occurs when the Mini App is successfully added to the home screen.
@@ -254,25 +253,17 @@ sealed external interface EventType {
          * @since Bot API 8.0
          */
         @JsValue("homeScreenAdded")
-        val homeScreenAdded: EventType
+        val homeScreenAdded: EventType<VoidFunction>
 
         /**
          * Occurs after checking the home screen status.
          *
-         * *eventHandler* receives an object with the field `status`, which is a string indicating the current home
-         * screen status.
-         * Possible values for `status` are:
-         * - `unsupported` – the feature is not supported, and it is not possible to add the icon to the home screen,
-         * - `unknown` – the feature is supported, and the icon can be added, but it is not possible to determine if the
-         * icon has already been added,
-         * - `added` – the icon has already been added to the home screen,
-         * - `missed` – the icon has not been added to the home screen.
+         * *eventHandler* receives an [HomeScreenChecked] object.
          *
          * @since Bot API 8.0
          */
         @JsValue("homeScreenChecked")
-        val homeScreenChecked: EventType
-
+        val homeScreenChecked: EventType<(HomeScreenChecked) -> Unit>
 
         /**
          * Occurs when accelerometer tracking has started successfully.
@@ -282,7 +273,7 @@ sealed external interface EventType {
          * @since Bot API 8.0
          */
         @JsValue("accelerometerStarted")
-        val accelerometerStarted: EventType
+        val accelerometerStarted: EventType<VoidFunction>
 
         /**
          * Occurs when accelerometer tracking has stopped.
@@ -290,32 +281,34 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useAccelerometer
          */
         @JsValue("accelerometerStopped")
-        val accelerometerStopped: EventType
+        val accelerometerStopped: EventType<VoidFunction>
 
         /**
          * Occurs with the specified frequency after calling the start method, sending the current accelerometer data.
          *
-         * *eventHandler* receives no parameters. The current acceleration values can be received via `this.x`,
-         * `this.y`, and `this.z` respectively.
+         * *eventHandler* receives no parameters. The current acceleration values can be received via
+         * [WebApp.Accelerometer.x][Accelerometer.x], [WebApp.Accelerometer.y][Accelerometer.y], and
+         * [WebApp.Accelerometer.z][Accelerometer.z] respectively.
          *
          * @since Bot API 8.0
+         * @see useAccelerometer
          */
         @JsValue("accelerometerChanged")
-        val accelerometerChanged: EventType
+        val accelerometerChanged: EventType<VoidFunction>
 
         /**
          * Occurs if a request to start accelerometer tracking fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – Accelerometer tracking is not supported on this device or platform.
+         * *eventHandler* receives an [AccelerometerFailed] object.
          *
          * @since Bot API 8.0
+         * @see useAccelerometer
          */
         @JsValue("accelerometerFailed")
-        val accelerometerFailed: EventType
+        val accelerometerFailed: EventType<(AccelerometerFailed) -> Unit>
 
         /**
          * Occurs when device orientation tracking has started successfully.
@@ -323,9 +316,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useDeviceOrientation
          */
         @JsValue("deviceOrientationStarted")
-        val deviceOrientationStarted: EventType
+        val deviceOrientationStarted: EventType<VoidFunction>
 
         /**
          * Occurs when device orientation tracking has stopped.
@@ -333,32 +327,35 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useDeviceOrientation
          */
         @JsValue("deviceOrientationStopped")
-        val deviceOrientationStopped: EventType
+        val deviceOrientationStopped: EventType<VoidFunction>
 
         /**
          * Occurs with the specified frequency after calling the start method, sending the current orientation data.
          *
          * *eventHandler* receives no parameters. The current device orientation values can be received via
-         * `this.alpha`, `this.beta`, and `this.gamma` respectively.
+         * [WebApp.DeviceOrientation.alpha][DeviceOrientation.alpha],
+         * [WebApp.DeviceOrientation.beta][DeviceOrientation.beta], and
+         * [WebApp.DeviceOrientation.gamma][DeviceOrientation.gamma] respectively.
          *
          * @since Bot API 8.0
+         * @see useDeviceOrientation
          */
         @JsValue("deviceOrientationChanged")
-        val deviceOrientationChanged: EventType
+        val deviceOrientationChanged: EventType<VoidFunction>
 
         /**
          * Occurs if a request to start device orientation tracking fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – Device orientation tracking is not supported on this device or platform.
+         * *eventHandler* receives an [DeviceOrientationFailed] object.
          *
          * @since Bot API 8.0
+         * @see useDeviceOrientation
          */
         @JsValue("deviceOrientationFailed")
-        val deviceOrientationFailed: EventType
+        val deviceOrientationFailed: EventType<(DeviceOrientationFailed) -> Unit>
 
         /**
          * Occurs when gyroscope tracking has started successfully.
@@ -366,9 +363,10 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useGyroscope
          */
         @JsValue("gyroscopeStarted")
-        val gyroscopeStarted: EventType
+        val gyroscopeStarted: EventType<VoidFunction>
 
         /**
          * Occurs when gyroscope tracking has stopped.
@@ -376,32 +374,34 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useGyroscope
          */
         @JsValue("gyroscopeStopped")
-        val gyroscopeStopped: EventType
+        val gyroscopeStopped: EventType<VoidFunction>
 
         /**
          * Occurs with the specified frequency after calling the start method, sending the current gyroscope data.
          *
-         * *eventHandler* receives no parameters. The current rotation rates can be received via `this.x`, `this.y`, and
-         * `this.z` respectively.
+         * *eventHandler* receives no parameters. The current rotation rates can be received via
+         * [WebApp.Gyroscope.x][Gyroscope.x], [WebApp.Gyroscope.y][Gyroscope.y], and [WebApp.Gyroscope.z][Gyroscope.z]
+         * respectively.
          *
          * @since Bot API 8.0
+         * @see useGyroscope
          */
         @JsValue("gyroscopeChanged")
-        val gyroscopeChanged: EventType
+        val gyroscopeChanged: EventType<VoidFunction>
 
         /**
          * Occurs if a request to start gyroscope tracking fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – Gyroscope tracking is not supported on this device or platform.
+         * *eventHandler* receives an [GyroscopeFailed] object.
          *
          * @since Bot API 8.0
+         * @see useGyroscope
          */
         @JsValue("gyroscopeFailed")
-        val gyroscopeFailed: EventType
+        val gyroscopeFailed: EventType<(GyroscopeFailed) -> Unit>
 
         /**
          * Occurs whenever LocationManager object is changed.
@@ -409,20 +409,21 @@ sealed external interface EventType {
          * *eventHandler* receives no parameters.
          *
          * @since Bot API 8.0
+         * @see useLocationManager
          */
         @JsValue("locationManagerUpdated")
-        val locationManagerUpdated: EventType
+        val locationManagerUpdated: EventType<VoidFunction>
 
         /**
          * Occurs when location data is requested.
          *
-         * *eventHandler* receives an object with the single field `locationData` of type [LocationData], containing the
-         * current location information.
+         * *eventHandler* receives an [LocationRequested] object.
          *
          * @since Bot API 8.0
+         * @see useLocationManager
          */
         @JsValue("locationRequested")
-        val locationRequested: EventType
+        val locationRequested: EventType<(LocationRequested) -> Unit>
 
         /**
          * Occurs when the message is successfully shared by the user.
@@ -432,23 +433,17 @@ sealed external interface EventType {
          * @since Bot API 8.0
          */
         @JsValue("shareMessageSent")
-        val shareMessageSent: EventType
+        val shareMessageSent: EventType<VoidFunction>
 
         /**
          * Occurs if sharing the message fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – The feature is not supported by the client.
-         * - `MESSAGE_EXPIRED` – The message could not be retrieved because it has expired.
-         * - `MESSAGE_SEND_FAILED` – An error occurred while attempting to send the message.
-         * - `USER_DECLINED` – The user closed the dialog without sharing the message.
-         * - `UNKNOWN_ERROR` – An unknown error occurred.
+         * *eventHandler* receives an [ShareMessageFailed] object.
          *
          * @since Bot API 8.0
          */
         @JsValue("shareMessageFailed")
-        val shareMessageFailed: EventType
+        val shareMessageFailed: EventType<VoidFunction>
 
         /**
          * Occurs when the emoji status is successfully set.
@@ -458,47 +453,36 @@ sealed external interface EventType {
          * @since Bot API 8.0
          */
         @JsValue("emojiStatusSet")
-        val emojiStatusSet: EventType
+        val emojiStatusSet: EventType<VoidFunction>
 
         /**
          * Occurs if setting the emoji status fails.
          *
-         * *eventHandler* receives an object with the single field `error`, describing the reason for the failure.
-         * Possible values for `error` are:
-         * - `UNSUPPORTED` – The feature is not supported by the client.
-         * - `SUGGESTED_EMOJI_INVALID` – One or more emoji identifiers are invalid.
-         * - `DURATION_INVALID` – The specified duration is invalid.
-         * - `USER_DECLINED` – The user closed the dialog without setting a status.
-         * - `SERVER_ERROR` – A server error occurred when attempting to set the status.
-         * - `UNKNOWN_ERROR` – An unknown error occurred.
+         * *eventHandler* receives an [EmojiStatusFailed] object.
          *
          * @since Bot API 8.0
          */
         @JsValue("emojiStatusFailed")
-        val emojiStatusFailed: EventType
+        val emojiStatusFailed: EventType<(EmojiStatusFailed) -> Unit>
 
         /**
          * Occurs when the write permission was requested.
          *
-         * *eventHandler* receives an object with the single field `status` containing one of the statuses:
-         * - `allowed` – user granted emoji status permission to the bot,
-         * - `cancelled` – user declined this request.
+         * *eventHandler* receives an [EmojiStatusAccessRequested] object.
          *
          * @since Bot API 8.0
          */
         @JsValue("emojiStatusAccessRequested")
-        val emojiStatusAccessRequested: EventType
+        val emojiStatusAccessRequested: EventType<(EmojiStatusAccessRequested) -> Unit>
 
         /**
          * Occurs when the user responds to the file download request.
          *
-         * *eventHandler* receives an object with the single field `status` containing one of the statuses:
-         * - `downloading` – the file download has started,
-         * - `cancelled` – user declined this request.
+         * *eventHandler* receives an [FileDownloadRequested] object.
          *
          * @since Bot API 8.0
          */
         @JsValue("fileDownloadRequested")
-        val fileDownloadRequested: EventType
+        val fileDownloadRequested: EventType<VoidFunction>
     }
 }

@@ -4,8 +4,12 @@ import js.objects.jso
 import react.useEffectOnce
 import react.useMemo
 import react.useState
-import ru.raysmith.tgbot.*
-import ru.raysmith.tgbot.events.ViewportChangedEvent
+import ru.raysmith.tgbot.CssVar
+import ru.raysmith.tgbot.events.EventType
+import ru.raysmith.tgbot.events.FullscreenFailed
+import ru.raysmith.tgbot.events.FullscreenFailedType
+import ru.raysmith.tgbot.events.ViewportChanged
+import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
 /**
@@ -57,7 +61,7 @@ fun useViewport(): ViewportHookType {
     }
 
     useEffectOnce {
-        webApp.onEvent(EventType.viewportChanged) { payload: ViewportChangedEvent ->
+        webApp.onEvent(EventType.viewportChanged) { payload: ViewportChanged ->
             isStateStable = payload.isStateStable
             viewportHeight = webApp.viewportHeight
             viewportStableHeight = webApp.viewportStableHeight

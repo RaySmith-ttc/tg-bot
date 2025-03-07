@@ -5,19 +5,14 @@ import react.useEffect
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
+import ru.raysmith.tgbot.events.EventType
+import web.scheduling.VoidFunction
 
 /**
  * This hook controls location access on the device.
  * Before the first use of this object, it needs to be initialized using the [init] method.
- *
- * @param locationManagerUpdated Occurs whenever LocationManager object is changed.
- * *See [EventType.locationManagerUpdated]*
- * @param locationRequested Occurs when location data is requested. *See [EventType.locationRequested]*
  */
-fun useLocationManager(
-    locationManagerUpdated: ((LocationManager) -> Unit)? = null,
-    locationRequested: ((LocationManager) -> Unit)? = null,
-): LocationManagerHookType {
+fun useLocationManager(): LocationManagerHookType {
     var locationManager by useState(webApp.LocationManager)
     var locationData by useState<LocationData?>(null)
 
@@ -25,13 +20,6 @@ fun useLocationManager(
         if (locationManager.isInited) {
             webApp.onEvent(EventType.locationManagerUpdated) {
                 locationManager = copyOf(webApp.LocationManager)
-                locationManagerUpdated?.invoke(webApp.LocationManager)
-            }
-
-            if (locationRequested != null) {
-                webApp.onEvent(EventType.locationRequested) {
-                    locationRequested.invoke(webApp.LocationManager)
-                }
             }
         }
     }
@@ -55,7 +43,7 @@ fun useLocationManager(
         locationManager = copyOf(webApp.LocationManager.openSettings())
     }
 
-    return useMemo(locationManager, locationData, locationRequested) {
+    return useMemo(locationManager, locationData) {
         jso {
             this.locationData = locationData
             isInited = locationManager.isInited
@@ -91,7 +79,7 @@ external interface LocationManagerHookType {
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called when the object is initialized.
      */
-    var init: (callback: (() -> Unit)?) -> Unit
+    var init: (callback: VoidFunction?) -> Unit
 
     /** A method that requests and update location data. */
     var getLocation: (callback: ((locationData: LocationData?) -> Unit)?) -> Unit
@@ -103,5 +91,5 @@ external interface LocationManagerHookType {
      * *Note that this method can be called only in response to user interaction with the Mini App interface
      * (e.g., a click inside the Mini App or on the main button).*
      */
-    var openSettings: () -> Unit
+    var openSettings: VoidFunction
 }

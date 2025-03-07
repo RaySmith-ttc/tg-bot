@@ -1,9 +1,10 @@
 package ru.raysmith.tgbot.hooks
 
 import js.objects.jso
-import react.*
-import ru.raysmith.tgbot.EventType
-import ru.raysmith.tgbot.events.ViewportChangedEvent
+import react.useEffectOnce
+import react.useMemo
+import react.useState
+import ru.raysmith.tgbot.events.EventType
 import ru.raysmith.tgbot.webApp
 import web.scheduling.VoidFunction
 
