@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.webappapp.other
 import ru.raysmith.tgbot.webappapp.wrappers.InputProps
 import ru.raysmith.tgbot.webappapp.wrappers.shrink
 import web.navigator.navigator
+import web.window.window
 
 external interface DataDisplayTextFieldProps : TextFieldProps {
     var copyToClipboard: Boolean
@@ -23,6 +24,7 @@ val DataDisplayTextField = FC<DataDisplayTextFieldProps> { props ->
     var snackbar by useState(false)
 
     TextField {
+        value = props.value ?: ""
         variant = FormControlVariant.outlined
         disabled = props.value == null
         onFocus = { event -> event.target.blur() }
@@ -30,7 +32,7 @@ val DataDisplayTextField = FC<DataDisplayTextFieldProps> { props ->
         InputProps = jso {
             readOnly = true
             shrink = true
-            if (props.copyToClipboard) {
+            if (props.copyToClipboard && window.asDynamic().isSecureContext == true) {
                 endAdornment = InputAdornment.create {
                     position = InputAdornmentPosition.end
                     IconButton {
@@ -48,7 +50,7 @@ val DataDisplayTextField = FC<DataDisplayTextFieldProps> { props ->
             }
         }
 
-        +props.other("copyToClipboard")
+        +props.other("copyToClipboard", "value")
     }
 
     Snackbar {

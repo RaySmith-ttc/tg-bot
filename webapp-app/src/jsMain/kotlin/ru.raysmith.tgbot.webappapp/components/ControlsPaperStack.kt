@@ -48,7 +48,7 @@ val ControlsPaperStack = FC<ControlsPaperStackProps> { props ->
     }
 }
 
-fun ButtonProps.applyControlButtonStyle() {
+inline fun ButtonProps.applyControlButtonStyle() {
     fullWidth = true
     size = Size.large
 }

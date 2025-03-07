@@ -32,125 +32,119 @@ val LocationManagerPage = FC {
     BaseSubPageLayout {
         title = "Location manager"
 
+        Typography {
+            +"Manager state"
+            variant = TypographyVariant.h6
+            sx { pt = 2 }
+        }
+
+        DataDisplayTable {
+            DataDisplayTableRow {
+                title = "isInited"
+                value = DataDisplayCheckbox.create { checked = locationManager.isInited }
+            }
+            DataDisplayTableRow {
+                title = "isLocationAvailable"
+                value = DataDisplayCheckbox.create { checked = locationManager.isLocationAvailable }
+            }
+            DataDisplayTableRow {
+                title = "isAccessRequested"
+                value = DataDisplayCheckbox.create { checked = locationManager.isAccessRequested }
+            }
+            DataDisplayTableRow {
+                title = "isAccessGranted"
+                value = DataDisplayCheckbox.create { checked = locationManager.isAccessGranted }
+            }
+        }
+
+        if (!locationManager.isLocationAvailable) {
+            Alert {
+                +"LocationManager not available on this device. To access the additional features on this page, use a device with a GPS module."
+                severity = AlertColor.error.unsafeCast<String>()
+            }
+            return@BaseSubPageLayout
+        }
+
+        if (!locationManager.isAccessGranted) {
+            Stack {
+                spacing = responsive(1)
+
+                Alert {
+                    +"The bot does not have permission for location. Go to the settings and grant permission to use it."
+                    severity = AlertColor.warning.unsafeCast<String>()
+                }
+
+                Button {
+                    +"Open settings"
+                    applyControlButtonStyle()
+                    startIcon = Settings.create()
+                    onClick = {
+                        locationManager.openSettings()
+                    }
+                }
+            }
+            return@BaseSubPageLayout
+        }
 
         Stack {
+            direction = responsive(StackDirection.row)
             spacing = responsive(1)
+            sx {
+                alignItems = AlignItems.baseline
+            }
 
             Typography {
-                +"Manager state"
+                +"Location data"
                 variant = TypographyVariant.h6
                 sx { pt = 2 }
             }
 
-            DataDisplayTable {
-                DataDisplayTableRow {
-                    title = "isInited"
-                    value = DataDisplayCheckbox.create { checked = locationManager.isInited }
-                }
-                DataDisplayTableRow {
-                    title = "isLocationAvailable"
-                    value = DataDisplayCheckbox.create { checked = locationManager.isLocationAvailable }
-                }
-                DataDisplayTableRow {
-                    title = "isAccessRequested"
-                    value = DataDisplayCheckbox.create { checked = locationManager.isAccessRequested }
-                }
-                DataDisplayTableRow {
-                    title = "isAccessGranted"
-                    value = DataDisplayCheckbox.create { checked = locationManager.isAccessGranted }
+            Button {
+                +"Update"
+                disabled = !locationManager.isInited
+                onClick = {
+                    locationManager.getLocation(null)
                 }
             }
+        }
 
-            if (!locationManager.isLocationAvailable) {
-                Alert {
-                    +"LocationManager not available on this device. To access the additional features on this page, use a device with a GPS module."
-                    severity = AlertColor.error.unsafeCast<String>()
-                }
-                return@Stack
+        DataDisplayTable {
+            DataDisplayTableRow {
+                title = "latitude"
+                value = Typography.create { +locationManager.locationData?.latitude.toString() }
             }
-
-            if (!locationManager.isAccessGranted) {
-                Stack {
-                    spacing = responsive(1)
-
-                    Alert {
-                        +"The bot does not have permission for location. Go to the settings and grant permission to use it."
-                        severity = AlertColor.warning.unsafeCast<String>()
-                    }
-
-                    Button {
-                        +"Open settings"
-                        applyControlButtonStyle()
-                        startIcon = Settings.create()
-                        onClick = {
-                            locationManager.openSettings()
-                        }
-                    }
-                }
-                return@Stack
+            DataDisplayTableRow {
+                title = "longitude"
+                value = Typography.create { +locationManager.locationData?.longitude.toString() }
             }
-
-            Stack {
-                direction = responsive(StackDirection.row)
-                spacing = responsive(1)
-                sx {
-                    alignItems = AlignItems.baseline
-                }
-
-                Typography {
-                    +"Location data"
-                    variant = TypographyVariant.h6
-                    sx { pt = 2 }
-                }
-
-                Button {
-                    +"Update"
-                    disabled = !locationManager.isInited
-                    onClick = {
-                        locationManager.getLocation(null)
-                    }
-                }
+            DataDisplayTableRow {
+                title = "altitude"
+                value = Typography.create { +locationManager.locationData?.altitude.toString() }
             }
-
-            DataDisplayTable {
-                DataDisplayTableRow {
-                    title = "latitude"
-                    value = Typography.create { +locationManager.locationData?.latitude.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "longitude"
-                    value = Typography.create { +locationManager.locationData?.longitude.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "altitude"
-                    value = Typography.create { +locationManager.locationData?.altitude.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "course"
-                    value = Typography.create { +locationManager.locationData?.course.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "speed"
-                    value = Typography.create { +locationManager.locationData?.speed.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "horizontalAccuracy"
-                    value = Typography.create { +locationManager.locationData?.horizontalAccuracy.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "verticalAccuracy"
-                    value = Typography.create { +locationManager.locationData?.verticalAccuracy.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "courseAccuracy"
-                    value = Typography.create { +locationManager.locationData?.courseAccuracy.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "speedAccuracy"
-                    value = Typography.create { +locationManager.locationData?.speedAccuracy.toString() }
-                }
+            DataDisplayTableRow {
+                title = "course"
+                value = Typography.create { +locationManager.locationData?.course.toString() }
             }
-
+            DataDisplayTableRow {
+                title = "speed"
+                value = Typography.create { +locationManager.locationData?.speed.toString() }
+            }
+            DataDisplayTableRow {
+                title = "horizontalAccuracy"
+                value = Typography.create { +locationManager.locationData?.horizontalAccuracy.toString() }
+            }
+            DataDisplayTableRow {
+                title = "verticalAccuracy"
+                value = Typography.create { +locationManager.locationData?.verticalAccuracy.toString() }
+            }
+            DataDisplayTableRow {
+                title = "courseAccuracy"
+                value = Typography.create { +locationManager.locationData?.courseAccuracy.toString() }
+            }
+            DataDisplayTableRow {
+                title = "speedAccuracy"
+                value = Typography.create { +locationManager.locationData?.speedAccuracy.toString() }
+            }
         }
     }
 }

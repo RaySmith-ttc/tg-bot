@@ -4,8 +4,8 @@ import mui.icons.material.AddToHomeScreen
 import mui.material.*
 import mui.system.responsive
 import react.*
-import ru.raysmith.tgbot.EventType
 import ru.raysmith.tgbot.HomeScreenStatus
+import ru.raysmith.tgbot.events.EventType
 import ru.raysmith.tgbot.hooks.useBackButton
 import ru.raysmith.tgbot.webApp
 import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
