@@ -23,8 +23,8 @@ val App = FC<Props> {
         fallback = FullPageLoading.create()
 
         SettingsProvider {
-            WebAppGuard {
-                ThemeProvider {
+            ThemeProvider {
+                WebAppGuard {
                     Router {
 
                     }

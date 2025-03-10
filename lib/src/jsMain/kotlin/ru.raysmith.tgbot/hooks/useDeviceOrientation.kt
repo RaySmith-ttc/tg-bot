@@ -69,7 +69,6 @@ fun useDeviceOrientation(): DeviceOrientationHookType {
             this.gamma = deviceOrientation.gamma
             this.start = start
             this.stop = stop
-
             this.isOrientationLocked = isOrientationLocked
             this.lockOrientation = lockOrientation
             this.unlockOrientation = unlockOrientation

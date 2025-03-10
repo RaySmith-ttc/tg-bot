@@ -32,7 +32,6 @@ kotlin {
             webpackTask {
                 mainOutputFileName.set("webappapp.js")
                 args += listOf(
-                    "--env", "TG_BOT_TOKEN=${System.getenv("TG_BOT_TOKEN")}",
                     "--env", "WEBAPP_GUARD_ENABLED=${System.getenv("WEBAPP_GUARD_ENABLED")?.toBoolean() ?: true}",
                 )
             }

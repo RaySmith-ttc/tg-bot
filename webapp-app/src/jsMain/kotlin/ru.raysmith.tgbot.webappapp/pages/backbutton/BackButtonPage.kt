@@ -1,6 +1,8 @@
 package ru.raysmith.tgbot.webappapp.pages.backbutton
 
-import mui.material.*
+import mui.material.Button
+import mui.material.Stack
+import mui.material.StackDirection
 import mui.system.responsive
 import react.FC
 import react.create
@@ -10,6 +12,7 @@ import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
+import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.prompts.alert
@@ -31,19 +34,17 @@ val BackButtonPage = FC<BBProps> { props ->
             direction = responsive(StackDirection.column)
             spacing = responsive(2)
 
-            Table {
-                TableBody {
-                    DataDisplayTableRow {
-                        title = "isVisible"
-                        value = DataDisplayCheckbox.create { checked = backButton.isVisible }
+            DataDisplayTable {
+                DataDisplayTableRow {
+                    title = "isVisible"
+                    value = DataDisplayCheckbox.create { checked = backButton.isVisible }
 
-                        ToggleButtonsGroupControl {
-                            value = backButton.isVisible
-                            items = mapOf(
-                                ("Show" to true) to { backButton.show() },
-                                ("Hide" to false) to { backButton.hide() }
-                            )
-                        }
+                    ToggleButtonsGroupControl {
+                        value = backButton.isVisible
+                        items = mapOf(
+                            ("Show" to true) to { backButton.show() },
+                            ("Hide" to false) to { backButton.hide() }
+                        )
                     }
                 }
             }

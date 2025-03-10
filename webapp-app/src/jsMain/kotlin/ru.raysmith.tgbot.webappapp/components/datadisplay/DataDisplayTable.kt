@@ -9,7 +9,6 @@ import ru.raysmith.tgbot.webappapp.other
 import web.cssom.TableLayout
 import web.cssom.pct
 
-// TODO replace Table>TableBody to DataDisplayTable
 val DataDisplayTable = FC<TableProps> { props ->
     Table {
         sx {

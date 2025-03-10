@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.webappapp.components.ButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.components.FullPageLoading
 import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
+import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTextField
 import ru.raysmith.tgbot.webappapp.mainScope
@@ -123,72 +124,70 @@ val BiometricPage = FC<Props> {
             return@BaseSubPageLayout
         }
 
-        Table {
-            TableBody {
-                DataDisplayTableRow {
-                    title = "isInited"
-                    value = DataDisplayCheckbox.create { checked = biometric.isInited }
-                }
-                DataDisplayTableRow {
-                    title = "biometricType"
-                    value = Typography.create { +biometric.biometricType.toString() }
-                }
-                DataDisplayTableRow {
-                    title = "deviceId"
-                    value = Typography.create { +biometric.deviceId }
-                }
-                DataDisplayTableRow {
-                    title = "isAccessRequested"
-                    value = DataDisplayCheckbox.create { checked = biometric.isAccessRequested }
-                }
-                DataDisplayTableRow {
-                    title = "isAccessGranted"
-                    value = DataDisplayCheckbox.create { checked = biometric.isAccessGranted }
-                }
-                DataDisplayTableRow {
-                    title = "isBiometricTokenSaved"
-                    value = DataDisplayCheckbox.create { checked = biometric.isBiometricTokenSaved }
+        DataDisplayTable {
+            DataDisplayTableRow {
+                title = "isInited"
+                value = DataDisplayCheckbox.create { checked = biometric.isInited }
+            }
+            DataDisplayTableRow {
+                title = "biometricType"
+                value = Typography.create { +biometric.biometricType.toString() }
+            }
+            DataDisplayTableRow {
+                title = "deviceId"
+                value = Typography.create { +biometric.deviceId }
+            }
+            DataDisplayTableRow {
+                title = "isAccessRequested"
+                value = DataDisplayCheckbox.create { checked = biometric.isAccessRequested }
+            }
+            DataDisplayTableRow {
+                title = "isAccessGranted"
+                value = DataDisplayCheckbox.create { checked = biometric.isAccessGranted }
+            }
+            DataDisplayTableRow {
+                title = "isBiometricTokenSaved"
+                value = DataDisplayCheckbox.create { checked = biometric.isBiometricTokenSaved }
 
-                    DataDisplayTextField {
-                        label = ReactNode("token")
-                        value = token ?: ""
-                        copyToClipboard = true
-                        fullWidth = true
-                    }
-
-                    ButtonsGroupControl {
-                        sx { mt = 1 }
-                        items = mapOf(
-                            "Save token" to { onTokenSave() },
-                            "Reset token" to onTokenReset
-                        )
-                    }
+                DataDisplayTextField {
+                    label = ReactNode("token")
+                    value = token ?: ""
+                    copyToClipboard = true
+                    fullWidth = true
                 }
 
-                if (biometric.isBiometricAvailable) {
-                    DataDisplayTableRow {
-                        title = "Access granted"
-                        value = DataDisplayCheckbox.create { checked = granted ?: false }
-                        Button {
-                            +"Request"
-                            onClick = {
-                                biometric.requestAccess(jso { reason = "Some reason" }) { res ->
-                                    granted = res
-                                }
+                ButtonsGroupControl {
+                    sx { mt = 1 }
+                    items = mapOf(
+                        "Save token" to { onTokenSave() },
+                        "Reset token" to onTokenReset
+                    )
+                }
+            }
+
+            if (biometric.isBiometricAvailable) {
+                DataDisplayTableRow {
+                    title = "Access granted"
+                    value = DataDisplayCheckbox.create { checked = granted ?: false }
+                    Button {
+                        +"Request"
+                        onClick = {
+                            biometric.requestAccess(jso { reason = "Some reason" }) { res ->
+                                granted = res
                             }
                         }
                     }
+                }
 
-                    DataDisplayTableRow {
-                        title = "Authenticated"
-                        value = DataDisplayCheckbox.create { checked = auth ?: false }
-                        Button {
-                            +"Authenticate"
-                            onClick = {
-                                biometric.authenticate(jso { reason = "Some reason" }) { res, t ->
-                                    auth = res
-                                    token = t
-                                }
+                DataDisplayTableRow {
+                    title = "Authenticated"
+                    value = DataDisplayCheckbox.create { checked = auth ?: false }
+                    Button {
+                        +"Authenticate"
+                        onClick = {
+                            biometric.authenticate(jso { reason = "Some reason" }) { res, t ->
+                                auth = res
+                                token = t
                             }
                         }
                     }

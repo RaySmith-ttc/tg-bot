@@ -13,6 +13,7 @@ import ru.raysmith.tgbot.webappapp.components.ButtonsControl
 import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.ToggleButtonsGroupControl
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayCheckbox
+import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 
@@ -35,35 +36,33 @@ val DeviceOrientationPage = FC {
                     severity = AlertColor.error.unsafeCast<String>()
                 }
             } else {
-                Table {
-                    TableBody {
-                        DataDisplayTableRow {
-                            title = "isStarted"
-                            value = DataDisplayCheckbox.create { checked = deviceOrientation.isStarted }
-                        }
-                        DataDisplayTableRow {
-                            title = "alpha"
-                            value = Typography.create { +deviceOrientation.alpha.toString().take(16) }
-                        }
-                        DataDisplayTableRow {
-                            title = "beta"
-                            value = Typography.create { +deviceOrientation.beta.toString().take(16) }
-                        }
-                        DataDisplayTableRow {
-                            title = "gamma"
-                            value = Typography.create { +deviceOrientation.gamma.toString().take(16) }
-                        }
-                        DataDisplayTableRow {
-                            title = "isOrientationLocked"
-                            value = DataDisplayCheckbox.create { checked = deviceOrientation.isOrientationLocked }
+                DataDisplayTable {
+                    DataDisplayTableRow {
+                        title = "isStarted"
+                        value = DataDisplayCheckbox.create { checked = deviceOrientation.isStarted }
+                    }
+                    DataDisplayTableRow {
+                        title = "alpha"
+                        value = Typography.create { +deviceOrientation.alpha.toString().take(16) }
+                    }
+                    DataDisplayTableRow {
+                        title = "beta"
+                        value = Typography.create { +deviceOrientation.beta.toString().take(16) }
+                    }
+                    DataDisplayTableRow {
+                        title = "gamma"
+                        value = Typography.create { +deviceOrientation.gamma.toString().take(16) }
+                    }
+                    DataDisplayTableRow {
+                        title = "isOrientationLocked"
+                        value = DataDisplayCheckbox.create { checked = deviceOrientation.isOrientationLocked }
 
-                            ToggleButtonsGroupControl {
-                                value = deviceOrientation.isOrientationLocked
-                                items = mapOf(
-                                    ("Lock" to true) to { deviceOrientation.lockOrientation() },
-                                    ("Unlock" to false) to { deviceOrientation.unlockOrientation() }
-                                )
-                            }
+                        ToggleButtonsGroupControl {
+                            value = deviceOrientation.isOrientationLocked
+                            items = mapOf(
+                                ("Lock" to true) to { deviceOrientation.lockOrientation() },
+                                ("Unlock" to false) to { deviceOrientation.unlockOrientation() }
+                            )
                         }
                     }
                 }

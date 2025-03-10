@@ -1,7 +1,8 @@
 package ru.raysmith.tgbot.webappapp.components.datadisplay
 
-import mui.material.*
-import mui.system.responsive
+import mui.material.TableCell
+import mui.material.TableRow
+import mui.material.Typography
 import mui.system.sx
 import react.FC
 import react.PropsWithChildren
@@ -44,16 +45,8 @@ val DataDisplayTableRow = FC<BaseInfoPageProps> { props ->
                     pb = 1
                 }
             }
-            Stack { // TODO remove? (check theme page)
-                direction = responsive(StackDirection.row)
-                spacing = responsive(1)
-                sx {
-                    justifyItems = JustifyItems.center
-                    alignItems = AlignItems.center
-                }
 
-                +props.value
-            }
+            +props.value
         }
     }
 

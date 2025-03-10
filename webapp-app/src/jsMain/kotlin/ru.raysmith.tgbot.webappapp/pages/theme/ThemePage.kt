@@ -10,6 +10,7 @@ import ru.raysmith.tgbot.webappapp.capitalize
 import ru.raysmith.tgbot.webappapp.components.ColorBlock
 import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.DefaultValuesHintAlert
+import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTableRow
 import ru.raysmith.tgbot.webappapp.decapitalize
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
@@ -38,22 +39,20 @@ val ThemePage = FC<Props> {
             }
         }
 
-        Table {
-            TableBody {
-                DataDisplayTableRow {
-                    title = "colorScheme"
-                    value = Typography.create { +tp.colorScheme.toString() }
-                }
+        DataDisplayTable {
+            DataDisplayTableRow {
+                title = "colorScheme"
+                value = Typography.create { +tp.colorScheme.toString() }
+            }
 
-                tpKeys.forEach {
-                    DataDisplayTableRow {
-                        title = it
-                        value = ColorBlock.create {
-                            backgroundColor =
-                                tp.asDynamic()[it.split("_").joinToString("") { w -> w.capitalize() }.decapitalize()]
-                                    ?.unsafeCast<BackgroundColor>()
-                                    ?: NamedColor.transparent
-                        }
+            tpKeys.forEach {
+                DataDisplayTableRow {
+                    title = it
+                    value = ColorBlock.create {
+                        backgroundColor =
+                            tp.asDynamic()[it.split("_").joinToString("") { w -> w.capitalize() }.decapitalize()]
+                                ?.unsafeCast<BackgroundColor>()
+                                ?: NamedColor.transparent
                     }
                 }
             }

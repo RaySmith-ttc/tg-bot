@@ -4,7 +4,6 @@ import js.array.JsTuple2
 import js.array.ReadonlyArray
 import js.collections.JsMap
 import js.objects.Object
-import js.objects.ReadonlyRecord
 import js.objects.jso
 import react.*
 import ru.raysmith.tgbot.BuiltinImplementation
@@ -133,7 +132,7 @@ fun useCloudStorage(): CloudStorageHookType {
     val removeItems: (keys: Iterable<String>, callback: ((error: String?, isRemoved: Boolean) -> Unit)?) -> Unit = useCallback(items) { keys, callback ->
         state = CloudStorageHookState.REMOVING_ITEM
 
-        val arrayKeys = if (js("Array.isArray(keys)") as Boolean) { // TODO is it worked with production webpack?
+        val arrayKeys = if (js("Array.isArray(keys)") as Boolean) {
             keys.unsafeCast<Array<String>>()
         } else {
             keys.toList().toTypedArray()

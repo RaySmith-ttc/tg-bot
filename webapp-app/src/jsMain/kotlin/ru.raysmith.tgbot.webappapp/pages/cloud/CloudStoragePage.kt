@@ -1,6 +1,9 @@
 package ru.raysmith.tgbot.webappapp.pages.cloud
 
-import mui.material.*
+import mui.material.Button
+import mui.material.TableCell
+import mui.material.TableRow
+import mui.material.Typography
 import mui.system.sx
 import react.FC
 import react.useReducer
@@ -9,6 +12,7 @@ import ru.raysmith.tgbot.hooks.CloudStorageHookState
 import ru.raysmith.tgbot.hooks.useCloudStorage
 import ru.raysmith.tgbot.webappapp.components.ControlsPaperStack
 import ru.raysmith.tgbot.webappapp.components.applyControlButtonStyle
+import ru.raysmith.tgbot.webappapp.components.datadisplay.DataDisplayTable
 import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 import web.cssom.OverflowWrap
 import web.cssom.WhiteSpace
@@ -28,30 +32,28 @@ val CloudStoragePage = FC {
             +"State: ${if (waitAddingBatch > 0) ADDING_BATCH else cloudStorage.state}"
         }
 
-        Table {
-            TableBody {
-                cloudStorage.items.forEach { (key, value) ->
-                    TableRow {
-                        this.key = key
-                        TableCell {
-                            sx {
-                                wordWrap = WordWrap.breakWord
-                                whiteSpace = WhiteSpace.normal
-                                overflowWrap = OverflowWrap.anywhere
-                            }
-                            Typography {
-                                +key
-                            }
+        DataDisplayTable {
+            cloudStorage.items.forEach { (key, value) ->
+                TableRow {
+                    this.key = key
+                    TableCell {
+                        sx {
+                            wordWrap = WordWrap.breakWord
+                            whiteSpace = WhiteSpace.normal
+                            overflowWrap = OverflowWrap.anywhere
                         }
-                        TableCell {
-                            sx {
-                                wordWrap = WordWrap.breakWord
-                                whiteSpace = WhiteSpace.normal
-                                overflowWrap = OverflowWrap.anywhere
-                            }
-                            Typography {
-                                +value
-                            }
+                        Typography {
+                            +key
+                        }
+                    }
+                    TableCell {
+                        sx {
+                            wordWrap = WordWrap.breakWord
+                            whiteSpace = WhiteSpace.normal
+                            overflowWrap = OverflowWrap.anywhere
+                        }
+                        Typography {
+                            +value
                         }
                     }
                 }
