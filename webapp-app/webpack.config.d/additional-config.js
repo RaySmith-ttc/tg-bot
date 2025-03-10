@@ -5,7 +5,7 @@ module.exports = env => {
     const webpack = require("webpack");
     config.plugins.push(new webpack.DefinePlugin({
         'process.env': JSON.stringify({}),
-        'process.env.FOO': env.FOO,
+        'process.env.WEBAPP_GUARD_ENABLED': env.WEBAPP_GUARD_ENABLED,
     }));
 
     config.module.rules.push({
