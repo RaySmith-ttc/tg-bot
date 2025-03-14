@@ -28,12 +28,6 @@ val ViewportPage = FC<Props> {
         title = "Viewport"
         spacing = responsive(1)
 
-        Typography {
-            +"Viewport"
-            variant = TypographyVariant.h6
-            sx { pt = 2 }
-        }
-
         DataDisplayTable {
             DataDisplayTableRow {
                 title = "isExpanded"

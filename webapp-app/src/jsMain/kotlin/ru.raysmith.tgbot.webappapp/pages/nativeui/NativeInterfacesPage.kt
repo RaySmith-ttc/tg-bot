@@ -28,6 +28,8 @@ val NativeInterfacesPage = FC {
     var qrCodeData by useState<String?>(null)
     var textFromClipboard by useState<String?>(null)
 
+    val isHttps = window.asDynamic().isSecureContext == true
+
     useEffectOnce {
         webApp.onEvent(EventType.popupClosed) {
             println("EventType.popupClosed: ${JSON.stringify(it)}")
@@ -124,8 +126,8 @@ val NativeInterfacesPage = FC {
                     webApp.showScanQrPopup(jso {
                         text = "Text"
                     }) {
-                        qrCodeData = it
                         println("QR data: $it")
+                        qrCodeData = it
                         true
                     }
                 }
@@ -136,7 +138,7 @@ val NativeInterfacesPage = FC {
             direction = responsive(StackDirection.column)
 
             DataDisplayTextField {
-                disabled = window.asDynamic().isSecureContext == false
+                disabled = !isHttps
                 label = ReactNode("Text from clipboard")
                 value = textFromClipboard
                 fullWidth = true
@@ -145,7 +147,7 @@ val NativeInterfacesPage = FC {
             Button {
                 +"Copy random string to clipboard"
                 applyControlButtonStyle()
-                disabled = window.asDynamic().isSecureContext == false
+                disabled = !isHttps
                 onClick = {
                     mainScope.launch {
                         navigator.clipboard.writeText(generateRandomString(8))
@@ -156,15 +158,15 @@ val NativeInterfacesPage = FC {
             Button {
                 +"Read text from clipboard"
                 applyControlButtonStyle()
-                disabled = window.asDynamic().isSecureContext == false
+                disabled = !isHttps
                 onClick = {
                     webApp.readTextFromClipboard {
-                        println("Text from clipboard: $it")
+                        textFromClipboard = it
                     }
                 }
             }
 
-            if (window.asDynamic().isSecureContext == false) {
+            if (!isHttps) {
                 Alert {
                     +"This features are available only in secure context (HTTPS)"
                     severity = AlertColor.info.unsafeCast<String>()

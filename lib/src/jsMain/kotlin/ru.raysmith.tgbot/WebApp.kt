@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot
 
 import ru.raysmith.tgbot.events.EventType
+import ru.raysmith.tgbot.events.ViewportChanged
 import web.cssom.Color
 import web.scheduling.VoidFunction
 
@@ -33,7 +34,7 @@ external object WebApp {
      * */
     val colorScheme: ColorScheme
 
-//    /** An object containing the current theme settings used in the Telegram app. */
+    /** An object containing the current theme settings used in the Telegram app. */
     val themeParams: ThemeParams
 
     /**
@@ -42,26 +43,24 @@ external object WebApp {
      * */
     val isActive: Boolean
 
-    // TODO link to expand
     /**
      * *True*, if the Mini App is expanded to the maximum available height. False, if the Mini App occupies part of
-     * the screen and can be expanded to the full height using the **expand()** method.
+     * the screen and can be expanded to the full height using the [expand] method.
      * */
     val isExpanded: Boolean
 
-    // TODO link to expand
     /**
      * The current height of the visible area of the Mini App. Also available in CSS as the variable
      * [CssVar.tgViewportHeight].
      *
      * The application can display just the top part of the Mini App, with its lower part remaining outside the screen
      * area. From this position, the user can “pull” the Mini App to its maximum height, while the bot can do the same
-     * by calling the **expand()** method. As the position of the Mini App changes, the current height value of the
+     * by calling the [expand] method. As the position of the Mini App changes, the current height value of the
      * visible area will be updated in real time.
      *
      * Please note that the refresh rate of this value is not sufficient to smoothly follow the lower border of the
      * window. It should not be used to pin interface elements to the bottom of the visible area. It's more appropriate
-     * to use the value of the `viewportStableHeight` field for this purpose.
+     * to use the value of the [viewportStableHeight] field for this purpose.
      * */
     val viewportHeight: Float
 
@@ -72,13 +71,14 @@ external object WebApp {
      *
      * The application can display just the top part of the Mini App, with its lower part remaining outside the screen
      * area. From this position, the user can “pull” the Mini App to its maximum height, while the bot can do the same
-     * by calling the **expand()** method. Unlike the value of `viewportHeight`, the value of `viewportStableHeight`
+     * by calling the [expand] method. Unlike the value of [viewportHeight], the value of [viewportStableHeight]
      * does not change as the position of the Mini App changes with user gestures or during animations. The value of
-     * `viewportStableHeight` will be updated after all gestures and animations are completed and the Mini App reaches
+     * [viewportStableHeight] will be updated after all gestures and animations are completed and the Mini App reaches
      * its final size.
      *
-     * *Note the event `viewportChanged` with the passed parameter `isStateStable=true`, which will allow you to track
-     * when the stable state of the height of the visible area changes.
+     * *Note the event [EventType.viewportChanged] with the passed parameter
+     * [isStateStable][ViewportChanged.isStateStable]`=true`, which will allow you to track when the stable state of
+     * the height of the visible area changes.
      * */
     val viewportStableHeight: Float
 
@@ -300,7 +300,7 @@ external object WebApp {
 
     /**
      * A method used to send data to the bot. When this method is called, a service message is sent to the bot
-     * containing the data `data` of the length up to 4096 bytes, and the Mini App is closed.
+     * containing the [data] of the length up to 4096 bytes, and the Mini App is closed.
      * See the field `webAppData` in the class [Message](https://core.telegram.org/bots/api#message).
      *
      * *This method is only available for Mini Apps launched via a
@@ -309,12 +309,13 @@ external object WebApp {
     fun sendData(data: String)
 
     /**
-     * A method that inserts the bot's username and the specified inline query in the current chat's
+     * A method that inserts the bot's username and the specified inline [query] in the current chat's
      * input field. Query may be empty, in which case only the bot's username will be inserted.
-     * If an optional `chooseChatTypes` parameter was passed, the client prompts the user to choose a specific chat,
-     * then opens that chat and inserts the bot's username and the specified inline query in the input field.
+     * If an optional [chooseChatTypes] parameter was passed, the client prompts the user to choose a specific chat,
+     * then opens that chat and inserts the bot's username and the specified inline [query] in the input field.
      * You can specify which types of chats the user will be able to choose from. It can be one or more of the
-     * following types: [InlineQueryChatType.users], [InlineQueryChatType.bots], [InlineQueryChatType.bots], [InlineQueryChatType.channels].
+     * following types: [InlineQueryChatType.users], [InlineQueryChatType.bots], [InlineQueryChatType.bots],
+     * [InlineQueryChatType.channels].
      *
      * @since Bot API 6.7
      * */
@@ -323,6 +324,7 @@ external object WebApp {
 
     /**
      * A method that opens a link in an external browser. The Mini App will *not* be closed.
+     *
      * `Bot API 6.4+` If the optional options parameter is passed with the field [OpenLinkOptions.tryInstantView]=true,
      * the link will be opened in [Instant View](https://instantview.telegram.org/) mode if possible.
      *
@@ -339,15 +341,14 @@ external object WebApp {
      * */
     fun openTelegramLink(url: String)
 
-    // TODO link to event
     /**
-     * A method that opens an invoice using the link url. The Mini App will receive the event
-     * *invoiceClosed* when the invoice is closed. If an optional [callback] parameter was passed, the [callback]
-     * function will be called and the invoice status will be passed as the first argument.
+     * A method that opens an invoice using the link url. The Mini App will receive the event [EventType.invoiceClosed]
+     * when the invoice is closed. If an optional [callback] parameter was passed, the [callback] function will be
+     * called and the invoice status will be passed as the first argument.
      *
      * @since Bot API 6.1
      * */
-    fun openInvoice(url: String, callback: VoidFunction = definedExternally)
+    fun openInvoice(url: String, callback: (status: dynamic) -> Unit = definedExternally) // TODO what is status?
 
     /**
      * A method that opens the native story editor with the media specified in the mediaUrl parameter as an HTTPS URL.
@@ -359,9 +360,10 @@ external object WebApp {
 
     /**
      * A method that opens a dialog allowing the user to share a message provided by the bot.
-     * If an optional [callback] parameter is provided, the [callback] function will be called with a boolean as the first
-     * argument, indicating whether the message was successfully sent. The message id passed to this method must belong
-     * to a [PreparedInlineMessage] previously obtained via the Bot API method [savePreparedInlineMessage].
+     * If an optional [callback] parameter is provided, the [callback] function will be called with a boolean as the
+     * first argument, indicating whether the message was successfully sent. The message id passed to this method must
+     * belong to a [PreparedInlineMessage](https://core.telegram.org/bots/api#preparedinlinemessage) previously obtained
+     * via the Bot API method [savePreparedInlineMessage](https://core.telegram.org/bots/api#savepreparedinlinemessage).
      *
      * @since Bot API 8.0
      * */
@@ -370,8 +372,8 @@ external object WebApp {
     /**
      * A method that opens a dialog allowing the user to set the specified custom emoji as their status.
      * An optional params argument of type EmojiStatusParams specifies additional settings, such as duration.
-     * If an optional [callback] parameter is provided, the [callback] function will be called with a boolean as the first
-     * argument, indicating whether the status was set.
+     * If an optional [callback] parameter is provided, the [callback] function will be called with a boolean as the
+     * first argument, indicating whether the status was set.
      *
      * @since Bot API 8.0
      * */
@@ -381,8 +383,8 @@ external object WebApp {
 
     /**
      * A method that shows a native popup requesting permission for the bot to manage user's emoji status.
-     * If an optional [callback] parameter was passed, the [callback] function will be called when the popup is closed and
-     * the first argument will be a boolean indicating whether the user granted this access.
+     * If an optional [callback] parameter was passed, the [callback] function will be called when the popup is closed
+     * and the first argument will be a boolean indicating whether the user granted this access.
      *
      * @since Bot API 8.0
      * */
@@ -390,8 +392,8 @@ external object WebApp {
 
     /**
      * A method that displays a native popup prompting the user to download a file specified by the params argument of
-     * type [DownloadFileParams]. If an optional [callback] parameter is provided, the [callback] function will be called
-     * when the popup is closed, with the first argument as a boolean indicating whether the user accepted the
+     * type [DownloadFileParams]. If an optional [callback] parameter is provided, the [callback] function will be
+     * called when the popup is closed, with the first argument as a boolean indicating whether the user accepted the
      * download request.
      *
      * @since Bot API 8.0
@@ -409,7 +411,7 @@ external object WebApp {
     fun showPopup(params: PopupParams, callback: (buttonId: String?) -> Unit = definedExternally)
 
     /**
-     * A method that shows *message* in a simple alert with a 'Close' button. If an optional [callback] parameter was
+     * A method that shows [message] in a simple alert with a 'Close' button. If an optional [callback] parameter was
      * passed, the [callback] function will be called when the popup is closed.
      *
      * @since Bot API 6.2
@@ -417,13 +419,13 @@ external object WebApp {
     fun showAlert(message: String, callback: VoidFunction = definedExternally)
 
     /**
-     * A method that shows *message* in a simple confirmation window with 'OK' and 'Cancel' buttons. If an optional
+     * A method that shows [message] in a simple confirmation window with 'OK' and 'Cancel' buttons. If an optional
      * [callback] parameter was passed, the [callback] function will be called when the popup is closed and the first
      * argument will be a boolean indicating whether the user pressed the 'OK' button.
      *
      * @since Bot API 6.2
      * */
-    fun showConfirm(message: String, callback: VoidFunction = definedExternally)
+    fun showConfirm(message: String, callback: (isOkPressed: Boolean) -> Unit = definedExternally)
 
     /**
      * A method that shows a native popup for scanning a QR code described by the `params` argument of the type
@@ -437,7 +439,7 @@ external object WebApp {
      *
      * @since Bot API 6.4
      * */
-    fun showScanQrPopup(params: ScanQrPopupParams, callback: (dynamic) -> Boolean = definedExternally)
+    fun showScanQrPopup(params: ScanQrPopupParams, callback: (String) -> Boolean = definedExternally)
 
     /**
      * A method that closes the native popup for scanning a QR code opened with the [showScanQrPopup] method.
@@ -448,15 +450,15 @@ external object WebApp {
     fun closeScanQrPopup()
 
     /**
-     * A method that requests text from the clipboard. The Mini App will receive the event *clipboardTextReceived*.
-     * If an optional [callback] parameter was passed, the [callback] function will be called and the text from the
-     * clipboard will be passed as the first argument.
+     * A method that requests text from the clipboard. The Mini App will receive the event
+     * [EventType.clipboardTextReceived]. If an optional [callback] parameter was passed, the [callback] function will
+     * be called and the text from the clipboard will be passed as the first argument.
      *
      * *Note: this method can be called only for Mini Apps launched from the attachment menu and only in response to
      * a user interaction with the Mini App interface (e.g. a click inside the Mini App or on the main button).*
      * @since Bot API 6.4
      * */
-    fun readTextFromClipboard(callback: (dynamic) -> Unit = definedExternally)
+    fun readTextFromClipboard(callback: (String) -> Unit = definedExternally)
 
     /**
      * A method that shows a native popup requesting permission for the bot to send messages to the user.
