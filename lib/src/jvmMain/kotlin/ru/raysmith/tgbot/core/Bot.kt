@@ -37,12 +37,15 @@ import kotlin.system.measureTimeMillis
  * are returned. An update is considered confirmed as soon as [getUpdates] is called with an *offset* higher than
  * its *update_id*. The negative offset can be specified to retrieve updates starting from -*offset* update from
  * the end of the updates queue. All previous updates will be forgotten.
+ * @param useTestServer If true, bot will use
+ * [test environment](https://core.telegram.org/bots/features#testing-your-bot) for requests. Defaults to false.
  * */
 class Bot(
     val token: String? = null,
     val timeout: Int = 50,
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
     private var lastUpdateId: Int? = null,
+    val useTestServer: Boolean = false
 ) : API {
 
     init {
@@ -61,8 +64,8 @@ class Bot(
     private var blockingSelector: ((Update) -> Any?)? = null
     private var clientBuilder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
     override val client: HttpClient by lazy {
-        token?.let { TelegramApi.defaultClient(it, clientBuilder) }
-            ?: TelegramApi.defaultClient(builder = clientBuilder)
+        token?.let { TelegramApi.defaultClient(it, useTestServer, clientBuilder) }
+            ?: TelegramApi.defaultClient(useTestServer = useTestServer, builder = clientBuilder)
     }
 
     // states

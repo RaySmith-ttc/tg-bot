@@ -25,7 +25,7 @@ abstract class TextWithEntities(private val bot: Bot, private val type: MessageT
     /** Returns the raw text with safe length for sending the message, empty string if not set */
     protected open fun getMessageText() =
         messageText?.getTextString()
-            ?: text?.let { if (safeTextLength) it.withSafeLength(type) else it }
+            ?: text?.let { if (parseMode == null && safeTextLength) it.withSafeLength(type) else it }
             ?: ""
 
     /** Returns the [parseMode] if entities were not used, null otherwise */

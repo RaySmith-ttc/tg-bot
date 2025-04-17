@@ -51,7 +51,6 @@ class LocationsWrapper<L : LocationConfig>(override val bot: Bot) : BotHolder {
         additionalEventHandlers.add(setup)
     }
 
-    context(BotHolder)
     @LocationsDSL
     suspend fun location(name: String, @LocationsDSL newLocation: suspend Location<L>.() -> Unit) {
         add(createLocation(name, this) {

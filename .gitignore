@@ -1,9 +1,13 @@
-### Gradle template
 .gradle
-.idea
+
 .kotlin
+buildSrc/.kotlin
+
 **/build/
+
 /logs
+/webapp-app/logs
+/lib/logs
 /out
 
 !gradle-wrapper.jar

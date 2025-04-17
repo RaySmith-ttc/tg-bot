@@ -1,5 +1,12 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JsModuleKind
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
@@ -10,6 +17,7 @@ plugins {
     alias(libs.plugins.benManes.versions)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.seskar)
 }
 
 group = "ru.raysmith"
@@ -22,14 +30,13 @@ java {
 }
 
 kotlin {
-
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
+        // TODO refactor: use languageSettings / root build.gradle.kts
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-Xcontext-receivers",
-            "-XXLanguage:+UnitConversionsOnArbitraryExpressions",
+            "-XXLanguage:+UnitConversionsOnArbitraryExpressions", // TODO is it required? provide comment
         )
     }
 
@@ -39,6 +46,13 @@ kotlin {
     }
 
     js(IR) {
+        compilerOptions {
+            target = "es2015"
+            freeCompilerArgs.addAll (
+//                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
+            )
+        }
+
         browser {
             webpackTask {
                 mainOutputFileName.set("tg-bot.js")
@@ -93,11 +107,9 @@ kotlin {
 
         jsMain {
             dependencies {
-                implementation(libs.kotlin.node)
-//                implementation(libs.kotlin.react)
+                implementation(kotlinWrappers.node)
+                implementation(kotlinWrappers.react)
                 implementation(libs.seskar.core)
-
-                implementation(npm("crypto-js", "^4.2.0"))
             }
         }
     }

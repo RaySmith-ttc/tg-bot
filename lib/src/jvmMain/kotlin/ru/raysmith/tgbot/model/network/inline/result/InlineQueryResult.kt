@@ -28,7 +28,6 @@ import kotlinx.serialization.Serializable
  * - [InlineQueryResultVideo]
  * - [InlineQueryResultVoice]
  * */
-@Polymorphic
 @Serializable
 sealed class InlineQueryResult {
     abstract val type: String

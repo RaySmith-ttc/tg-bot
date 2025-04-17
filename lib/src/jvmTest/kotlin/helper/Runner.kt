@@ -2,7 +2,6 @@ package helper
 
 import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -56,6 +55,7 @@ import ru.raysmith.tgbot.utils.locations.LocationConfig
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import ru.raysmith.tgbot.utils.pagination.Pagination
+import ru.raysmith.utils.generateRandomString
 import ru.raysmith.utils.takeOrCut
 import java.io.File
 import java.io.IOException
@@ -592,7 +592,6 @@ class Runner {
 
                 handleMyChatMember {
                     if (newChatMember is ChatMemberMember) {
-//                        send("Я родился")
                         send(chat.id.value.toString())
                     }
                 }
@@ -663,7 +662,7 @@ class Runner {
                         } else {
                             send {
                                 linkPreviewOptions = LinkPreviewOptions.DISABLED
-                                messageEffectId = Message.Effect.POO
+                                messageEffectId = Message.Effect.Poo
                                 textWithEntities {
                                     setupTestMessage(message)
                                 }
@@ -728,6 +727,25 @@ class Runner {
 
                     isCommand("lookPollAnswers") {
                         lookPollAnswers = true
+                    }
+
+                    isCommand("entitiesTest") {
+                        send {
+                            textWithEntities {
+                                repeat(100) {
+                                    mix("some text", MessageEntityType.BOLD, MessageEntityType.TEXT_LINK, url = "https://open.spotify.com/track/${generateRandomString(32)}").n()
+                                    mix("subtitle: ${generateRandomString(16)}", MessageEntityType.ITALIC, MessageEntityType.CODE).n()
+                                    n()
+                                    code(generateRandomString(64)).n()
+                                    mix(generateRandomString(64), MessageEntityType.BLOCKQUOTE, MessageEntityType.CODE).n()
+                                    code(generateRandomString(64)).n()
+                                    text("--------").n()
+                                }
+                            }
+                            inlineKeyboard {
+                                row("back", "list_1")
+                            }
+                        }
                     }
 
                     isCommand("reloadConfig") {

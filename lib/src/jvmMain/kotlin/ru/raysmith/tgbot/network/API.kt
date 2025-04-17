@@ -5,6 +5,7 @@ package ru.raysmith.tgbot.network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.api.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -61,8 +62,8 @@ import kotlin.time.Duration
 // TODO missed docs + check alt. method in BotContext
 
 interface API {
-    val botConfig: BotConfig
-    val client: HttpClient
+    val botConfig: BotConfig // TODO make internal
+    val client: HttpClient // TODO make internal
 
     private suspend inline fun <reified T> request(block: () -> HttpResponse): T {
         val response = block()
@@ -3143,7 +3144,7 @@ interface API {
      * On success, a [SentWebAppMessage] object is returned.
      *
      * @param webAppQueryId Unique identifier for the query to be answered
-     * @param result Object describing the message to be sent
+     * @param result Message to be sent
      * */
     suspend fun answerWebAppQuery(
         webAppQueryId: String,
@@ -3156,14 +3157,14 @@ interface API {
     }
 
     /**
-     * Stores a message that can be sent by a user of a Mini App. Returns a [PreparedInlineMessage] object.
+     * Stores a message that can be sent by a user of a Mini App.
      *
      * @param userId Unique identifier of the target user that can use the prepared message
-     * @param result An object describing the message to be sent
+     * @param result Message to be sent
      * @param allowUserChats Pass *True* if the message can be sent to private chats with users
      * @param allowBotChats Pass *True* if the message can be sent to private chats with bots
      * @param allowGroupChats Pass *True* if the message can be sent to group and supergroup chats
-     * @param allowChannelChats Pass *True* the message can be sent to channel chats
+     * @param allowChannelChats Pass *True* if the message can be sent to channel chats
      * */
     suspend fun savePreparedInlineMessage(
         userId: ChatId.ID,
@@ -3519,8 +3520,13 @@ interface API {
     // TODO [docs]
     suspend fun downloadFile(fileId: String) = downloadFile(getFile(fileId))
 
+    // TODO test
     suspend fun downloadFile(file: File) = request<InputStream> {
-        client.get("${TelegramApi.BASE_URL}/file/bot${client.plugin(TokenAuthorization).token}/${file.path!!}") {
+        val isTestServerPluginInstalled = client.pluginOrNull(TelegramTestServer) != null
+        val token = client.plugin(Token).token
+        val testPath = if (isTestServerPluginInstalled) "test/" else ""
+
+        client.get("/file/bot$token/$testPath${file.path!!}") {
             unauthenticated()
         }
     }

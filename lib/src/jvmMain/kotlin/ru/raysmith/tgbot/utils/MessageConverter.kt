@@ -6,6 +6,7 @@ import ru.raysmith.tgbot.model.network.Poll
 import ru.raysmith.tgbot.model.network.Venue
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.message.Dice
+import ru.raysmith.tgbot.model.network.message.WebAppData
 
 /**
  * Applies a [onResult] to the message object after [convert] to another type and [verify] or returns null if [convert] returns null or [verify] returns false
@@ -14,13 +15,15 @@ import ru.raysmith.tgbot.model.network.message.Dice
  * ```
  *  messageText<Int>()
  *      .convert { it.toInt() }
- *      .verification { it > 0 }
- *      .use {
+ *      .verify { it > 0 }
+ *      .onResult {
  *          send("correct value: $it")
  *      } ?: send("incorrect")
  * ```
  * */
 class MessageConverter<T>(private var value: T?, private var hint: String? = null, private var onNull: ((String?) -> Unit)? = null) {
+
+    // TODO make docs more comprehensive
 
     /** Verifies the current value. Returns null and [hint] in [onResult] and [hint] in [onNull] blocks if it returns false */
     suspend fun verify(hint: String? = null, block: suspend (T) -> Boolean): MessageConverter<T> {
@@ -173,6 +176,22 @@ fun MessageHandler.messageDice() = MessageConverter(message.dice)
 
 /** Applies a [block] to the message dice or returns null if message doesn't contain dice */
 suspend fun MessageHandler.messageDice(block: suspend (Dice) -> Unit) = message.dice?.also { block(it) }
+
+
+// WebAppData
+/** Returns [MessageConverter] instance for webapp data */
+fun MessageHandler.messageWebAppData() = MessageConverter(message.webAppData)
+
+/** Applies a [block] to the message dice or returns null if message doesn't contain dice */
+suspend fun MessageHandler.messageWebAppData(block: suspend (WebAppData) -> Unit) = message.webAppData?.also { block(it) }
+
+
+// Story
+/** Returns [MessageConverter] instance for story */
+fun MessageHandler.messageStory() = MessageConverter(message.story)
+
+/** Applies a [block] to the message dice or returns null if message doesn't contain dice */
+suspend fun MessageHandler.messageStory(block: suspend (Story) -> Unit) = message.story?.also { block(it) }
 
 
 // Any media

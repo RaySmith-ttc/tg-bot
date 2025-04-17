@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.network
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.api.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
@@ -14,8 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.utils.properties.getOrNull
+import ru.raysmith.tgbot.utils.obtainToken
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -25,33 +25,44 @@ fun HttpRequestBuilder.unauthenticated() {
     attributes.put(UnauthenticatedRequestKey, Unit)
 }
 
-class TokenAuthorization(val token: String) {
-    class Config {
-        var token: String = ""
-    }
+class TelegramTestServerConfig {
+    var token: String? = null
+}
+val TelegramTestServer = createClientPlugin("TelegramTestServer", ::TelegramTestServerConfig) {
+    val token = pluginConfig.token
+        ?: client.pluginOrNull(Token)?.token
+        ?: error("Can't install TelegramTestServer plugin to http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property")
 
-    companion object : HttpClientPlugin<Config, TokenAuthorization> {
-        override val key = AttributeKey<TokenAuthorization>("TokenAuthorization")
-
-        override fun prepare(block: Config.() -> Unit): TokenAuthorization {
-            val config = Config().apply(block)
-            return TokenAuthorization(config.token)
-        }
-
-        override fun install(plugin: TokenAuthorization, scope: HttpClient) {
-            scope.requestPipeline.intercept(HttpRequestPipeline.Before) {
-                val isUnauthenticatedRequest = context.attributes.contains(UnauthenticatedRequestKey)
-
-                if (!isUnauthenticatedRequest) {
-                    context.url.encodedPath = "/bot${plugin.token}/${context.url.encodedPath}"
-                }
-            }
+    onRequest { request, _ ->
+        if (!request.attributes.contains(UnauthenticatedRequestKey)) {
+            request.url.encodedPath = "/bot${token}/test/${request.url.pathSegments.drop(2).joinToString("/")}"
         }
     }
 }
 
-fun HttpClientConfig<*>.tokenAuth(block: TokenAuthorization.Config.() -> Unit) {
-    install(TokenAuthorization, block)
+class Token(val token: String) {
+    class Config {
+        var token: String = ""
+    }
+
+    companion object : HttpClientPlugin<Config, Token> {
+        override val key = AttributeKey<Token>("Token")
+
+        override fun prepare(block: Config.() -> Unit): Token {
+            val config = Config().apply(block)
+            return Token(config.token)
+        }
+
+        override fun install(plugin: Token, scope: HttpClient) {
+//            scope.requestPipeline.intercept(HttpRequestPipeline.Before) {
+//                val isUnauthenticatedRequest = context.attributes.contains(UnauthenticatedRequestKey)
+//
+//                if (!isUnauthenticatedRequest) {
+//                    context.url.encodedPath = "/bot${plugin.token}/${context.url.encodedPath}"
+//                }
+//            }
+        }
+    }
 }
 
 object TelegramApi {
@@ -70,8 +81,8 @@ object TelegramApi {
     }
 
     fun defaultClient(
-        token: String = Bot.properties?.getOrNull("token") ?: System.getenv("TG_BOT_TOKEN")
-            ?: error("Can't create default http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property"),
+        token: String = obtainToken() ?: error("Can't create default http client: token not found. Provide it with TG_BOT_TOKEN environment variable or token property"),
+        useTestServer: Boolean = false,
         builder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
     ) = HttpClient(OkHttp) {
         engine {
@@ -104,12 +115,12 @@ object TelegramApi {
             json(json)
         }
 
-        tokenAuth {
+        install(Token) {
             this.token = token
         }
 
         defaultRequest {
-            url("$BASE_URL/bot${token}/")
+            url("$BASE_URL/bot${token}/${if (useTestServer) "test/" else ""}")
 
             headers {
                 contentType(ContentType.Application.Json)
