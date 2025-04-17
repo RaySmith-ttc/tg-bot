@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
  * - [InputMediaPhoto]
  * - [InputMediaVideo]
  * */
-@Polymorphic
+@Polymorphic // TODO delete?
 @Serializable
 sealed class InputMedia : InputMediaOrInputPaidMedia {
 

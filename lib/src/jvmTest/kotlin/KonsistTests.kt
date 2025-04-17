@@ -5,8 +5,12 @@ import com.lemonappdev.konsist.api.ext.list.parameters
 import com.lemonappdev.konsist.api.ext.list.properties
 import com.lemonappdev.konsist.api.ext.provider.representsTypeOf
 import com.lemonappdev.konsist.api.verify.assertTrue
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.ClassDiscriminatorMode
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 import org.junit.jupiter.api.Test
 import ru.raysmith.tgbot.network.API
 

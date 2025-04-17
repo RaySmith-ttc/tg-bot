@@ -13,6 +13,8 @@ application {
     mainClass = "ru.raysmith.tgbot.webappapp.MainKt"
 }
 
+
+
 kotlin {
     jvmToolchain(17)
     jvm {
@@ -60,12 +62,15 @@ kotlin {
         }
 
         jvmMain {
+            languageSettings {
+                optIn("kotlinx.serialization.ExperimentalSerializationApi")
+            }
             dependencies {
                 implementation(projects.lib)
 
-                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.bundles.ktor.server)
                 implementation(libs.ktor.network.tlsCertificates)
+                implementation(libs.kotlinx.coroutines.core)
 
                 implementation(libs.log4j.core)
                 implementation(libs.slf4j.api)
@@ -76,7 +81,6 @@ kotlin {
         jsMain {
             dependencies {
                 implementation(projects.lib)
-                implementation(libs.kotlinx.coroutines.core)
 
                 implementation(kotlinWrappers.react)
                 implementation(kotlinWrappers.reactDom)
@@ -85,11 +89,12 @@ kotlin {
                 implementation(kotlinWrappers.mui.material)
                 implementation(kotlinWrappers.mui.iconsMaterial)
                 implementation(kotlinWrappers.emotion)
+                implementation(npm("webpack-bundle-analyzer", "^4.10.2"))
 
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.js)
 
-                implementation(npm("webpack-bundle-analyzer", "^4.10.2"))
             }
         }
     }

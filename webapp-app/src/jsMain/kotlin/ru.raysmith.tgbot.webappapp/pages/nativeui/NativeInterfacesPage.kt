@@ -11,6 +11,8 @@ import react.FC
 import react.ReactNode
 import react.useEffectOnce
 import react.useState
+import ru.raysmith.tgbot.Browser
+import ru.raysmith.tgbot.NotOfficialDocumentedOptIn
 import ru.raysmith.tgbot.PopupButtonType
 import ru.raysmith.tgbot.events.EventType
 import ru.raysmith.tgbot.webApp
@@ -107,6 +109,16 @@ val NativeInterfacesPage = FC {
                     }
                 }
             }
+
+            Button {
+                +"Show confirm"
+                applyControlButtonStyle()
+                onClick = {
+                    webApp.showConfirm("Message") { isOkPressed ->
+                        println("isOkPressed: $isOkPressed")
+                    }
+                }
+            }
         }
 
         ControlsPaperStack {
@@ -175,12 +187,20 @@ val NativeInterfacesPage = FC {
         }
 
         Button {
-            +"test"
+            +"Open link"
             applyControlButtonStyle()
             onClick = {
-                webApp.requestContact {
-                    println("isUserSharedItsPhoneNumber: $it")
-                }
+                webApp.openLink("https://google.com", jso {
+                    tryInstantView = true
+                })
+            }
+        }
+
+        Button {
+            +"Open Telegram link"
+            applyControlButtonStyle()
+            onClick = {
+                webApp.openTelegramLink("https://tg.me/botfather")
             }
         }
     }

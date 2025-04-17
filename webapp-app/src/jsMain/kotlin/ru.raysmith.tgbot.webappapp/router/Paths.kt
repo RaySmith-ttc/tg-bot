@@ -18,4 +18,5 @@ object Paths {
     val gyroscope = "/gyroscope"
     val location = "/location"
     val nativeInterfaces = "/nativeui"
+    val tg = "/tg"
 }

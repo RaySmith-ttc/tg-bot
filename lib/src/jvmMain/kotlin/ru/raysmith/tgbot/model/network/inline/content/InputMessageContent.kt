@@ -13,6 +13,5 @@ import kotlinx.serialization.Serializable
  * - [InputContactMessageContent]
  * - [InputInvoiceMessageContent]
  * */
-@Polymorphic
 @Serializable
 sealed class InputMessageContent

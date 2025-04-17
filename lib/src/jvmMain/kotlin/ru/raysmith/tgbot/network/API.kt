@@ -34,6 +34,7 @@ import ru.raysmith.tgbot.model.network.command.BotCommand
 import ru.raysmith.tgbot.model.network.command.BotCommandScope
 import ru.raysmith.tgbot.model.network.command.BotCommandScopeDefault
 import ru.raysmith.tgbot.model.network.file.File
+import ru.raysmith.tgbot.model.network.inline.PreparedInlineMessage
 import ru.raysmith.tgbot.model.network.inline.SentWebAppMessage
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
@@ -59,8 +60,8 @@ import kotlin.time.Duration
 // TODO missed docs + check alt. method in BotContext
 
 interface API {
-    val botConfig: BotConfig
-    val client: HttpClient
+    val botConfig: BotConfig // TODO make internal
+    val client: HttpClient // TODO make internal
 
     private suspend inline fun <reified T> request(block: () -> HttpResponse): T {
         val response = block()
@@ -2913,7 +2914,7 @@ interface API {
      * On success, a [SentWebAppMessage] object is returned.
      *
      * @param webAppQueryId Unique identifier for the query to be answered
-     * @param result Object describing the message to be sent
+     * @param result Message to be sent
      * */
     suspend fun answerWebAppQuery(
         webAppQueryId: String,
@@ -2922,6 +2923,34 @@ interface API {
         client.post("answerWebAppQuery") {
             parameter("web_app_query_id", webAppQueryId)
             parameter("result", result)
+        }
+    }
+
+    /**
+     * Stores a message that can be sent by a user of a Mini App.
+     *
+     * @param userId Unique identifier of the target user that can use the prepared message
+     * @param result Message to be sent
+     * @param allowUserChats Pass *True* if the message can be sent to private chats with users
+     * @param allowBotChats Pass *True* if the message can be sent to private chats with bots
+     * @param allowGroupChats Pass *True* if the message can be sent to group and supergroup chats
+     * @param allowChannelChats Pass *True* if the message can be sent to channel chats
+     * */
+    suspend fun savePreparedInlineMessage(
+        userId: ChatId.ID,
+        result: InlineQueryResult,
+        allowUserChats: Boolean? = null,
+        allowBotChats: Boolean? = null,
+        allowGroupChats: Boolean? = null,
+        allowChannelChats: Boolean? = null,
+    ) = request<PreparedInlineMessage> {
+        client.post("savePreparedInlineMessage") {
+            parameter("user_id", userId)
+            parameter("result", result)
+            parameter("allow_user_chats", allowUserChats)
+            parameter("allow_bot_chats", allowBotChats)
+            parameter("allow_group_chats", allowGroupChats)
+            parameter("allow_channel_chats", allowChannelChats)
         }
     }
 

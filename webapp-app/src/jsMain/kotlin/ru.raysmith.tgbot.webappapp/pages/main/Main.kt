@@ -158,6 +158,12 @@ val MainPage = FC<Props> {
             href = Paths.nativeInterfaces
             startIcon = QrCodeScanner.create()
         }
+
+        SubPageButton {
+            +"Interaction with Telegram"
+            href = Paths.tg
+            startIcon = Telegram.create()
+        }
     }
 
     VerificationDialog {

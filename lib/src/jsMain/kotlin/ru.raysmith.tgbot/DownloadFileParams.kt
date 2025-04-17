@@ -7,13 +7,13 @@ package ru.raysmith.tgbot
  * `Content-Disposition: attachment; filename="<file_name>"` in the server response. This header helps prompt the
  * download action and suggests a file name for the downloaded file, especially on web platforms where forced downloads
  * cannot always be guaranteed.
+ *
+ * @property url The HTTPS URL of the file to be downloaded.
+ * @property fileName The suggested name for the downloaded file.
  * */
 external interface DownloadFileParams {
+    var url: String
 
-    /** The HTTPS URL of the file to be downloaded. */
-    val url: String
-
-    /** TThe suggested name for the downloaded file. */
     @JsName("file_name")
-    val fileName: String
+    var fileName: String
 }

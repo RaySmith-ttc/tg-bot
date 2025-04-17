@@ -2,7 +2,6 @@ package helper
 
 import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -663,7 +662,7 @@ class Runner {
                         } else {
                             send {
                                 linkPreviewOptions = LinkPreviewOptions.DISABLED
-                                messageEffectId = Message.Effect.POO
+                                messageEffectId = Message.Effect.Poo
                                 textWithEntities {
                                     setupTestMessage(message)
                                 }

@@ -1,6 +1,7 @@
 package ru.raysmith.tgbot
 
 import ru.raysmith.tgbot.events.EventType
+import ru.raysmith.tgbot.events.InvoiceClosedStatus
 import ru.raysmith.tgbot.events.ViewportChanged
 import web.cssom.Color
 import web.scheduling.VoidFunction
@@ -64,7 +65,6 @@ external object WebApp {
      * */
     val viewportHeight: Float
 
-    // TODO link to expand, event
     /**
      * The height of the visible area of the Mini App in its last stable state. Also available in CSS as a variable
      * [CssVar.tgViewportStableHeight].
@@ -319,8 +319,7 @@ external object WebApp {
      *
      * @since Bot API 6.7
      * */
-//    val switchInlineQuery: (query: String, chooseChatTypes: List<InlineQueryChatType>) -> Unit
-    fun switchInlineQuery(query: String, chooseChatTypes: List<InlineQueryChatType> = definedExternally)
+    fun switchInlineQuery(query: String, chooseChatTypes: Array<InlineQueryChatType> = definedExternally)
 
     /**
      * A method that opens a link in an external browser. The Mini App will *not* be closed.
@@ -331,7 +330,7 @@ external object WebApp {
      * *Note that this method can be called only in response to user interaction with the Mini App interface
      * (e.g. a click inside the Mini App or on the main button)*
      * */
-    fun openLink(url: String, options: OpenLinkOptions)
+    fun openLink(url: String, options: OpenLinkOptions = definedExternally)
 
     /**
      * A method that opens a telegram link inside the Telegram app.
@@ -348,7 +347,7 @@ external object WebApp {
      *
      * @since Bot API 6.1
      * */
-    fun openInvoice(url: String, callback: (status: dynamic) -> Unit = definedExternally) // TODO what is status?
+    fun openInvoice(url: String, callback: (status: InvoiceClosedStatus) -> Unit = definedExternally)
 
     /**
      * A method that opens the native story editor with the media specified in the mediaUrl parameter as an HTTPS URL.
@@ -374,6 +373,10 @@ external object WebApp {
      * An optional params argument of type EmojiStatusParams specifies additional settings, such as duration.
      * If an optional [callback] parameter is provided, the [callback] function will be called with a boolean as the
      * first argument, indicating whether the status was set.
+     *
+     * Note: this method opens a native dialog and cannot be used to set the emoji status without manual user
+     * interaction. For fully programmatic changes, you should instead use the Bot API method setUserEmojiStatus after
+     * obtaining authorization to do so via the Mini App method [requestEmojiStatusAccess].
      *
      * @since Bot API 8.0
      * */
@@ -467,7 +470,7 @@ external object WebApp {
      *
      * @since Bot API 6.9
      * */
-    fun requestWriteAccess(callback: VoidFunction = definedExternally)
+    fun requestWriteAccess(callback: (granted: Boolean) -> Unit = definedExternally)
 
     /**
      * A method that shows a native popup prompting the user for their phone number. If an optional [callback] parameter

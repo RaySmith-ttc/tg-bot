@@ -42,7 +42,7 @@ class CreateInvoiceLinkRequestBuilder(override val bot: Bot) : API, BotHolder {
      * Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
      * delivery cost, delivery tax, bonus, etc.)
      * */
-    var prices: List<LabeledPrice>? = null
+    var prices: List<LabeledPrice>? = null // TODO replace with DSL
 
     /**
      * The maximum accepted amount for tips in the *smallest units* of the currency

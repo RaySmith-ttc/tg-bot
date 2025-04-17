@@ -29,13 +29,13 @@ java {
 }
 
 kotlin {
-
     compilerOptions {
+        // TODO refactor: use languageSettings / root build.gradle.kts
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-Xcontext-receivers",
-            "-XXLanguage:+UnitConversionsOnArbitraryExpressions",
+            "-XXLanguage:+UnitConversionsOnArbitraryExpressions", // TODO is it required? provide comment
         )
     }
 

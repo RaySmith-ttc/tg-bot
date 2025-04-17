@@ -22,11 +22,11 @@ import javax.crypto.spec.SecretKeySpec
  * @param update update with which the context should be associated. If null, the update will be empty with an id of -1.
  * */
 @BotContextDsl
-suspend fun <T> botContext(
+inline fun <T> botContext(
     bot: Bot,
     withChatId: ChatId? = null,
     update: Update? = null,
-    block: suspend context(BotContext<UnknownEventHandler>) () -> T
+    block: context(BotContext<UnknownEventHandler>) () -> T
 ) = object : BotContext<UnknownEventHandler> {
     override val bot = bot
     override val client: HttpClient = bot.client
@@ -40,7 +40,7 @@ suspend fun <T> botContext(
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(update ?: Update(-1), bot).block()
     }
-}.also { block(it) }
+}.let { block(it) }
 
 
 internal fun createEventHandler(

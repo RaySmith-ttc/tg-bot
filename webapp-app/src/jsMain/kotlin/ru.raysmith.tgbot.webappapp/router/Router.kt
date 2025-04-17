@@ -5,6 +5,7 @@ import react.*
 import react.router.RouterProvider
 import react.router.dom.createBrowserRouter
 import ru.raysmith.tgbot.hooks.useBackButton
+import ru.raysmith.tgbot.webApp
 import ru.raysmith.tgbot.webappapp.pages.RootPage
 import ru.raysmith.tgbot.webappapp.pages.accelerometer.AccelerometerPage
 import ru.raysmith.tgbot.webappapp.pages.backbutton.BackButtonPage
@@ -21,6 +22,7 @@ import ru.raysmith.tgbot.webappapp.pages.nativeui.NativeInterfacesPage
 import ru.raysmith.tgbot.webappapp.pages.orientation.DeviceOrientationPage
 import ru.raysmith.tgbot.webappapp.pages.settingsbutton.SettingsButtonPage
 import ru.raysmith.tgbot.webappapp.pages.state.StatePage
+import ru.raysmith.tgbot.webappapp.pages.tg.TgInteractionPage
 import ru.raysmith.tgbot.webappapp.pages.theme.ThemePage
 import ru.raysmith.tgbot.webappapp.pages.viewport.ViewportPage
 import web.scheduling.VoidFunction
@@ -106,9 +108,14 @@ val Router = FC<PropsWithChildren> { props ->
                     path = Paths.nativeInterfaces
                     element = NativeInterfacesPage.create()
                 },
+                jso {
+                    path = Paths.tg
+                    element = TgInteractionPage.create()
+                },
             )
         }
     ))
+
     val backButtonOnClick: VoidFunction = useCallback {
         router.navigate(-1)
     }
@@ -118,6 +125,12 @@ val Router = FC<PropsWithChildren> { props ->
             backButton.onClick(backButtonOnClick)
         } else {
             backButton.offClick(backButtonOnClick)
+        }
+    }
+
+    useEffectOnce {
+        if (webApp.initDataUnsafe.startParam == "info") {
+            router.navigate(Paths.baseInfo)
         }
     }
 

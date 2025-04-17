@@ -333,7 +333,7 @@ data class Message(
     /** Service message: new participants invited to a video chat */
     @SerialName("video_chat_participants_invited") val videoChatParticipantsInvited: VideoChatParticipantsInvited? = null,
 
-    /** Service message: new participants invited to a voice chat */
+    /** Service message: data sent by a Web App */
     @SerialName("web_app_data") val webAppData: WebAppData? = null,
 
     /** Inline keyboard attached to the message. `login_url` buttons are represented as ordinary `url` buttons. */
@@ -342,25 +342,25 @@ data class Message(
 ) : MaybeInaccessibleMessage(), ChatIdHolder {
 
     /** Contains all unique identifiers of the message effects */
-    object Effect {
+    object Effect { // TODO does it work on test server?
 
         /** 🔥 */
-        const val FLAME = "5104841245755180586"
+        const val Flame = "5104841245755180586"
 
         /** 👍 */
-        const val LIKE = "5107584321108051014"
+        const val Like = "5107584321108051014"
 
         /** ❤️ */
-        const val HEART = "5044134455711629726"
+        const val Heart = "5044134455711629726"
 
         /** 🎉 */
-        const val TADA = "5046509860389126442"
+        const val Tada = "5046509860389126442"
 
         /** 👎 */
-        const val DISLIKE = "5104858069142078462"
+        const val Dislike = "5104858069142078462"
 
         /** 💩 */
-        const val POO = "5046589136895476101"
+        const val Poo = "5046589136895476101"
     }
 
     /** [Type][MessageType] of the message. It can be text, command or inline data */

@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * - [InputMediaAudio]
  * - [InputMediaVideo]
  * */
-@Polymorphic
+@Polymorphic // TODO delete?
 @Serializable
 sealed class InputMediaGroupWithThumbnail : InputMediaGroup() {
     /**

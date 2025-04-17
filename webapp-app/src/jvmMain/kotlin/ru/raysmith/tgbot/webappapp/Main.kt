@@ -11,19 +11,22 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.*
 import io.ktor.util.logging.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.base.isCommand
+import ru.raysmith.tgbot.core.send
+import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.BotCommand
+import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.network.inline.content.InputTextMessageContent
+import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultArticle
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
+import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.utils.verifyWebAppInitData
+import ru.raysmith.tgbot.utils.*
 import java.net.InetAddress
 
 private val localIp by lazy {
@@ -32,13 +35,17 @@ private val localIp by lazy {
 
 private val port = System.getenv("PORT")?.toInt() ?: 8080
 private val host = System.getenv("HOST") ?: "http://$localIp:$port"
+private val useTestServer = System.getenv("TEST_SERVER") == "true"
 
-val bot = Bot(useTestServer = System.getenv("TEST_SERVER") == "true")
+val bot = Bot(useTestServer = useTestServer)
     .onError { Bot.logger.error(it) }
 
-@OptIn(DelicateCoroutinesApi::class, ExperimentalSerializationApi::class)
+val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+var preparedMessageId: String? = null
+
 fun main() {
-    GlobalScope.launch {
+    scope.launch {
         val prettyPrintJson = Json(TelegramApi.json) {
             prettyPrint = true
             prettyPrintIndent = " "
@@ -48,11 +55,15 @@ fun main() {
             handleCommand {
                 isCommand(BotCommand.START) {
                     send {
-                        text = "site"
+                        text = "Use the button to open WebApp"
+                        textWithEntities {
+                            textLink("Open via link", "https://t.me/${ru.raysmith.tgbot.webappapp.bot.me.username}?startapp").n()
+                            textLink("Open specific page via link", "https://t.me/${ru.raysmith.tgbot.webappapp.bot.me.username}?startapp=info").n()
+                        }
                         inlineKeyboard {
                             row {
                                 button {
-                                    text = "Open"
+                                    text = "Open via button"
                                     webApp = WebAppInfo(host)
                                 }
                             }
@@ -62,11 +73,29 @@ fun main() {
             }
 
             handleMessage {
-                if (message.webAppData != null) {
-                    println(prettyPrintJson.encodeToString(message.webAppData))
-                } else {
-                    println("MESSAGE: $message")
-                }
+                messageContact {
+                    send("Contact was received: ${it.phoneNumber}")
+                } ?:
+
+                messageWebAppData {
+                    send {
+                        textWithEntities {
+                            text("WebAppData was received:").n()
+                            text("• data: ").code(it.data).n()
+                            text("• button_text: ").code(it.buttonText).n()
+                        }
+                    }
+                } ?:
+
+                messageStory {
+                    println(prettyPrintJson.encodeToString(it))
+                } ?:
+
+                println(message)
+            }
+
+            handlePreCheckoutQuery {
+                println("answerPreCheckoutQuery: ${answerPreCheckoutQuery(true)}")
             }
         }
     }
@@ -101,6 +130,41 @@ fun main() {
                     call.respond(HttpStatusCode.BadRequest)
                 }
             }
+
+            get("/createInvoiceLink") {
+                val link = botContext(bot) {
+                    createInvoiceLink {
+                        title = "Test invoice"
+                        description = "Test invoice description"
+                        payload = "payload"
+                        currency = Currency.RUB
+                        prices = listOf(LabeledPrice("Test", Currency.RUB.ofNative(299)))
+                        providerToken = "381764678:TEST:29287"
+                    }
+                }
+
+                call.respond(link)
+            }
+
+            get("/preparedMessageId") {
+                val userId = call.parameters.getOrFail<Long>("userId")
+                call.respond(preparedMessageId ?: run {
+                    bot.savePreparedInlineMessage(
+                        userId = ChatId.ID(userId),
+                        result = InlineQueryResultArticle(
+                            id = "id",
+                            title = "Title",
+                            inputMessageContent = InputTextMessageContent(
+                                messageText = "Message text"
+                            ),
+                        ),
+                        allowBotChats = true,
+                    )
+                        .also { preparedMessageId = it.id }
+                        .id
+                })
+            }
+
         }
     }.start(wait = true)
 }

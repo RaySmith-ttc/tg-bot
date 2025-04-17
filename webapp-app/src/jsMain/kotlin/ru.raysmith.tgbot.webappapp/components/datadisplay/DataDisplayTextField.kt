@@ -16,7 +16,7 @@ import ru.raysmith.tgbot.webappapp.wrappers.shrink
 import web.navigator.navigator
 import web.window.window
 
-external interface DataDisplayTextFieldProps : TextFieldProps {
+external interface DataDisplayTextFieldProps : StandardTextFieldProps {
     var copyToClipboard: Boolean
 }
 

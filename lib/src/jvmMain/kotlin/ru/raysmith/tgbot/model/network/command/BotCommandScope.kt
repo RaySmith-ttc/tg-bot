@@ -39,7 +39,7 @@ import kotlinx.serialization.Serializable
  * - botCommandScopeDefault + language_code
  * - botCommandScopeDefault
  * */
-@Polymorphic
+@Polymorphic // TODO delete?
 @Serializable
 sealed class BotCommandScope {
     abstract val type: String

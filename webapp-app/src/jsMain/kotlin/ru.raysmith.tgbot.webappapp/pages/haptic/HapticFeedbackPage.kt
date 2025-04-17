@@ -13,11 +13,6 @@ import ru.raysmith.tgbot.webappapp.pages.BaseSubPageLayout
 
 val HapticFeedbackPage = FC<Props> {
     val fh = useHapticFeedback()
-    val backButton = useBackButton()
-
-    useEffectOnce {
-        backButton.show()
-    }
 
     BaseSubPageLayout {
         title = "Haptic feedback"
