@@ -67,9 +67,9 @@ data class User(
      *
      * @see API.getUserProfilePhotos
      * */
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     suspend fun getProfilePhotos(offset: Int? = null, limit: Int? = null): List<List<PhotoSize>> {
-        return getUserProfilePhotos(id, offset, limit).photos
+        return ctx.getUserProfilePhotos(id, offset, limit).photos
     }
 
     /**
@@ -77,11 +77,11 @@ data class User(
      *
      * @see API.getUserProfilePhotos
      * */
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     suspend fun getAllProfilePhotos(): List<List<PhotoSize>> = buildList {
         var offset = 0
         do {
-            val res = getUserProfilePhotos(id, offset)
+            val res = ctx.getUserProfilePhotos(id, offset)
             addAll(res.photos)
             offset += 100
         } while (size < res.totalCount)

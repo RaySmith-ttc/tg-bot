@@ -45,9 +45,9 @@ open class CreateNewStickerInStickerSet(
         stickers.add(InputSticker(sticker, format, emojiList, maskPosition, keywords))
     }
 
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     internal suspend fun create(): Boolean {
-        return createNewStickerSet(
+        return ctx.createNewStickerSet(
             userId, name, title, stickers, stickerType, needsRepainting
         )
     }

@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.message.LinkPreviewOptions
 import ru.raysmith.tgbot.model.network.message.MessageEntity
 import ru.raysmith.tgbot.model.network.message.ParseMode
@@ -34,9 +35,9 @@ data class InputTextMessageContent(
  * @param parseMode Mode for parsing entities in the message text. See [formatting options][ParseMode] for more details.
  * @param entities List of special entities that appear in message text, which can be specified instead of [parseMode].
  * */
-context(BotContext<*>)
+context(holder: BotHolder)
 fun InputTextMessageContent(
     messageText: String,
     parseMode: ParseMode? = null,
     entities: List<MessageEntity>? = null,
-) = InputTextMessageContent(messageText, parseMode, entities, bot.botConfig.linkPreviewOptions)
+) = InputTextMessageContent(messageText, parseMode, entities, holder.bot.botConfig.linkPreviewOptions)

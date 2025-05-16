@@ -22,6 +22,6 @@ data class UploadStickerFile(
 
 ) : MediaRequest() {
 
-    context(BotContext<*>)
-    suspend fun upload() = uploadStickerFile(userId, sticker, stickerFormat)
+    context(ctx: BotContext<*>)
+    suspend fun upload() = ctx.uploadStickerFile(userId, sticker, stickerFormat)
 }

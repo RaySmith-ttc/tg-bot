@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.model.bot.message
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
@@ -58,6 +59,7 @@ class TextMessage(
         replyMarkup = keyboardMarkup?.toMarkup()
     )
 
+    context(_: BotContext<*>)
     suspend fun datePicker(datePicker: DatePicker, data: String? = null) {
         textWithEntities { datePickerMessageText(datePicker, data) }
         inlineKeyboard { createDatePicker(datePicker, data) }

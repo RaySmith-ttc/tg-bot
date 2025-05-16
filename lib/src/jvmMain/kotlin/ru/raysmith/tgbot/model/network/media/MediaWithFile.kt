@@ -18,5 +18,5 @@ interface MediaWithFile : Media {
     val fileName: String?
 }
 
-context(BotContext<*>)
-suspend fun MediaWithFile.inputStream() = downloadFile(fileId)
+context(ctx: BotContext<*>)
+suspend fun MediaWithFile.inputStream() = ctx.downloadFile(fileId)

@@ -1,23 +1,12 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JsModuleKind
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.tasks.Kotlin2JsCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
-    java
     signing
     `maven-publish`
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.benManes.versions)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.seskar)
+//    alias(libs.plugins.seskar) // TODO need 2.2.0 kotlin support
 }
 
 group = "ru.raysmith"
@@ -31,42 +20,41 @@ java {
 
 kotlin {
     compilerOptions {
-        // TODO refactor: use languageSettings / root build.gradle.kts
+        // TODO refactor: use languageSettings / root lib.gradle.kts
         freeCompilerArgs.addAll(
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xcontext-receivers",
+            "-Xcontext-parameters",
             "-XXLanguage:+UnitConversionsOnArbitraryExpressions", // TODO is it required? provide comment
         )
     }
 
-    jvm {
-        withJava()
+    jvm("jvm") {
         withSourcesJar()
     }
 
-    js(IR) {
-        compilerOptions {
-            target = "es2015"
-            freeCompilerArgs.addAll (
-//                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
-            )
-        }
-
-        browser {
-            webpackTask {
-                mainOutputFileName.set("tg-bot.js")
-            }
-            commonWebpackConfig {
-                cssSupport {
-                    enabled.set(true)
-                }
-                export = false
-            }
-        }
-        nodejs()
-        binaries.executable()
-    }
+//    js(IR) { // TODO need seskar update
+//        compilerOptions {
+//            target = "es2015"
+//            freeCompilerArgs.addAll (
+////                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
+//            )
+//        }
+//
+//        browser {
+//            webpackTask {
+//                mainOutputFileName.set("tg-bot.js")
+//            }
+//            commonWebpackConfig {
+//                cssSupport {
+//                    enabled.set(true)
+//                }
+//                export = false
+//            }
+//        }
+//        nodejs()
+//        binaries.executable()
+//    }
 
     sourceSets {
         commonMain {
@@ -105,30 +93,19 @@ kotlin {
             }
         }
 
-        jsMain {
-            dependencies {
-                implementation(kotlinWrappers.node)
-                implementation(kotlinWrappers.react)
-                implementation(libs.seskar.core)
-            }
-        }
+//        jsMain {
+//            dependencies {
+//                implementation(kotlinWrappers.node)
+//                implementation(kotlinWrappers.react)
+//                implementation(libs.seskar.core)
+//            }
+//        }
     }
 }
 
 tasks {
     withType<Test> {
         useJUnitPlatform()
-    }
-
-    named<DependencyUpdatesTask>("dependencyUpdates").configure {
-        val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-        val stableList = listOf("RELEASE", "FINAL", "GA")
-
-        rejectVersionIf {
-            val stableKeyword = stableList.any { candidate.version.uppercase().contains(it) }
-            val isStable = stableKeyword || regex.matches(candidate.version)
-            isStable.not()
-        }
     }
 
     register<HtmlDiffTask>("apiDiff") {

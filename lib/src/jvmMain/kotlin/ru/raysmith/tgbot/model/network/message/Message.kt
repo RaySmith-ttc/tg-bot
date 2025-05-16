@@ -419,8 +419,8 @@ data class Message(
      *
      * Returns *True* on Success.
      * */
-    context(BotContext<*>)
-    suspend fun delete() = deleteMessage(chat.id, messageId)
+    context(ctx: BotContext<*>)
+    suspend fun delete() = ctx.deleteMessage(chat.id, messageId)
 
     /**
      *  A safe version of the [delete] method that swallows a [TelegramApiException].
@@ -428,7 +428,7 @@ data class Message(
      *
      *  *If you don't need a result use [API.deleteMessages]*
      *  */
-    context(BotContext<*>)
+    context(_: BotContext<*>)
     suspend fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }
 
 }

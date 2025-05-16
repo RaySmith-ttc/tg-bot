@@ -29,7 +29,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
 
     suspend fun <T> pagination(pagination: Pagination<T>) = pagination.setupMarkup(this)
 
-    context(BotHolder)
+    context(holder: BotHolder)
     suspend fun <T> pagination(
         data: Iterable<T>,
         callbackQueryPrefix: String,
@@ -37,13 +37,13 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         setup: suspend Pagination<T>.() -> Unit = {},
         createButtons: suspend Row.(item: T) -> Unit = {}
     ) {
-        Pagination.create(bot, data, callbackQueryPrefix, page, setup, createButtons)
+        Pagination.create(holder.bot, data, callbackQueryPrefix, page, setup, createButtons)
             .setupMarkup(this@MessageInlineKeyboard)
     }
 
-    context(BotHolder)
+    context(holder: BotHolder)
     suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) =
-        createDatePicker(bot.botConfig, datePicker, data)
+        createDatePicker(holder.bot.botConfig, datePicker, data)
 
     suspend fun createDatePicker(botConfig: BotConfig, datePicker: DatePicker, data: String? = null) {
         datePicker.setupMarkup(botConfig, this, data)

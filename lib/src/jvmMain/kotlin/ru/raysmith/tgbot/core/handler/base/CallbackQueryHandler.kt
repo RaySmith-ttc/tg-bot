@@ -57,7 +57,7 @@ open class CallbackQueryHandler(
         else localFeatures.addAll(features)
     }
 
-    context(EventHandler)
+    context(_: EventHandler)
     protected suspend fun handleLocalFeatures(handled: Boolean) {
         localFeatures.forEach { feature ->
             feature.handle(this as EventHandler, handled)

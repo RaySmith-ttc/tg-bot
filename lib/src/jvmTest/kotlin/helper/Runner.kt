@@ -319,7 +319,7 @@ class Runner {
                 val userId by lazy { update.findFrom()?.id?.value ?: -1 }
                 var foo = "bar"
             }
-            
+
             if (locations) {
                 bot.locations<LocationConfigImpl> {
                     getLocation {
@@ -443,49 +443,47 @@ class Runner {
                             println("on enter other")
                         }
 
-                        handle {
-                            handleCommand {
-                                isCommand("repeat") {
-                                    toLocation("other")
-                                }
-                                isCommand("other") {
-                                    send("other")
-                                }
-                                isCommand("tomenu") {
-                                    toLocation("menu")
-                                }
-                                isCommand("dp") {
-                                    send {
-                                        text = "dp"
-                                        inlineKeyboard {
-                                            createDatePicker(datePicker)
-                                        }
+                        handleCommand {
+                            isCommand("repeat") {
+                                toLocation("other")
+                            }
+                            isCommand("other") {
+                                send("other")
+                            }
+                            isCommand("tomenu") {
+                                toLocation("menu")
+                            }
+                            isCommand("dp") {
+                                send {
+                                    text = "dp"
+                                    inlineKeyboard {
+                                        createDatePicker(datePicker)
                                     }
                                 }
                             }
+                        }
 
-                            handleEditedMessage {
-                                println("Message was edit in other")
-                            }
+                        handleEditedMessage {
+                            println("Message was edit in other")
+                        }
 
-                            handleMessage {
-                                send("handled in ${this@location.name}")
+                        handleMessage {
+                            send("handled in ${this@location.name}")
 
-                                messageText()
-                                    .verify { it.contains(".") }
-                                    .convert { it.toFloatOrNull() }
-                                    .verify { it > 0.0 }
-                                    .onResult {
-                                        send("value: $it")
-                                    } ?: send("incorrect")
-                            }
+                            messageText()
+                                .verify { it.contains(".") }
+                                .convert { it.toFloatOrNull() }
+                                .verify { it > 0.0 }
+                                .onResult {
+                                    send("value: $it")
+                                } ?: send("incorrect")
+                        }
 
 //                        handleCallbackQuery {
 //                            datePickerResult(datePicker) {
 //                                send("result: $it")
 //                            }
 //                        }
-                        }
                     }
 
                     location("poll") {
@@ -525,19 +523,17 @@ class Runner {
                             }
                         }
 
-                        handle {
-                            handlePoll {
-                                println("Receive poll #${poll.id}")
-                            }
+                        handlePoll {
+                            println("Receive poll #${poll.id}")
+                        }
 
-                            handlePollAnswer {
-                                println("Receive poll answer: ${pollAnswer.optionIds}")
-                            }
+                        handlePollAnswer {
+                            println("Receive poll answer: ${pollAnswer.optionIds}")
                         }
                     }
                 }
             }
-            
+
             bot.start { bot ->
                 handleEditedMessage {
                     send(buildString {
@@ -586,7 +582,7 @@ class Runner {
                     )
                 }
 
-                handleChosenInlineQuery { 
+                handleChosenInlineQuery {
                     println("handleChosenInlineQuery: ${inlineResult.resultId}")
                 }
 
@@ -620,7 +616,7 @@ class Runner {
                         .onResult {
                             send(it)
                         } ?:
-                    
+
                     messageContact(/*verification = { it.phoneNumber != "" }*/) {
                         send(it.toString())
 //                    } ?: messagePhoto {

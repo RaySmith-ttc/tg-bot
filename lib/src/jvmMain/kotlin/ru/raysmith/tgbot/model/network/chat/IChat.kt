@@ -28,14 +28,14 @@ interface IChat {
      * @see API.banChatMember
      * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     suspend fun ban(userId: ChatId.ID, untilDate: Until? = null, revokeMessages: Boolean? = null) {
         val id = when(type) {
             ChatType.GROUP -> id
             ChatType.SUPERGROUP, ChatType.CHANNEL -> username!!.toChatId()
             else -> error("Chat must be a group, supergroup or channel")
         }
-        banChatMember(id, userId, untilDate, revokeMessages)
+        ctx.banChatMember(id, userId, untilDate, revokeMessages)
     }
 
     /**
@@ -47,13 +47,13 @@ interface IChat {
      * @see API.unbanChatMember
      * @throws IllegalArgumentException if the chat is not a group, supergroup or channel
      * */
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     suspend fun unban(userId: ChatId.ID, onlyIfBanned: Boolean? = null) {
         val id = when(type) {
             ChatType.GROUP -> id
             ChatType.SUPERGROUP, ChatType.CHANNEL -> username!!.toChatId()
             else -> error("Chat must be a group, supergroup or channel")
         }
-        unbanChatMember(id, userId, onlyIfBanned)
+        ctx.unbanChatMember(id, userId, onlyIfBanned)
     }
 }

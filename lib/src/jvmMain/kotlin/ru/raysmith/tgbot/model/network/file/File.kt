@@ -28,8 +28,8 @@ data class File(
 ) {
 
     // TODO [docs]
-    context(BotContext<*>)
+    context(ctx: BotContext<*>)
     suspend fun download() {
-        downloadFile(this)
+        ctx.downloadFile(this)
     }
 }
