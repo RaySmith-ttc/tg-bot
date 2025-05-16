@@ -6,7 +6,7 @@ import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
 import ru.raysmith.tgbot.events.EventType
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This hook controls location access on the device.

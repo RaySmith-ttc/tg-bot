@@ -33,8 +33,8 @@ private val localIp by lazy {
     InetAddress.getLocalHost().hostAddress
 }
 
-private val port = System.getenv("PORT")?.toInt() ?: 8080
-private val host = System.getenv("HOST") ?: "http://$localIp:$port"
+private val port = System.getenv("PORT")?.ifEmpty { null }?.toInt() ?: 8080
+private val host = System.getenv("HOST")?.ifEmpty { null } ?: "http://$localIp:$port"
 private val useTestServer = System.getenv("TEST_SERVER") == "true"
 
 val bot = Bot(useTestServer = useTestServer)
@@ -44,7 +44,7 @@ val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
 var preparedMessageId: String? = null
 
-fun main() {
+fun startApp() {
     scope.launch {
         val prettyPrintJson = Json(TelegramApi.json) {
             prettyPrint = true

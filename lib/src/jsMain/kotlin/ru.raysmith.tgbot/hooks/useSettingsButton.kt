@@ -5,7 +5,7 @@ import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.copyOf
 import ru.raysmith.tgbot.webApp
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 fun useSettingsButton(): SettingsButtonHookType {
     var settingsButton by useState(webApp.SettingsButton)

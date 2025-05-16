@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot
 
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This object controls the **back** button, which can be displayed in the header of the Mini App in the

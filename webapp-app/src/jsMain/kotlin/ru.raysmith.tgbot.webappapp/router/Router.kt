@@ -25,7 +25,7 @@ import ru.raysmith.tgbot.webappapp.pages.state.StatePage
 import ru.raysmith.tgbot.webappapp.pages.tg.TgInteractionPage
 import ru.raysmith.tgbot.webappapp.pages.theme.ThemePage
 import ru.raysmith.tgbot.webappapp.pages.viewport.ViewportPage
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 val Router = FC<PropsWithChildren> { props ->
     val backButton = useBackButton()

@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.events
 import ru.raysmith.tgbot.*
 import ru.raysmith.tgbot.hooks.*
 import seskar.js.JsValue
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface EventType<T> {

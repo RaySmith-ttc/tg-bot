@@ -6,7 +6,7 @@ import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.events.EventType
 import ru.raysmith.tgbot.webApp
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This hook provides information and control over the state of the App.

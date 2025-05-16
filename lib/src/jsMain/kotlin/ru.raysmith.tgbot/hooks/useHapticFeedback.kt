@@ -4,7 +4,7 @@ import js.objects.jso
 import ru.raysmith.tgbot.HapticFeedbackStyle
 import ru.raysmith.tgbot.HapticFeedbackType
 import ru.raysmith.tgbot.webApp
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /** This hook controls haptic feedback. */
 fun useHapticFeedback(): HapticFeedbackHookType {

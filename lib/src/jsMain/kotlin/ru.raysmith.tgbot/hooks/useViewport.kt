@@ -10,7 +10,7 @@ import ru.raysmith.tgbot.events.FullscreenFailed
 import ru.raysmith.tgbot.events.FullscreenFailedType
 import ru.raysmith.tgbot.events.ViewportChanged
 import ru.raysmith.tgbot.webApp
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This hook provides information about the current state of the viewport.

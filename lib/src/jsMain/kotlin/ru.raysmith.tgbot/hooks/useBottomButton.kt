@@ -4,7 +4,7 @@ import js.objects.jso
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.*
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 fun useBottomButton(type: BottomButtonType): BottomButtonHookType {
     var bb by useState(when(type) {

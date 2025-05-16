@@ -4,29 +4,14 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.benManes.versions)
-    alias(libs.plugins.seskar)
-    application
+    alias(libs.plugins.seskar) // TODO need 2.2.0 kotlin support
 }
-
-application {
-    mainClass = "ru.raysmith.tgbot.webappapp.MainKt"
-}
-
-
 
 kotlin {
-    jvmToolchain(17)
-    jvm {
-        withJava()
-    }
-
+    jvm()
     js(IR) {
         compilerOptions {
             target = "es2015"
-            freeCompilerArgs.apply {
-//                add("-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-            }
         }
         useCommonJs()
         browser {
@@ -88,7 +73,8 @@ kotlin {
                 implementation(kotlinWrappers.node)
                 implementation(kotlinWrappers.mui.material)
                 implementation(kotlinWrappers.mui.iconsMaterial)
-                implementation(kotlinWrappers.emotion)
+                implementation(kotlinWrappers.emotion.styled)
+                implementation(kotlinWrappers.emotion.react)
                 implementation(npm("webpack-bundle-analyzer", "^4.10.2"))
 
                 implementation(libs.kotlinx.coroutines.core)
@@ -114,15 +100,4 @@ tasks {
             target.set("es2015")
         }
     }
-
-
-//    getByName<JavaExec>("run") {
-//        classpath(getByName<Jar>("jvmJar"))
-//    }
-//    println("jvmRun: ${findByName("jvmRun")}")
-//
-//    withType<org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrLink> {
-//        compilerOptions.moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_COMMONJS)
-//    }
-
 }

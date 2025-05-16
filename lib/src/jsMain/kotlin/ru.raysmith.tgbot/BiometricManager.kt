@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot
 
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This object controls biometrics on the device.

@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot
 
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /** This object controls the **Settings** item in the context menu of the Mini App in the Telegram interface. */
 external interface SettingsButton {

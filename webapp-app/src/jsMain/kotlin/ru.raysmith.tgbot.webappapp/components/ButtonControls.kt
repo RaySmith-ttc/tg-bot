@@ -7,7 +7,7 @@ import mui.system.sx
 import react.FC
 import react.Props
 import web.cssom.pct
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 external interface ButtonControlsProps : Props {
     var value: Boolean

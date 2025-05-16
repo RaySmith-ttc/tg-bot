@@ -112,7 +112,7 @@ fun useCloudStorage(): CloudStorageHookType {
             }
 
     val getItem: (key: String) -> String? = useCallback(items) { key ->
-        items[key]
+        items.get(key)
     }
 
     val removeItem: (key: String, callback: ((error: String?, isRemoved: Boolean) -> Unit)?) -> Unit = useCallback(items) { key, callback ->

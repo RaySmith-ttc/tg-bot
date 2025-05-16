@@ -4,7 +4,7 @@ import ru.raysmith.tgbot.events.EventType
 import ru.raysmith.tgbot.events.InvoiceClosedStatus
 import ru.raysmith.tgbot.events.ViewportChanged
 import web.cssom.Color
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 external object WebApp {
     /**

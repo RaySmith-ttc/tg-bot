@@ -5,7 +5,7 @@ import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.copyOf
 import ru.raysmith.tgbot.webApp
-import web.scheduling.VoidFunction
+import web.function.VoidFunction
 
 /**
  * This hook controls the back button, which can be displayed in the header of the Mini App in the Telegram interface.

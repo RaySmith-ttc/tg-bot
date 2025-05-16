@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import org.junit.jupiter.api.Test
 import ru.raysmith.tgbot.network.API
+import kotlin.test.assertTrue
 
 class KonsistTests {
 
@@ -63,12 +64,12 @@ class KonsistTests {
     @Test
     fun `all subclasses of sealed classes with Serializable annotations should be annotated with Serializable`() {
         val sealedClasses = Konsist.scopeFromProject()
-            .classes()
+            .classesAndInterfaces()
             .filter { it.hasSealedModifier && it.hasAnnotationOf<Serializable>() }
 
         Konsist.scopeFromProject()
             .classes()
-            .filter { it.parentClass in sealedClasses }
+            .filter { it.parents().any { parent -> sealedClasses.any { sc -> sc == parent.sourceDeclaration!!.asClassOrInterfaceDeclaration() } } }
             .assertTrue {
                 it.hasAnnotationOf<Serializable>()
             }
@@ -82,12 +83,13 @@ class KonsistTests {
 
         Konsist.scopeFromProject()
             .objects()
-            .filter { it.hasProperties() && it.parentClass in sealedClasses }
+//            .filter { it.hasProperties() && it.parentClass in sealedClasses }
+            .filter { it.hasProperties() && it.parents().any { parent -> sealedClasses.any { sc -> sc == parent.sourceDeclaration!!.asClassOrInterfaceDeclaration() } } }
             .assertTrue {
                 it.hasAnnotationOf<Serializable>() &&
-                        it.annotations.first { it.representsTypeOf<Serializable>() }.let {
-                            it.arguments.isNotEmpty() && it.arguments.find { it.name == "with" } != null
-                        }
+                    it.annotations.first { it.representsTypeOf<Serializable>() }.let {
+                        it.arguments.isNotEmpty() && it.arguments.find { it.name == "with" } != null
+                    }
             }
     }
 
