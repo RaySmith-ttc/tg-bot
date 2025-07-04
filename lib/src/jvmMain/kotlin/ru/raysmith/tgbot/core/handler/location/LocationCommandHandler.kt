@@ -2,7 +2,7 @@ package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.HandlerDsl
+import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.model.bot.BotCommand
@@ -14,7 +14,6 @@ data class LocationCommandHandlerData<T : LocationConfig>(
     val handler: (suspend context(T) LocationCommandHandler<T>.() -> Unit)? = null
 )
 
-@HandlerDsl
 class LocationCommandHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
     private val handlerData: List<LocationCommandHandlerData<T>>,
@@ -31,12 +30,14 @@ class LocationCommandHandler<T : LocationConfig>(
         handleLocalFeatures(handled)
     }
 
-    suspend fun isCommand(value: String, equalHandler: suspend LocationCommandHandler<T>.(argsString: String?) -> Unit) {
+    suspend fun isCommand(value: String, equalHandler: suspend context(T) LocationCommandHandler<T>.(argsString: String?) -> Unit) {
         if (command.body == value) {
-            equalHandler(command.argsString)
+            with(config) {
+                equalHandler(command.argsString)
+            }
         }
     }
-    
+
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<CommandHandler>.() -> R): R {
         return LocationCommandHandler(update, bot, handlerData, locationsWrapper).let {
             this.block()

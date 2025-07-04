@@ -4,6 +4,7 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotConfig
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.network.keyboard.CopyTextButton
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
@@ -16,7 +17,7 @@ import ru.raysmith.tgbot.utils.pagination.Pagination
 @Serializable
 class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Row> {
 
-    @EncodeDefault
+    @EncodeDefault // TODO ?
     @SerialName("class")
     override val classDiscriminator = "MessageInlineKeyboard"
 
@@ -29,7 +30,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
 
     suspend fun <T> pagination(pagination: Pagination<T>) = pagination.setupMarkup(this)
 
-    context(holder: BotHolder)
+    context(holder: BotContext<*>) // TODO [2.2] should be BotHolder
     suspend fun <T> pagination(
         data: Iterable<T>,
         callbackQueryPrefix: String,
@@ -41,7 +42,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
             .setupMarkup(this@MessageInlineKeyboard)
     }
 
-    context(holder: BotHolder)
+    context(holder: BotContext<*>) // TODO [2.2] should be BotHolder
     suspend fun createDatePicker(datePicker: DatePicker, data: String? = null) =
         createDatePicker(holder.bot.botConfig, datePicker, data)
 
@@ -54,6 +55,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     suspend fun row(setRow: suspend Row.() -> Unit) = _rows.add(Row().apply { setRow() })
 
     @Serializable
+    @KeyboardDsl
     class Row : MessageKeyboardRow<Button> {
         private val _buttons: MutableList<Button> = mutableListOf()
         override val buttons: List<Button> = _buttons
@@ -77,6 +79,7 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     }
 
     @Serializable
+    @KeyboardDsl
     class Button : MessageKeyboardButton {
         var text: String = ""
         var url: String? = null

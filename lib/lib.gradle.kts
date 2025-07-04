@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.multiplatform)
-//    alias(libs.plugins.seskar) // TODO need 2.2.0 kotlin support
+    alias(libs.plugins.seskar)
 }
 
 group = "ru.raysmith"
@@ -19,42 +19,32 @@ java {
 }
 
 kotlin {
-    compilerOptions {
-        // TODO refactor: use languageSettings / root lib.gradle.kts
-        freeCompilerArgs.addAll(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xcontext-parameters",
-            "-XXLanguage:+UnitConversionsOnArbitraryExpressions", // TODO is it required? provide comment
-        )
-    }
-
     jvm("jvm") {
         withSourcesJar()
     }
 
-//    js(IR) { // TODO need seskar update
-//        compilerOptions {
-//            target = "es2015"
-//            freeCompilerArgs.addAll (
-////                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
-//            )
-//        }
-//
-//        browser {
-//            webpackTask {
-//                mainOutputFileName.set("tg-bot.js")
-//            }
-//            commonWebpackConfig {
-//                cssSupport {
-//                    enabled.set(true)
-//                }
-//                export = false
-//            }
-//        }
-//        nodejs()
-//        binaries.executable()
-//    }
+    js(IR) { // TODO need seskar update
+        compilerOptions {
+            target = "es2015"
+            freeCompilerArgs.addAll (
+//                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
+            )
+        }
+
+        browser {
+            webpackTask {
+                mainOutputFileName.set("tg-bot.js")
+            }
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+                export = false
+            }
+        }
+        nodejs()
+        binaries.executable()
+    }
 
     sourceSets {
         commonMain {
@@ -93,13 +83,13 @@ kotlin {
             }
         }
 
-//        jsMain {
-//            dependencies {
-//                implementation(kotlinWrappers.node)
-//                implementation(kotlinWrappers.react)
-//                implementation(libs.seskar.core)
-//            }
-//        }
+        jsMain {
+            dependencies {
+                implementation(kotlinWrappers.node)
+                implementation(kotlinWrappers.react)
+                implementation(libs.seskar.core)
+            }
+        }
     }
 }
 

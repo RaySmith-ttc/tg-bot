@@ -2,7 +2,6 @@ package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.PollHandler
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -13,7 +12,6 @@ data class LocationPollHandlerData<T : LocationConfig>(
     val handler: (suspend context(T) LocationPollHandler<T>.() -> Unit)? = null
 )
 
-@HandlerDsl
 class LocationPollHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationPollHandlerData<T>>,

@@ -6,11 +6,9 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotContextDsl
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.message.Message
 
-@HandlerDsl
 open class CommandHandler(
     val command: BotCommand, val message: Message,
     final override val bot: Bot,

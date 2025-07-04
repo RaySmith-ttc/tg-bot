@@ -13,7 +13,7 @@ import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
 /** Represent a simple message with a text to be sent or edit using the [sendMessage][API.sendMessage] method */
-@TextMessageDsl
+@MessageDsl
 class TextMessage(
     override val bot: Bot
 ) : TextWithEntities(bot, MessageTextType.TEXT), MessageWithReplyMarkup, BotHolder, IMessage<Message> {

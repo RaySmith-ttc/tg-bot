@@ -6,6 +6,20 @@ plugins {
     alias(libs.plugins.benManes.versions)
 }
 
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.addAll(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                "-Xcontext-parameters",
+                "-Xcontext-sensitive-resolution",
+                "-XXLanguage:+UnitConversionsOnArbitraryExpressions", // TODO is it required? provide comment
+            )
+        }
+    }
+}
+
 tasks {
     named<DependencyUpdatesTask>("dependencyUpdates").configure {
         val regex = "^[0-9,.v-]+(-rc)?$".toRegex()

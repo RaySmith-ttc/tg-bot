@@ -16,7 +16,6 @@ import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationConfig
-import ru.raysmith.tgbot.utils.locations.LocationsDSL
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 import ru.raysmith.utils.letIf
 import ru.raysmith.utils.properties.PropertiesFactory
@@ -300,7 +299,6 @@ class Bot(
     
     private var isLocationsMode = false
     private var locationsWrapper: LocationsWrapper<*>? = null
-    @LocationsDSL
     suspend fun <T : LocationConfig> locations(setup: suspend LocationsWrapper<T>.() -> Unit) {
         locationsWrapper = LocationsWrapper<T>(this).apply { setup() }
         eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)

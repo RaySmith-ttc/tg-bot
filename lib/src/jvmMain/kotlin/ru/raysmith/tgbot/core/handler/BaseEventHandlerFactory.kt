@@ -8,10 +8,6 @@ import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 
-@DslMarker
-annotation class HandlerDsl
-
-@HandlerDsl
 open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory, BotHolder {
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
@@ -135,49 +131,41 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
         }
     }
 
-    @HandlerDsl
     fun handleMessage(handler: suspend MessageHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         messageHandler = handler
     }
 
-    @HandlerDsl
     fun handleCommand(handler: suspend CommandHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         commandHandler = handler
     }
 
-    @HandlerDsl
     fun handleEditedMessage(handler: suspend EditedMessageHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_MESSAGE)
         editedMessageHandler = handler
     }
 
-    @HandlerDsl
     fun handleChannelPost(handler: suspend ChannelPostHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHANNEL_POST)
         channelPostHandler = handler
     }
 
-    @HandlerDsl
     fun handleEditedChannelPost(handler: suspend EditedChannelPostHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
         editedChannelPostHandler = handler
     }
 
-    @HandlerDsl
     fun handleInlineQuery(handler: suspend InlineQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.INLINE_QUERY)
         inlineQueryHandler = handler
     }
 
-    @HandlerDsl
     fun handleChosenInlineQuery(handler: suspend ChosenInlineQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHOSEN_INLINE_RESULT)
         chosenInlineQueryHandler = handler
     }
-    
-    @HandlerDsl
+
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
         handler: (suspend (CallbackQueryHandler.() -> Unit))?
@@ -186,62 +174,52 @@ open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory,
         callbackQueryHandler.add(CallbackQueryHandlerData(handler, alwaysAnswer))
     }
 
-    @HandlerDsl
     fun handleShippingQuery(handler: suspend ShippingQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.SHIPPING_QUERY)
         shippingQueryHandler = handler
     }
 
-    @HandlerDsl
     fun handlePreCheckoutQuery(handler: suspend PreCheckoutQueryHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.PRE_CHECKOUT_QUERY)
         preCheckoutQueryHandler = handler
     }
 
-    @HandlerDsl
     fun handlePoll(handler: suspend PollHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL)
         pollHandler = handler
     }
 
-    @HandlerDsl
     fun handlePollAnswer(handler: suspend PollAnswerHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL_ANSWER)
         pollAnswerHandler = handler
     }
 
-    @HandlerDsl
     fun handleMyChatMember(handler: suspend ChatMemberHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MY_CHAT_MEMBER)
         myChatMemberHandler = handler
     }
 
-    @HandlerDsl
     fun handleChatMember(handler: suspend ChatMemberHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_MEMBER)
         chatMemberHandler = handler
     }
 
-    @HandlerDsl
     fun handleChatJoinRequest(handler: suspend ChatJoinRequestHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler = handler
     }
 
-    @HandlerDsl
     fun handleMessageReaction(handler: suspend MessageReactionHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE_REACTION)
         messageReactionHandler = handler
     }
 
 
-    @HandlerDsl
     fun handleMessageReactionCount(handler: suspend MessageReactionCountHandler.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE_REACTION_COUNT)
         messageReactionCountHandler = handler
     }
 
-    @HandlerDsl
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) {
         unknownHandler = handler
     }

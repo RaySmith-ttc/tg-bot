@@ -5,13 +5,11 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.inline.InlineQuery
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
 import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
 import kotlin.time.Duration
 
-@HandlerDsl
 open class InlineQueryHandler(
     val inlineQuery: InlineQuery,
     final override val bot: Bot,

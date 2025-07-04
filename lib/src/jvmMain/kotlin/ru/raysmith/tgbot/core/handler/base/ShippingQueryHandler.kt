@@ -1,17 +1,14 @@
 package ru.raysmith.tgbot.core.handler.base
 
 import io.ktor.client.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.payment.ShippingOption
 import ru.raysmith.tgbot.model.network.payment.ShippingQuery
 
-@HandlerDsl
 open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
     final override val bot: Bot,

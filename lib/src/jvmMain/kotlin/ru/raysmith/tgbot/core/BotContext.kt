@@ -1,9 +1,7 @@
 package ru.raysmith.tgbot.core
 
-import io.ktor.client.request.*
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.IMessage
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
@@ -32,7 +30,7 @@ import kotlin.time.Duration.Companion.days
 // TODO improve interface documentation
 
 /** Allows to change a bot for the [handler][T] */
-interface BotContext<T : EventHandler> : ISender, IEditor {
+interface BotContext<T : EventHandler> : ISender, IEditor, BotHolder {
 
     /** Uses the [bot] token to make requests to telegram from [block]. */
     @BotContextDsl

@@ -23,7 +23,7 @@ inline fun <T> botContext(
     bot: Bot,
     withChatId: ChatId? = null,
     update: Update? = null,
-    block: context(BotContext<UnknownEventHandler>) () -> T
+    block: BotContext<UnknownEventHandler>.() -> T
 ): T = object : BotContext<UnknownEventHandler> {
     override val bot = bot
     override val client: HttpClient = bot.client
@@ -38,7 +38,6 @@ inline fun <T> botContext(
         return UnknownEventHandler(update ?: Update(-1), bot).block()
     }
 }.let { block(it) }
-
 
 internal fun createEventHandler(
     bot: Bot,

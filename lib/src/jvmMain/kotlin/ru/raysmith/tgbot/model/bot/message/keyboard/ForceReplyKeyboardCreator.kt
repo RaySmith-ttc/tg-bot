@@ -1,6 +1,5 @@
 package ru.raysmith.tgbot.model.bot.message.keyboard
 
-@KeyboardDsl
 interface ForceReplyKeyboardCreator {
     var keyboardMarkup: MessageKeyboard?
 

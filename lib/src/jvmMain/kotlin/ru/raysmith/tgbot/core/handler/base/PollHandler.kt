@@ -5,11 +5,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
 import ru.raysmith.tgbot.model.network.Poll
 
-@HandlerDsl
 open class PollHandler(
     val poll: Poll,
     final override val bot: Bot,

@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.Bot
+import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
@@ -205,6 +206,22 @@ fun MessageText.setupTestMessage(message: Message) {
 //    }
 }
 
+class LocationConfigImpl(override val update: Update) : LocationConfig {
+    val userId by lazy { update.findFrom()?.id?.value ?: -1 }
+    var foo = "bar"
+}
+
+//context(_: L)
+//inline fun <L> locationContext(): L where L : LocationConfig = contextOf()
+
+context(_: L)
+val <L : LocationConfig> ctx: L get() = contextOf<L>()
+
+context(ctx: BotContext<*>)
+inline fun <R> withBotContext(block: BotContext<*>.() -> R): R {
+    return block(ctx)
+}
+
 val pagesData = 1..120
 
 class Runner {
@@ -213,6 +230,9 @@ class Runner {
 
     suspend fun ISender.sendMain() {
         send {
+            send {
+
+            }
             text = "main"
 
             inlineKeyboard {
@@ -266,7 +286,7 @@ class Runner {
 
 //            startWebAppServer()
             val logger = LoggerFactory.getLogger("bot")
-            val notifierBot = Bot(token = "5031990924:AAG-7F1QzGqybvYW1CJdhvFlFUR0s5Icw6Y")
+            val notifierBot = Bot(token = System.getenv("SECOND_TG_BOT_TOKEN"))
 
             val bot = Bot(token = System.getenv("BOT_TOKEN")/*, lastUpdateId = -2*/)
                 .client {
@@ -315,15 +335,9 @@ class Runner {
 //                bot.restart()
 //            }
 
-            class LocationConfigImpl(override val update: Update) : LocationConfig {
-                val userId by lazy { update.findFrom()?.id?.value ?: -1 }
-                var foo = "bar"
-            }
-
             if (locations) {
-                bot.locations<LocationConfigImpl> {
+                bot.locations {
                     getLocation {
-                        userId
                         loc
                     }
                     config {
@@ -333,11 +347,16 @@ class Runner {
                         loc = it.name
                     }
 
-                    filter { true }
+                    filter {
+                        true
+                    }
 
                     global {
                         handleMyChatMember {
                             send(chatId = update.findChatId()!!) {
+                                send {
+
+                                }
                                 text = update.findChatId()!!.toString()
                             }
                         }
@@ -410,7 +429,6 @@ class Runner {
                             }
 
                             isCommand("toother") {
-                                foo = "changed"
                                 toLocation("other")
                             }
                         }
@@ -439,7 +457,7 @@ class Runner {
 
                     location("other") {
                         onEnter {
-                            send("in other\nfoo:${foo}")
+                            send("in other\nfoo:${config.foo}")
                             println("on enter other")
                         }
 
@@ -454,6 +472,8 @@ class Runner {
                                 toLocation("menu")
                             }
                             isCommand("dp") {
+                                ctx.userId
+
                                 send {
                                     text = "dp"
                                     inlineKeyboard {
@@ -479,17 +499,16 @@ class Runner {
                                 } ?: send("incorrect")
                         }
 
-//                        handleCallbackQuery {
-//                            datePickerResult(datePicker) {
-//                                send("result: $it")
-//                            }
-//                        }
+                        handleCallbackQuery {
+                            datePickerResult(datePicker) {
+                                send("result: $it")
+                            }
+                        }
                     }
 
                     location("poll") {
                         onEnter {
                             val poll = sendPoll {
-
                                 question {
                                     text = ""
                                     textWithEntities {
@@ -518,9 +537,11 @@ class Runner {
                             }
 
                             runBlocking { delay(5000) }
-                            stopPoll(poll.messageId) {
-                                row("New button", "btn")
-                            }
+
+                            // TODO
+//                            stopPoll(poll.messageId) {
+//                                row("New button", "btn")
+//                            }
                         }
 
                         handlePoll {
@@ -667,7 +688,6 @@ class Runner {
                                     row {
                                         button("hello", "hello")
                                         button("world", "${CALLBACK_PREFIX}world")
-                                        row {  }
                                     }
                                     row {
                                         button {
@@ -1284,7 +1304,7 @@ class Runner {
                     }
 
                     isCommand("service") {
-                        //                            withService(TelegramApi.service) {
+//                            withService(TelegramApi.service) {
 //                                send("main")
 //                                withService(telegramServiceOfNotifierBot) {
 //                                    send("second")
@@ -1858,6 +1878,7 @@ suspend fun EventHandler.sendAnswerVariants(action: MessageAction) = message(act
     }
 }
 
+context(_: BotContext<*>)
 suspend fun EventHandler.sendPagination(page: Int, action: MessageAction = MessageAction.EDIT) = message(action) {
     text = "Choose item"
     inlineKeyboard {

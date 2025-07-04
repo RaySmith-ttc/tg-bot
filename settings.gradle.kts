@@ -7,6 +7,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven { setUrl("https://plugins.gradle.org/m2/") }
+        maven("https://redirector.kotlinlang.org/maven/bootstrap")
     }
 }
 
@@ -31,6 +32,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        maven("https://redirector.kotlinlang.org/maven/bootstrap")
         mavenRaySmith("utils")
     }
 

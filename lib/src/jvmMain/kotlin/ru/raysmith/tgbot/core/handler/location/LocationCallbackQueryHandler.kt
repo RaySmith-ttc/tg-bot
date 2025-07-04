@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.core.handler.location
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
@@ -16,7 +15,6 @@ data class LocationCallbackQueryHandlerData<T : LocationConfig>(
     val alwaysAnswer: Boolean
 )
 
-@HandlerDsl
 open class LocationCallbackQueryHandler<T : LocationConfig>(
     override val update: Update, bot: Bot,
     protected val handlerData: List<LocationCallbackQueryHandlerData<T>>,

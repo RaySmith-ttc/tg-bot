@@ -5,10 +5,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.model.network.updates.Update
 
-@HandlerDsl
 class UnknownEventHandler(
     val update: Update,
     override val bot: Bot,

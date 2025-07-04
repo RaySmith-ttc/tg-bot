@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven("https://redirector.kotlinlang.org/maven/bootstrap")
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
@@ -12,5 +20,6 @@ dependencyResolutionManagement {
         mavenCentral()
         gradlePluginPortal()
         mavenLocal()
+        maven("https://redirector.kotlinlang.org/maven/bootstrap")
     }
 }

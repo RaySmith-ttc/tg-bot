@@ -7,7 +7,6 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.EventHandler
-import ru.raysmith.tgbot.core.handler.HandlerDsl
 import ru.raysmith.tgbot.core.handler.utils.DataCallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.utils.ValueDataCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.UnknownChatIdException
@@ -21,7 +20,6 @@ data class CallbackQueryHandlerData(
     val alwaysAnswer: Boolean
 )
 
-@HandlerDsl
 open class CallbackQueryHandler(
     final override val query: CallbackQuery,
     private val handlerData: List<CallbackQueryHandlerData>,
@@ -57,10 +55,10 @@ open class CallbackQueryHandler(
         else localFeatures.addAll(features)
     }
 
-    context(_: EventHandler)
+    context(handler: EventHandler)
     protected suspend fun handleLocalFeatures(handled: Boolean) {
-        localFeatures.forEach { feature ->
-            feature.handle(this as EventHandler, handled)
+        this.localFeatures.forEach { feature ->
+            feature.handle(handler, handled)
         }
     }
 

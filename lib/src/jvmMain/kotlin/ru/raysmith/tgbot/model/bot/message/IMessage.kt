@@ -5,6 +5,7 @@ import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.network.API
 
+@MessageDsl
 interface IMessage<T> : API {
     companion object {
         const val MAX_TEXT_LENGTH = 4096
