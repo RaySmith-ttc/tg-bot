@@ -52,7 +52,7 @@ import ru.raysmith.tgbot.utils.*
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.datepicker.createDatePicker
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import ru.raysmith.tgbot.utils.pagination.Pagination
@@ -97,7 +97,7 @@ suspend inline fun <reified T> ISender.sendAsJson(value: T) = send {
     }
 }
 
-var loc: String = "menu"
+var location: String = "menu"
 
 var lookPollAnswers = false
 
@@ -206,16 +206,10 @@ fun MessageText.setupTestMessage(message: Message) {
 //    }
 }
 
-class LocationConfigImpl(override val update: Update) : LocationConfig {
+class LocationFlowContextImpl(override val update: Update) : LocationFlowContext {
     val userId by lazy { update.findFrom()?.id?.value ?: -1 }
     var foo = "bar"
 }
-
-//context(_: L)
-//inline fun <L> locationContext(): L where L : LocationConfig = contextOf()
-
-context(_: L)
-val <L : LocationConfig> ctx: L get() = contextOf<L>()
 
 context(ctx: BotContext<*>)
 inline fun <R> withBotContext(block: BotContext<*>.() -> R): R {
@@ -338,13 +332,13 @@ class Runner {
             if (locations) {
                 bot.locations {
                     getLocation {
-                        loc
+                        location
                     }
                     config {
-                        LocationConfigImpl(it)
+                        LocationFlowContextImpl(it)
                     }
                     updateLocation {
-                        loc = it.name
+                        location = it.name
                     }
 
                     filter {
@@ -472,8 +466,6 @@ class Runner {
                                 toLocation("menu")
                             }
                             isCommand("dp") {
-                                ctx.userId
-
                                 send {
                                     text = "dp"
                                     inlineKeyboard {
@@ -508,6 +500,8 @@ class Runner {
 
                     location("poll") {
                         onEnter {
+                            setupFeatures()
+
                             val poll = sendPoll {
                                 question {
                                     text = ""
@@ -538,10 +532,9 @@ class Runner {
 
                             runBlocking { delay(5000) }
 
-                            // TODO
-//                            stopPoll(poll.messageId) {
-//                                row("New button", "btn")
-//                            }
+                            stopPoll(poll.messageId) {
+                                row("New button", "btn")
+                            }
                         }
 
                         handlePoll {

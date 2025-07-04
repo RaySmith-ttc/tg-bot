@@ -7,10 +7,10 @@ import ru.raysmith.tgbot.core.handler.location.*
 import ru.raysmith.tgbot.model.network.message.MessageType
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory, BotHolder {
+interface ILocationEventHandlerFactory<T : LocationFlowContext> : EventHandlerFactory, BotHolder {
     val locationsWrapper: LocationsWrapper<T>
 
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit)
@@ -53,7 +53,7 @@ interface ILocationEventHandlerFactory<T : LocationConfig> : EventHandlerFactory
     fun handleMessageReactionCount(handler: suspend context(T) LocationMessageReactionCountHandler<T>.() -> Unit)
 }
 
-class LocationEventHandlerFactory<T : LocationConfig>(
+class LocationEventHandlerFactory<T : LocationFlowContext>(
     override val locationsWrapper: LocationsWrapper<T>,
 ) : ILocationEventHandlerFactory<T> {
     override val bot: Bot = locationsWrapper.bot

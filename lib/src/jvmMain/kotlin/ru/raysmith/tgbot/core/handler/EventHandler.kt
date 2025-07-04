@@ -6,14 +6,14 @@ import ru.raysmith.tgbot.core.IEditor
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.BotFeature
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 @HandlerDsl
 interface EventHandler : ChatIdHolder, IEditor, ISender {
-    var handled: Boolean
+    var handled: Boolean // TODO should be internal
     suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean = false)
-    suspend fun handle()
+    suspend fun handle() // TODO should be internal
 }
 
 abstract class BaseEventHandler : EventHandler {
@@ -36,14 +36,13 @@ abstract class BaseEventHandler : EventHandler {
     }
 }
 
-interface LocationHandler<T : LocationConfig> : EventHandler {
+interface LocationHandler<T : LocationFlowContext, E : EventHandler> : EventHandler, BotContext<E> {
     val update: Update
     val locationsWrapper: LocationsWrapper<T> // TODO should be internal
 
-    context(ctx: BotContext<*>)
     suspend fun toLocation(name: String) {
         val location = locationsWrapper.onToLocation(config, name)
-        location.onEnter(config, ctx, this)
+        location.onEnter(config, this)
     }
     
     val config: T

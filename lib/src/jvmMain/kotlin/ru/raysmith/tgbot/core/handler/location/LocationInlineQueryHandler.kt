@@ -5,18 +5,18 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.InlineQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationInlineQueryHandlerData<T : LocationConfig>(
+data class LocationInlineQueryHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationInlineQueryHandler<T>.() -> Unit)? = null
 )
 
-class LocationInlineQueryHandler<T : LocationConfig>(
+class LocationInlineQueryHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationInlineQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : InlineQueryHandler(update.inlineQuery!!, bot), LocationHandler<T> {
+) : InlineQueryHandler(update.inlineQuery!!, bot), LocationHandler<T, InlineQueryHandler> {
 
     override val config by lazy { config() }
     override suspend fun handle() {

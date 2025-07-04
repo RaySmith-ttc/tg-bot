@@ -7,19 +7,19 @@ import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.network.CallbackQuery
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationCallbackQueryHandlerData<T : LocationConfig>(
+data class LocationCallbackQueryHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
     val alwaysAnswer: Boolean
 )
 
-open class LocationCallbackQueryHandler<T : LocationConfig>(
+open class LocationCallbackQueryHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     protected val handlerData: List<LocationCallbackQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : CallbackQueryHandler(update.callbackQuery!!, emptyList(), bot), LocationHandler<T> {
+) : CallbackQueryHandler(update.callbackQuery!!, emptyList(), bot), LocationHandler<T, CallbackQueryHandler> {
     override val botConfig: BotConfig = bot.botConfig
     override val config by lazy { config() }
 

@@ -8,7 +8,7 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 
 @LocationsDSL
-class LocationsWrapper<L : LocationConfig>(override val bot: Bot) : BotHolder {
+class LocationsWrapper<L : LocationFlowContext>(override val bot: Bot) : BotHolder {
     internal val locations = mutableMapOf<String, Location<L>>()
     
     private var locationNameGetter: context(L) LocationsWrapper<L>.() -> String = { error("TODO") } // TODO

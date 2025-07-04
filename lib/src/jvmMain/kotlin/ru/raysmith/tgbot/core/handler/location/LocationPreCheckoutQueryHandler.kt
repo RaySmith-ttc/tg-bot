@@ -5,18 +5,18 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.PreCheckoutQueryHandler
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationPreCheckoutQueryHandlerData<T : LocationConfig>(
+data class LocationPreCheckoutQueryHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)? = null
 )
 
-class LocationPreCheckoutQueryHandler<T : LocationConfig>(
+class LocationPreCheckoutQueryHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationPreCheckoutQueryHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : PreCheckoutQueryHandler(update.preCheckoutQuery!!, bot), LocationHandler<T> {
+) : PreCheckoutQueryHandler(update.preCheckoutQuery!!, bot), LocationHandler<T, PreCheckoutQueryHandler> {
 
     override val config by lazy { config() }
     override suspend fun handle() {

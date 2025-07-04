@@ -5,18 +5,18 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.ChatJoinRequestHandler
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationChatJoinRequestHandlerData<T : LocationConfig>(
+data class LocationChatJoinRequestHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationChatJoinRequestHandler<T>.() -> Unit)? = null
 )
 
-class LocationChatJoinRequestHandler<T : LocationConfig>(
+class LocationChatJoinRequestHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationChatJoinRequestHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : ChatJoinRequestHandler(update.chatJoinRequest!!, bot), LocationHandler<T> {
+) : ChatJoinRequestHandler(update.chatJoinRequest!!, bot), LocationHandler<T, ChatJoinRequestHandler> {
 
     override val config by lazy { config() }
     override suspend fun handle() {

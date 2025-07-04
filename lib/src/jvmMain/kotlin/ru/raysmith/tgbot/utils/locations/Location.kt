@@ -1,13 +1,12 @@
 package ru.raysmith.tgbot.utils.locations
 
-import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.ILocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.model.network.updates.Update
 
 @LocationsDSL
-suspend fun <T : LocationConfig> createLocation(name: String, wrapper: LocationsWrapper<T>, setup: suspend LocationEventHandlerFactory<T>.(location: Location<T>) -> Unit): Location<T> {
+suspend fun <T : LocationFlowContext> createLocation(name: String, wrapper: LocationsWrapper<T>, setup: suspend LocationEventHandlerFactory<T>.(location: Location<T>) -> Unit): Location<T> {
     val factory = LocationEventHandlerFactory(wrapper)
     val location = Location(name, factory)
     factory.setup(location)
@@ -15,15 +14,15 @@ suspend fun <T : LocationConfig> createLocation(name: String, wrapper: Locations
 }
 
 @LocationsDSL
-class Location<T : LocationConfig>(val name: String, internal val handlerFactory: LocationEventHandlerFactory<T>) : ILocationEventHandlerFactory<T> by handlerFactory {
+class Location<T : LocationFlowContext>(val name: String, internal val handlerFactory: LocationEventHandlerFactory<T>) : ILocationEventHandlerFactory<T> by handlerFactory {
     internal var isAdditionalHandlersInit = false
     internal lateinit var update: Update
     
-    var onEnter: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit = {  }
+    var onEnter: suspend context(T) LocationHandler<T, *>.() -> Unit = {  }
         private set
     
     @LocationsDSL
-    fun onEnter(block: suspend context(T, BotContext<*>) LocationHandler<T>.() -> Unit) {
+    fun onEnter(block: suspend context(T) LocationHandler<T, *>.() -> Unit) {
         this.onEnter = block
     }
     

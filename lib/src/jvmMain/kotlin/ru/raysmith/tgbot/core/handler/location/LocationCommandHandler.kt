@@ -2,23 +2,22 @@ package ru.raysmith.tgbot.core.handler.location
 
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationCommandHandlerData<T : LocationConfig>(
+data class LocationCommandHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationCommandHandler<T>.() -> Unit)? = null
 )
 
-class LocationCommandHandler<T : LocationConfig>(
+class LocationCommandHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: List<LocationCommandHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : CommandHandler(BotCommand(update.message!!.text!!), update.message, bot), LocationHandler<T> {
+) : CommandHandler(BotCommand(update.message!!.text!!), update.message, bot), LocationHandler<T, CommandHandler> {
     
     override val config by lazy { config() }
     override suspend fun handle() {

@@ -5,18 +5,18 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.ChatMemberHandler
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationChatMemberHandlerData<T : LocationConfig>(
+data class LocationChatMemberHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationChatMemberHandler<T>.() -> Unit)? = null
 )
 
-class LocationChatMemberHandler<T : LocationConfig>(
+class LocationChatMemberHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationChatMemberHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : ChatMemberHandler(update.myChatMember!!, bot), LocationHandler<T> {
+) : ChatMemberHandler(update.myChatMember!!, bot), LocationHandler<T, ChatMemberHandler> {
     
     override val config by lazy { config() }
     override fun getChatId() = chat.id

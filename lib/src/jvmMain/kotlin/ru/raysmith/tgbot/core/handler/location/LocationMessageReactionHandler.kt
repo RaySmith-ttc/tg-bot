@@ -5,18 +5,18 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.MessageReactionHandler
 import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.utils.locations.LocationConfig
+import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationMessageReactionHandlerData<T : LocationConfig>(
+data class LocationMessageReactionHandlerData<T : LocationFlowContext>(
     val handler: (suspend context(T) LocationMessageReactionHandler<T>.() -> Unit)? = null
 )
 
-class LocationMessageReactionHandler<T : LocationConfig>(
+class LocationMessageReactionHandler<T : LocationFlowContext>(
     override val update: Update, bot: Bot,
     private val handlerData: MutableList<LocationMessageReactionHandlerData<T>>,
     override val locationsWrapper: LocationsWrapper<T>
-) : MessageReactionHandler(update.messageReaction!!, bot), LocationHandler<T> {
+) : MessageReactionHandler(update.messageReaction!!, bot), LocationHandler<T, MessageReactionHandler> {
 
     override val config by lazy { config() }
     override suspend fun handle() {
