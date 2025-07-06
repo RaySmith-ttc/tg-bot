@@ -66,6 +66,10 @@ fun createDatePicker(
 @Suppress("KDocUnresolvedReference")
 class DatePicker(val callbackQueryPrefix: String) : BotFeature {
 
+    constructor(callbackQueryPrefix: String, builder: DatePicker.() -> Unit) : this(callbackQueryPrefix) {
+        builder()
+    }
+
     /**
      * Function that can be applied to MessageText to initialize text with entities
      *
@@ -116,8 +120,9 @@ class DatePicker(val callbackQueryPrefix: String) : BotFeature {
      * @param data optional custom data provided when sending a message
      * @param state Current picker view state ([DatePickerState.DAY], [DatePickerState.MONTH] or [DatePickerState.YEAR])
      * */
-    fun additionalRows(block: suspend () -> Unit) { additionalRows = { _, _, _ -> block() } }
+    fun additionalRows(block: suspend MessageInlineKeyboard.() -> Unit) { additionalRows = { _, _, _ -> block() } }
 
+    fun test() {}
 
 
     /**

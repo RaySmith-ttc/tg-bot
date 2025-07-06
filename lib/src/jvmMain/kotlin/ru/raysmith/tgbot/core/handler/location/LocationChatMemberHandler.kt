@@ -8,17 +8,17 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationChatMemberHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationChatMemberHandler<T>.() -> Unit)? = null
+data class LocationChatMemberHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationChatMemberHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationChatMemberHandler<T : LocationFlowContext>(
+class LocationChatMemberHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableList<LocationChatMemberHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : ChatMemberHandler(update.myChatMember!!, bot), LocationHandler<T, ChatMemberHandler> {
+    private val handlerData: MutableList<LocationChatMemberHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : ChatMemberHandler(update.myChatMember!!, bot), LocationHandler<LFC, ChatMemberHandler> {
     
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override fun getChatId() = chat.id
     override fun getChatIdOrThrow() = chat.id
     override var messageId: Int? = null
@@ -26,7 +26,7 @@ class LocationChatMemberHandler<T : LocationFlowContext>(
     
     override suspend fun handle() {
         handlerData.forEach {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }

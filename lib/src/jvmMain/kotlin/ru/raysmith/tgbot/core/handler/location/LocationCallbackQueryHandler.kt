@@ -10,18 +10,18 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationCallbackQueryHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)? = null,
+data class LocationCallbackQueryHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationCallbackQueryHandler<LFC>.() -> Unit)? = null,
     val alwaysAnswer: Boolean
 )
 
-open class LocationCallbackQueryHandler<T : LocationFlowContext>(
+open class LocationCallbackQueryHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    protected val handlerData: List<LocationCallbackQueryHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : CallbackQueryHandler(update.callbackQuery!!, emptyList(), bot), LocationHandler<T, CallbackQueryHandler> {
+    protected val handlerData: List<LocationCallbackQueryHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : CallbackQueryHandler(update.callbackQuery!!, emptyList(), bot), LocationHandler<LFC, CallbackQueryHandler> {
     override val botConfig: BotConfig = bot.botConfig
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
 
 //    init {
 //        println("init LocationCallbackQueryHandler")
@@ -36,7 +36,7 @@ open class LocationCallbackQueryHandler<T : LocationFlowContext>(
                 break
             }
 
-            data.handler?.let { h -> h(config, this) }
+            data.handler?.let { h -> h(locationFlowContext, this) }
         }
 
         handleLocalFeatures(handled)

@@ -36,15 +36,15 @@ abstract class BaseEventHandler : EventHandler {
     }
 }
 
-interface LocationHandler<T : LocationFlowContext, E : EventHandler> : EventHandler, BotContext<E> {
+interface LocationHandler<LFC : LocationFlowContext, E : EventHandler> : EventHandler, BotContext<E> {
     val update: Update
-    val locationsWrapper: LocationsWrapper<T> // TODO should be internal
+    val locationsWrapper: LocationsWrapper<LFC> // TODO should be internal
 
     suspend fun toLocation(name: String) {
-        val location = locationsWrapper.onToLocation(config, name)
-        location.onEnter(config, this)
+        val location = locationsWrapper.onToLocation(locationFlowContext, name)
+        location.onEnter(locationFlowContext, this)
     }
     
-    val config: T
-    fun config() = locationsWrapper.configCreator(locationsWrapper, update)
+    val locationFlowContext: LFC
+    fun locationFlowContext() = locationsWrapper.configCreator(update) // TODO should be internal
 }

@@ -8,20 +8,20 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationShippingQueryHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationShippingQueryHandler<T>.() -> Unit)? = null
+data class LocationShippingQueryHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationShippingQueryHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationShippingQueryHandler<T : LocationFlowContext>(
+class LocationShippingQueryHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableList<LocationShippingQueryHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : ShippingQueryHandler(update.shippingQuery!!, bot), LocationHandler<T, ShippingQueryHandler> {
+    private val handlerData: MutableList<LocationShippingQueryHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : ShippingQueryHandler(update.shippingQuery!!, bot), LocationHandler<LFC, ShippingQueryHandler> {
 
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }

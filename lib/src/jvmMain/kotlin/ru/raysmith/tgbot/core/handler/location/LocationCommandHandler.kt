@@ -9,29 +9,29 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationCommandHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationCommandHandler<T>.() -> Unit)? = null
+data class LocationCommandHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationCommandHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationCommandHandler<T : LocationFlowContext>(
+class LocationCommandHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: List<LocationCommandHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : CommandHandler(BotCommand(update.message!!.text!!), update.message, bot), LocationHandler<T, CommandHandler> {
+    private val handlerData: List<LocationCommandHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : CommandHandler(BotCommand(update.message!!.text!!), update.message, bot), LocationHandler<LFC, CommandHandler> {
     
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override suspend fun handle() {
         for (it in handlerData) {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }
         handleLocalFeatures(handled)
     }
 
-    suspend fun isCommand(value: String, equalHandler: suspend context(T) LocationCommandHandler<T>.(argsString: String?) -> Unit) {
+    suspend fun isCommand(value: String, equalHandler: suspend context(LFC) LocationCommandHandler<LFC>.(argsString: String?) -> Unit) {
         if (command.body == value) {
-            with(config) {
+            with(locationFlowContext) {
                 equalHandler(command.argsString)
             }
         }

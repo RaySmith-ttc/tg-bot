@@ -10,73 +10,73 @@ import ru.raysmith.tgbot.model.network.updates.UpdateType
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-interface ILocationEventHandlerFactory<T : LocationFlowContext> : EventHandlerFactory, BotHolder {
-    val locationsWrapper: LocationsWrapper<T>
+interface ILocationEventHandlerFactory<LFC : LocationFlowContext> : EventHandlerFactory, BotHolder {
+    val locationsWrapper: LocationsWrapper<LFC>
 
     fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit)
 
-    fun handleMessage(handler: suspend context(T) LocationMessageHandler<T>.() -> Unit)
+    fun handleMessage(handler: suspend context(LFC) LocationMessageHandler<LFC>.() -> Unit)
 
-    fun handleCommand(handler:suspend context(T) LocationCommandHandler<T>.() -> Unit)
+    fun handleCommand(handler:suspend context(LFC) LocationCommandHandler<LFC>.() -> Unit)
 
-    fun handleEditedMessage(handler: suspend context(T) LocationEditedMessageHandler<T>.() -> Unit)
+    fun handleEditedMessage(handler: suspend context(LFC) LocationEditedMessageHandler<LFC>.() -> Unit)
 
-    fun handleChannelPost(handler: suspend context(T) LocationChannelPostHandler<T>.() -> Unit)
+    fun handleChannelPost(handler: suspend context(LFC) LocationChannelPostHandler<LFC>.() -> Unit)
 
-    fun handleEditedChannelPost(handler: suspend context(T) LocationEditedChannelPostHandler<T>.() -> Unit)
+    fun handleEditedChannelPost(handler: suspend context(LFC) LocationEditedChannelPostHandler<LFC>.() -> Unit)
 
-    fun handleInlineQuery(handler: suspend context(T) LocationInlineQueryHandler<T>.() -> Unit)
+    fun handleInlineQuery(handler: suspend context(LFC) LocationInlineQueryHandler<LFC>.() -> Unit)
 
-    fun handleChosenInlineQuery(handler: suspend context(T) LocationChosenInlineQueryHandler<T>.() -> Unit)
+    fun handleChosenInlineQuery(handler: suspend context(LFC) LocationChosenInlineQueryHandler<LFC>.() -> Unit)
 
     fun handleCallbackQuery(
         alwaysAnswer: Boolean = bot.botConfig.alwaysAnswerCallback,
-        handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
+        handler: (suspend context(LFC) LocationCallbackQueryHandler<LFC>.() -> Unit)?
     )
 
-    fun handleShippingQuery(handler: suspend context(T) LocationShippingQueryHandler<T>.() -> Unit)
+    fun handleShippingQuery(handler: suspend context(LFC) LocationShippingQueryHandler<LFC>.() -> Unit)
 
-    fun handlePreCheckoutQuery(handler: suspend context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit)
+    fun handlePreCheckoutQuery(handler: suspend context(LFC) LocationPreCheckoutQueryHandler<LFC>.() -> Unit)
 
-    fun handlePoll(handler: suspend context(T) LocationPollHandler<T>.() -> Unit)
+    fun handlePoll(handler: suspend context(LFC) LocationPollHandler<LFC>.() -> Unit)
 
-    fun handlePollAnswer(handler: suspend context(T) LocationPollAnswerHandler<T>.() -> Unit)
+    fun handlePollAnswer(handler: suspend context(LFC) LocationPollAnswerHandler<LFC>.() -> Unit)
 
-    fun handleMyChatMember(handler: suspend context(T) LocationChatMemberHandler<T>.() -> Unit)
+    fun handleMyChatMember(handler: suspend context(LFC) LocationChatMemberHandler<LFC>.() -> Unit)
 
-    fun handleChatMember(handler: suspend context(T) LocationChatMemberHandler<T>.() -> Unit)
+    fun handleChatMember(handler: suspend context(LFC) LocationChatMemberHandler<LFC>.() -> Unit)
 
-    fun handleChatJoinRequest(handler: suspend context(T) LocationChatJoinRequestHandler<T>.() -> Unit)
+    fun handleChatJoinRequest(handler: suspend context(LFC) LocationChatJoinRequestHandler<LFC>.() -> Unit)
 
-    fun handleMessageReaction(handler: suspend context(T) LocationMessageReactionHandler<T>.() -> Unit)
+    fun handleMessageReaction(handler: suspend context(LFC) LocationMessageReactionHandler<LFC>.() -> Unit)
 
-    fun handleMessageReactionCount(handler: suspend context(T) LocationMessageReactionCountHandler<T>.() -> Unit)
+    fun handleMessageReactionCount(handler: suspend context(LFC) LocationMessageReactionCountHandler<LFC>.() -> Unit)
 }
 
-class LocationEventHandlerFactory<T : LocationFlowContext>(
-    override val locationsWrapper: LocationsWrapper<T>,
-) : ILocationEventHandlerFactory<T> {
+class LocationEventHandlerFactory<LFC : LocationFlowContext>(
+    override val locationsWrapper: LocationsWrapper<LFC>,
+) : ILocationEventHandlerFactory<LFC> {
     override val bot: Bot = locationsWrapper.bot
 
     override val allowedUpdates = mutableSetOf<UpdateType>()
 
-    private val messageHandler: MutableList<LocationMessageHandlerData<T>> = mutableListOf()
-    private val commandHandler: MutableList<LocationCommandHandlerData<T>> = mutableListOf()
-    private val editedMessageHandler: MutableList<LocationEditMessageHandlerData<T>> = mutableListOf()
-    private val channelPostHandler: MutableList<LocationChannelPostHandlerData<T>> = mutableListOf()
-    private val editedChannelPostHandler: MutableList<LocationEditedChannelPostHandlerData<T>> = mutableListOf()
-    private val inlineQueryHandler: MutableList<LocationInlineQueryHandlerData<T>> = mutableListOf()
-    private val chosenInlineQueryHandler: MutableList<LocationChosenInlineQueryHandlerData<T>> = mutableListOf()
-    private val callbackQueryHandler: MutableList<LocationCallbackQueryHandlerData<T>> = mutableListOf()
-    private val shippingQueryHandler: MutableList<LocationShippingQueryHandlerData<T>> = mutableListOf()
-    private val preCheckoutQueryHandler: MutableList<LocationPreCheckoutQueryHandlerData<T>> = mutableListOf()
-    private val pollHandler: MutableList<LocationPollHandlerData<T>> = mutableListOf()
-    private val pollAnswerHandler: MutableList<LocationPollAnswerHandlerData<T>> = mutableListOf()
-    private val myChatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
-    private val chatMemberHandler: MutableList<LocationChatMemberHandlerData<T>> = mutableListOf()
-    private val chatJoinRequestHandler: MutableList<LocationChatJoinRequestHandlerData<T>> = mutableListOf()
-    private val messageReactionHandler: MutableList<LocationMessageReactionHandlerData<T>> = mutableListOf()
-    private val messageReactionCountHandler: MutableList<LocationMessageReactionCountHandlerData<T>> = mutableListOf()
+    private val messageHandler: MutableList<LocationMessageHandlerData<LFC>> = mutableListOf()
+    private val commandHandler: MutableList<LocationCommandHandlerData<LFC>> = mutableListOf()
+    private val editedMessageHandler: MutableList<LocationEditMessageHandlerData<LFC>> = mutableListOf()
+    private val channelPostHandler: MutableList<LocationChannelPostHandlerData<LFC>> = mutableListOf()
+    private val editedChannelPostHandler: MutableList<LocationEditedChannelPostHandlerData<LFC>> = mutableListOf()
+    private val inlineQueryHandler: MutableList<LocationInlineQueryHandlerData<LFC>> = mutableListOf()
+    private val chosenInlineQueryHandler: MutableList<LocationChosenInlineQueryHandlerData<LFC>> = mutableListOf()
+    private val callbackQueryHandler: MutableList<LocationCallbackQueryHandlerData<LFC>> = mutableListOf()
+    private val shippingQueryHandler: MutableList<LocationShippingQueryHandlerData<LFC>> = mutableListOf()
+    private val preCheckoutQueryHandler: MutableList<LocationPreCheckoutQueryHandlerData<LFC>> = mutableListOf()
+    private val pollHandler: MutableList<LocationPollHandlerData<LFC>> = mutableListOf()
+    private val pollAnswerHandler: MutableList<LocationPollAnswerHandlerData<LFC>> = mutableListOf()
+    private val myChatMemberHandler: MutableList<LocationChatMemberHandlerData<LFC>> = mutableListOf()
+    private val chatMemberHandler: MutableList<LocationChatMemberHandlerData<LFC>> = mutableListOf()
+    private val chatJoinRequestHandler: MutableList<LocationChatJoinRequestHandlerData<LFC>> = mutableListOf()
+    private val messageReactionHandler: MutableList<LocationMessageReactionHandlerData<LFC>> = mutableListOf()
+    private val messageReactionCountHandler: MutableList<LocationMessageReactionCountHandlerData<LFC>> = mutableListOf()
 
     private var unknownHandler: suspend UnknownEventHandler.() -> Unit = { }
 
@@ -176,90 +176,90 @@ class LocationEventHandlerFactory<T : LocationFlowContext>(
     }
 
 
-    override fun handleMessage(handler: suspend context(T) LocationMessageHandler<T>.() -> Unit) {
+    override fun handleMessage(handler: suspend context(LFC) LocationMessageHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         messageHandler.add(LocationMessageHandlerData(handler))
     }
 
-    override fun handleCommand(handler: suspend context(T) LocationCommandHandler<T>.() -> Unit) {
+    override fun handleCommand(handler: suspend context(LFC) LocationCommandHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE)
         commandHandler.add(LocationCommandHandlerData(handler))
     }
 
-    override fun handleEditedMessage(handler: suspend context(T) LocationEditedMessageHandler<T>.() -> Unit) {
+    override fun handleEditedMessage(handler: suspend context(LFC) LocationEditedMessageHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_MESSAGE)
         editedMessageHandler.add(LocationEditMessageHandlerData(handler))
     }
 
-    override fun handleChannelPost(handler: suspend context(T) LocationChannelPostHandler<T>.() -> Unit) {
+    override fun handleChannelPost(handler: suspend context(LFC) LocationChannelPostHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.CHANNEL_POST)
         channelPostHandler.add(LocationChannelPostHandlerData(handler))
     }
 
-    override fun handleEditedChannelPost(handler: suspend context(T) LocationEditedChannelPostHandler<T>.() -> Unit) {
+    override fun handleEditedChannelPost(handler: suspend context(LFC) LocationEditedChannelPostHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.EDITED_CHANNEL_POST)
         editedChannelPostHandler.add(LocationEditedChannelPostHandlerData(handler))
     }
 
-    override fun handleInlineQuery(handler: suspend context(T) LocationInlineQueryHandler<T>.() -> Unit) {
+    override fun handleInlineQuery(handler: suspend context(LFC) LocationInlineQueryHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.INLINE_QUERY)
         inlineQueryHandler.add(LocationInlineQueryHandlerData(handler))
     }
 
-    override fun handleChosenInlineQuery(handler: suspend context(T) LocationChosenInlineQueryHandler<T>.() -> Unit) {
+    override fun handleChosenInlineQuery(handler: suspend context(LFC) LocationChosenInlineQueryHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.CHOSEN_INLINE_RESULT)
         chosenInlineQueryHandler.add(LocationChosenInlineQueryHandlerData(handler))
     }
 
     override fun handleCallbackQuery(
         alwaysAnswer: Boolean,
-        handler: (suspend context(T) LocationCallbackQueryHandler<T>.() -> Unit)?
+        handler: (suspend context(LFC) LocationCallbackQueryHandler<LFC>.() -> Unit)?
     ) {
         allowedUpdates.add(UpdateType.CALLBACK_QUERY)
         callbackQueryHandler.add(LocationCallbackQueryHandlerData(handler, alwaysAnswer))
     }
 
-    override fun handleShippingQuery(handler: suspend context(T) LocationShippingQueryHandler<T>.() -> Unit) {
+    override fun handleShippingQuery(handler: suspend context(LFC) LocationShippingQueryHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.SHIPPING_QUERY)
         shippingQueryHandler.add(LocationShippingQueryHandlerData(handler))
     }
 
-    override fun handlePreCheckoutQuery(handler: suspend context(T) LocationPreCheckoutQueryHandler<T>.() -> Unit) {
+    override fun handlePreCheckoutQuery(handler: suspend context(LFC) LocationPreCheckoutQueryHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.PRE_CHECKOUT_QUERY)
         preCheckoutQueryHandler.add(LocationPreCheckoutQueryHandlerData(handler))
     }
 
-    override fun handlePoll(handler: suspend context(T) LocationPollHandler<T>.() -> Unit) {
+    override fun handlePoll(handler: suspend context(LFC) LocationPollHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL)
         pollHandler.add(LocationPollHandlerData(handler))
     }
 
-    override fun handlePollAnswer(handler: suspend context(T) LocationPollAnswerHandler<T>.() -> Unit) {
+    override fun handlePollAnswer(handler: suspend context(LFC) LocationPollAnswerHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.POLL_ANSWER)
         pollAnswerHandler.add(LocationPollAnswerHandlerData(handler))
     }
 
-    override fun handleMyChatMember(handler: suspend context(T) LocationChatMemberHandler<T>.() -> Unit) {
+    override fun handleMyChatMember(handler: suspend context(LFC) LocationChatMemberHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.MY_CHAT_MEMBER)
         myChatMemberHandler.add(LocationChatMemberHandlerData(handler))
     }
 
-    override fun handleChatMember(handler: suspend context(T) LocationChatMemberHandler<T>.() -> Unit) {
+    override fun handleChatMember(handler: suspend context(LFC) LocationChatMemberHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_MEMBER)
         chatMemberHandler.add(LocationChatMemberHandlerData(handler))
     }
 
-    override fun handleChatJoinRequest(handler: suspend context(T) LocationChatJoinRequestHandler<T>.() -> Unit) {
+    override fun handleChatJoinRequest(handler: suspend context(LFC) LocationChatJoinRequestHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.CHAT_JOIN_REQUEST)
         chatJoinRequestHandler.add(LocationChatJoinRequestHandlerData(handler))
     }
 
-    override fun handleMessageReaction(handler: suspend context(T) LocationMessageReactionHandler<T>.() -> Unit) {
+    override fun handleMessageReaction(handler: suspend context(LFC) LocationMessageReactionHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE_REACTION)
         messageReactionHandler.add(LocationMessageReactionHandlerData(handler))
     }
 
-    override fun handleMessageReactionCount(handler: suspend context(T) LocationMessageReactionCountHandler<T>.() -> Unit) {
+    override fun handleMessageReactionCount(handler: suspend context(LFC) LocationMessageReactionCountHandler<LFC>.() -> Unit) {
         allowedUpdates.add(UpdateType.MESSAGE_REACTION_COUNT)
         messageReactionCountHandler.add(LocationMessageReactionCountHandlerData(handler))
     }

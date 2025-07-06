@@ -8,20 +8,20 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationMessageReactionCountHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationMessageReactionCountHandler<T>.() -> Unit)? = null
+data class LocationMessageReactionCountHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationMessageReactionCountHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationMessageReactionCountHandler<T : LocationFlowContext>(
+class LocationMessageReactionCountHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableList<LocationMessageReactionCountHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : MessageReactionCountHandler(update.messageReactionCount!!, bot), LocationHandler<T, MessageReactionCountHandler> {
+    private val handlerData: MutableList<LocationMessageReactionCountHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : MessageReactionCountHandler(update.messageReactionCount!!, bot), LocationHandler<LFC, MessageReactionCountHandler> {
 
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }

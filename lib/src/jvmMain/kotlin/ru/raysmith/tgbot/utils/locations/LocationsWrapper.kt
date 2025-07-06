@@ -8,45 +8,45 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.model.network.updates.UpdateType
 
 @LocationsDSL
-class LocationsWrapper<L : LocationFlowContext>(override val bot: Bot) : BotHolder {
-    internal val locations = mutableMapOf<String, Location<L>>()
+class LocationsWrapper<LFC : LocationFlowContext>(override val bot: Bot) : BotHolder {
+    internal val locations = mutableMapOf<String, Location<LFC>>()
     
-    private var locationNameGetter: context(L) LocationsWrapper<L>.() -> String = { error("TODO") } // TODO
-    fun getLocation(locationNameGetter: context(L, LocationsWrapper<L>) () -> String) {
+    private var locationNameGetter: LFC.() -> String = { error("TODO") } // TODO
+    fun getLocation(locationNameGetter: LFC.() -> String) {
         this.locationNameGetter = locationNameGetter
     }
 
-    internal var configCreator: context(LocationsWrapper<L>) (update: Update) -> L = { error("TODO") } // TODO
-    fun config(configCreator: context(LocationsWrapper<L>) (update: Update) -> L) {
+    internal var configCreator: (update: Update) -> LFC = { error("TODO") } // TODO
+    fun config(configCreator: (update: Update) -> LFC) {
         this.configCreator = configCreator
     }
 
-    private var updateLocation: context(LocationsWrapper<L>) (location: Location<L>) -> Unit = {  }
-    fun updateLocation(block: context(LocationsWrapper<L>) (location: Location<L>) -> Unit) {
+    private var updateLocation: LFC.(location: Location<LFC>) -> Unit = {  }
+    fun updateLocation(block: LFC.(location: Location<LFC>) -> Unit) {
         this.updateLocation = block
     }
     
-    private var filter: context(L) LocationsWrapper<L>.(update: Update) -> Boolean = { true }
-    fun filter(block: context(L) LocationsWrapper<L>.(update: Update) -> Boolean) {
+    private var filter: context(LFC) LocationsWrapper<LFC>.(update: Update) -> Boolean = { true }
+    fun filter(block: context(LFC) LocationsWrapper<LFC>.(update: Update) -> Boolean) {
         this.filter = block
     }
     
-    internal var onToLocation: L.(name: String) -> Location<L> = {
+    internal var onToLocation: LFC.(name: String) -> Location<LFC> = {
         val location = locations[it] ?: error("TODO") // TODO
         updateLocation(location)
         location
     }
     
-    private fun add(location: Location<L>) {
+    private fun add(location: Location<LFC>) {
         locations[location.name] = location
     }
     
-    private val additionalEventHandlers: MutableList<suspend LocationEventHandlerFactory<L>.() -> Unit> = mutableListOf()
-    fun global(setup: suspend LocationEventHandlerFactory<L>.() -> Unit) { // TODO: DSL scope violation
+    private val additionalEventHandlers: MutableList<suspend LocationEventHandlerFactory<LFC>.() -> Unit> = mutableListOf()
+    fun global(setup: suspend LocationEventHandlerFactory<LFC>.() -> Unit) { // TODO: DSL scope violation
         additionalEventHandlers.add(setup)
     }
 
-    suspend fun location(name: String, newLocation: suspend Location<L>.() -> Unit) {
+    suspend fun location(name: String, newLocation: suspend Location<LFC>.() -> Unit) {
         add(createLocation(name, this) {
             newLocation(it)
         }.also { it.handlerFactory })
@@ -54,7 +54,7 @@ class LocationsWrapper<L : LocationFlowContext>(override val bot: Bot) : BotHold
 
     suspend fun allowedUpdates(bot: Bot): Set<UpdateType> {
         val locationUpdates = locations.map { it.value.handlerFactory.allowedUpdates }.flatten()
-        val location = Location("", LocationEventHandlerFactory<L>(LocationsWrapper(bot)))
+        val location = Location("", LocationEventHandlerFactory<LFC>(LocationsWrapper(bot)))
         val globalUpdates = location.handlerFactory.apply {
             additionalEventHandlers.forEach { handler ->
                 handler()
@@ -64,7 +64,7 @@ class LocationsWrapper<L : LocationFlowContext>(override val bot: Bot) : BotHold
         return (locationUpdates + globalUpdates).toSet()
     }
 
-    private suspend fun LocationEventHandlerFactory<L>.withAdditionalHandlers(): LocationEventHandlerFactory<L> {
+    private suspend fun LocationEventHandlerFactory<LFC>.withAdditionalHandlers(): LocationEventHandlerFactory<LFC> {
         additionalEventHandlers.forEach { handler ->
             handler()
         }
@@ -75,18 +75,18 @@ class LocationsWrapper<L : LocationFlowContext>(override val bot: Bot) : BotHold
     internal suspend fun getHandlerFactory(
         update: Update,
         additionalEventHandlers: MutableList<(eventHandlerFactory: EventHandlerFactory) -> Unit>
-    ): LocationEventHandlerFactory<L> {
+    ): LocationEventHandlerFactory<LFC> {
         val config = configCreator(update)
         if (!filter.invoke(config, this, update)) {
             Bot.logger.debug("Update #${update.updateId} skipped by locations filter")
             return LocationEventHandlerFactory(this)
         }
 
-        val locationName = locationNameGetter(config, this)
+        val locationName = locationNameGetter(config)
         val location = locations[locationName] ?: return LocationEventHandlerFactory(this)
             .withAdditionalHandlers()
         
-        updateLocation(location)
+        updateLocation(config, location)
 
         if (!location.isAdditionalHandlersInit) {
             location.handlerFactory.withAdditionalHandlers()

@@ -81,7 +81,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun datePickerResult(datePicker: DatePicker, datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
+    suspend inline fun datePickerResult(datePicker: DatePicker, datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate) -> Unit) {
         val callbackQueryPrefix = datePicker.callbackQueryPrefix
         if (!handled && query.data != null && query.data.startsWith("r$callbackQueryPrefix")) {
             val value = query.data.substring(callbackQueryPrefix.length + 1)
@@ -91,7 +91,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun datePickerResultWithAdditionalData(
+    suspend inline fun datePickerResultWithAdditionalData(
         datePicker: DatePicker,
         datePickerHandler: suspend DatePickerCallbackQueryHandler.(date: LocalDate, additionalData: String?) -> Unit
     ) {
@@ -104,7 +104,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun isDataEqual(vararg value: String, equalHandler: suspend DataCallbackQueryHandler.(data: String) -> Unit) {
+    suspend inline fun isDataEqual(vararg value: String, equalHandler: suspend DataCallbackQueryHandler.(data: String) -> Unit) {
         if (!handled && query.data != null && query.data in value) {
             DataCallbackQueryHandler(query, query.data, bot)
                 .apply { equalHandler(query.data!!) }
@@ -112,7 +112,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun isDataRegex(regex: Regex, regexHandler: suspend DataCallbackQueryHandler.(value: String) -> Unit) {
+    suspend inline fun isDataRegex(regex: Regex, regexHandler: suspend DataCallbackQueryHandler.(value: String) -> Unit) {
         if (!handled && query.data?.matches(regex) == true) {
             DataCallbackQueryHandler(query, query.data, bot)
                 .apply { regexHandler(query.data!!) }
@@ -120,7 +120,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Int) -> Unit) {
+    suspend inline fun isPage(paginationCallbackQueryPrefix: String, handler: suspend PaginationCallbackQueryHandler.(page: Int) -> Unit) {
         if (!handled && query.data != null && query.data.startsWith(paginationCallbackQueryPrefix)) {
             query.data.substring(paginationCallbackQueryPrefix.length).let {
                 // 1 = Pagination.SYMBOL_PAGE_PREFIX length
@@ -133,7 +133,7 @@ open class CallbackQueryHandler(
         }
     }
 
-    suspend fun isDataStartWith(
+    inline suspend fun isDataStartWith(
         vararg startWith: String,
         startWithHandler: suspend ValueDataCallbackQueryHandler.(value: String) -> Unit
     ) {

@@ -8,20 +8,20 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationPollHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationPollHandler<T>.() -> Unit)? = null
+data class LocationPollHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationPollHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationPollHandler<T : LocationFlowContext>(
+class LocationPollHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableList<LocationPollHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : PollHandler(update.poll!!, bot), LocationHandler<T, PollHandler> {
+    private val handlerData: MutableList<LocationPollHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : PollHandler(update.poll!!, bot), LocationHandler<LFC, PollHandler> {
 
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }

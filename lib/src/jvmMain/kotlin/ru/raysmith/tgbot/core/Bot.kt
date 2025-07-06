@@ -299,8 +299,8 @@ class Bot(
     
     private var isLocationsMode = false
     private var locationsWrapper: LocationsWrapper<*>? = null
-    suspend fun <T : LocationFlowContext> locations(setup: suspend LocationsWrapper<T>.() -> Unit) {
-        locationsWrapper = LocationsWrapper<T>(this).apply { setup() }
+    suspend fun <LFC : LocationFlowContext> locations(setup: suspend LocationsWrapper<LFC>.() -> Unit) {
+        locationsWrapper = LocationsWrapper<LFC>(this).apply { setup() }
         eventHandlerFactory = LocationEventHandlerFactory(locationsWrapper as LocationsWrapper<*>)
         eventHandlerBuilder = {}
         isLocationsMode = true

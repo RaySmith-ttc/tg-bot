@@ -8,20 +8,20 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
-data class LocationChatJoinRequestHandlerData<T : LocationFlowContext>(
-    val handler: (suspend context(T) LocationChatJoinRequestHandler<T>.() -> Unit)? = null
+data class LocationChatJoinRequestHandlerData<LFC : LocationFlowContext>(
+    val handler: (suspend context(LFC) LocationChatJoinRequestHandler<LFC>.() -> Unit)? = null
 )
 
-class LocationChatJoinRequestHandler<T : LocationFlowContext>(
+class LocationChatJoinRequestHandler<LFC : LocationFlowContext>(
     override val update: Update, bot: Bot,
-    private val handlerData: MutableList<LocationChatJoinRequestHandlerData<T>>,
-    override val locationsWrapper: LocationsWrapper<T>
-) : ChatJoinRequestHandler(update.chatJoinRequest!!, bot), LocationHandler<T, ChatJoinRequestHandler> {
+    private val handlerData: MutableList<LocationChatJoinRequestHandlerData<LFC>>,
+    override val locationsWrapper: LocationsWrapper<LFC>
+) : ChatJoinRequestHandler(update.chatJoinRequest!!, bot), LocationHandler<LFC, ChatJoinRequestHandler> {
 
-    override val config by lazy { config() }
+    override val locationFlowContext by lazy { locationFlowContext() }
     override suspend fun handle() {
         handlerData.forEach {
-            it.handler?.let { it1 -> it1(config, this) }?.also {
+            it.handler?.let { it1 -> it1(locationFlowContext, this) }?.also {
                 handled = true
             }
         }
