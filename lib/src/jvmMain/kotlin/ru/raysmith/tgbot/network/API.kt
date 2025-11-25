@@ -5,16 +5,11 @@ package ru.raysmith.tgbot.network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.api.*
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
-import io.ktor.utils.io.streams.*
-import kotlinx.serialization.encodeToString
 import ru.raysmith.tgbot.core.BotConfig
-import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.BotDescription
 import ru.raysmith.tgbot.model.bot.BotName
@@ -77,9 +72,13 @@ interface API {
                 else -> response.body<NetworkResponse<T>>().result
             }
         } else if (response.status == HttpStatusCode.Unauthorized) {
-            throw BotException("Bot is unauthorized with token")
+            throw BadBotTokenException("Bot is unauthorized with token")
         } else {
             val error = response.body<Error>()
+            if (error.errorCode == 404 && response.request.url.rawSegments.lastOrNull() == "getUpdates") {
+                val token = response.request.url.rawSegments.firstOrNull { it.startsWith("bot") }?.drop(3)
+                throw BadBotTokenException("The bot token '$token' is incorrect or have been revoked")
+            }
             throw TelegramApiException(error, response.request)
         }
     }

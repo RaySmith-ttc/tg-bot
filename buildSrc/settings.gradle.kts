@@ -18,7 +18,6 @@ dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
-        gradlePluginPortal()
         mavenLocal()
         maven("https://redirector.kotlinlang.org/maven/bootstrap")
     }

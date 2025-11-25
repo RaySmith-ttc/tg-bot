@@ -53,6 +53,7 @@ import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.datepicker.createDatePicker
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
+import ru.raysmith.tgbot.utils.locations.loc
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
 import ru.raysmith.tgbot.utils.pagination.Pagination
@@ -224,9 +225,6 @@ class Runner {
 
     suspend fun ISender.sendMain() {
         send {
-            send {
-
-            }
             text = "main"
 
             inlineKeyboard {
@@ -331,11 +329,12 @@ class Runner {
 
             if (locations) {
                 bot.locations {
-                    getLocation {
-                        location
-                    }
                     config {
                         LocationFlowContextImpl(it)
+                    }
+                    getLocation {
+                        loc.foo
+                        location
                     }
                     updateLocation {
                         location = it.name
@@ -451,7 +450,7 @@ class Runner {
 
                     location("other") {
                         onEnter {
-                            send("in other\nfoo:${config.foo}")
+                            send("in other\nfoo:${locationFlowContext.foo}")
                             println("on enter other")
                         }
 

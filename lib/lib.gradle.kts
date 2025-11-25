@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
@@ -23,7 +24,7 @@ kotlin {
         withSourcesJar()
     }
 
-    js(IR) { // TODO need seskar update
+    js(IR) {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.addAll (
@@ -33,9 +34,11 @@ kotlin {
 
         browser {
             webpackTask {
+                mode = KotlinWebpackConfig.Mode.PRODUCTION
                 mainOutputFileName.set("tg-bot.js")
             }
             commonWebpackConfig {
+                mode = KotlinWebpackConfig.Mode.PRODUCTION
                 cssSupport {
                     enabled.set(true)
                 }

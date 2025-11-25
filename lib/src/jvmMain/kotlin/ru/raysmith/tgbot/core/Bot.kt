@@ -14,6 +14,7 @@ import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
+import ru.raysmith.tgbot.network.BadBotTokenException
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
@@ -62,8 +63,9 @@ class Bot(
     // options
     private var blockingSelector: ((Update) -> Any?)? = null
     private var clientBuilder: HttpClientConfig<OkHttpConfig>.() -> Unit = {}
-    override val client: HttpClient by lazy {
-        token?.let { TelegramApi.defaultClient(it, useTestServer, clientBuilder) }
+    override val client: HttpClient = run {
+        token
+            ?.let { TelegramApi.defaultClient(it, useTestServer, clientBuilder) }
             ?: TelegramApi.defaultClient(useTestServer = useTestServer, builder = clientBuilder)
     }
 
@@ -146,7 +148,7 @@ class Bot(
         }
 
         try {
-            scope.launch {
+            scope.launch(CoroutineName("update")) {
                 try {
                     val handler = if (isLocationsMode) {
                         locationsWrapper!!.getHandlerFactory(update, additionalEventHandlers).getHandler(update)
@@ -205,6 +207,9 @@ class Bot(
     private suspend inline fun safeNetwork(action: () -> Unit) {
         try {
             action()
+        } catch (e: BadBotTokenException) {
+            safeOnError(e)
+            isActive = false
         } catch (e: BotException) {
             incLastUpdateId()
             safeOnError(e)
@@ -239,8 +244,6 @@ class Bot(
         isActive = true
         logger.info("Tg bot started...")
         try {
-            onStart(this)
-    
             val allowedUpdates = if (isLocationsMode) {
                 (eventHandlerFactory as LocationEventHandlerFactory<*>).locationsWrapper
                     .allowedUpdates(this).toList()
@@ -248,19 +251,16 @@ class Bot(
                 eventHandlerFactory.allowedUpdates.toList()
             }
 
+            onStart(this)
+
             while (isActive) {
                 safeNetwork {
-                    updateScope.async {
-                        val updates = try {
-                            getUpdates(
-                                offset = lastUpdateId,
-                                timeout = timeout,
-                                allowedUpdates = allowedUpdates
-                            )
-                        } catch (e: Exception) {
-                            safeOnError(e)
-                            return@async
-                        }
+                    updateScope.async(CoroutineName("getUpdates")) {
+                        val updates = getUpdates(
+                            offset = lastUpdateId,
+                            timeout = timeout,
+                            allowedUpdates = allowedUpdates
+                        )
 
                         if (updates.isNotEmpty()) {
                             onUpdate(updates)
