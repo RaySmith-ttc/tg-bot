@@ -8,6 +8,7 @@ pluginManagement {
         mavenCentral()
         maven { setUrl("https://plugins.gradle.org/m2/") }
         maven("https://redirector.kotlinlang.org/maven/bootstrap")
+        mavenLocal()
     }
 }
 
@@ -29,6 +30,7 @@ rootProject.children.forEach {
 }
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
