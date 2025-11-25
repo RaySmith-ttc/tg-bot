@@ -13,5 +13,5 @@ setupapp {
 }
 
 application {
-    mainClass = "ru.raysmith.tgbot.webappapp.MainKt"
+    mainClass = "ru.raysmith.tgbot.webappapp.application.MainKt"
 }

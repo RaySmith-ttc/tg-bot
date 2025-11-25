@@ -14,6 +14,8 @@ import ru.raysmith.tgbot.network.API
 /** Represent an object that can send messages */
 interface ISender : ChatIdHolder, API, BotHolder {
 
+    // TODO add messageThreadId to ChatIdHolder; rename to ChatDataHolder; add messageThreadId arg to all methods
+
     suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
         return TextMessage(bot).apply { message() }.send(chatId)
     }

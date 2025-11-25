@@ -28,7 +28,7 @@ class TextMessage(
     override var replyParameters: ReplyParameters? = null
     override var keyboardMarkup: MessageKeyboard? = null
     override var protectContent: Boolean? = null
-    override var businessConnectionId: String? = null
+    override var businessConnectionId: String? = null // TODO global configuration?
     override var messageEffectId: String? = null
     override var allowPaidBroadcast: Boolean? = null
 

@@ -17,12 +17,14 @@ kotlin {
         browser {
             nodejs()
             webpackTask {
+                mode = KotlinWebpackConfig.Mode.DEVELOPMENT
                 mainOutputFileName.set("webappapp.js")
                 args += listOf(
                     "--env", "WEBAPP_GUARD_ENABLED=${System.getenv("WEBAPP_GUARD_ENABLED")?.toBoolean() ?: true}",
                 )
             }
             commonWebpackConfig {
+                mode = KotlinWebpackConfig.Mode.DEVELOPMENT
                 cssSupport {
                     enabled.set(true)
                 }
