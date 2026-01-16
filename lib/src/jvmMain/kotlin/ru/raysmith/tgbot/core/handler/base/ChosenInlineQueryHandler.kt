@@ -19,7 +19,7 @@ open class ChosenInlineQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineResult.from.id
-    override fun getChatIdOrThrow() = inlineResult.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

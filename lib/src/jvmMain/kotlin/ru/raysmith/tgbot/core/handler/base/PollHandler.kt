@@ -19,8 +19,8 @@ open class PollHandler(
     override var messageId: Int? = null
     override var inlineMessageId: String? = null
 
-    override fun getChatId() = null
-    override fun getChatIdOrThrow() = throw UnknownChatIdException()
+    override fun getChatId() = null // TODO always null?
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

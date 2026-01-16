@@ -5,10 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.IMessage
-import ru.raysmith.tgbot.model.bot.message.MessageTextType
-import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
-import ru.raysmith.tgbot.model.bot.message.TextWithEntities
+import ru.raysmith.tgbot.model.bot.message.*
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
 import ru.raysmith.tgbot.model.network.message.Message
@@ -28,7 +25,8 @@ internal class PollOptionTextWithEntities(bot: Bot) : TextWithEntities(bot, Mess
  * */
 class PollMessage(
     override val bot: Bot,
-) : IMessage<Message>, KeyboardCreator, BotHolder, ExtendedMessage<Message> {
+) : IMessage<Message>, KeyboardCreator, BotHolder, ThreadMessage<Message>, EffectableMessage<Message>, BusinessMessage<Message> {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 

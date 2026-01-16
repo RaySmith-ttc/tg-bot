@@ -815,6 +815,7 @@ interface API {
     suspend fun sendPaidMedia(
         businessConnectionId: String? = null,
         chatId: ChatId,
+        messageThreadId: Int? = null,
         starCount: Int,
         media: List<InputPaidMedia>,
         payload: String? = null,
@@ -831,8 +832,9 @@ interface API {
     ) = request<Message> {
         client.post("sendPaidMedia") {
             parameter("business_connection_id", businessConnectionId)
-            parameter("star_count", starCount)
             parameter("chat_id", chatId)
+            parameter("message_thread_id", messageThreadId)
+            parameter("star_count", starCount)
             parameter("media", media)
             parameter("caption", caption)
             parameter("caption_entities", captionEntities)

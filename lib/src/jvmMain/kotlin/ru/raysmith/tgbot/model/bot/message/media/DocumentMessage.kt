@@ -4,11 +4,15 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
+import ru.raysmith.tgbot.model.bot.message.BusinessMessage
+import ru.raysmith.tgbot.model.bot.message.EffectableMessage
+import ru.raysmith.tgbot.model.bot.message.ThreadMessage
 import ru.raysmith.tgbot.model.network.media.input.InputFile
 import ru.raysmith.tgbot.model.network.message.Message
 
-class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb(), ExtendedMessage<Message> {
+class DocumentMessage(override val bot: Bot) : MediaMessageWithThumb(), ThreadMessage<Message>,
+    EffectableMessage<Message>, BusinessMessage<Message> {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 

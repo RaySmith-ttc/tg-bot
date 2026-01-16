@@ -171,7 +171,7 @@ class LocationEventHandlerFactory<LFC : LocationFlowContext>(
         null -> UnknownEventHandler(update, bot, unknownHandler)
     }
 
-    override fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) {
+    override fun handleUnknown(handler: suspend UnknownEventHandler.() -> Unit) { // TODO location variant with flow context?
         unknownHandler = handler
     }
 

@@ -2,11 +2,11 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.MessageDsl
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageWithReplyMarkup
 import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.bot.message.media.CaptionableMediaMessage
 import ru.raysmith.tgbot.model.bot.message.media.ExtendedCaptionableMediaMessage
 import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
 import ru.raysmith.tgbot.model.network.media.input.InputMedia
@@ -16,7 +16,7 @@ import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.pagination.Pagination
 
 /** Represent an object that can edit messages */
-interface IEditor : ChatIdHolder, API, BotHolder {
+interface IEditor : ChatDataHolder, API, BotHolder {
 
     /** Identifier of the message to be edited */
     var messageId: Int?
@@ -75,6 +75,11 @@ interface IEditor : ChatIdHolder, API, BotHolder {
             .editMedia(media, chatId, messageId, inlineMessageId)
     }
 
+    @MessageDsl
+    suspend fun edit(text: String) = edit { this.text = text }
+    suspend fun editWithEntities(message: suspend (@MessageDsl MessageText).() -> Unit) = edit {
+        textWithEntities { message() }
+    }
     suspend fun edit(
         chatId: ChatId = getChatIdOrThrow(),
         messageId: Int? = this.messageId,
@@ -104,14 +109,17 @@ interface IEditor : ChatIdHolder, API, BotHolder {
 
     private fun CallbackQueryHandler.getPreviousPageButton(pagePrefix: String? = null): InlineKeyboardButton? {
         var res: InlineKeyboardButton? = null
-        when(query.message) {
+        when (query.message) {
             is InaccessibleMessage, null -> {}
             is Message -> {
                 if (query.message.replyMarkup?.keyboard != null) {
                     keyboard@ for (row in query.message.replyMarkup.keyboard) {
                         row@ for (button in row) {
                             if (pagePrefix != null && row.none { it.callbackData?.startsWith(pagePrefix) == true }) break@row
-                            if (button.text.startsWith(Pagination.SYMBOL_CURRENT_PAGE) && button.text.endsWith(Pagination.SYMBOL_CURRENT_PAGE)) {
+                            if (button.text.startsWith(Pagination.SYMBOL_CURRENT_PAGE) && button.text.endsWith(
+                                    Pagination.SYMBOL_CURRENT_PAGE
+                                )
+                            ) {
                                 res = button
                                 break@keyboard
                             }
@@ -142,7 +150,7 @@ interface IEditor : ChatIdHolder, API, BotHolder {
         else null
     }
 
-    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Int  {
+    private fun CallbackQueryHandler.getPreviousPage(pagePrefix: String? = null): Int {
         return getPreviousPageButton(pagePrefix)?.getPageOrNull() ?: Pagination.PAGE_FIRST
     }
 

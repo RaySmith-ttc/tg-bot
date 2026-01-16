@@ -14,3 +14,7 @@ interface ChatIdHolder {
      * */
     fun getChatIdOrThrow() = getChatId() ?: throw UnknownChatIdException()
 }
+
+interface ChatDataHolder : ChatIdHolder {
+    fun getMessageThreadId(): Int?
+}

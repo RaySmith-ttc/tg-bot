@@ -7,14 +7,16 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.raysmith.tgbot.core.handler.BaseEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.EventHandlerFactory
+import ru.raysmith.tgbot.core.handler.ILocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
+import ru.raysmith.tgbot.core.handler.location.LocationCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.BotException
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.API
+import ru.raysmith.tgbot.network.BadBotTokenException
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.network.TelegramApiException
-import ru.raysmith.tgbot.network.BadBotTokenException
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
@@ -346,12 +348,9 @@ class Bot(
                 is BaseEventHandlerFactory -> {
                     it.handleCallbackQuery(alwaysAnswer, handler = { setupFeatures(datePicker, callFirst = true) })
                 }
-    
-                is LocationEventHandlerFactory<*> -> {
-                    it.handleCallbackQuery(alwaysAnswer, handler = { setupFeatures(datePicker, callFirst = true) })
-                }
-    
-                else -> return@add
+                is ILocationEventHandlerFactory<*> -> it.handleCallbackQuery(alwaysAnswer, handler = {
+                    contextOf<LocationCallbackQueryHandler<*>>().setupFeatures(datePicker, callFirst = true)
+                })
             }
         }
         return this

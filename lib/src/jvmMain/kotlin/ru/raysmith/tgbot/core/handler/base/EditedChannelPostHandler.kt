@@ -19,7 +19,7 @@ open class EditedChannelPostHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = channelPost.chat.id
-    override fun getChatIdOrThrow() = channelPost.chat.id
+    override fun getMessageThreadId(): Int? = channelPost.getMessageThreadId()
 
     override suspend fun handle() {
         handler()

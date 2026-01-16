@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.message.reaction
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.User
@@ -33,7 +34,5 @@ data class MessageReactionUpdated(
     @SerialName("new_reaction") val newReaction: List<ReactionType>
 
 ) : ChatIdHolder {
-    override fun getChatId(): ChatId {
-        return chat.id
-    }
+    override fun getChatId(): ChatId = chat.id
 }

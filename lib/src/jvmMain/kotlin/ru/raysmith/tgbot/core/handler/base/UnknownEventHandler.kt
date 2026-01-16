@@ -19,6 +19,7 @@ class UnknownEventHandler(
     override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
     override fun getChatId() = update.findChatId()
+    override fun getMessageThreadId(): Int? = update.findThreadId()
 
     override suspend fun handle() {
         handler()

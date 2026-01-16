@@ -1,7 +1,11 @@
 package helper
 
 import io.ktor.client.plugins.logging.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -11,7 +15,6 @@ import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.core.handler.EventHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.core.handler.base.isCommand
-import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.asChatId
@@ -39,7 +42,10 @@ import ru.raysmith.tgbot.model.network.menubutton.MenuButtonCommands
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonDefault
 import ru.raysmith.tgbot.model.network.menubutton.MenuButtonWebApp
 import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
-import ru.raysmith.tgbot.model.network.message.*
+import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.network.message.MessageEntityType
+import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.network.message.PollType
 import ru.raysmith.tgbot.model.network.message.reaction.ReactionTypeEmoji
 import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.model.network.response.BooleanResponse
@@ -48,7 +54,9 @@ import ru.raysmith.tgbot.model.network.sticker.InputSticker
 import ru.raysmith.tgbot.model.network.sticker.StickerFormat
 import ru.raysmith.tgbot.model.network.updates.Update
 import ru.raysmith.tgbot.network.TelegramApi
-import ru.raysmith.tgbot.utils.*
+import ru.raysmith.tgbot.utils.BotFeature
+import ru.raysmith.tgbot.utils.buildHTMLString
+import ru.raysmith.tgbot.utils.buildMarkdownV2String
 import ru.raysmith.tgbot.utils.datepicker.AdditionalRowsPosition
 import ru.raysmith.tgbot.utils.datepicker.DatePickerState
 import ru.raysmith.tgbot.utils.datepicker.createDatePicker
@@ -56,7 +64,16 @@ import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.loc
 import ru.raysmith.tgbot.utils.message.MessageAction
 import ru.raysmith.tgbot.utils.message.message
+import ru.raysmith.tgbot.utils.messageAudio
+import ru.raysmith.tgbot.utils.messageContact
+import ru.raysmith.tgbot.utils.messagePhoto
+import ru.raysmith.tgbot.utils.messageText
+import ru.raysmith.tgbot.utils.messageUsersShared
+import ru.raysmith.tgbot.utils.n
 import ru.raysmith.tgbot.utils.pagination.Pagination
+import ru.raysmith.tgbot.utils.stickerSetName
+import ru.raysmith.tgbot.utils.stickerSetShareLink
+import ru.raysmith.tgbot.utils.toChatId
 import ru.raysmith.utils.generateRandomString
 import ru.raysmith.utils.takeOrCut
 import java.io.File
@@ -219,6 +236,21 @@ inline fun <R> withBotContext(block: BotContext<*>.() -> R): R {
 
 val pagesData = 1..120
 
+val names = listOf("Костя", "Артем", "Женя", "Назар", "Таня")
+
+val used = mutableSetOf<Char>()
+val result = List(names.size) { index ->
+    val l = names[index].first()
+    val free = names.filter { it.first() != l && !used.contains(it.first()) }
+    val name = free.random()
+    used.add(name.first())
+    l to name
+}.toMap()
+
+val usedLetters = Collections.synchronizedMap<String, String>(mutableMapOf())
+val usedArgs = Collections.synchronizedList<String>(mutableListOf())
+val mutex = object {}
+
 class Runner {
 
     val CALLBACK_PREFIX = "cb_"
@@ -319,7 +351,7 @@ class Runner {
                 .registerDatePicker(datePicker)
 //                .registerPagination(pagination)
 //                .enableBlocking { u -> u.findFrom() }
-                .enableBlocking { u -> u.findChatId() }
+                .enableBlocking { mutex /*u -> u.findChatId()*/ }
                 .shutdownCommand("/shutdown")
                 .onStop {
                     println("Bot stopped by command: ${it?.command}")
@@ -671,29 +703,29 @@ class Runner {
                                 text = "<b>bold</b>"
                             }
                         } else {
-                            send {
-                                linkPreviewOptions = LinkPreviewOptions.DISABLED
-                                messageEffectId = Message.Effect.Poo
-                                textWithEntities {
-                                    setupTestMessage(message)
-                                }
-
-                                inlineKeyboard {
-                                    row {
-                                        button("hello", "hello")
-                                        button("world", "${CALLBACK_PREFIX}world")
-                                    }
-                                    row {
-                                        button {
-                                            text = "!"
-                                            callbackData = "asd"
-                                        }
-                                    }
-                                    row("send media group from files", "media_group_file")
-                                    row("send media group from id", "media_group_id")
-                                    row("forceReply", "forceReply")
-                                }
-                            }
+//                            send {
+//                                linkPreviewOptions = LinkPreviewOptions.DISABLED
+//                                messageEffectId = Message.Effect.Poo
+//                                textWithEntities {
+//                                    setupTestMessage(message)
+//                                }
+//
+//                                inlineKeyboard {
+//                                    row {
+//                                        button("hello", "hello")
+//                                        button("world", "${CALLBACK_PREFIX}world")
+//                                    }
+//                                    row {
+//                                        button {
+//                                            text = "!"
+//                                            callbackData = "asd"
+//                                        }
+//                                    }
+//                                    row("send media group from files", "media_group_file")
+//                                    row("send media group from id", "media_group_id")
+//                                    row("forceReply", "forceReply")
+//                                }
+//                            }
                         }
                     }
                 }
@@ -723,6 +755,41 @@ class Runner {
                                 append("${it.command} - ${it.description}\n")
                             }
                         })
+                    }
+
+                    isCommand("santa") { a ->
+                        val args = a?.trim()?.uppercase()
+                        if (args == null || args !in listOf("К", "А", "Ж", "Н", "Т")) {
+                            send("Неверный аргумент: /santa [К|А|Ж|Н|Т]")
+                            return@isCommand
+                        }
+
+                        send(result[args.first()]!!)
+                        return@isCommand
+
+                        if (usedLetters.containsKey(args)) {
+                            send(usedLetters[args]!!)
+                            return@isCommand
+                        }
+
+                        val used = usedLetters.values.map { it.first().toString() }
+
+                        val f1 = names.filter { it.first().toString() !in used }
+                        val f2 = f1.filter { it.first().toString() != args }
+
+                        println(used)
+                        println(f1)
+                        println(f2)
+
+                        val letter = f2.random()
+                        usedLetters[args] = letter
+                        send(letter)
+                        if ((names.map { it.first().toString() } - usedLetters.values.map { it.first().toString() }.toSet()).isEmpty()) {
+                            send {
+                                text = "Finish"
+                                messageEffectId = Message.Effect.Poo
+                            }
+                        }
                     }
 
                     isCommand("me") {
@@ -1542,7 +1609,7 @@ class Runner {
                     isCommand("uploadStickerFile") {
 //                            val file1 = uploadStickerFile(getChatIdOrThrow(), "https://png.pngtree.com/element_our/png/20180928/beautiful-hologram-water-color-frame-png_119551.jpg".asTgFile())
 //                            println(file1)
-                        val file2 = uploadStickerFile(getChatIdOrThrow(), "files/logo2.png".asResources().asTgFile(), StickerFormat.STATIC)
+                        val file2 = uploadStickerFile(getChatIdOrThrow() as ChatId.ID, "files/logo2.png".asResources().asTgFile(), StickerFormat.STATIC)
                         println(file2)
                     }
 
@@ -1563,7 +1630,7 @@ class Runner {
                             )
                         )
 
-                        createNewStickerSet(getChatIdOrThrow(), stickerSetName(name), title, stickers)
+                        createNewStickerSet(getChatIdOrThrow() as ChatId.ID, stickerSetName(name), title, stickers)
 
                         send(stickerSetShareLink(name))
                     }
@@ -1595,12 +1662,12 @@ class Runner {
                             listOf("\uD83D\uDE08"),
                             keywords = listOf("asd")
                         )
-                        addStickerToSet(getChatIdOrThrow(), stickerSetName(name), sticker)
+                        addStickerToSet(getChatIdOrThrow() as ChatId.ID, stickerSetName(name), sticker)
                     }
 
                     isCommand("setStickerSetThumbnail") {
                         setStickerSetThumbnail(
-                            stickerSetName("name"), getChatIdOrThrow(), StickerFormat.STATIC,
+                            stickerSetName("name"), getChatIdOrThrow() as ChatId.ID, StickerFormat.STATIC,
                             InputFile.FileIdOrUrl("https://i.ibb.co/ZS7TT09/image.png")
                         )
                     }

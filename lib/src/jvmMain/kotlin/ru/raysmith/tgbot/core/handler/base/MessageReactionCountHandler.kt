@@ -19,7 +19,7 @@ open class MessageReactionCountHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = messageReactionCount.chat.id
-    override fun getChatIdOrThrow() = messageReactionCount.chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

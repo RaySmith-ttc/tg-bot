@@ -34,6 +34,7 @@ inline fun <T> botContext(
     override var businessConnectionId: String? = null
 
     override fun getChatId(): ChatId? = withChatId ?: update?.findChatId()
+    override fun getMessageThreadId(): Int? = update?.findThreadId()
     override suspend fun <R> withBot(bot: Bot, block: suspend BotContext<UnknownEventHandler>.() -> R): R {
         return UnknownEventHandler(update ?: Update(-1), bot).block()
     }
@@ -42,11 +43,13 @@ inline fun <T> botContext(
 internal fun createEventHandler(
     bot: Bot,
     withChatId: ChatId? = null,
+    withMessageThreadId: Int? = null,
     withMessageId: Int? = null,
     withInlineMessageId: String? = null
 ): BaseEventHandler = object : BaseEventHandler() {
     override suspend fun handle() {}
     override fun getChatId(): ChatId? = withChatId
+    override fun getMessageThreadId(): Int? = withMessageThreadId
     override var messageId: Int? = withMessageId
     override var inlineMessageId: String? = withInlineMessageId
     override val bot: Bot = bot

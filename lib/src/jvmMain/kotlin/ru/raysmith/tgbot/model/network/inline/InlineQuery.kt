@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.inline
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.User

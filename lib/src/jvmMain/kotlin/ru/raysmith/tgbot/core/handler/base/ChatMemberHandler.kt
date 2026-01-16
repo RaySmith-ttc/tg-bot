@@ -34,7 +34,7 @@ open class ChatMemberHandler(
     )
 
     override fun getChatId() = chat.id
-    override fun getChatIdOrThrow() = chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

@@ -12,7 +12,8 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 
 class VenueMessage(
     val latitude: Double, val longitude: Double, val title: String, val address: String, override val bot: Bot
-) : KeyboardCreator, BotHolder, ExtendedMessage<Message> {
+) : KeyboardCreator, BotHolder, ThreadMessage<Message>, EffectableMessage<Message>, BusinessMessage<Message> {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 

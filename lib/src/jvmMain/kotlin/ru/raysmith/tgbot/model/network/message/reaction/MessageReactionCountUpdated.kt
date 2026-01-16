@@ -2,6 +2,7 @@ package ru.raysmith.tgbot.model.network.message.reaction
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.core.ChatIdHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.network.chat.Chat
@@ -22,7 +23,5 @@ data class MessageReactionCountUpdated(
     /** List of reactions that are present on the message */
     @SerialName("reactions") val reactions: List<ReactionCount>
 ) : ChatIdHolder {
-    override fun getChatId(): ChatId {
-        return chat.id
-    }
+    override fun getChatId(): ChatId = chat.id
 }
