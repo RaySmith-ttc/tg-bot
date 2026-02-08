@@ -17,7 +17,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.handler.base.isCommand
-import ru.raysmith.tgbot.core.send
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.bot.ChatId

@@ -95,7 +95,7 @@ object TelegramApi {
 
         install(HttpRequestRetry) {
             retryOnException(retryOnTimeout = true)
-            retryIf(Int.MAX_VALUE) { _, response ->
+            retryIf(Int.MAX_VALUE - 1) { _, response ->  // -1 because HttpSend adds one more retry
                 response.status.value.let { it in 500..599 } ||
                 response.status == HttpStatusCode.TooManyRequests
             }
