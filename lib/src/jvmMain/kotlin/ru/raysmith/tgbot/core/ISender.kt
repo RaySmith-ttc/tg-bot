@@ -20,6 +20,8 @@ interface ISender : ChatDataHolder, API, BotHolder {
         textWithEntities { message() }
     }
 
+    // TODO add messageThreadId to ChatIdHolder; rename to ChatDataHolder; add messageThreadId arg to all methods
+
     suspend fun send(chatId: ChatId = getChatIdOrThrow(), message: suspend TextMessage.() -> Unit): Message {
         return TextMessage(bot).apply {
             this.messageThreadId = getMessageThreadId()
