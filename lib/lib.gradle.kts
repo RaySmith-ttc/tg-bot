@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-import ru.raysmith.tgbot.gradle.HtmlDiffTask
+  import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
     signing
