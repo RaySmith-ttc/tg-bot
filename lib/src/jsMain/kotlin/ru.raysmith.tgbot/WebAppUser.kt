@@ -1,8 +1,11 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object contains the data of the Mini App user.
  */
+@JsPlainObject
 external interface WebAppUser {
 
     /** A unique identifier for the user or bot. */

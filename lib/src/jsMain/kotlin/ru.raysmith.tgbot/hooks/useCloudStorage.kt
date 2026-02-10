@@ -1,10 +1,11 @@
 package ru.raysmith.tgbot.hooks
 
-import js.array.JsTuple2
-import js.array.ReadonlyArray
+import js.array.Tuple2
+import js.array.component1
+import js.array.component2
 import js.collections.JsMap
 import js.objects.Object
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.*
 import ru.raysmith.tgbot.BuiltinImplementation
 import ru.raysmith.tgbot.webApp
@@ -54,7 +55,7 @@ fun CloudStorageHookState.isUpdatingItems() = this == CloudStorageHookState.READ
  * - `loadingError`: Error message if an error occurs while loading items from cloud storage.
  * - `items`: Items fetched from cloud storage as a map.
  * */
-@OptIn(ExperimentalJsCollectionsApi::class)
+@OptIn(ExperimentalWasmJsInterop::class)
 @BuiltinImplementation
 fun useCloudStorage(): CloudStorageHookType {
     var state by useState(CloudStorageHookState.GETTING_ITEMS)
@@ -62,10 +63,10 @@ fun useCloudStorage(): CloudStorageHookType {
 
     val (items, dispatch) = useReducer<JsMap<String, String>, Action>({ reducerState, action ->
         when (action.action) {
-            ActionType.ADD -> JsMap(reducerState.unsafeCast<ReadonlyArray<JsTuple2<String, String>>>()).apply { set(action.key, action.value) } // Создаём новый объект
-            ActionType.REMOVE -> JsMap(reducerState.unsafeCast<ReadonlyArray<JsTuple2<String, String>>>()).apply { delete(action.key) }
-            ActionType.ADD_ALL -> JsMap(reducerState.unsafeCast<ReadonlyArray<JsTuple2<String, String>>>()).apply { action.valuesToAdd.forEach { value, key -> set(key, value) } }
-            ActionType.REMOVE_ALL -> JsMap(reducerState.unsafeCast<ReadonlyArray<JsTuple2<String, String>>>()).apply { action.keysToRemove.forEach { delete(it) } }
+            ActionType.ADD -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { set(action.key!!, action.value!!) } // Создаём новый объект
+            ActionType.REMOVE -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { delete(action.key!!) }
+            ActionType.ADD_ALL -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { action.valuesToAdd!!.forEach { value, key -> set(key, value) } }
+            ActionType.REMOVE_ALL -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { action.keysToRemove!!.forEach { delete(it) } }
             else -> reducerState
         }
     }, JsMap())
@@ -83,11 +84,10 @@ fun useCloudStorage(): CloudStorageHookType {
                     }
                     if (values != null) {
                         state = CloudStorageHookState.READY
-                        dispatch(jso {
-                            this.action = ActionType.ADD_ALL
-                            @Suppress("UnsafeCastFromDynamic")
-                            this.valuesToAdd = JsMap(Object.entries(values))
-                        })
+                        dispatch(ru.raysmith.tgbot.hooks.Action(
+                            action = ActionType.ADD_ALL,
+                            valuesToAdd = JsMap(Object.entries(values)),
+                        ))
                     }
                 }
             }
@@ -101,11 +101,11 @@ fun useCloudStorage(): CloudStorageHookType {
                 webApp.CloudStorage.setItem(key, value) { error, isStored ->
                     state = CloudStorageHookState.READY
                     if (isStored) {
-                        dispatch(jso {
-                            this.action = ActionType.ADD
-                            this.key = key
-                            this.value = value
-                        })
+                        dispatch(ru.raysmith.tgbot.hooks.Action(
+                            action = ActionType.ADD,
+                            key = key,
+                            value = value,
+                        ))
                     }
                     callback(error, isStored)
                 }
@@ -120,10 +120,10 @@ fun useCloudStorage(): CloudStorageHookType {
         webApp.CloudStorage.removeItem(key) { error, isRemoved ->
             state = CloudStorageHookState.READY
             if (isRemoved) {
-                dispatch(jso {
-                    this.action = ActionType.REMOVE
-                    this.key = key
-                })
+                dispatch(ru.raysmith.tgbot.hooks.Action(
+                    action = ActionType.REMOVE,
+                    key = key,
+                ))
             }
             callback?.invoke(error, isRemoved)
         }
@@ -141,38 +141,39 @@ fun useCloudStorage(): CloudStorageHookType {
         webApp.CloudStorage.removeItems(arrayKeys) { error, isRemoved ->
             state = CloudStorageHookState.READY
             if (isRemoved) {
-                dispatch(jso {
-                    this.action = ActionType.REMOVE_ALL
-                    this.keysToRemove = arrayKeys
-                })
+                dispatch(ru.raysmith.tgbot.hooks.Action(
+                    action = ActionType.REMOVE_ALL,
+                    keysToRemove = arrayKeys,
+                ))
             }
             callback?.invoke(error, isRemoved)
         }
     }
 
     return useMemo(state, items, fetchingError) {
-        jso {
-            this.state = state
-            this.items = (items.unsafeCast<JsReadonlyMap<String, String>>()).toMap()
-            this.fetchingError = fetchingError
-            this.setItem = setItem
-            this.getItem = getItem
-            this.removeItem = removeItem
-            this.removeItems = removeItems
-        }
+        CloudStorageHookType(
+            state = state,
+            items = (items.unsafeCast<JsReadonlyMap<String, String>>()).toMap(),
+            fetchingError = fetchingError,
+            setItem = setItem,
+            getItem = getItem,
+            removeItem = removeItem,
+            removeItems = removeItems,
+        )
     }
 }
 
+@JsPlainObject
 external interface CloudStorageHookType {
 
     /** A state that tracks the current state of the hook */
-    var state: CloudStorageHookState
+    val state: CloudStorageHookState
 
     /** A map that holds the items fetched from cloud storage */
-    var items: Map<String, String>
+    val items: Map<String, String>
 
     /** An error message if an error occurs while fetching items from cloud storage */
-    var fetchingError: String?
+    val fetchingError: String?
 
     /**
      * A method that stores a value in the cloud storage using the specified `key`.
@@ -182,13 +183,13 @@ external interface CloudStorageHookType {
      * In case of an error, `error` will contain the error.
      * In case of success, `error` will be `null` and `isStored`  will be indicated whether the value was stored.
      */
-    var setItem: (key: String, value: String, callback: (error: String?, isStored: Boolean) -> Unit) -> Unit
+    val setItem: (key: String, value: String, callback: (error: String?, isStored: Boolean) -> Unit) -> Unit
 
     /**
      * A method that returns a value from the cloud storage using the specified `key`.
      * The `key` should contain 1-128 characters, only `A-Z`, `a-z`, `0-9`, `_` and `-` are allowed.
      */
-    var getItem: (key: String) -> String?
+    val getItem: (key: String) -> String?
 
     /**
      * A method that removes a value from the cloud storage using the specified `key`.
@@ -197,7 +198,7 @@ external interface CloudStorageHookType {
      * In case of an error, `error` will contain the error.
      * In case of success, `error` will be `null` and `isRemoved` will be indicated whether the value was removed.
      */
-    var removeItem: (key: String, callback: (error: String?, isRemoved: Boolean) -> Unit) -> Unit
+    val removeItem: (key: String, callback: (error: String?, isRemoved: Boolean) -> Unit) -> Unit
 
     /**
      * A method that removes values from the cloud storage using the specified `keys`.
@@ -206,7 +207,7 @@ external interface CloudStorageHookType {
      * In case of an error, `error` will contain the error.
      * In case of success, `error` will be `null` and  `isRemoved` will be indicated whether the values were removed.
      */
-    var removeItems: (keys: Iterable<String>, callback: ((error: String?, isRemoved: Boolean) -> Unit)?) -> Unit
+    val removeItems: (keys: Iterable<String>, callback: ((error: String?, isRemoved: Boolean) -> Unit)?) -> Unit
 }
 
 // ---------------------------------------------------- Internal -------------------------------------------------------
@@ -221,10 +222,11 @@ private sealed external interface ActionType {
     }
 }
 
+@JsPlainObject
 private external interface Action {
-    var action: ActionType
-    var key: String
-    var value: String
-    var keysToRemove: Array<String>
-    var valuesToAdd: JsMap<String, String>
+    val action: ActionType
+    val key: String?
+    val value: String?
+    val keysToRemove: Array<String>?
+    val valuesToAdd: JsMap<String, String>?
 }

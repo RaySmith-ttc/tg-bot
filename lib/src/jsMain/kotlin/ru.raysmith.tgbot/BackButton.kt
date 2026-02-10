@@ -1,11 +1,13 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import web.function.VoidFunction
 
 /**
  * This object controls the **back** button, which can be displayed in the header of the Mini App in the
  * Telegram interface.
  * */
+@JsPlainObject
 external interface BackButton {
 
     /** Shows whether the button is visible. Set to *false* by default. */

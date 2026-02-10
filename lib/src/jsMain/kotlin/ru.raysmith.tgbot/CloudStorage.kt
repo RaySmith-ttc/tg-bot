@@ -1,6 +1,9 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /** This object controls the cloud storage. Each bot can store up to 1024 items per user in the cloud storage. */
+@JsPlainObject
 external interface CloudStorage {
 
     /**

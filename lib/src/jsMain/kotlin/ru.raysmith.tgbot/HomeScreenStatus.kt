@@ -2,6 +2,12 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property unsupported The feature is not supported, and it is not possible to add the icon to the home screen
+ * @property unknown The feature is supported, and the icon can be added, but it is not possible to determine if the icon has already been added
+ * @property added The icon has already been added to the home screen
+ * @property missed The icon has not been added to the home screen
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface HomeScreenStatus {
     companion object {

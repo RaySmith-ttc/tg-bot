@@ -1,6 +1,9 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /** This object defines the parameters for starting accelerometer tracking. */
+@JsPlainObject
 external interface AccelerometerStartParams {
 
     /**

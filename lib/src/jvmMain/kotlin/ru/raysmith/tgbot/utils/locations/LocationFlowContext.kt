@@ -7,7 +7,7 @@ interface LocationFlowContext {
 }
 
 context(_: LFC)
-val <LFC : LocationFlowContext> loc: LFC get() = contextOf()
+val <LFC : LocationFlowContext> loc: LFC get() = contextOf<LFC>()
 
 /** Empty implementation of LocationFlowContext */
 class LocationFlowContextImpl(override val update: Update) : LocationFlowContext

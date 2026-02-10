@@ -1,8 +1,11 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object represents a chat.
  */
+@JsPlainObject
 external interface WebAppChat {
 
     /** Unique identifier for this chat. */

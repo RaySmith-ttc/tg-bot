@@ -1,6 +1,9 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /** This object controls haptic feedback. */
+@JsPlainObject
 external interface HapticFeedback {
 
     /**

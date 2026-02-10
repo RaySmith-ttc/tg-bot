@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -38,40 +38,41 @@ fun useWebAppState(): WebAppStateHookType {
         isActive,
         isClosingConfirmationEnabled,
     ) {
-        jso {
-            this.isActive = isActive
-            this.isClosingConfirmationEnabled = isClosingConfirmationEnabled
-            this.enableClosingConfirmation = enableClosingConfirmation
-            this.disableClosingConfirmation = disableClosingConfirmation
-        }
+        WebAppStateHookType(
+            isActive = isActive,
+            isClosingConfirmationEnabled = isClosingConfirmationEnabled,
+            enableClosingConfirmation = enableClosingConfirmation,
+            disableClosingConfirmation = disableClosingConfirmation,
+        )
     }
 }
 
+@JsPlainObject
 external interface WebAppStateHookType {
 
     /**
      * *True*, if the Mini App is currently active. *False*, if the Mini App is minimized.
      * @since Bot API 8.0
      * */
-    var isActive: Boolean
+    val isActive: Boolean
 
     /**
      * *True*, if the confirmation dialog is enabled while the user is trying to close the Mini App.
      * *False*, if the confirmation dialog is disabled.
      * */
-    var isClosingConfirmationEnabled: Boolean
+    val isClosingConfirmationEnabled: Boolean
 
     /**
      * A method that enables a confirmation dialog while the user is trying to close the Mini App.
      *
      * @since Bot API 6.2
      * */
-    var enableClosingConfirmation: VoidFunction
+    val enableClosingConfirmation: VoidFunction
 
     /**
      * A method that disables the confirmation dialog while the user is trying to close the Mini App.
      *
      * @since Bot API 6.2
      * */
-    var disableClosingConfirmation: VoidFunction
+    val disableClosingConfirmation: VoidFunction
 }

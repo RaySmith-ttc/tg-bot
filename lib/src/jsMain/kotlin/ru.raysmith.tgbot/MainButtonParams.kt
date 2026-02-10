@@ -1,19 +1,21 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import web.cssom.Color
 
 /** An object containing one or several fields that need to be changed */
+@JsPlainObject
 external interface MainButtonParams {
 
     /** button text */
-    var text: String
+    val text: String
 
     /** button color */
-    var color: Color
+    val color: Color
 
     /** button text color */
     @JsName("text_color")
-    var textColor: Color
+    val textColor: Color
 
     /**
      * enable shine effect
@@ -21,16 +23,16 @@ external interface MainButtonParams {
      * @since Bot API 7.10
      * */
     @JsName("has_shine_effect")
-    var hasShineEffect: Color
+    val hasShineEffect: Color
 
     /** position of the secondary button */
-    var position: BottomButtonPosition
+    val position: BottomButtonPosition
 
     /** enable the button */
     @JsName("is_active")
-    var isActive: Boolean
+    val isActive: Boolean
 
     /** show the button */
     @JsName("is_visible")
-    var isVisible: Boolean
+    val isVisible: Boolean
 }

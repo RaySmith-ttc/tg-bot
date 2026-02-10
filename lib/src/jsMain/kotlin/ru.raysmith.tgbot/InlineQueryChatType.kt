@@ -2,6 +2,12 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property users
+ * @property bots
+ * @property groups
+ * @property channels
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface InlineQueryChatType {
     companion object {

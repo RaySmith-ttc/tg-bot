@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useMemo
 import react.useState
 import ru.raysmith.tgbot.copyOf
@@ -27,30 +27,31 @@ fun useSettingsButton(): SettingsButtonHookType {
     }
 
     return useMemo(settingsButton) {
-        jso {
-            this.isVisible = settingsButton.isVisible
-            this.onClick = onClick
-            this.offClick = offClick
-            this.show = show
-            this.hide = hide
-        }
+        SettingsButtonHookType(
+            isVisible = settingsButton.isVisible,
+            onClick = onClick,
+            offClick = offClick,
+            show = show,
+            hide = hide,
+        )
     }
 }
 
+@JsPlainObject
 external interface SettingsButtonHookType {
 
     /** Shows whether the context menu item is visible. Set to false by default */
-    var isVisible: Boolean
+    val isVisible: Boolean
 
     /** A method that sets the press event handler for the Settings item in the context menu */
-    var onClick: (callback: VoidFunction) -> Unit
+    val onClick: (callback: VoidFunction) -> Unit
 
     /** A method that removes the press event handler from the Settings item in the context menu */
-    var offClick: (callback: VoidFunction) -> Unit
+    val offClick: (callback: VoidFunction) -> Unit
 
     /** A method to make the Settings item in the context menu visible */
-    var show: VoidFunction
+    val show: VoidFunction
 
     /** A method to hide the Settings item in the context menu */
-    var hide: VoidFunction
+    val hide: VoidFunction
 }

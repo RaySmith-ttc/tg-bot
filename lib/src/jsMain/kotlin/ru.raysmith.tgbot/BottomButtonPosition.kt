@@ -2,6 +2,12 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property left displayed to the left of the main button
+ * @property right displayed to the right of the main button
+ * @property top displayed above the main button
+ * @property bottom displayed below the main button
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface BottomButtonPosition {
     companion object {

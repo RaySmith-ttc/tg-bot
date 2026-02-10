@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useCallback
 import react.useEffect
 import react.useMemo
@@ -56,59 +56,60 @@ fun useBiometric(): BiometricHookType {
     }
 
     return useMemo(BiometricManager, isInit) {
-        jso {
-            this.isInited = BiometricManager.isInited
-            this.isBiometricAvailable = BiometricManager.isBiometricAvailable
-            this.biometricType = BiometricManager.biometricType
-            this.isAccessRequested = BiometricManager.isAccessRequested
-            this.isAccessGranted = BiometricManager.isAccessGranted
-            this.isBiometricTokenSaved = BiometricManager.isBiometricTokenSaved
-            this.deviceId = BiometricManager.deviceId
-            this.init = init
-            this.requestAccess = requestAccess
-            this.authenticate = authenticate
-            this.updateBiometricToken = updateBiometricToken
-            this.openSettings = openSettings
-        }
+        BiometricHookType(
+            isInited = BiometricManager.isInited,
+            isBiometricAvailable = BiometricManager.isBiometricAvailable,
+            biometricType = BiometricManager.biometricType,
+            isAccessRequested = BiometricManager.isAccessRequested,
+            isAccessGranted = BiometricManager.isAccessGranted,
+            isBiometricTokenSaved = BiometricManager.isBiometricTokenSaved,
+            deviceId = BiometricManager.deviceId,
+            init = init,
+            requestAccess = requestAccess,
+            authenticate = authenticate,
+            updateBiometricToken = updateBiometricToken,
+            openSettings = openSettings,
+        )
     }
 }
 
+@JsPlainObject
 external interface BiometricHookType {
 
     /** Shows whether biometrics object is initialized. */
-    var isInited: Boolean
+    val isInited: Boolean
 
     /** Shows whether biometrics is available on the current device. */
-    var isBiometricAvailable: Boolean
+    val isBiometricAvailable: Boolean
 
     /** The type of biometrics currently available on the device. */
-    var biometricType: BiometricType
+    val biometricType: BiometricType
 
     /** Shows whether permission to use biometrics has been requested. */
-    var isAccessRequested: Boolean
+    val isAccessRequested: Boolean
 
     /** Shows whether permission to use biometrics has been granted. */
-    var isAccessGranted: Boolean
+    val isAccessGranted: Boolean
 
     /** Shows whether the token is saved in secure storage on the device. */
-    var isBiometricTokenSaved: Boolean
+    val isBiometricTokenSaved: Boolean
 
     /** A unique device identifier that can be used to match the token to the device. */
-    var deviceId: String
+    val deviceId: String
 
     /**
      * A method that initializes the BiometricManager object. It should be called before the object's first use.
      * If an optional *callback* parameter was passed, the *callback* function will be called when the object is
      * initialized.
      */
-    var init: (callback: VoidFunction) -> Unit
+    val init: (callback: VoidFunction) -> Unit
 
     /**
      * A method that requests permission to use biometrics according to the *params* argument of type
      * [BiometricRequestAccessParams]. If an optional *callback* parameter was passed, the *callback* function will
      * be called and the first argument will be a boolean indicating whether the user granted access.
      */
-    var requestAccess: (params: BiometricRequestAccessParams, callback: ((granted: Boolean) -> Unit)?) -> Unit
+    val requestAccess: (params: BiometricRequestAccessParams, callback: ((granted: Boolean) -> Unit)?) -> Unit
 
     /**
      * A method that authenticates the user using biometrics according to the *params* argument of type
@@ -117,14 +118,14 @@ external interface BiometricHookType {
      * will be a boolean indicating whether the user authenticated successfully.
      * If so, the second argument will be a biometric token.
      */
-    var authenticate: (params: BiometricAuthenticateParams, callback: ((authenticated: Boolean, token: String?) -> Unit)?) -> Unit
+    val authenticate: (params: BiometricAuthenticateParams, callback: ((authenticated: Boolean, token: String?) -> Unit)?) -> Unit
 
     /**
      * A method that updates the biometric token in secure storage on the device. To remove the token, pass an empty
      * string. If an optional *callback* parameter was passed, the *callback* function will be called and the first
      * argument will be a boolean indicating whether the token was updated.
      */
-    var updateBiometricToken: (token: String, callback: ((updated: Boolean) -> Unit)?) -> Unit
+    val updateBiometricToken: (token: String, callback: ((updated: Boolean) -> Unit)?) -> Unit
 
     /**
      * A method that opens the biometric access settings for bots. Useful when you need to request biometrics access
@@ -133,5 +134,5 @@ external interface BiometricHookType {
      * *Note that this method can be called only in response to user interaction with the Mini App interface
      * (e.g. a click inside the Mini App or on the main button).*
      */
-    var openSettings: () -> Unit
+    val openSettings: () -> Unit
 }

@@ -5,6 +5,52 @@ import ru.raysmith.tgbot.hooks.*
 import seskar.js.JsValue
 import web.function.VoidFunction
 
+/**
+ * @property activated occurs when the Mini App becomes active (e.g., opened from minimized state or selected among tabs).
+ * @property deactivated occurs when the Mini App becomes inactive (e.g., minimized or moved to an inactive tab).
+ * @property themeChanged occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
+ * @property viewportChanged occurs when the visible section of the Mini App is changed.
+ * @property safeAreaChanged occurs when the device's safe area insets change (e.g., due to orientation change or screen adjustments).
+ * @property contentSafeAreaChanged occurs when the safe area for content changes (e.g., due to orientation change or screen adjustments).
+ * @property mainButtonClicked occurs when the [main button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
+ * @property secondaryButtonClicked occurs when the [secondary button](https://core.telegram.org/bots/webapps#bottombutton) is pressed.
+ * @property backButtonClicked occurs when the back button is pressed.
+ * @property settingsButtonClicked occurs when the Settings item in context menu is pressed.
+ * @property invoiceClosed occurs when the opened invoice is closed.
+ * @property popupClosed occurs when the opened popup is closed.
+ * @property qrTextReceived occurs when the QR code scanner catches a code with text data.
+ * @property scanQrPopupClosed occurs when the QR code scanner popup is closed by the user.
+ * @property clipboardTextReceived occurs when the [WebApp.readTextFromClipboard] method is called.
+ * @property writeAccessRequested occurs when the write permission was requested.
+ * @property contactRequested occurs when the user's phone number was requested.
+ * @property biometricManagerUpdated occurs whenever [BiometricManager] object is changed.
+ * @property biometricAuthRequested occurs whenever biometric authentication was requested.
+ * @property biometricTokenUpdated occurs whenever the biometric token was updated.
+ * @property fullscreenChanged occurs whenever the Mini App enters or exits fullscreen mode.
+ * @property fullscreenFailed occurs if a request to enter fullscreen mode fails.
+ * @property homeScreenAdded occurs when the Mini App is successfully added to the home screen.
+ * @property homeScreenChecked occurs after checking the home screen status.
+ * @property accelerometerStarted occurs when accelerometer tracking has started successfully.
+ * @property accelerometerStopped occurs when accelerometer tracking has stopped.
+ * @property accelerometerChanged occurs with the specified frequency after calling the start method, sending the current accelerometer data.
+ * @property accelerometerFailed occurs if a request to start accelerometer tracking fails.
+ * @property deviceOrientationStarted occurs when device orientation tracking has started successfully.
+ * @property deviceOrientationStopped occurs when device orientation tracking has stopped.
+ * @property deviceOrientationChanged occurs with the specified frequency after calling the start method, sending the current orientation data.
+ * @property deviceOrientationFailed occurs if a request to start device orientation tracking fails.
+ * @property gyroscopeStarted occurs when gyroscope tracking has started successfully.
+ * @property gyroscopeStopped occurs when gyroscope tracking has stopped.
+ * @property gyroscopeChanged occurs with the specified frequency after calling the start method, sending the current gyroscope data.
+ * @property gyroscopeFailed occurs if a request to start gyroscope tracking fails.
+ * @property locationManagerUpdated occurs whenever [LocationManager] object is changed.
+ * @property locationRequested occurs when location data is requested.
+ * @property shareMessageSent occurs when the message is successfully shared by the user.
+ * @property shareMessageFailed occurs if sharing the message fails.
+ * @property emojiStatusSet occurs when the emoji status is successfully set.
+ * @property emojiStatusFailed occurs if setting the emoji status fails.
+ * @property emojiStatusAccessRequested occurs when the write permission was requested.
+ * @property fileDownloadRequested occurs when the user responds to the file download request.
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface EventType<T> {
     companion object {

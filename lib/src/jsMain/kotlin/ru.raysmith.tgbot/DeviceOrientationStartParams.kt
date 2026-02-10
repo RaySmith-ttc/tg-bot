@@ -1,8 +1,11 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object defines the parameters for starting device orientation tracking.
  */
+@JsPlainObject
 external interface DeviceOrientationStartParams {
 
     /**
@@ -11,7 +14,7 @@ external interface DeviceOrientationStartParams {
      * so the actual tracking frequency may differ from the specified value.
      */
     @JsName("refresh_rate")
-    var refreshRate: Int?
+    val refreshRate: Int?
 
     /**
      * Pass *true* to receive absolute orientation data, allowing you to determine the device's attitude relative to
@@ -23,5 +26,5 @@ external interface DeviceOrientationStartParams {
      * to determine whether the data provided is absolute or relative.
      */
     @JsName("need_absolute")
-    var needAbsolute: Boolean?
+    val needAbsolute: Boolean?
 }

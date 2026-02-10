@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -52,60 +52,61 @@ fun useThemeParams(): ThemeParamsHookType {
         backgroundColor,
         bottomBarColor
     ) {
-        jso {
-            this.colorScheme = colorScheme
-            this.bgColor = themeParams.bgColor
-            this.textColor = themeParams.textColor
-            this.hintColor = themeParams.hintColor
-            this.linkColor = themeParams.linkColor
-            this.buttonColor = themeParams.buttonColor
-            this.buttonTextColor = themeParams.buttonTextColor
-            this.secondaryBgColor = themeParams.secondaryBgColor
-            this.headerBgColor = themeParams.headerBgColor
-            this.bottomBarBgColor = themeParams.bottomBarBgColor
-            this.accentTextColor = themeParams.accentTextColor
-            this.sectionBgColor = themeParams.sectionBgColor
-            this.sectionHeaderTextColor = themeParams.sectionHeaderTextColor
-            this.sectionSeparatorColor = themeParams.sectionSeparatorColor
-            this.subtitleTextColor = themeParams.subtitleTextColor
-            this.destructiveTextColor = themeParams.destructiveTextColor
-            this.headerColor = headerColor
-            this.backgroundColor = backgroundColor
-            this.bottomBarColor = bottomBarColor
-            this.setHeaderColor = setHeaderColor
-            this.setBackgroundColor = setBackgroundColor
-            this.setBottomBarColor = setBottomBarColor
-        }
+        ThemeParamsHookType(
+            colorScheme = colorScheme,
+            bgColor = themeParams.bgColor,
+            textColor = themeParams.textColor,
+            hintColor = themeParams.hintColor,
+            linkColor = themeParams.linkColor,
+            buttonColor = themeParams.buttonColor,
+            buttonTextColor = themeParams.buttonTextColor,
+            secondaryBgColor = themeParams.secondaryBgColor,
+            headerBgColor = themeParams.headerBgColor,
+            bottomBarBgColor = themeParams.bottomBarBgColor,
+            accentTextColor = themeParams.accentTextColor,
+            sectionBgColor = themeParams.sectionBgColor,
+            sectionHeaderTextColor = themeParams.sectionHeaderTextColor,
+            sectionSeparatorColor = themeParams.sectionSeparatorColor,
+            subtitleTextColor = themeParams.subtitleTextColor,
+            destructiveTextColor = themeParams.destructiveTextColor,
+            headerColor = headerColor,
+            backgroundColor = backgroundColor,
+            bottomBarColor = bottomBarColor,
+            setHeaderColor = setHeaderColor,
+            setBackgroundColor = setBackgroundColor,
+            setBottomBarColor = setBottomBarColor,
+        )
     }
 }
 
+@JsPlainObject
 external interface ThemeParamsHookType {
 
     /**
      * The color scheme currently used in the Telegram app. Also available as the CSS variable [CssVar.tgColorScheme].
      * */
-    var colorScheme: ColorScheme
+    val colorScheme: ColorScheme
 
     /** Background color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeBgColor]. */
-    var bgColor: Color?
+    val bgColor: Color?
 
     /** Main text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeTextColor]. */
-    var textColor: Color?
+    val textColor: Color?
 
     /** Hint text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeHintColor]. */
-    var hintColor: Color?
+    val hintColor: Color?
 
     /** Link text color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeLinkColor]. */
-    var linkColor: Color?
+    val linkColor: Color?
 
     /** Button color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeButtonColor]. */
-    var buttonColor: Color?
+    val buttonColor: Color?
 
     /**
      * Button text color in the `#RRGGBB` format. Also available as the CSS variable
      * [CssVar.tgThemeButtonTextColor].
      * */
-    var buttonTextColor: Color?
+    val buttonTextColor: Color?
 
     /**
      * Secondary background color in the `#RRGGBB` format. Also available as the CSS variable
@@ -113,7 +114,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 6.1
      * */
-    var secondaryBgColor: Color?
+    val secondaryBgColor: Color?
 
     /**
      * Header background color in the `#RRGGBB` format. Also available as the CSS variable
@@ -121,7 +122,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var headerBgColor: Color?
+    val headerBgColor: Color?
 
     /**
      * Bottom background color in the `#RRGGBB` format. Also available as the CSS variable
@@ -129,7 +130,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.10
      * */
-    var bottomBarBgColor: Color?
+    val bottomBarBgColor: Color?
 
     /**
      * Accent text color in the `#RRGGBB` format. Also available as the CSS variable
@@ -137,7 +138,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var accentTextColor: Color?
+    val accentTextColor: Color?
 
     /**
      * Background color for the section in the `#RRGGBB` format. It is recommended to use this in conjunction with
@@ -145,7 +146,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var sectionBgColor: Color?
+    val sectionBgColor: Color?
 
     /**
      * Header text color for the section in the `#RRGGBB` format. Also available as the CSS variable
@@ -153,7 +154,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var sectionHeaderTextColor: Color?
+    val sectionHeaderTextColor: Color?
 
     /**
      * Section separator color in the `#RRGGBB` format. Also available as the CSS variable
@@ -161,7 +162,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.6
      * */
-    var sectionSeparatorColor: Color?
+    val sectionSeparatorColor: Color?
 
     /**
      * Subtitle text color in the `#RRGGBB` format. Also available as the CSS variable
@@ -169,7 +170,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var subtitleTextColor: Color?
+    val subtitleTextColor: Color?
 
     /**
      * Text color for destructive actions in the `#RRGGBB` format. Also available as the CSS variable
@@ -177,16 +178,16 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.0
      * */
-    var destructiveTextColor: Color?
+    val destructiveTextColor: Color?
 
     /** Current header color in the `#RRGGBB` format. */
-    var headerColor: Color
+    val headerColor: Color
 
     /** Current background color in the `#RRGGBB` format. */
-    var backgroundColor: Color
+    val backgroundColor: Color
 
     /** Current bottom bar color in the `#RRGGBB` format. */
-    var bottomBarColor: Color
+    val bottomBarColor: Color
 
     /**
      * A method that sets the app header color in the `#RRGGBB` format. You can also use keywords *bg_color* and
@@ -197,7 +198,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 6.1
      * */
-    var setHeaderColor: (color: Color) -> Unit
+    val setHeaderColor: (color: Color) -> Unit
 
     /**
      * A method that sets the app background color in the `#RRGGBB` format. You can also use keywords *bg_color* and
@@ -205,7 +206,7 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 6.1
      * */
-    var setBackgroundColor: (color: Color) -> Unit
+    val setBackgroundColor: (color: Color) -> Unit
 
     /**
      * A method that sets the app's bottom bar color in the `#RRGGBB` format. You can also use the keywords *bg_color*,
@@ -213,5 +214,5 @@ external interface ThemeParamsHookType {
      *
      * @since Bot API 7.10
      * */
-    var setBottomBarColor: (color: Color) -> Unit
+    val setBottomBarColor: (color: Color) -> Unit
 }
