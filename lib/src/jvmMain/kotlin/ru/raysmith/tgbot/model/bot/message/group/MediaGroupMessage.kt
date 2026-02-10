@@ -5,9 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.MessageText
-import ru.raysmith.tgbot.model.bot.message.MessageTextType
-import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
+import ru.raysmith.tgbot.model.bot.message.*
 import ru.raysmith.tgbot.model.network.chat.ChatAction
 import ru.raysmith.tgbot.model.network.media.input.*
 import ru.raysmith.tgbot.model.network.message.Message
@@ -16,7 +14,9 @@ import ru.raysmith.tgbot.model.network.message.ParseMode
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.withSafeLength
 
-class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ExtendedMessage<List<Message>>, BotHolder {
+class MediaGroupMessage(override val bot: Bot) : MediaRequest(), ThreadMessage<List<Message>>,
+    EffectableMessage<List<Message>>, BusinessMessage<List<Message>>, BotHolder {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 

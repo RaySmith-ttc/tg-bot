@@ -48,10 +48,13 @@ interface BusinessMessage<T> : IMessage<T> {
     var businessConnectionId: String?
 }
 
-interface ExtendedMessage<T> : BusinessMessage<T> {
+interface ThreadMessage<T> : IMessage<T>{
 
     /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only */
     var messageThreadId: Int?
+}
+
+interface EffectableMessage<T> : IMessage<T> {
 
     /** Unique identifier of the message effect to be added to the message; for private chats only */
     var messageEffectId: String?

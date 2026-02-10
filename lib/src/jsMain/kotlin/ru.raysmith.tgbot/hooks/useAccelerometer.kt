@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -49,18 +49,19 @@ fun useAccelerometer(): AccelerometerHookType {
     }
 
     return useMemo(accelerometer, failed) {
-        jso {
-            this.failed = failed
-            this.isStarted = accelerometer.isStarted
-            this.x = accelerometer.x
-            this.y = accelerometer.y
-            this.z = accelerometer.z
-            this.start = start
-            this.stop = stop
-        }
+        AccelerometerHookType(
+            failed = failed,
+            isStarted = accelerometer.isStarted,
+            x = accelerometer.x,
+            y = accelerometer.y,
+            z = accelerometer.z,
+            start = start,
+            stop = stop
+        )
     }
 }
 
+@JsPlainObject
 external interface AccelerometerHookType {
 
     /**
@@ -69,31 +70,31 @@ external interface AccelerometerHookType {
      * Possible values:
      * - [AccelerometerFailedType.UNSUPPORTED] – Accelerometer tracking is not supported on this device or platform
      */
-    var failed: AccelerometerFailed?
+    val failed: AccelerometerFailed?
 
     /** Indicates whether accelerometer tracking is currently active. */
-    var isStarted: Boolean
+    val isStarted: Boolean
 
     /** The current acceleration in the X-axis, measured in m/s². */
-    var x: Float?
+    val x: Float?
 
     /** The current acceleration in the Y-axis, measured in m/s². */
-    var y: Float?
+    val y: Float?
 
     /** The current acceleration in the Z-axis, measured in m/s². */
-    var z: Float?
+    val z: Float?
 
     /**
      * Starts tracking accelerometer data using params of type [AccelerometerStartParams].
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called with a boolean indicating whether tracking was successfully started.
      * */
-    var start: (params: AccelerometerStartParams, callback: ((isTrackingStarted: Boolean) -> Unit)?) -> Unit
+    val start: (params: AccelerometerStartParams, callback: ((isTrackingStarted: Boolean) -> Unit)?) -> Unit
 
     /**
      * Stops tracking accelerometer data.
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called with a boolean indicating whether tracking was successfully stopped.
      * */
-    var stop: (callback: ((isTrackingStopped: Boolean) -> Unit)?) -> Unit
+    val stop: (callback: ((isTrackingStopped: Boolean) -> Unit)?) -> Unit
 }

@@ -1,11 +1,13 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import web.function.VoidFunction
 
 /**
  * This object controls biometrics on the device.
  * Before the first use of this object, it needs to be initialized using the [init] method.
  * */
+@JsPlainObject
 external interface BiometricManager {
 
     /**

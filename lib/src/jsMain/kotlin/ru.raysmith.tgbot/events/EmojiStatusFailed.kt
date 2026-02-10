@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.EmojiStatusFailedError.Companion.DURATION_INVALID
 import ru.raysmith.tgbot.events.EmojiStatusFailedError.Companion.SERVER_ERROR
 import ru.raysmith.tgbot.events.EmojiStatusFailedError.Companion.SUGGESTED_EMOJI_INVALID
@@ -11,9 +12,8 @@ import seskar.js.JsValue
 /**
  * @property error Reason for the failure
  * */
+@JsPlainObject
 external interface EmojiStatusFailed {
-
-    /** Reason for the failure */
     val error: EmojiStatusFailedError
 }
 

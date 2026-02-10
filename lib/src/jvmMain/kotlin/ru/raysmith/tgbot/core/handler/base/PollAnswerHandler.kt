@@ -20,7 +20,7 @@ open class PollAnswerHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = pollAnswer.voterChat?.id
-    override fun getChatIdOrThrow() = pollAnswer.voterChat?.id ?: throw UnknownChatIdException()
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

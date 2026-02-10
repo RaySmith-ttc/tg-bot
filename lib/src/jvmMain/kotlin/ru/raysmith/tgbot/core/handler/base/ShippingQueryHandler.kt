@@ -21,7 +21,7 @@ open class ShippingQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = shippingQuery.from.id
-    override fun getChatIdOrThrow() = shippingQuery.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

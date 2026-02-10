@@ -1,9 +1,12 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object contains data that is transferred to the Mini App when it is opened.
  * It is empty if the Mini App was launched from a keyboard button or from inline mode.
  */
+@JsPlainObject
 external interface WebAppInitData {
 
     /**

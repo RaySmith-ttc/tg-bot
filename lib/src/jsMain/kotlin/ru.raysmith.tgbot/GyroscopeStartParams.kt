@@ -1,8 +1,11 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object defines the parameters for starting gyroscope tracking.
  */
+@JsPlainObject
 external interface GyroscopeStartParams {
 
     /**
@@ -11,5 +14,5 @@ external interface GyroscopeStartParams {
      * so the actual tracking frequency may differ from the specified value.
      */
     @JsName("refresh_rate")
-    var refreshRate: Int?
+    val refreshRate: Int?
 }

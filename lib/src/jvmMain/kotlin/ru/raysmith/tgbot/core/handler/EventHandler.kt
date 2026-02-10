@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.core.handler
 
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.ChatIdHolder
+import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.core.IEditor
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.network.updates.Update
@@ -10,7 +10,7 @@ import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 
 @HandlerDsl
-interface EventHandler : ChatIdHolder, IEditor, ISender {
+interface EventHandler : ChatDataHolder, IEditor, ISender {
     var handled: Boolean // TODO should be internal
     suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean = false)
     suspend fun handle() // TODO should be internal

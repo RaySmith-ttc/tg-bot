@@ -19,7 +19,7 @@ open class PreCheckoutQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = preCheckoutQuery.from.id
-    override fun getChatIdOrThrow() = preCheckoutQuery.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

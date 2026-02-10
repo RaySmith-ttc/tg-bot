@@ -197,5 +197,28 @@ data class Update(
         UpdateType.MESSAGE_REACTION_COUNT -> messageReactionCount!!.getChatId()
         null -> null
     }
+
+    /**
+     * Find message thread id by current update.
+     * */
+    fun findThreadId(): Int? = when(type) {
+        UpdateType.MESSAGE -> message!!.getMessageThreadId()
+        UpdateType.EDITED_MESSAGE -> editedMessage!!.getMessageThreadId()
+        UpdateType.CHANNEL_POST -> channelPost!!.getMessageThreadId()
+        UpdateType.EDITED_CHANNEL_POST -> editedChannelPost!!.getMessageThreadId()
+        UpdateType.INLINE_QUERY -> null
+        UpdateType.CHOSEN_INLINE_RESULT -> null
+        UpdateType.CALLBACK_QUERY -> callbackQuery!!.message?.asMessageOrNull()?.getMessageThreadId()
+        UpdateType.POLL -> null
+        UpdateType.POLL_ANSWER -> null
+        UpdateType.MY_CHAT_MEMBER -> null
+        UpdateType.CHAT_MEMBER -> null
+        UpdateType.SHIPPING_QUERY -> null
+        UpdateType.PRE_CHECKOUT_QUERY -> null
+        UpdateType.CHAT_JOIN_REQUEST -> null
+        UpdateType.MESSAGE_REACTION -> null
+        UpdateType.MESSAGE_REACTION_COUNT -> null
+        null -> null
+    }
 }
 

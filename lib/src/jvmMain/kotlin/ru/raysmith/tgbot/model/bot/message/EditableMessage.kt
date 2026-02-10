@@ -11,7 +11,9 @@ import ru.raysmith.tgbot.model.network.message.Message
 import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.noimpl
 
-interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator, ExtendedMessage<Message> {
+interface MessageWithReplyMarkup : EditableMessage, KeyboardCreator, ThreadMessage<Message>, EffectableMessage<Message>,
+    BusinessMessage<Message> {
+
     companion object {
         internal fun instance(bot: Bot) = object : MessageWithReplyMarkup {
             override val client: HttpClient = bot.client

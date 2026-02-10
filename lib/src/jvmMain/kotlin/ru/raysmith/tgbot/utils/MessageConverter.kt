@@ -3,6 +3,7 @@ package ru.raysmith.tgbot.utils
 import ru.raysmith.tgbot.core.handler.base.MessageHandler
 import ru.raysmith.tgbot.model.network.Location
 import ru.raysmith.tgbot.model.network.Poll
+import ru.raysmith.tgbot.model.network.User
 import ru.raysmith.tgbot.model.network.Venue
 import ru.raysmith.tgbot.model.network.media.*
 import ru.raysmith.tgbot.model.network.message.Dice
@@ -204,9 +205,11 @@ suspend fun MessageHandler.messageAnyMedia(block: suspend (MediaWithFile) -> Uni
     message.voice ?: message.videoNote
 )?.also { block(it) }
 
+
 // Users shared
 /** Returns [MessageConverter] instance for shared users */
 fun MessageHandler.messageUsersShared() = MessageConverter(message.usersShared)
+
 
 // Chat shared
 /** Returns [MessageConverter] instance for shared users */

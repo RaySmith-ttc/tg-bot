@@ -1,9 +1,13 @@
+@file:Suppress("UnusedImport")
+
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.EventType
 import web.function.VoidFunction
 
 /** This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface. */
+@JsPlainObject
 external interface BottomButton {
 
     /**

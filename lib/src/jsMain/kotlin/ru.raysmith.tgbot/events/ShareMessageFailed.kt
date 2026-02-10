@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.ShareMessageFailedError.Companion.MESSAGE_EXPIRED
 import ru.raysmith.tgbot.events.ShareMessageFailedError.Companion.MESSAGE_SEND_FAILED
 import ru.raysmith.tgbot.events.ShareMessageFailedError.Companion.UNKNOWN_ERROR
@@ -10,9 +11,8 @@ import seskar.js.JsValue
 /**
  * @property error Reason for the failure
  * */
+@JsPlainObject
 external interface ShareMessageFailed {
-
-    /** Reason for the failure */
     val error: ShareMessageFailedError
 }
 

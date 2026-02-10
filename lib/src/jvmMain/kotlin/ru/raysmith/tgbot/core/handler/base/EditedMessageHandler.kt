@@ -20,7 +20,7 @@ open class EditedMessageHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = message.chat.id
-    override fun getChatIdOrThrow() = message.chat.id
+    override fun getMessageThreadId(): Int? = message.asMessageOrNull()?.getMessageThreadId()
 
     override suspend fun handle() {
         handler()

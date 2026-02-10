@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import web.cssom.Color
 
 /**
@@ -8,6 +9,7 @@ import web.cssom.Color
  *
  * <img src="https://core.telegram.org/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" />
  * */
+@JsPlainObject
 external interface ThemeParams {
 
     /** Background color in the `#RRGGBB` format. Also available as the CSS variable [CssVar.tgThemeBgColor]. */

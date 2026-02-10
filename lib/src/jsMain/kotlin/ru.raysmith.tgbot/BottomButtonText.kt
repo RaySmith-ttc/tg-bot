@@ -2,6 +2,10 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property Continue
+ * @property Cancel
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface BottomButtonText {
     companion object {

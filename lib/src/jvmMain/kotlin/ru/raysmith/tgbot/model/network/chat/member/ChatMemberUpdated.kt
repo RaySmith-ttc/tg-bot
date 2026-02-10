@@ -40,5 +40,4 @@ data class ChatMemberUpdated(
 
 ) : ChatIdHolder {
     override fun getChatId() = chat.id
-    override fun getChatIdOrThrow() = chat.id
 }

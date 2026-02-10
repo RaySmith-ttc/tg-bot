@@ -2,6 +2,9 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property UNSUPPORTED Gyroscope tracking is not supported on this device or platform
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface GyroscopeFailedType {
     companion object {

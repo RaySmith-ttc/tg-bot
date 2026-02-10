@@ -1,9 +1,12 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object controls location access on the device.
  * Before the first use of this object, it needs to be initialized using the [init] method.
  */
+@JsPlainObject
 external interface LocationManager {
 
     /** Shows whether the [LocationManager] object has been initialized. */

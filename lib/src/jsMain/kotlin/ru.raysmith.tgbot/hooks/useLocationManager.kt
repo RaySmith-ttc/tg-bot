@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffect
 import react.useMemo
 import react.useState
@@ -44,45 +44,46 @@ fun useLocationManager(): LocationManagerHookType {
     }
 
     return useMemo(locationManager, locationData) {
-        jso {
-            this.locationData = locationData
-            isInited = locationManager.isInited
-            isLocationAvailable = locationManager.isLocationAvailable
-            isAccessRequested = locationManager.isAccessRequested
-            isAccessGranted = locationManager.isAccessGranted
-            this.init = init
-            this.getLocation = getLocation
-            this.openSettings = openSettings
-        }
+        LocationManagerHookType(
+            locationData = locationData,
+            isInited = locationManager.isInited,
+            isLocationAvailable = locationManager.isLocationAvailable,
+            isAccessRequested = locationManager.isAccessRequested,
+            isAccessGranted = locationManager.isAccessGranted,
+            init = init,
+            getLocation = getLocation,
+            openSettings = openSettings,
+        )
     }
 }
 
+@JsPlainObject
 external interface LocationManagerHookType {
 
     /** This object contains data about the current location. */
-    var locationData: LocationData?
+    val locationData: LocationData?
 
     /** Shows whether the [LocationManager] object has been initialized. */
-    var isInited: Boolean
+    val isInited: Boolean
 
     /** Shows whether location services are available on the current device. */
-    var isLocationAvailable: Boolean
+    val isLocationAvailable: Boolean
 
     /** Shows whether permission to use location has been requested. */
-    var isAccessRequested: Boolean
+    val isAccessRequested: Boolean
 
     /** Shows whether permission to use location has been granted. */
-    var isAccessGranted: Boolean
+    val isAccessGranted: Boolean
 
     /**
      * A method that initializes the [LocationManager] object. It should be called before the object's first use.
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called when the object is initialized.
      */
-    var init: (callback: VoidFunction?) -> Unit
+    val init: (callback: VoidFunction?) -> Unit
 
     /** A method that requests and update location data. */
-    var getLocation: (callback: ((locationData: LocationData?) -> Unit)?) -> Unit
+    val getLocation: (callback: ((locationData: LocationData?) -> Unit)?) -> Unit
 
     /**
      * A method that opens the location access settings for bots. Useful when you need to request location access from
@@ -91,5 +92,5 @@ external interface LocationManagerHookType {
      * *Note that this method can be called only in response to user interaction with the Mini App interface
      * (e.g., a click inside the Mini App or on the main button).*
      */
-    var openSettings: VoidFunction
+    val openSettings: VoidFunction
 }

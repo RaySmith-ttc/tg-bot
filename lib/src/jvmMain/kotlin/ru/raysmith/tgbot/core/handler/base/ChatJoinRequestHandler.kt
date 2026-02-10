@@ -19,7 +19,7 @@ open class ChatJoinRequestHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = chatJoinRequest.chat.id
-    override fun getChatIdOrThrow() = chatJoinRequest.chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

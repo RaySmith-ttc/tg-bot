@@ -1,17 +1,17 @@
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
-  import ru.raysmith.tgbot.gradle.HtmlDiffTask
+import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
     signing
     `maven-publish`
-    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.seskar)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlinx.jsPlainObjects)
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.18"
+version = "1.0.0-beta.20"
 
 java {
     toolchain {
@@ -24,36 +24,21 @@ kotlin {
         withSourcesJar()
     }
 
-    js(IR) {
+    js {
         compilerOptions {
             target = "es2015"
             freeCompilerArgs.addAll (
 //                "-Xsuppress-warning=UNCHECKED_CAST_TO_EXTERNAL_INTERFACE",
             )
         }
+        generateTypeScriptDefinitions()
+        useEsModules()
 
-        browser {
-            webpackTask {
-                mode = KotlinWebpackConfig.Mode.PRODUCTION
-                mainOutputFileName.set("tg-bot.js")
-            }
-            commonWebpackConfig {
-                mode = KotlinWebpackConfig.Mode.PRODUCTION
-                cssSupport {
-                    enabled.set(true)
-                }
-                export = false
-            }
-        }
         nodejs()
         binaries.executable()
     }
 
     sourceSets {
-        commonMain {
-
-        }
-
         jvmMain {
             dependencies {
                 // Kotlin

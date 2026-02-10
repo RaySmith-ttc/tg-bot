@@ -48,7 +48,7 @@ open class CallbackQueryHandler(
     }
 
     override fun getChatId() = query.message?.chat?.id
-    override fun getChatIdOrThrow() = query.message?.chat?.id ?: throw UnknownChatIdException()
+    override fun getMessageThreadId(): Int? = query.message?.asMessageOrNull()?.messageThreadId
 
     override suspend fun setupFeatures(vararg features: BotFeature, callFirst: Boolean) {
         if (callFirst) localFeatures.addAll(0, features.toList())

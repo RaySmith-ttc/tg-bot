@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import seskar.js.JsValue
 
 /**
@@ -9,16 +10,23 @@ import seskar.js.JsValue
  *  (use [browser] for custom string value)
  * @see
  * */
+@JsPlainObject
 external interface OpenLinkOptions {
 
     @JsName("try_instant_view")
-    var tryInstantView: Boolean
+    val tryInstantView: Boolean
 
     @NotOfficialDocumentedOptIn
     @JsName("try_browser")
-    var tryBrowser: Browser
+    val tryBrowser: Browser
 }
 
+/**
+ * @property chrome
+ * @property firefox
+ * @property safari
+ * @property opera
+ */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface Browser {
     companion object {

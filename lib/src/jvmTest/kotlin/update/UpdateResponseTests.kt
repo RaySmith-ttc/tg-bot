@@ -17,7 +17,7 @@ class UpdateResponseTests {
 
         assertThat(actualUpdate.message!!.getAllEntity(MessageEntityType.URL))
             .hasSize(1).first().isEqualTo("https://telegram.org")
-        assertThat(actualUpdate.message!!.getAllEntity(MessageEntityType.PHONE_NUMBER))
+        assertThat(actualUpdate.message.getAllEntity(MessageEntityType.PHONE_NUMBER))
             .hasSize(1).first().isEqualTo("+1-212-555-0123")
     }
 

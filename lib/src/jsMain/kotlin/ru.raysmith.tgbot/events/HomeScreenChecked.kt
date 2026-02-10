@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.HomeScreenCheckedStatus.Companion.added
 import ru.raysmith.tgbot.events.HomeScreenCheckedStatus.Companion.missed
 import ru.raysmith.tgbot.events.HomeScreenCheckedStatus.Companion.unknown
@@ -9,9 +10,8 @@ import seskar.js.JsValue
 /**
  * @property status Current home screen status
  * */
+@JsPlainObject
 external interface HomeScreenChecked {
-
-    /** Current home screen status */
     val status: HomeScreenCheckedStatus
 }
 
@@ -20,11 +20,11 @@ external interface HomeScreenChecked {
  *
  * @property unsupported The feature is not supported, and it is not possible to add the icon to the home screen
  * @property unknown The feature is supported, and the icon can be added, but it is not possible to determine if the
- *                   icon has already been added
+ *  icon has already been added
  * @property added The icon has already been added to the home screen
  * @property missed The icon has not been added to the home screen
  * */
-external interface HomeScreenCheckedStatus {
+sealed external interface HomeScreenCheckedStatus {
     companion object {
 
         /** The feature is not supported, and it is not possible to add the icon to the home screen */

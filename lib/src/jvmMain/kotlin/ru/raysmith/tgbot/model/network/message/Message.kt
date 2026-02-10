@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.model.network.message
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.ChatIdHolder
+import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.model.network.*
 import ru.raysmith.tgbot.model.network.chat.Chat
 import ru.raysmith.tgbot.model.network.chat.background.ChatBackground
@@ -35,6 +35,7 @@ data class Message(
     @SerialName("message_id") override val messageId: Int,
 
     /** Unique identifier of a message thread to which the message belongs; for supergroups only */
+    @get:JvmName("getMessageThreadIdField")
     @SerialName("message_thread_id") val messageThreadId: Int? = null,
 
     /**
@@ -348,7 +349,7 @@ data class Message(
     /** Inline keyboard attached to the message. `login_url` buttons are represented as ordinary `url` buttons. */
     @SerialName("reply_markup") val replyMarkup: InlineKeyboardMarkup? = null
 
-) : MaybeInaccessibleMessage(), ChatIdHolder {
+) : MaybeInaccessibleMessage(), ChatDataHolder {
 
     /** Contains all unique identifiers of the message effects */
     object Effect { // TODO does it work on test server?
@@ -380,6 +381,7 @@ data class Message(
 
     override fun getChatId() = chat.id
     override fun getChatIdOrThrow() = chat.id
+    override fun getMessageThreadId(): Int? = messageThreadId
 
     /** Return true if entities has one or more link */
     fun hasUrl() : Boolean = entities?.any { it.type == MessageEntityType.URL } ?: false
@@ -418,17 +420,17 @@ data class Message(
      * - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
      *
      * Returns *True* on Success.
+     *
+     * @see safeDelete
      * */
     context(ctx: BotContext<*>)
     suspend fun delete() = ctx.deleteMessage(chat.id, messageId)
 
     /**
      *  A safe version of the [delete] method that swallows a [TelegramApiException].
-     *  Return true if message success deleted.
-     *
-     *  *If you don't need a result use [API.deleteMessages]*
+     *  Return true if message successfully deleted.
      *  */
     context(_: BotContext<*>)
-    suspend fun safeDelete() = try { delete() } catch (e: TelegramApiException) { false }
+    suspend fun safeDelete() = try { delete() } catch (_: TelegramApiException) { false }
 
 }

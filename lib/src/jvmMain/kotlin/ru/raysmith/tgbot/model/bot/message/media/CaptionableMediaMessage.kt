@@ -14,7 +14,9 @@ import ru.raysmith.tgbot.model.network.message.ReplyParameters
 import ru.raysmith.tgbot.utils.noimpl
 import ru.raysmith.tgbot.utils.withSafeLength
 
-abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), ExtendedMessage<Message> {
+abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), ThreadMessage<Message>,
+    EffectableMessage<Message>, BusinessMessage<Message> {
+
     companion object {
         internal fun instance(
             bot: Bot, mediaName: String = "",
