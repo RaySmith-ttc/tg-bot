@@ -6,12 +6,19 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlinx.jsPlainObjects)
     alias(libs.plugins.seskar)
+    alias(libs.plugins.benManes.versions)
 }
 
 kotlin {
-    jvm()
+    jvm {
+        binaries {
+            executable {
+                mainClass.set("ru.raysmith.tgbot.webappapp.MainKt")
+            }
+        }
+    }
     js {
-//        useEsModules()
+        useEsModules()
         browser {
             val webpackMode = System.getProperty("WEBPACK_MODE")?.let {
                 KotlinWebpackConfig.Mode.valueOf(it.uppercase())
@@ -26,20 +33,22 @@ kotlin {
                 args += listOf(
                     "--env", "WEBAPP_GUARD_ENABLED=${System.getenv("WEBAPP_GUARD_ENABLED")?.toBoolean() ?: true}",
                 )
+
+                println(configDirectory?.absolutePath)
             }
-            commonWebpackConfig {
-                mode = webpackMode
-                cssSupport {
-                    enabled.set(true)
-                }
-                export = false
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        add(project.rootDir.path)
-//                        add(project.projectDir.path)
-//                    }
+//            commonWebpackConfig {
+//                mode = webpackMode
+//                cssSupport {
+//                    enabled.set(true)
 //                }
-            }
+//                export = false
+////                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+////                    static = (static ?: mutableListOf()).apply {
+////                        add(project.rootDir.path)
+////                        add(project.projectDir.path)
+////                    }
+////                }
+//            }
         }
         binaries.executable()
     }
@@ -98,7 +107,8 @@ kotlin {
 tasks {
     getByName<ProcessResources>("jvmProcessResources") {
         val isProd = System.getenv("env") == "prod"
-        val webpackTask = getByName<KotlinWebpack>(if (isProd) "jsBrowserProductionWebpack" else "jsBrowserDevelopmentWebpack")
+        val webpackTaskName = if (isProd) "jsBrowserProductionWebpack" else "jsBrowserDevelopmentWebpack"
+        val webpackTask = getByName<KotlinWebpack>(webpackTaskName)
         dependsOn(webpackTask)
         from(File(webpackTask.outputDirectory.asFile.get(), webpackTask.mainOutputFileName.get()))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE

@@ -1,23 +1,19 @@
-
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = env => {
-    const webpack = require("webpack");
-    config.plugins.push(new webpack.DefinePlugin({
-        'process.env': JSON.stringify({}),
-        'process.env.WEBAPP_GUARD_ENABLED': env.WEBAPP_GUARD_ENABLED,
-    }));
+config.module.rules.push({
+    test: /\.m?js$/,
+    resolve: {
+        fullySpecified: false,
+    },
+});
 
-    config.module.rules.push({
-        test: /\.m?js$/i,
-        resolve: {
-            fullySpecified: false,
-        },
-    });
+const webpack = require("webpack");
 
-    // config.plugins.push(new BundleAnalyzerPlugin({
-    //     analyzerPort: 8888
-    // }));
+config.plugins.push(new webpack.DefinePlugin({
+    'process.env': JSON.stringify({}),
+    'process.env.WEBAPP_GUARD_ENABLED':  JSON.stringify(process.env.WEBAPP_GUARD_ENABLED),
+}));
 
-    return config
-};
+// config.plugins.push(new BundleAnalyzerPlugin({
+//     analyzerPort: 8888
+// }));

@@ -14,11 +14,11 @@ import seskar.js.JsValue
 external interface OpenLinkOptions {
 
     @JsName("try_instant_view")
-    val tryInstantView: Boolean
+    val tryInstantView: Boolean?
 
     @NotOfficialDocumentedOptIn
     @JsName("try_browser")
-    val tryBrowser: Browser
+    val tryBrowser: Browser?
 }
 
 /**

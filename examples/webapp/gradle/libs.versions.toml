@@ -12,12 +12,12 @@ kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.1"
 ktor = "3.4.0"
-logback = "1.5.28"
+logback = "1.5.29"
 seskar = "4.32.0"
 setupapp = "2.1"
 shadow = "9.3.1"
-tgBot = "1.0.0-beta.18"
-utils = "3.4.0"
+tgBot = "1.0.0-beta.20"
+utils = "4.0.0"
 
 [libraries]
 

@@ -8,14 +8,14 @@ import web.cssom.Color
 external interface MainButtonParams {
 
     /** button text */
-    val text: String
+    val text: String?
 
     /** button color */
-    val color: Color
+    val color: Color?
 
     /** button text color */
     @JsName("text_color")
-    val textColor: Color
+    val textColor: Color?
 
     /**
      * enable shine effect
@@ -23,16 +23,16 @@ external interface MainButtonParams {
      * @since Bot API 7.10
      * */
     @JsName("has_shine_effect")
-    val hasShineEffect: Color
+    val hasShineEffect: Color?
 
     /** position of the secondary button */
-    val position: BottomButtonPosition
+    val position: BottomButtonPosition?
 
     /** enable the button */
     @JsName("is_active")
-    val isActive: Boolean
+    val isActive: Boolean?
 
     /** show the button */
     @JsName("is_visible")
-    val isVisible: Boolean
+    val isVisible: Boolean?
 }
