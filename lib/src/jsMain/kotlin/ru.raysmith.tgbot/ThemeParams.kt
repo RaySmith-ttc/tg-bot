@@ -7,7 +7,7 @@ import web.cssom.Color
  * Mini Apps can [adjust the appearance](https://core.telegram.org/bots/webapps#color-schemes) of the interface to match
  * the Telegram user's app in real time. This object contains the user's current theme settings
  *
- * <img src="https://core.telegram.org/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" />
+ * @see <img src="https://core.telegram.org/file/400780400851/2/6GwDkk6T-aY.416569/b591d589108b487d63" />
  * */
 @JsPlainObject
 external interface ThemeParams {

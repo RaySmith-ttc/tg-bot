@@ -10,7 +10,7 @@ import ru.raysmith.tgbot.events.EventType
 /**
  * This hook provides access to gyroscope data on the device.
  *
- * <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
+ * @see <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
  */
 fun useGyroscope(): GyroscopeHookType {
 

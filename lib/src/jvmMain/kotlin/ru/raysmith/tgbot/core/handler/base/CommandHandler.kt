@@ -7,7 +7,7 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotContextDsl
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.model.bot.BotCommand
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.api.message.Message
 
 open class CommandHandler(
     val command: BotCommand, val message: Message,

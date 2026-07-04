@@ -67,7 +67,6 @@ fun useCloudStorage(): CloudStorageHookType {
             ActionType.REMOVE -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { delete(action.key!!) }
             ActionType.ADD_ALL -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { action.valuesToAdd!!.forEach { value, key -> set(key, value) } }
             ActionType.REMOVE_ALL -> JsMap(reducerState.unsafeCast<JsArray<Tuple2<String, String>>>()).apply { action.keysToRemove!!.forEach { delete(it) } }
-            else -> reducerState
         }
     }, JsMap())
 
@@ -84,7 +83,7 @@ fun useCloudStorage(): CloudStorageHookType {
                     }
                     if (values != null) {
                         state = CloudStorageHookState.READY
-                        dispatch(ru.raysmith.tgbot.hooks.Action(
+                        dispatch(Action(
                             action = ActionType.ADD_ALL,
                             valuesToAdd = JsMap(Object.entries(values)),
                         ))
@@ -101,7 +100,7 @@ fun useCloudStorage(): CloudStorageHookType {
                 webApp.CloudStorage.setItem(key, value) { error, isStored ->
                     state = CloudStorageHookState.READY
                     if (isStored) {
-                        dispatch(ru.raysmith.tgbot.hooks.Action(
+                        dispatch(Action(
                             action = ActionType.ADD,
                             key = key,
                             value = value,
@@ -120,7 +119,7 @@ fun useCloudStorage(): CloudStorageHookType {
         webApp.CloudStorage.removeItem(key) { error, isRemoved ->
             state = CloudStorageHookState.READY
             if (isRemoved) {
-                dispatch(ru.raysmith.tgbot.hooks.Action(
+                dispatch(Action(
                     action = ActionType.REMOVE,
                     key = key,
                 ))
@@ -141,7 +140,7 @@ fun useCloudStorage(): CloudStorageHookType {
         webApp.CloudStorage.removeItems(arrayKeys) { error, isRemoved ->
             state = CloudStorageHookState.READY
             if (isRemoved) {
-                dispatch(ru.raysmith.tgbot.hooks.Action(
+                dispatch(Action(
                     action = ActionType.REMOVE_ALL,
                     keysToRemove = arrayKeys,
                 ))

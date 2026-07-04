@@ -1,24 +1,28 @@
 package ru.raysmith.tgbot.core
 
 import io.ktor.client.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
+import ru.raysmith.tgbot.model.api.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.payment.LabeledPrice
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
 import ru.raysmith.tgbot.model.bot.ChatId
+import ru.raysmith.tgbot.model.bot.message.EffectableMessage
 import ru.raysmith.tgbot.model.bot.message.IMessage
+import ru.raysmith.tgbot.model.bot.message.SuggestablePostMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.InlineKeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
-import ru.raysmith.tgbot.model.network.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 
 // TODO check class (as IMessage)
 
 /** Builder of [sendInvoice][API.sendInvoice] request */
-class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder, IMessage<Message> {
+class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, API, BotHolder, EffectableMessage,
+    SuggestablePostMessage, IMessage<Message> {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -52,7 +56,7 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
      * Price breakdown, a JSON-serialized list of components (e.g. product price, tax, discount,
      * delivery cost, delivery tax, bonus, etc.)
      * */
-    var prices: List<LabeledPrice>? = null
+    var prices: List<LabeledPrice> = emptyList()
 
     /**
      * The maximum accepted amount for tips in the *smallest units* of the currency
@@ -125,9 +129,12 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
     override var replyParameters: ReplyParameters? = null
     override var protectContent: Boolean? = null
     override var allowPaidBroadcast: Boolean? = null
+    override var messageEffectId: String? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
     /**
-     * Object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
+     * An object for an [inline keyboard](https://core.telegram.org/bots/features#inline-keyboards).
      * If empty, one 'Pay `total price`' button will be shown. If not empty, the first button must be a Pay button.
      * */
     override var keyboardMarkup: MessageKeyboard? = null
@@ -135,14 +142,15 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
     override suspend fun send(chatId: ChatId) = sendInvoice(
         chatId = chatId,
         messageThreadId = messageThreadId,
+        directMessagesTopicId = directMessagesTopicId,
         title = title ?: "",
         description = description ?: "",
         payload = payload ?: "",
         providerToken = providerToken,
         currency = currency?.code ?: "",
-        prices = prices?.let { Json.encodeToString(it) } ?: "",
+        prices = prices,
         maxTipAmount = maxTipAmount,
-        suggestedTipAmounts = suggestedTipAmounts?.let { Json.encodeToString(it) },
+        suggestedTipAmounts = suggestedTipAmounts,
         startParameter = startParameter,
         providerData = providerData?.let { Json.encodeToString(it) },
         photoUrl = photoUrl,
@@ -159,6 +167,8 @@ class SendInvoiceRequestBuilder(override val bot: Bot) : InlineKeyboardCreator, 
         disableNotification = disableNotification,
         protectContent = protectContent,
         allowPaidBroadcast = allowPaidBroadcast,
+        messageEffectId = messageEffectId,
+        suggestedPostParameters = suggestedPostParameters,
         replyParameters = replyParameters,
         replyMarkup = keyboardMarkup?.toMarkup() as InlineKeyboardMarkup?
     )

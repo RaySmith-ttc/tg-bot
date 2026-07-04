@@ -10,7 +10,6 @@ fun useBottomButton(type: BottomButtonType): BottomButtonHookType {
     var bb by useState(when(type) {
         BottomButtonType.main -> webApp.MainButton
         BottomButtonType.secondary -> webApp.SecondaryButton
-        else -> error("Unknown bottom button type: $type")
     })
 
     val setText = { text: String ->

@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.utils.pagination
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.api.CallbackQuery
 import ru.raysmith.tgbot.utils.getOrDefault
 
 // TODO

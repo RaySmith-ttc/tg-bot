@@ -10,7 +10,7 @@ import ru.raysmith.tgbot.events.EventType
 /**
  * This hook provides access to accelerometer data on the device.
  *
- * <img src="https://core.telegram.org/file/400780400808/3/4R4bxuff6H0.529743/2a9f6212eaed26d194" />
+ * @see <img src="https://core.telegram.org/file/400780400808/3/4R4bxuff6H0.529743/2a9f6212eaed26d194" />
  * */
 fun useAccelerometer(): AccelerometerHookType {
 

@@ -1,10 +1,10 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.BotConfig
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.message.MessageEntity
-import ru.raysmith.tgbot.model.network.message.MessageEntityType
-import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.api.user.User
+import ru.raysmith.tgbot.model.api.message.MessageEntity
+import ru.raysmith.tgbot.model.api.message.MessageEntityType
+import ru.raysmith.tgbot.model.api.message.ParseMode
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.withSafeLength
 import ru.raysmith.utils.letIf

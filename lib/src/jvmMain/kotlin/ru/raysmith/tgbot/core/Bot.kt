@@ -12,7 +12,7 @@ import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.base.CommandHandler
 import ru.raysmith.tgbot.core.handler.location.LocationCallbackQueryHandler
 import ru.raysmith.tgbot.exceptions.BotException
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.network.BadBotTokenException
 import ru.raysmith.tgbot.network.TelegramApi
@@ -265,12 +265,14 @@ class Bot(
                         )
 
                         if (updates.isNotEmpty()) {
-                            onUpdate(updates)
-                            updates.forEach { update ->
-                                newUpdate(update)
+                            try {
+                                onUpdate(updates)
+                                updates.forEach { update ->
+                                    newUpdate(update)
+                                }
+                            } finally {
+                                lastUpdateId = updates.last().updateId + 1
                             }
-
-                            lastUpdateId = updates.last().updateId + 1
                         }
                     }.await()
                 }

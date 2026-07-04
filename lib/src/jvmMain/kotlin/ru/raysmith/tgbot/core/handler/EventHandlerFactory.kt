@@ -1,8 +1,8 @@
 package ru.raysmith.tgbot.core.handler
 
 import org.slf4j.LoggerFactory
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 
 @HandlerDsl
 sealed interface EventHandlerFactory {

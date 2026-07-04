@@ -4,7 +4,7 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.ChatDataHolder
 import ru.raysmith.tgbot.core.IEditor
 import ru.raysmith.tgbot.core.ISender
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper

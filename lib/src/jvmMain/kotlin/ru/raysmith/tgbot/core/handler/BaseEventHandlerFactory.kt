@@ -4,9 +4,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.base.*
 import ru.raysmith.tgbot.model.bot.BotCommand
-import ru.raysmith.tgbot.model.network.message.MessageType
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.message.MessageType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 
 open class BaseEventHandlerFactory(override val bot: Bot) : EventHandlerFactory, BotHolder {
 

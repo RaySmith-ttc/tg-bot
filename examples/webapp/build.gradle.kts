@@ -84,7 +84,6 @@ kotlin {
                 implementation(kotlinWrappers.react)
                 implementation(kotlinWrappers.reactDom)
                 implementation(kotlinWrappers.reactUse)
-                implementation(kotlinWrappers.reactCore)
                 implementation(kotlinWrappers.tanstack.reactRouter)
                 implementation(kotlinWrappers.node)
                 implementation(kotlinWrappers.mui.material)

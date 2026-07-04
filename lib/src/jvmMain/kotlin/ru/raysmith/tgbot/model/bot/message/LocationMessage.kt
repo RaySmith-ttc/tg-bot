@@ -7,14 +7,13 @@ import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
 
 @Suppress("MemberVisibilityCanBePrivate")
-class LocationMessage(
-    val latitude: Double, val longitude: Double, override val bot: Bot
-) : IMessage<Message>, KeyboardCreator, BotHolder, ThreadMessage<Message>, EffectableMessage<Message>,
-    BusinessMessage<Message> {
+class LocationMessage(val latitude: Double, val longitude: Double, override val bot: Bot) : IMessage<Message>,
+    KeyboardCreator, BotHolder, ThreadMessage, EffectableMessage, BusinessMessage, SuggestablePostMessage {
 
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
@@ -23,7 +22,7 @@ class LocationMessage(
 
     /**
      * Period during which the location will be updated (see [Live Locations](https://telegram.org/blog/live-locations),
-     * should be between `60` and `86400`, or [LivePeriod.Indefinitely] for live locations that can be edited
+     * should be between `60` and `86400` seconds, or [LivePeriod.Indefinitely] for live locations that can be edited
      * indefinitely.
      * */
     var livePeriod: LivePeriod? = null
@@ -31,6 +30,7 @@ class LocationMessage(
     var proximityAlertRadius: Int? = null
     override var keyboardMarkup: MessageKeyboard? = null
 
+    // TODO some fields not used for edit/stop
     override var messageThreadId: Int? = null
     override var disableNotification: Boolean? = null
     override var replyParameters: ReplyParameters? = null
@@ -38,11 +38,14 @@ class LocationMessage(
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
     override var allowPaidBroadcast: Boolean? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
     override suspend fun send(chatId: ChatId) = sendLocation(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
+        directMessagesTopicId = directMessagesTopicId,
         latitude = latitude,
         longitude = longitude,
         horizontalAccuracy = horizontalAccuracy,
@@ -53,8 +56,9 @@ class LocationMessage(
         protectContent = protectContent,
         allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
+        suggestedPostParameters = suggestedPostParameters,
         replyParameters = replyParameters,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
+        keyboardMarkup = keyboardMarkup?.toMarkup(),
     )
 
     suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageLiveLocation(
@@ -67,7 +71,7 @@ class LocationMessage(
         horizontalAccuracy = horizontalAccuracy,
         heading = heading,
         proximityAlertRadius = proximityAlertRadius,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
+        keyboardMarkup = keyboardMarkup?.toMarkup(),
     )
 
     suspend fun stop(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = stopMessageLiveLocation(
@@ -75,6 +79,6 @@ class LocationMessage(
         chatId = chatId,
         messageId = messageId,
         inlineMessageId = inlineMessageId,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
+        keyboardMarkup = keyboardMarkup?.toMarkup(),
     )
 }

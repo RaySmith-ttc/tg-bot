@@ -6,7 +6,7 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import ru.raysmith.tgbot.model.network.keyboard.*
+import ru.raysmith.tgbot.model.api.keyboard.*
 
 internal object MessageKeyboardPolymorphicSerializer : JsonContentPolymorphicSerializer<MessageKeyboard>(MessageKeyboard::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MessageKeyboard> {
@@ -20,9 +20,9 @@ internal object MessageKeyboardPolymorphicSerializer : JsonContentPolymorphicSer
 }
 
 @KeyboardDsl
-@Serializable(with = MessageKeyboardPolymorphicSerializer::class)
+@Serializable(MessageKeyboardPolymorphicSerializer::class)
 sealed interface MessageKeyboard {
-    val classDiscriminator: String
+    val classDiscriminator: String // TODO ???
     fun toMarkup(): KeyboardMarkup?
 
     companion object {
@@ -33,13 +33,18 @@ sealed interface MessageKeyboard {
                         row {
                             row.forEach { button ->
                                 button {
-                                    this.callbackData = button.callbackData
-                                    this.pay = button.pay
-                                    this.loginUrl = button.loginUrl
                                     this.text = button.text
+                                    this.iconCustomEmojiId = button.iconCustomEmojiId
+                                    this.style = button.style
                                     this.url = button.url
-                                    this.switchInlineQuery = button.switchInlineQuery
+                                    this.callbackData = button.callbackData
                                     this.webApp = button.webApp
+                                    this.loginUrl = button.loginUrl
+                                    this.switchInlineQuery = button.switchInlineQuery
+                                    this.switchInlineQueryCurrentChat = button.switchInlineQueryCurrentChat
+                                    this.switchInlineQueryChosenChat = button.switchInlineQueryChosenChat
+                                    this.copyText = button.copyText
+                                    this.pay = button.pay
                                 }
                             }
                         }

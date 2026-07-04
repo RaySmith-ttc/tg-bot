@@ -20,10 +20,10 @@ import ru.raysmith.tgbot.core.handler.base.isCommand
 import ru.raysmith.tgbot.model.Currency
 import ru.raysmith.tgbot.model.bot.BotCommand
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.inline.content.InputTextMessageContent
-import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultArticle
-import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
-import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.model.api.inline.content.InputTextMessageContent
+import ru.raysmith.tgbot.model.api.inline.result.InlineQueryResultArticle
+import ru.raysmith.tgbot.model.api.menubutton.WebAppInfo
+import ru.raysmith.tgbot.model.api.payment.LabeledPrice
 import ru.raysmith.tgbot.network.TelegramApi
 import ru.raysmith.tgbot.utils.*
 import java.io.File
@@ -36,7 +36,7 @@ private val localIp by lazy {
 private val portHttp = System.getenv("PORT")?.ifEmpty { null }?.toInt() ?: 8080
 private val portHttps = System.getenv("PORT_HTTPS")?.ifEmpty { null }?.toInt() ?: 8081
 private val host = System.getenv("HOST")?.ifEmpty { null } ?: "http://$localIp:$portHttp"
-private val useTestServer = System.getenv("TEST_SERVER") == "true"
+private val useTestServer = System.getenv("TEST_SERVER") != "false"
 private val paymentProviderToken = System.getenv("PAYMENT_PROVIDER_TOKEN")
 
 val webappBot = Bot(useTestServer = useTestServer)
@@ -67,7 +67,7 @@ fun startApp() {
                             textLink("Open via link", "https://t.me/${webappBot.me.username}?startapp").n()
                             textLink("Open specific page via link", "https://t.me/${webappBot.me.username}?startapp=info").n()
                         }
-                        replyKeyboard {
+                        inlineKeyboard {
                             row {
                                 button {
                                     text = "Open via button"
@@ -75,14 +75,6 @@ fun startApp() {
                                 }
                             }
                         }
-//                        inlineKeyboard {
-//                            row {
-//                                button {
-//                                    text = "Open via button"
-//                                    webApp = WebAppInfo(host)
-//                                }
-//                            }
-//                        }
                     }
                 }
             }

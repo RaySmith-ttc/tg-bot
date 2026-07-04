@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
-import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.api.CallbackQuery
 import ru.raysmith.tgbot.utils.datepicker.DatePickerData
 import java.time.LocalDate
 

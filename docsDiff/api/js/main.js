@@ -167,9 +167,7 @@ function backToTopGo () {
 }
 
 function backToTopResize () {
-  var left = getXY(pageContentWrapEl)[0],
-      dwidth = Math.max(window.innerWidth, document.documentElement.clientWidth, 0),
-      dheight = Math.max(window.innerHeight, document.documentElement.clientHeight);
+  var left = 132
 
   curVisible = pageContentWrapEl && left > 130 && dwidth > 640;
   toTopWrapEl.style.width = left + 'px';

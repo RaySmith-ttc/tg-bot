@@ -6,8 +6,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.payment.ShippingOption
-import ru.raysmith.tgbot.model.network.payment.ShippingQuery
+import ru.raysmith.tgbot.model.api.payment.ShippingOption
+import ru.raysmith.tgbot.model.api.payment.ShippingQuery
 
 open class ShippingQueryHandler(
     val shippingQuery: ShippingQuery,
@@ -33,9 +33,11 @@ open class ShippingQueryHandler(
         return ShippingQueryHandler(shippingQuery, bot, handler).block()
     }
 
-    suspend fun answerShippingQuery(ok: Boolean, shippingOptions: List<ShippingOption>, errorMessage: String? = null): Boolean {
-        return answerShippingQuery(
-            shippingQuery.id, ok, Json.encodeToString(shippingOptions), errorMessage
-        )
+    suspend fun answerShippingQuery(
+        ok: Boolean,
+        shippingOptions: List<ShippingOption>,
+        errorMessage: String? = null,
+    ): Boolean {
+        return answerShippingQuery(shippingQuery.id, ok, shippingOptions, errorMessage)
     }
 }

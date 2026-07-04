@@ -71,13 +71,17 @@
         <li><a href="#integration"><strong>Integration</strong></a>
          <ul>
           <li><a href="#mini-apps">Mini Apps</a></li>
-          <li><a href="#bots-for-business">Bots for Business</a></li>
+          <li><a href="#secretary-bots">Secretary Bots</a></li>
+          <li><a href="#managed-bots">Managed Bots</a></li>
+          <li><a href="#bot-to-bot-communication">Bot-to-Bot Communication</a></li>
+          <li><a href="#guest-bots">Guest Bots</a></li>
           <li><a href="#payments">Payments</a></li>
           <li><a href="#web-login">Web Login</a></li>
           <li><a href="#html5-games">HTML5 Games</a></li>
           <li><a href="#stickers-and-custom-emoji">Stickers</a></li>
          </ul></li>
         <li><a href="#monetization"><strong>Monetization</strong></a></li>
+        <li><a href="#advanced-formatting-options"><strong>Advanced Formatting</strong></a></li>
         <li><a href="#language-support"><strong>Language Support</strong></a></li>
         <li><a href="#bot-management"><strong>Bot Management</strong></a>
          <ul>
@@ -390,26 +394,149 @@
        </div>
        <h4><a class="anchor" name="device-hardware-info" href="#device-hardware-info"><i class="anchor-icon"></i></a>Device Hardware Info</h4>
        <p>A user's device can send <a href="https://core.telegram.org/bots/webapps#additional-data-in-user-agent">basic hardware info</a> to mini apps, such as its processing power and memory capacity. Mini apps can then use this to <strong>optimize graphics</strong> and automatically <strong>adjust settings</strong> for the smoothest experience.</p>
-       <h3><a class="anchor" name="bots-for-business" href="#bots-for-business"><i class="anchor-icon"></i></a>Bots for Business</h3>
-       <p>Bots can enable <strong>Business Mode</strong>, allowing <a href="https://telegram.org/blog/telegram-business">Telegram Business</a> subscribers to connect them to their account – streamlining and automating private chat management and interactions with their clients.</p>
-       <p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates normally supported by the <a href="https://core.telegram.org/bots/api">Bot API</a>, except messages sent by itself and other bots. Depending on the business connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
-       <p>Here is a quick start guide to integrate your bot with Telegram Business:</p>
+       <h3><a class="anchor" name="secretary-bots" href="#secretary-bots"><i class="anchor-icon"></i></a>Secretary Bots</h3>
+       <p>Bots can enable <strong>Secretary Mode</strong>, allowing users to connect them to their account and allow it to <strong>process incoming messages</strong> and even <strong>respond</strong> on their behalf.</p>
+       <p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates normally supported by the <a href="https://core.telegram.org/bots/api">Bot API</a>, except messages sent by itself and other bots. Depending on the connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
+       <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400639/5/dNX9ECFkOLs.2619159.png/cbaa22f22167d1451b" style="max-width: 600px;" alt="TITLE">
+          <source src="file\400780400052\3\jE-Kv05jrbA.2162030.mp4\fd1fd73a18777a5503" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <p>Here is a quick start guide for allowing users to connect your bot to their accounts:</p>
        <ul>
-        <li>Enable <strong>Business Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
+        <li>Enable <strong>Secretary Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
         <li>Handle incoming <a href="https://core.telegram.org/bots/api#businessconnection">BusinessConnection</a> updates, signaling that a user has <em>established</em>, <em>edited</em> or <em>ended</em> a Business Connection with your bot.</li>
         <li>Process business messages by handling <code>business_message</code>, <code>edited_business_message</code> and <code>deleted_business_messages</code> updates.</li>
         <li>Check your bot’s write permissions via <code>can_reply</code> in the latest <a href="https://core.telegram.org/bots#businessconnection">BusinessConnection</a> update.</li>
         <li>If allowed to, use the <code>business_connection_id</code> field in <a href="https://core.telegram.org/bots/api#sendmessage">sendMessage</a>, <a href="https://core.telegram.org/bots/api#sendchataction">sendChatAction</a> and other send methods to communicate on behalf of the Business user.</li>
        </ul>
        <p>Users who <strong>connect your bot</strong> to their account will see a <strong>quick action bar</strong> at the top of each managed chat – tapping on “Manage Bot” will redirect them to your bot, which will receive a deep link message in the format <code>/start bizChat&lt;user_chat_id&gt;</code>.</p>
-       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
-        <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400238/1/x875tPT245w.58064/1b426d3eda0a923c03" style="max-width: 400px;" title="" alt="">
-         <source src="file\400780400382\1\BVN6m4W5a6w.4289566.mp4\9dc47caab261eaade4" type="video/mp4">
-        </video>
-       </div>
        <blockquote>
         <p>Please keep in mind that operating bots on Telegram is subject to the <a href="https://telegram.org/tos/bot-developers">Telegram Bot Developer Terms of Service</a>. Specifically, for Telegram Business, make sure you have read and understood <a href="https://telegram.org/tos/bot-developers#5-4-telegram-business">Section 5.4</a>.</p>
        </blockquote>
+       <h3><a class="anchor" name="managed-bots" href="#managed-bots"><i class="anchor-icon"></i></a>Managed Bots</h3>
+       <p>Telegram allows bots to create and <strong>manage other bots</strong> on behalf of their owners. You can choose an existing third-party bot as a manager or create your own.</p>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="AI Managed Bot">
+          <source src="file\400780400324\6\GkwTVCnGHaw.2913685.mp4\b5e8e586657ac3e204" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <blockquote>
+        <p>Your bot manager can allow users to seamlessly spin up their own personal <strong>AI agents</strong>, <a href="#bots-for-business">business bots</a>, games, custom productivity tools and more.</p>
+       </blockquote>
+       <h4><a class="anchor" name="creating-your-own-management-bot" href="#creating-your-own-management-bot"><i class="anchor-icon"></i></a>Creating Your Own Management Bot</h4>
+       <p>To make your own management bot, simply do the following:</p>
+       <ol>
+        <li>Choose one of your existing bots or <a href="https://core.telegram.org/bots/features#creating-a-new-bot">create a new bot</a> via <a href="https://t.me/botfather">@BotFather</a>.</li>
+        <li>Open the bot's settings in BotFather’s <a href="https://t.me/Botfather?startapp">MiniApp</a> and enable <em>'Bot Management Mode'</em>.</li>
+       </ol>
+       <h4><a class="anchor" name="sharing-your-management-bot" href="#sharing-your-management-bot"><i class="anchor-icon"></i></a>Sharing Your Management Bot</h4>
+       <p>Once enabled, you can allow others to utilize your bot to create and manage their own bots.</p>
+       <p>To do so, send users a link in this format:</p>
+       <pre><code>https://t.me/newbot/{manager_bot_username}/{new_username}?name={new_name}</code></pre>
+       <div>
+        <br>
+       </div>
+       <p>For example, if the bot you created was called <strong>@ManagerBot</strong>, it could look like this – where <code>new_username</code> is a suggested placeholder for the user's new bot and <code>new_name</code> is a suggested display name:</p>
+       <pre><code>https://t.me/newbot/ManagerBot/CoolAIAgentBot?name=Cool+AI+Agent</code></pre>
+       <p>When the user opens the link, they will see a window to finish creating their bot, where the bot's @username and display name are pre-filled, but editable.</p>
+       <h4><a class="anchor" name="using-your-management-bot" href="#using-your-management-bot"><i class="anchor-icon"></i></a>Using Your Management Bot</h4>
+       <p>Once the user confirms the information, the bot is created:</p>
+       <ul>
+        <li>Your <strong>@ManagerBot</strong> receives a <code>managed_bot</code> update with a <a href="/bots/api#managedbotupdated">ManagedBotUpdated</a> object.</li>
+        <li>This object includes basic information on the new bot and its creator.</li>
+        <li>You can use the Bot API method <a href="/bots/api#getmanagedbottoken">getManagedBotToken</a> to fetch the bot's access token.</li>
+        <li>You can then control the new bot via the Bot API, receive and respond to messages, change its <a href="/bots/api#setmyprofilephoto">profile</a>, <a href="https://core.telegram.org/bots/api#setmycommands">settings</a> and more.</li>
+       </ul>
+       <h3><a class="anchor" name="bot-to-bot-communication" href="#bot-to-bot-communication"><i class="anchor-icon"></i></a>Bot-to-Bot Communication</h3>
+       <p>On Telegram, bots generally <strong>cannot see</strong> messages from other bots. However, in specific contexts, Bot-to-Bot communication is <strong>allowed</strong> – unlocking complex agentic flows and AI-powered use cases.</p>
+       <blockquote>
+        <p>Regardless of context, you should make sure <em>Bot-to-Bot Communication Mode</em> is enabled for your bot in <a href="https://t.me/botfather">@BotFather</a> to take full advantage of this feature.</p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-in-group-chats" href="#communication-in-group-chats"><i class="anchor-icon"></i></a>Communication in Group Chats</h5>
+       <p>A bot can interact with another bot within the same group by:</p>
+       <ul>
+        <li>Mentioning it in a command: <code>/command@OtherBot</code>.</li>
+        <li>Replying directly to a message from the bot.</li>
+       </ul>
+       <p>If at least one of the bots has <em>Bot-to-Bot Communication Mode</em> enabled, the receiving bot will get the message and will be able to respond.</p>
+       <p>Additionally, bots with <em>Bot-to-Bot Communication Mode</em> enabled will receive <strong>all</strong> messages from other bots in groups without explicit mentions or replies if they:</p>
+       <ul>
+        <li>Have admin rights in the group, or</li>
+        <li>Have Group Privacy Mode disabled</li>
+       </ul>
+       <blockquote>
+        <p><strong>Example</strong><br>
+         A contributor bot may request a code review from a reviewer bot and processes feedback directly in the group – optionally with human supervision.</p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-in-private-chats" href="#communication-in-private-chats"><i class="anchor-icon"></i></a>Communication in Private Chats</h5>
+       <p>Bots can send private messages to other bots by passing their <code>@username</code> to the <a href="/bots/api#sendmessage">sendMessage</a> method.</p>
+       <p>This requires <em>Bot-to-Bot Communication Mode</em> to be enabled for both the sender and the recipient of the message.</p>
+       <blockquote>
+        <p><strong>Example</strong><br>
+         Two AI agent bots could coordinate directly via private messages to orchestrate a complex multi-step flow.</p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-via-business-accounts" href="#communication-via-business-accounts"><i class="anchor-icon"></i></a>Communication via Business Accounts</h5>
+       <p>If a bot is connected to a business account using <em>Chat Access Mode</em>, it can send messages to other bots used by that business account.</p>
+       <p>This requires <em>Bot-to-Bot Communication Mode</em> to be enabled for the bot that is sending the messages.</p>
+       <blockquote>
+        <p><strong>Example</strong><br>
+         Using another bot as a <strong>tool</strong> within business workflows – to book reservations, process customer queries, or perform complex tasks on behalf of a user.</p>
+       </blockquote>
+       <h4><a class="anchor" name="loop-prevention-requirements" href="#loop-prevention-requirements"><i class="anchor-icon"></i></a>Loop Prevention Requirements</h4>
+       <p>Bot-to-bot communication can easily result in <strong>infinite interaction loops</strong>. When enabling this feature, you must implement safeguards to ensure interactions terminate.</p>
+       <p><strong>Recommended Safeguards</strong></p>
+       <ul>
+        <li>Deduplicate repeated messages.</li>
+        <li>Apply rate limits (e.g., no more than one reply every few seconds per bot).</li>
+        <li>Enforce maximum interaction depth or timeouts, both globally and per sender/receiver.</li>
+       </ul>
+       <blockquote>
+        <p><img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"> <strong>Important</strong><br>
+         Your bot must remain stable even if another bot intentionally responds instantly and continuously.<br>
+         Failure to handle loops properly may lead to degraded performance or platform restrictions.</p>
+       </blockquote>
+       <h3><a class="anchor" name="guest-bots" href="#guest-bots"><i class="anchor-icon"></i></a>Guest Bots</h3>
+       <p>Telegram bots can enable <strong>Guest Mode</strong> to easily interact with users in any <strong>group</strong> or <strong>private chat</strong> on Telegram. This allows for seamless utility integration without the overhead of chat management or access to message history.</p>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="Guest Bots" poster="/file/400780400097/2/Cfjt6tSE0UE.75990.jpg/e408f7a9eb1ff93736">
+          <source src="file\400780400507\2\HA9w0y-JaJA.4068142.mp4\72dbc63ed44ef9fe89" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <blockquote>
+        <p>To enable this feature, simply open your bot's settings in BotFather's <a href="https://t.me/Botfather?startapp">MiniApp</a> and enable <em>'Guest Mode'</em>.</p>
+       </blockquote>
+       <h4><a class="anchor" name="guest-interactions" href="#guest-interactions"><i class="anchor-icon"></i></a>Guest Interactions</h4>
+       <p>When a user mentions a guest bot (e.g., <code>@botname</code>) in a supported chat or replies to one of its messages, the bot receives a dedicated update and is able to issue one reply. This allows the bot to:</p>
+       <ul>
+        <li><strong>Receive Context</strong> from a dedicated update that includes the summoning message and, when present, the specific message it was replying to.</li>
+        <li><strong>Respond Directly</strong> with a message back to the chat where the interaction occurred, even without being a participant.</li>
+       </ul>
+       <p>Guest mode <strong>does not</strong> grant access to a chat's message history or participant list. Similarly, the guest bot won't receive updates about future messages in the chat unless it is mentioned again or directly replied to.</p>
+       <blockquote>
+        <p>You can mention up to <strong>3</strong> guest bots in your message at the same time, allowing for more complex or cooperative agentic flows.</p>
+       </blockquote>
+       <h4><a class="anchor" name="use-cases-guest-mode-vs-inline-mode" href="#use-cases-guest-mode-vs-inline-mode"><i class="anchor-icon"></i></a>Use Cases: Guest Mode vs. Inline Mode</h4>
+       <p>Telegram bots also support <a href="#inline-requests">Inline Mode</a>, which allows sending requests to bots right from the input field — from any chat on Telegram.</p>
+       <p>The difference is that <strong>Inline Mode</strong> is for fetching or accessing content (e.g., gifs, quotes, articles) via a bot to send it <em>yourself</em> in one tap, while <strong>Guest Mode</strong> allows a bot to actively participate and independently reply <em>as itself</em> in any chat based on the relevant context.</p>
+       <p><strong>Guest Mode is ideal for:</strong></p>
+       <ul>
+        <li><strong>AI Assistants:</strong> Summoning an agent to answer a specific question or carry out a task, reporting its progress back to the chat or group.</li>
+        <li><strong>Contextual Tools:</strong> Translation, fact-checking, and similar context-dependent or multi-step utilities.</li>
+        <li><strong>Temporary Utility:</strong> Bringing a bot's functionality into a chat briefly without cluttering the participant list, exposing messages or granting any permissions.</li>
+       </ul>
+       <p><strong>Inline Mode is ideal for:</strong></p>
+       <ul>
+        <li><strong>Search &amp; Share:</strong> Finding and instantly sending content (e.g., try <code>@gif</code> or <code>@pic</code>) without leaving the current chat.</li>
+        <li><strong>Quick Utilities:</strong> Fetching calculations, formatting text, or checking quick stats on the fly.</li>
+        <li><strong>Flexible Attachments:</strong> Using inline Mini Apps (e.g., try <code>@durgerkingbot</code>) to attach or access interactive menus, complex interfaces and custom items on the fly.</li>
+       </ul>
        <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
        <blockquote>
         <p>If your bot or mini app sells <strong>digital goods and services</strong>, be sure to carry out the payment in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> by specifying <code>XTR</code> as currency. In compliance with third-party store policies, Telegram does not support the sale of digital goods and services using other currencies.</p>
@@ -499,6 +626,44 @@
        <p>Once you're done creating and sharing your artwork, don't forget to check out our <a href="api#stickers">remaining sticker methods</a> to find out how to <a href="api#setstickersetthumb">edit</a>, <a href="api#deletestickerfromset">delete</a> and even <a href="api#setstickerpositioninset">reorder</a> your pack.</p>
        <blockquote>
         <p>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>.</p>
+       </blockquote>
+       <h4><a class="anchor" name="advanced-formatting-options" href="#advanced-formatting-options"><i class="anchor-icon"></i></a>Advanced Formatting Options</h4>
+       <p>Telegram bots can use a broad set of native text styling tools to send <strong>richly formatted messages</strong> in any chat. Supported formats include complex nested emphasis, code, structured documents, customizable tables, mathematical formulas and nearly <strong>one hundred</strong> other options.</p>
+       <p>Formatting is available on two levels – both render natively in <strong>all Telegram apps</strong>:</p>
+       <ul>
+        <li><a href="/bots/api#inputrichmessage"><strong>Rich Messages</strong></a> for advanced structured content</li>
+        <li><a href="/bots/api#sendMessage"><strong>Regular Messages</strong></a> for lightweight formatted text.</li>
+       </ul>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted poster="/file/400780400485/5/ZlL9lRtV5dg.45747.jpg/c564788bd371f0ac48" style="max-width: 400px;" title="" alt="Rich Text Formatting for Bots" vindex="1" preload="auto">
+         <source src="file\400780400478\5\5rtLzULtA5E.3640041.mp4\a641a5c9d3290e2b78" type="video/mp4">
+        </video>
+       </div>
+       <blockquote>
+        <p>Send a message to <a href="https://t.me/richtextdemobot">@RichTextDemoBot</a> to play around with an interactive <strong>rich message</strong> demo.</p>
+       </blockquote>
+       <h4><a class="anchor" name="rich-messages" href="#rich-messages"><i class="anchor-icon"></i></a>Rich Messages</h4>
+       <p>Rich messages are designed for highly structured responses: reports, AI-streamed answers, documentation snippets, technical papers and similarly complex content.</p>
+       <p>These messages support both <a href="/bots/api#rich-markdown-style"><strong>Rich Markdown</strong></a> and <a href="/bots/api#rich-html-style"><strong>Rich HTML</strong></a>. Rich Markdown follows GitHub Flavored Markdown where possible and can include supported HTML tags directly in the same message. Rich HTML gives bots granular control over even more formatting features with dedicated tags.</p>
+       <p><a href="/bots/api#rich-markdown-style">Supported styles</a> include:</p>
+       <ul>
+        <li>Headings, paragraphs, dividers, lists and task lists.</li>
+        <li>Deeply nested inline formatting, including bold, italic, underline, strikethrough, spoiler, code, subscript and superscript.</li>
+        <li>Tables with alignment, captions, borders, striped styling, column spans and row spans.</li>
+        <li>Media blocks for photos, videos and audio files, with captions and credits.</li>
+        <li>Block quotes, pull quotes, collapsible details blocks, anchors and in-document links</li>
+        <li>Footnotes and referenced text.</li>
+        <li>Full LaTeX support, including both inline and block formulas.</li>
+        <li>Maps with custom coordinates, collages, slideshows and more.</li>
+       </ul>
+       <blockquote>
+        <p>See <a href="/bots/api#rich-message-formatting-options">here</a> for the full syntax grammar with examples.</p>
+       </blockquote>
+       <h4><a class="anchor" name="regular-messages" href="#regular-messages"><i class="anchor-icon"></i></a>Regular Messages</h4>
+       <p>Regular <a href="/bots/api#sendmessage">messages</a> are simpler and more lightweight versions of their rich counterparts. They support <a href="/bots/api#markdownv2-style"><strong>MarkdownV2</strong></a> and <a href="/bots/api#html-style"><strong>HTML</strong></a> formatting – concise styles that are the best choice for short text, confirmations, simple chat flows and other content that does not require complex structure.</p>
+       <p>Regular messages are simpler to work with for basic use cases and support exclusive interactions like <a href="https://telegram.org/blog/reply-revolution#reply-revolution">partial quotes</a> and <strong>quoting messages to other chats</strong>.</p>
+       <blockquote>
+        <p>See <a href="/bots/api#formatting-options">here</a> for the full syntax grammar with examples.</p>
        </blockquote>
        <h3><a class="anchor" name="language-support" href="#language-support"><i class="anchor-icon"></i></a>Language Support</h3>
        <p>Bots can tailor their interfaces to <strong>support multiple languages</strong> – updating inputs and information on the fly. A user’s <a href="/bots/api#user">language_code</a> is included in every relevant <a href="/bots/api#update">update</a> as an <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a>, allowing bots to adapt accordingly.</p>
@@ -780,7 +945,7 @@
       <h5><a href="//telegram.org/press">Press</a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="//telegram.org/moderation">Moderation</a></h5>
+      <h5><a href="//telegram.org/safety">Safety</a></h5>
      </div>
     </div>
    </div>

@@ -15,7 +15,8 @@
   <link rel="alternate icon" href="img\favicon.ico" type="image/x-icon">
   <link href="css\bootstrap.min.css" rel="stylesheet">
   <link href="css\telegram.css" rel="stylesheet" media="screen">
-  <style></style>
+  <style>
+    </style>
   <meta charset="UTF-8">
   <style>
     ins {
@@ -170,13 +171,26 @@
         <li><a href="#integration"><strong>Integration</strong></a>
          <ul>
           <li><a href="#mini-apps">Mini Apps</a></li>
-          <li><a href="#bots-for-business">Bots for Business</a></li>
+          <li><a href="#secretary-bots">
+            <ins class="diffins">Secretary</ins>Bots</a></li>
+          <li><a href="#managed-bots">
+            <ins class="diffins">Managed</ins>
+            <del class="diffmod">for</del>
+            <ins class="diffmod">Bots</ins></a></li>
+          <li><a href="#bot-to-bot-communication">
+            <ins class="diffmod">Bot-to-Bot</ins>
+            <del class="diffmod">Business</del>
+            <ins class="diffmod">Communication</ins></a></li>
+          <li><a href="#guest-bots">
+            <ins class="diffmod">Guest Bots</ins></a></li>
           <li><a href="#payments">Payments</a></li>
           <li><a href="#web-login">Web Login</a></li>
           <li><a href="#html5-games">HTML5 Games</a></li>
           <li><a href="#stickers-and-custom-emoji">Stickers</a></li>
          </ul></li>
         <li><a href="#monetization"><strong>Monetization</strong></a></li>
+        <li><a href="#advanced-formatting-options"><strong>
+           <ins class="diffins">Advanced Formatting</ins></strong></a></li>
         <li><a href="#language-support"><strong>Language Support</strong></a></li>
         <li><a href="#bot-management"><strong>Bot Management</strong></a>
          <ul>
@@ -337,9 +351,7 @@
        <ul>
         <li>Use <a href="#web-apps">Web Apps</a> to replace any website.</li>
         <li>Build tools and integrate <a href="#bots-for-business">business services</a>.</li>
-        <li>Accept <a href="#payments">Payments</a> via 
-         <del class="diffdel">dozens of integrated</del>third-party payment providers
-         <ins class="diffins">that support integration with Bots and Mini Apps</ins>.</li>
+        <li>Accept <a href="#payments">Payments</a> via third-party payment providers that support integration with Bots and Mini Apps.</li>
         <li>Connect to Telegram using the <a href="#web-login">Web Login</a> functionality.</li>
         <li>Create gaming bots by integrating <a href="#html5-games">HTML5 Games</a>.</li>
         <li>Help users create and manage <a href="#stickers-and-custom-emoji">Telegram Stickers</a>.</li>
@@ -491,12 +503,52 @@
        </div>
        <h4><a class="anchor" name="device-hardware-info" href="#device-hardware-info"><i class="anchor-icon"></i></a>Device Hardware Info</h4>
        <p>A user's device can send <a href="https://core.telegram.org/bots/webapps#additional-data-in-user-agent">basic hardware info</a> to mini apps, such as its processing power and memory capacity. Mini apps can then use this to <strong>optimize graphics</strong> and automatically <strong>adjust settings</strong> for the smoothest experience.</p>
-       <h3><a class="anchor" name="bots-for-business" href="#bots-for-business"><i class="anchor-icon"></i></a>Bots for Business</h3>
-       <p>Bots can enable <strong>Business Mode</strong>, allowing <a href="https://telegram.org/blog/telegram-business">Telegram Business</a> subscribers to connect them to their account – streamlining and automating private chat management and interactions with their clients.</p>
-       <p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates normally supported by the <a href="https://core.telegram.org/bots/api">Bot API</a>, except messages sent by itself and other bots. Depending on the business connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
-       <p>Here is a quick start guide to integrate your bot with Telegram Business:</p>
+       <h3><a class="anchor" name="secretary-bots" href="#secretary-bots"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Secretary</ins>Bots
+        <del class="diffdel">for Business</del></h3>
+       <p>Bots can enable <strong>
+         <del class="diffmod">Business</del>
+         <ins class="diffmod">Secretary</ins> Mode</strong>, allowing <a href="https://telegram.org/blog/telegram-business">
+         <del class="diffmod">Telegram Business</del></a>
+        <del class="diffmod">subscribers</del>
+        <ins class="diffmod">users</ins> to connect them to their account 
+        <del class="diffmod">–</del>
+        <ins class="diffmod">and</ins>
+        <del class="diffmod">streamlining</del>
+        <ins class="diffmod">allow it to</ins><strong>
+         <ins class="diffmod">process incoming messages</ins></strong> and 
+        <del class="diffmod">automating</del>
+        <ins class="diffmod">even</ins>
+        <del class="diffmod">private</del><strong>
+         <ins class="mod">
+          <ins class="diffmod">respond</ins></ins></strong>
+        <del class="diffmod">chat management and interactions with</del>
+        <ins class="diffmod">on</ins> their 
+        <del class="diffmod">clients</del>
+        <ins class="diffmod">behalf</ins>.</p>
+       <p>The <strong>account owner</strong> can specify which chats your bot can access – within those chats, the bot will receive all updates normally supported by the <a href="https://core.telegram.org/bots/api">Bot API</a>, except messages sent by itself and other bots. Depending on the 
+        <del class="diffdel">business</del>connection settings, your bot may also be able to <strong>send messages</strong> and do other actions on behalf of the account owner in chats that were active in the last 24h.</p>
+       <div class="blog_video_player_wrap" style="max-width: 600px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted poster="/file/400780400639/5/dNX9ECFkOLs.2619159.png/cbaa22f22167d1451b" style="max-width: 600px;" alt="TITLE">
+          <source src="file\400780400052\3\jE-Kv05jrbA.2162030.mp4\fd1fd73a18777a5503" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <p>Here is a quick start guide 
+        <ins class="diffins">for allowing users</ins>to 
+        <del class="diffmod">integrate</del>
+        <ins class="diffmod">connect</ins> your bot 
+        <del class="diffmod">with</del>
+        <ins class="diffmod">to</ins>
+        <del class="diffmod">Telegram</del>
+        <ins class="diffmod">their</ins>
+        <del class="diffmod">Business</del>
+        <ins class="diffmod">accounts</ins>:</p>
        <ul>
-        <li>Enable <strong>Business Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
+        <li>Enable <strong>
+          <del class="diffmod">Business</del>
+          <ins class="diffmod">Secretary</ins> Mode</strong> for your bot in <a href="https://t.me/botfather">@BotFather</a>.</li>
         <li>Handle incoming <a href="https://core.telegram.org/bots/api#businessconnection">BusinessConnection</a> updates, signaling that a user has <em>established</em>, <em>edited</em> or <em>ended</em> a Business Connection with your bot.</li>
         <li>Process business messages by handling <code>business_message</code>, <code>edited_business_message</code> and <code>deleted_business_messages</code> updates.</li>
         <li>Check your bot’s write permissions via <code>can_reply</code> in the latest <a href="https://core.telegram.org/bots#businessconnection">BusinessConnection</a> update.</li>
@@ -511,12 +563,300 @@
        <blockquote>
         <p>Please keep in mind that operating bots on Telegram is subject to the <a href="https://telegram.org/tos/bot-developers">Telegram Bot Developer Terms of Service</a>. Specifically, for Telegram Business, make sure you have read and understood <a href="https://telegram.org/tos/bot-developers#5-4-telegram-business">Section 5.4</a>.</p>
        </blockquote>
+       <h3><a class="anchor" name="managed-bots" href="#managed-bots"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Managed Bots</ins></h3>
+       <p>
+        <ins class="diffins">Telegram allows bots to create and</ins><strong>
+         <ins class="diffins">manage other bots</ins></strong>
+        <ins class="diffins">on behalf of their owners. You can choose an existing third-party bot as a manager or create your own.</ins></p>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="AI Managed Bot">
+          <source src="file\400780400324\6\GkwTVCnGHaw.2913685.mp4\b5e8e586657ac3e204" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <blockquote>
+        <p>
+         <ins class="diffins">Your bot manager can allow users to seamlessly spin up their own personal</ins><strong>
+          <ins class="diffins">AI agents</ins></strong>
+         <ins class="diffins">,</ins><a href="#bots-for-business">
+          <ins class="diffins">business bots</ins></a>
+         <ins class="diffins">, games, custom productivity tools and more.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="creating-your-own-management-bot" href="#creating-your-own-management-bot"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Creating Your Own Management Bot</ins></h4>
+       <p>
+        <ins class="diffins">To make your own management bot, simply do the following:</ins></p>
+       <ol>
+        <li>
+         <ins class="diffins">Choose one of your existing bots or</ins><a href="https://core.telegram.org/bots/features#creating-a-new-bot">
+          <ins class="diffins">create a new bot</ins></a>
+         <ins class="diffins">via</ins><a href="https://t.me/botfather">
+          <ins class="diffins">@BotFather</ins></a>
+         <ins class="diffins">.</ins></li>
+        <li>
+         <ins class="diffins">Open the bot's settings in BotFather’s</ins><a href="https://t.me/Botfather?startapp">
+          <ins class="diffins">MiniApp</ins></a>
+         <ins class="diffins">and enable</ins><em>
+          <ins class="diffins">'Bot Management Mode'</ins></em>
+         <ins class="diffins">.</ins></li>
+       </ol>
+       <h4><a class="anchor" name="sharing-your-management-bot" href="#sharing-your-management-bot"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Sharing Your Management Bot</ins></h4>
+       <p>
+        <ins class="diffins">Once enabled, you can allow others to utilize your bot to create and manage their own bots.</ins></p>
+       <p>
+        <ins class="diffins">To do so, send users a link in this format:</ins></p>
+       <pre><code><ins class="diffins">https://t.me/newbot/{manager_bot_username}/{new_username}?name={new_name}</ins></code></pre>
+       <div>
+        <br>
+       </div>
+       <p>
+        <ins class="diffins">For example, if the bot you created was called</ins><strong>
+         <ins class="diffins">@ManagerBot</ins></strong>
+        <ins class="diffins">, it could look like this – where</ins><code>
+         <ins class="diffins">new_username</ins></code>
+        <ins class="diffins">is a suggested placeholder for the user's new bot and</ins><code>
+         <ins class="diffins">new_name</ins></code>
+        <ins class="diffins">is a suggested display name:</ins></p>
+       <pre><code><ins class="diffins">https://t.me/newbot/ManagerBot/CoolAIAgentBot?name=Cool+AI+Agent</ins></code></pre>
+       <p>
+        <ins class="diffins">When the user opens the link, they will see a window to finish creating their bot, where the bot's @username and display name are pre-filled, but editable.</ins></p>
+       <h4><a class="anchor" name="using-your-management-bot" href="#using-your-management-bot"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Using Your Management Bot</ins></h4>
+       <p>
+        <ins class="diffins">Once the user confirms the information, the bot is created:</ins></p>
+       <ul>
+        <li>
+         <ins class="diffins">Your</ins><strong>
+          <ins class="diffins">@ManagerBot</ins></strong>
+         <ins class="diffins">receives a</ins><code>
+          <ins class="diffins">managed_bot</ins></code>
+         <ins class="diffins">update with a</ins><a href="/bots/api#managedbotupdated">
+          <ins class="diffins">ManagedBotUpdated</ins></a>
+         <ins class="diffins">object.</ins></li>
+        <li>
+         <ins class="diffins">This object includes basic information on the new bot and its creator.</ins></li>
+        <li>
+         <ins class="diffins">You can use the Bot API method</ins><a href="/bots/api#getmanagedbottoken">
+          <ins class="diffins">getManagedBotToken</ins></a>
+         <ins class="diffins">to fetch the bot's access token.</ins></li>
+        <li>
+         <ins class="diffins">You can then control the new bot via the Bot API, receive and respond to messages, change its</ins><a href="/bots/api#setmyprofilephoto">
+          <ins class="diffins">profile</ins></a>
+         <ins class="diffins">,</ins><a href="https://core.telegram.org/bots/api#setmycommands">
+          <ins class="diffins">settings</ins></a>
+         <ins class="diffins">and more.</ins></li>
+       </ul>
+       <h3><a class="anchor" name="bot-to-bot-communication" href="#bot-to-bot-communication"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Bot-to-Bot Communication</ins></h3>
+       <p>
+        <ins class="diffins">On Telegram, bots generally</ins><strong>
+         <ins class="diffins">cannot see</ins></strong>
+        <ins class="diffins">messages from other bots. However, in specific contexts, Bot-to-Bot communication is</ins><strong>
+         <ins class="diffins">allowed</ins></strong>
+        <ins class="diffins">– unlocking complex agentic flows and AI-powered use cases.</ins></p>
+       <blockquote>
+        <p>
+         <ins class="diffins">Regardless of context, you should make sure</ins><em>
+          <ins class="diffins">Bot-to-Bot Communication Mode</ins></em>
+         <ins class="diffins">is enabled for your bot in</ins><a href="https://t.me/botfather">
+          <ins class="diffins">@BotFather</ins></a>
+         <ins class="diffins">to take full advantage of this feature.</ins></p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-in-group-chats" href="#communication-in-group-chats"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Communication in Group Chats</ins></h5>
+       <p>
+        <ins class="diffins">A bot can interact with another bot within the same group by:</ins></p>
+       <ul>
+        <li>
+         <ins class="diffins">Mentioning it in a command:</ins><code>
+          <ins class="diffins">/command@OtherBot</ins></code>
+         <ins class="diffins">.</ins></li>
+        <li>
+         <ins class="diffins">Replying directly to a message from the bot.</ins></li>
+       </ul>
+       <p>
+        <ins class="diffins">If at least one of the bots has</ins><em>
+         <ins class="diffins">Bot-to-Bot Communication Mode</ins></em>
+        <ins class="diffins">enabled, the receiving bot will get the message and will be able to respond.</ins></p>
+       <p>
+        <ins class="diffins">Additionally, bots with</ins><em>
+         <ins class="diffins">Bot-to-Bot Communication Mode</ins></em>
+        <ins class="diffins">enabled will receive</ins><strong>
+         <ins class="diffins">all</ins></strong>
+        <ins class="diffins">messages from other bots in groups without explicit mentions or replies if they:</ins></p>
+       <ul>
+        <li>
+         <ins class="diffins">Have admin rights in the group, or</ins></li>
+        <li>
+         <ins class="diffins">Have Group Privacy Mode disabled</ins></li>
+       </ul>
+       <blockquote>
+        <p><strong>
+          <ins class="diffins">Example</ins></strong><br>
+         <ins class="diffins">A contributor bot may request a code review from a reviewer bot and processes feedback directly in the group – optionally with human supervision.</ins></p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-in-private-chats" href="#communication-in-private-chats"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Communication in Private Chats</ins></h5>
+       <p>
+        <ins class="diffins">Bots can send private messages to other bots by passing their</ins><code>
+         <ins class="diffins">@username</ins></code>
+        <ins class="diffins">to the</ins><a href="/bots/api#sendmessage">
+         <ins class="diffins">sendMessage</ins></a>
+        <ins class="diffins">method.</ins></p>
+       <p>
+        <ins class="diffins">This requires</ins><em>
+         <ins class="diffins">Bot-to-Bot Communication Mode</ins></em>
+        <ins class="diffins">to be enabled for both the sender and the recipient of the message.</ins></p>
+       <blockquote>
+        <p><strong>
+          <ins class="diffins">Example</ins></strong><br>
+         <ins class="diffins">Two AI agent bots could coordinate directly via private messages to orchestrate a complex multi-step flow.</ins></p>
+       </blockquote>
+       <h5><a class="anchor" name="communication-via-business-accounts" href="#communication-via-business-accounts"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Communication via Business Accounts</ins></h5>
+       <p>
+        <ins class="diffins">If a bot is connected to a business account using</ins><em>
+         <ins class="diffins">Chat Access Mode</ins></em>
+        <ins class="diffins">, it can send messages to other bots used by that business account.</ins></p>
+       <p>
+        <ins class="diffins">This requires</ins><em>
+         <ins class="diffins">Bot-to-Bot Communication Mode</ins></em>
+        <ins class="diffins">to be enabled for the bot that is sending the messages.</ins></p>
+       <blockquote>
+        <p><strong>
+          <ins class="diffins">Example</ins></strong><br>
+         <ins class="diffins">Using another bot as a</ins><strong>
+          <ins class="diffins">tool</ins></strong>
+         <ins class="diffins">within business workflows – to book reservations, process customer queries, or perform complex tasks on behalf of a user.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="loop-prevention-requirements" href="#loop-prevention-requirements"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Loop Prevention Requirements</ins></h4>
+       <p>
+        <ins class="diffins">Bot-to-bot communication can easily result in</ins><strong>
+         <ins class="diffins">infinite interaction loops</ins></strong>
+        <ins class="diffins">. When enabling this feature, you must implement safeguards to ensure interactions terminate.</ins></p>
+       <p><strong>
+         <ins class="diffins">Recommended Safeguards</ins></strong></p>
+       <ul>
+        <li>
+         <ins class="diffins">Deduplicate repeated messages.</ins></li>
+        <li>
+         <ins class="diffins">Apply rate limits (e.g., no more than one reply every few seconds per bot).</ins></li>
+        <li>
+         <ins class="diffins">Enforce maximum interaction depth or timeouts, both globally and per sender/receiver.</ins></li>
+       </ul>
+       <blockquote>
+        <p>
+         <ins class="diffins"><img class="emoji" src="img\emoji\40\E29AA0.png" width="20" height="20" alt="⚠️"></ins><strong>
+          <ins class="diffins">Important</ins></strong><br>
+         <ins class="diffins">Your bot must remain stable even if another bot intentionally responds instantly and continuously.</ins><br>
+         <ins class="diffins">Failure to handle loops properly may lead to degraded performance or platform restrictions.</ins></p>
+       </blockquote>
+       <h3><a class="anchor" name="guest-bots" href="#guest-bots"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Guest Bots</ins></h3>
+       <p>
+        <ins class="diffins">Telegram bots can enable</ins><strong>
+         <ins class="diffins">Guest Mode</ins></strong>
+        <ins class="diffins">to easily interact with users in any</ins><strong>
+         <ins class="diffins">group</ins></strong>
+        <ins class="diffins">or</ins><strong>
+         <ins class="diffins">private chat</ins></strong>
+        <ins class="diffins">on Telegram. This allows for seamless utility integration without the overhead of chat management or access to message history.</ins></p>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <div>
+         <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" autoplay loop controls muted style="max-width: 400px;" alt="Guest Bots" poster="/file/400780400097/2/Cfjt6tSE0UE.75990.jpg/e408f7a9eb1ff93736">
+          <source src="file\400780400507\2\HA9w0y-JaJA.4068142.mp4\72dbc63ed44ef9fe89" type="video/mp4">
+         </video>
+        </div>
+       </div>
+       <blockquote>
+        <p>
+         <ins class="diffins">To enable this feature, simply open your bot's settings in BotFather's</ins><a href="https://t.me/Botfather?startapp">
+          <ins class="diffins">MiniApp</ins></a>
+         <ins class="diffins">and enable</ins><em>
+          <ins class="diffins">'Guest Mode'</ins></em>
+         <ins class="diffins">.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="guest-interactions" href="#guest-interactions"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Guest Interactions</ins></h4>
+       <p>
+        <ins class="diffins">When a user mentions a guest bot (e.g.,</ins><code>
+         <ins class="diffins">@botname</ins></code>
+        <ins class="diffins">) in a supported chat or replies to one of its messages, the bot receives a dedicated update and is able to issue one reply. This allows the bot to:</ins></p>
+       <ul>
+        <li><strong>
+          <ins class="diffins">Receive Context</ins></strong>
+         <ins class="diffins">from a dedicated update that includes the summoning message and, when present, the specific message it was replying to.</ins></li>
+        <li><strong>
+          <ins class="diffins">Respond Directly</ins></strong>
+         <ins class="diffins">with a message back to the chat where the interaction occurred, even without being a participant.</ins></li>
+       </ul>
+       <p>
+        <ins class="diffins">Guest mode</ins><strong>
+         <ins class="diffins">does not</ins></strong>
+        <ins class="diffins">grant access to a chat's message history or participant list. Similarly, the guest bot won't receive updates about future messages in the chat unless it is mentioned again or directly replied to.</ins></p>
+       <blockquote>
+        <p>
+         <ins class="diffins">You can mention up to</ins><strong>
+          <ins class="diffins">3</ins></strong>
+         <ins class="diffins">guest bots in your message at the same time, allowing for more complex or cooperative agentic flows.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="use-cases-guest-mode-vs-inline-mode" href="#use-cases-guest-mode-vs-inline-mode"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Use Cases: Guest Mode vs. Inline Mode</ins></h4>
+       <p>
+        <ins class="diffins">Telegram bots also support</ins><a href="#inline-requests">
+         <ins class="diffins">Inline Mode</ins></a>
+        <ins class="diffins">, which allows sending requests to bots right from the input field — from any chat on Telegram.</ins></p>
+       <p>
+        <ins class="diffins">The difference is that</ins><strong>
+         <ins class="diffins">Inline Mode</ins></strong>
+        <ins class="diffins">is for fetching or accessing content (e.g., gifs, quotes, articles) via a bot to send it</ins><em>
+         <ins class="diffins">yourself</ins></em>
+        <ins class="diffins">in one tap, while</ins><strong>
+         <ins class="diffins">Guest Mode</ins></strong>
+        <ins class="diffins">allows a bot to actively participate and independently reply</ins><em>
+         <ins class="diffins">as itself</ins></em>
+        <ins class="diffins">in any chat based on the relevant context.</ins></p>
+       <p><strong>
+         <ins class="diffins">Guest Mode is ideal for:</ins></strong></p>
+       <ul>
+        <li><strong>
+          <ins class="diffins">AI Assistants:</ins></strong>
+         <ins class="diffins">Summoning an agent to answer a specific question or carry out a task, reporting its progress back to the chat or group.</ins></li>
+        <li><strong>
+          <ins class="diffins">Contextual Tools:</ins></strong>
+         <ins class="diffins">Translation, fact-checking, and similar context-dependent or multi-step utilities.</ins></li>
+        <li><strong>
+          <ins class="diffins">Temporary Utility:</ins></strong>
+         <ins class="diffins">Bringing a bot's functionality into a chat briefly without cluttering the participant list, exposing messages or granting any permissions.</ins></li>
+       </ul>
+       <p><strong>
+         <ins class="diffins">Inline Mode is ideal for:</ins></strong></p>
+       <ul>
+        <li><strong>
+          <ins class="diffins">Search &amp; Share:</ins></strong>
+         <ins class="diffins">Finding and instantly sending content (e.g., try</ins><code>
+          <ins class="diffins">@gif</ins></code>
+         <ins class="diffins">or</ins><code>
+          <ins class="diffins">@pic</ins></code>
+         <ins class="diffins">) without leaving the current chat.</ins></li>
+        <li><strong>
+          <ins class="diffins">Quick Utilities:</ins></strong>
+         <ins class="diffins">Fetching calculations, formatting text, or checking quick stats on the fly.</ins></li>
+        <li><strong>
+          <ins class="diffins">Flexible Attachments:</ins></strong>
+         <ins class="diffins">Using inline Mini Apps (e.g., try</ins><code>
+          <ins class="diffins">@durgerkingbot</ins></code>
+         <ins class="diffins">) to attach or access interactive menus, complex interfaces and custom items on the fly.</ins></li>
+       </ul>
        <h3><a class="anchor" name="payments" href="#payments"><i class="anchor-icon"></i></a>Payments</h3>
        <blockquote>
         <p>If your bot or mini app sells <strong>digital goods and services</strong>, be sure to carry out the payment in <a href="https://telegram.org/blog/telegram-stars">Telegram Stars</a> by specifying <code>XTR</code> as currency. In compliance with third-party store policies, Telegram does not support the sale of digital goods and services using other currencies.</p>
        </blockquote>
-       <p>Telegram bots can accept payments with a sleek, streamlined interface that collects all necessary data from the user. Telegram <strong>doesn't collect</strong> any payment data – like the user's credit card information – and sends it directly to one of the supported 
-        <ins class="diffins">third-party</ins><a href="payments">payment providers</a>.</p>
+       <p>Telegram bots can accept payments with a sleek, streamlined interface that collects all necessary data from the user. Telegram <strong>doesn't collect</strong> any payment data – like the user's credit card information – and sends it directly to one of the supported third-party <a href="payments">payment providers</a>.</p>
        <p>Here is a <strong>quick start guide</strong> to implement payments:</p>
        <ul>
         <li>Pick a <a href="payments">provider</a> and obtain the <a href="payments#getting-a-token">proper token</a> as well as a <strong>test token</strong> from the "<strong>Stripe TEST MODE</strong>" provider.</li>
@@ -539,8 +879,7 @@
         <a href="/file/464001393/101fc/SB_bFCLR0tg.130549/7ecf91aaa44737e8cb" target="_blank"><img src="file\464001393\101fc\SB_bFCLR0tg.130549\7ecf91aaa44737e8cb" title="" class="dev_page_image" width="50%"></a>
        </div>
        <blockquote>
-        <p>Telegram does not directly process the payments, does not store data about orders and does not collect any fees. Invoices are forwarded directly to the
-         <ins class="diffins">third-party</ins> payment provider.<br>
+        <p>Telegram does not directly process the payments, does not store data about orders and does not collect any fees. Invoices are forwarded directly to the third-party payment provider.<br>
           For this reason, disputes must be solved between the user, the bot developer and the payment provider. You can read more about this in the <a href="https://telegram.org/privacy#7-third-party-payment-services">Privacy Policy</a>.</p>
        </blockquote>
        <h3><a class="anchor" name="web-login" href="#web-login"><i class="anchor-icon"></i></a>Web Login</h3>
@@ -601,7 +940,100 @@
        <p>Custom emoji additionally support <strong>adaptive colors</strong> – they will always match the current context (e.g., white on photos, accent color when used as status, etc.); to enable this feature, use the <code>needs_repainting</code> parameter in <a href="api#createnewstickerset">createStickerSet</a>.</p>
        <p>Once you're done creating and sharing your artwork, don't forget to check out our <a href="api#stickers">remaining sticker methods</a> to find out how to <a href="api#setstickersetthumb">edit</a>, <a href="api#deletestickerfromset">delete</a> and even <a href="api#setstickerpositioninset">reorder</a> your pack.</p>
        <blockquote>
-        <p>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>.</p>
+        <p>Note that these methods will only work on packs <strong>created by the bot that is calling them</strong>
+         <ins class="diffins">.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="advanced-formatting-options" href="#advanced-formatting-options"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Advanced Formatting Options</ins></h4>
+       <p>
+        <ins class="diffins">Telegram bots can use a broad set of native text styling tools to send</ins><strong>
+         <ins class="diffins">richly formatted messages</ins></strong>
+        <ins class="diffins">in any chat. Supported formats include complex nested emphasis, code, structured documents, customizable tables, mathematical formulas and nearly</ins><strong>
+         <ins class="diffins">one hundred</ins></strong>
+        <ins class="diffins">other options.</ins></p>
+       <p>
+        <ins class="diffins">Formatting is available on two levels – both render natively in</ins><strong>
+         <ins class="diffins">all Telegram apps</ins></strong>
+        <ins class="diffins">:</ins></p>
+       <ul>
+        <li><a href="/bots/api#inputrichmessage"><strong>
+           <ins class="diffins">Rich Messages</ins></strong></a>
+         <ins class="diffins">for advanced structured content</ins></li>
+        <li><a href="/bots/api#sendMessage"><strong>
+           <ins class="diffins">Regular Messages</ins></strong></a>
+         <ins class="diffins">for lightweight formatted text.</ins></li>
+       </ul>
+       <div class="blog_video_player_wrap" style="max-width: 400px; margin: 20px auto 20px;">
+        <video class="blog_video_player tl_blog_vid_autoplay" onclick="videoTogglePlay(this)" loop="" muted poster="/file/400780400485/5/ZlL9lRtV5dg.45747.jpg/c564788bd371f0ac48" style="max-width: 400px;" title="" alt="Rich Text Formatting for Bots" vindex="1" preload="auto">
+         <source src="file\400780400478\5\5rtLzULtA5E.3640041.mp4\a641a5c9d3290e2b78" type="video/mp4">
+        </video>
+       </div>
+       <blockquote>
+        <p>
+         <ins class="diffins">Send a message to</ins><a href="https://t.me/richtextdemobot">
+          <ins class="diffins">@RichTextDemoBot</ins></a>
+         <ins class="diffins">to play around with an interactive</ins><strong>
+          <ins class="diffins">rich message</ins></strong>
+         <ins class="diffins">demo.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="rich-messages" href="#rich-messages"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Rich Messages</ins></h4>
+       <p>
+        <ins class="diffins">Rich messages are designed for highly structured responses: reports, AI-streamed answers, documentation snippets, technical papers and similarly complex content.</ins></p>
+       <p>
+        <ins class="diffins">These messages support both</ins><a href="/bots/api#rich-markdown-style"><strong>
+          <ins class="diffins">Rich Markdown</ins></strong></a>
+        <ins class="diffins">and</ins><a href="/bots/api#rich-html-style"><strong>
+          <ins class="diffins">Rich HTML</ins></strong></a>
+        <ins class="diffins">. Rich Markdown follows GitHub Flavored Markdown where possible and can include supported HTML tags directly in the same message. Rich HTML gives bots granular control over even more formatting features with dedicated tags.</ins></p>
+       <p><a href="/bots/api#rich-markdown-style">
+         <ins class="diffins">Supported styles</ins></a>
+        <ins class="diffins">include:</ins></p>
+       <ul>
+        <li>
+         <ins class="diffins">Headings, paragraphs, dividers, lists and task lists.</ins></li>
+        <li>
+         <ins class="diffins">Deeply nested inline formatting, including bold, italic, underline, strikethrough, spoiler, code, subscript and superscript.</ins></li>
+        <li>
+         <ins class="diffins">Tables with alignment, captions, borders, striped styling, column spans and row spans.</ins></li>
+        <li>
+         <ins class="diffins">Media blocks for photos, videos and audio files, with captions and credits.</ins></li>
+        <li>
+         <ins class="diffins">Block quotes, pull quotes, collapsible details blocks, anchors and in-document links</ins></li>
+        <li>
+         <ins class="diffins">Footnotes and referenced text.</ins></li>
+        <li>
+         <ins class="diffins">Full LaTeX support, including both inline and block formulas.</ins></li>
+        <li>
+         <ins class="diffins">Maps with custom coordinates, collages, slideshows and more.</ins></li>
+       </ul>
+       <blockquote>
+        <p>
+         <ins class="diffins">See</ins><a href="/bots/api#rich-message-formatting-options">
+          <ins class="diffins">here</ins></a>
+         <ins class="diffins">for the full syntax grammar with examples.</ins></p>
+       </blockquote>
+       <h4><a class="anchor" name="regular-messages" href="#regular-messages"><i class="anchor-icon"></i></a>
+        <ins class="diffins">Regular Messages</ins></h4>
+       <p>
+        <ins class="diffins">Regular</ins><a href="/bots/api#sendmessage">
+         <ins class="diffins">messages</ins></a>
+        <ins class="diffins">are simpler and more lightweight versions of their rich counterparts. They support</ins><a href="/bots/api#markdownv2-style"><strong>
+          <ins class="diffins">MarkdownV2</ins></strong></a>
+        <ins class="diffins">and</ins><a href="/bots/api#html-style"><strong>
+          <ins class="diffins">HTML</ins></strong></a>
+        <ins class="diffins">formatting – concise styles that are the best choice for short text, confirmations, simple chat flows and other content that does not require complex structure.</ins></p>
+       <p>
+        <ins class="diffins">Regular messages are simpler to work with for basic use cases and support exclusive interactions like</ins><a href="https://telegram.org/blog/reply-revolution#reply-revolution">
+         <ins class="diffins">partial quotes</ins></a>
+        <ins class="diffins">and</ins><strong>
+         <ins class="diffins">quoting messages to other chats</ins></strong>
+        <ins class="diffins">.</ins></p>
+       <blockquote>
+        <p>
+         <ins class="diffins">See</ins><a href="/bots/api#formatting-options">
+          <ins class="diffins">here</ins></a>
+         <ins class="diffins">for the full syntax grammar with examples</ins>.</p>
        </blockquote>
        <h3><a class="anchor" name="language-support" href="#language-support"><i class="anchor-icon"></i></a>Language Support</h3>
        <p>Bots can tailor their interfaces to <strong>support multiple languages</strong> – updating inputs and information on the fly. A user’s <a href="/bots/api#user">language_code</a> is included in every relevant <a href="/bots/api#update">update</a> as an <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF language tag</a>, allowing bots to adapt accordingly.</p>
@@ -880,18 +1312,12 @@
       <h5><a href="//telegram.org/blog">Blog</a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="//telegram.org/press">
-        <del class="diffmod">Apps</del>
-        <ins class="diffmod">Press</ins></a></h5>
+      <h5><a href="//telegram.org/press">Press</a></h5>
      </div>
      <div class="footer_column">
-      <h5><a href="//telegram.org/moderation">
-        <del class="diffmod">Platform</del></a></h5>
-     </div>
-     <div class="footer_column">
-      <h5><a href="//telegram.org/press">
-        <del class="diffmod">Press</del>
-        <ins class="diffmod">Moderation</ins></a></h5>
+      <h5><a href="//telegram.org/safety">
+        <del class="diffmod">Moderation</del>
+        <ins class="diffmod">Safety</ins></a></h5>
      </div>
     </div>
    </div>
