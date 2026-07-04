@@ -5,8 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.exceptions.UnknownChatIdException
-import ru.raysmith.tgbot.model.network.PollAnswer
+import ru.raysmith.tgbot.model.api.poll.PollAnswer
 
 open class PollAnswerHandler(
     val pollAnswer: PollAnswer,

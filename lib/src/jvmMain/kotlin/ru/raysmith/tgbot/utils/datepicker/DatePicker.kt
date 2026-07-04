@@ -8,7 +8,7 @@ import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
-import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.api.CallbackQuery
 import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.utils.letIf
 import java.time.*

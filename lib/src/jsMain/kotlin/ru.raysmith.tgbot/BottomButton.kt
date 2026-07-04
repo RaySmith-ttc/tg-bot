@@ -17,6 +17,13 @@ external interface BottomButton {
     val type: BottomButtonType
 
     /**
+     * Unique identifier of the custom emoji shown before the text of the button.
+     *
+     * @since Bot API 9.5+
+     * */
+    val iconCustomEmojiId: String
+
+    /**
      * Current button text. Set to [BottomButtonText.Continue] for the main button and [BottomButtonText.Cancel] for
      * the secondary button by default.
      * */

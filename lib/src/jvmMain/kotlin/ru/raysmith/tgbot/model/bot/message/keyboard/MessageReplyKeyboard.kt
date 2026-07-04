@@ -3,8 +3,8 @@ package ru.raysmith.tgbot.model.bot.message.keyboard
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.model.network.keyboard.*
-import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
+import ru.raysmith.tgbot.model.api.keyboard.*
+import ru.raysmith.tgbot.model.api.menubutton.WebAppInfo
 
 @Serializable
 class MessageReplyKeyboard : MessageKeyboard {
@@ -25,8 +25,12 @@ class MessageReplyKeyboard : MessageKeyboard {
 
     override fun toMarkup(): ReplyKeyboardMarkup {
         return ReplyKeyboardMarkup(
-            rows.map { it.buttons.map { b -> b.toKeyboardButton() } }, isPersistent, resizeKeyboard, oneTimeKeyboard,
-            inputFieldPlaceholder, selective
+            keyboard = rows.map { it.buttons.map { b -> b.toKeyboardButton() } },
+            isPersistent = isPersistent,
+            resizeKeyboard = resizeKeyboard,
+            oneTimeKeyboard = oneTimeKeyboard,
+            inputFieldPlaceholder = inputFieldPlaceholder,
+            selective = selective,
         )
     }
 
@@ -55,15 +59,29 @@ class MessageReplyKeyboard : MessageKeyboard {
     @Serializable
     class Button : MessageKeyboardButton {
         var text: String = ""
+        var iconCustomEmojiId: String? = null
+        var style: ButtonStyle? = null
         var requestUser: KeyboardButtonRequestUsers? = null
         var requestChat:  KeyboardButtonRequestChat? = null
+        var requestManagedBot: KeyboardButtonRequestManagedBot? = null
         var requestContact: Boolean? = null
         var requestLocation: Boolean? = null
         var requestPoll: KeyboardButtonPollType? = null
         var webApp: WebAppInfo? = null
 
         override fun toKeyboardButton(): KeyboardButton {
-            return KeyboardButton(text, requestUser, requestChat, requestContact, requestLocation, requestPoll, webApp)
+            return KeyboardButton(
+                text = text,
+                iconCustomEmojiId = iconCustomEmojiId,
+                style = style,
+                requestUsers = requestUser,
+                requestChat = requestChat,
+                requestManagedBot = requestManagedBot,
+                requestContact = requestContact,
+                requestLocation = requestLocation,
+                requestPoll = requestPoll,
+                webApp = webApp,
+            )
         }
     }
 }

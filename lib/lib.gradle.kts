@@ -53,6 +53,7 @@ kotlin {
 
                 // Utils
                 implementation(libs.raysmith.utils)
+                implementation(libs.okio)
             }
         }
 

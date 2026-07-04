@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 
 class UnknownEventHandler(
     val update: Update,

@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.utils.locations
 
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 
 interface LocationFlowContext {
     val update: Update

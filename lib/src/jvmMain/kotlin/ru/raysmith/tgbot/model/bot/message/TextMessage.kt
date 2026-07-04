@@ -7,8 +7,10 @@ import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.message.rich.InputRichMessage
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 
@@ -16,7 +18,9 @@ import ru.raysmith.tgbot.utils.datepicker.DatePicker
 @MessageDsl
 class TextMessage(
     override val bot: Bot
-) : TextWithEntities(bot, MessageTextType.TEXT), MessageWithReplyMarkup, BotHolder, IMessage<Message> {
+) : TextWithEntities(bot, MessageTextType.TEXT), MessageWithReplyMarkup, BotHolder, IMessage<Message>, ThreadMessage,
+    SuggestablePostMessage, BusinessMessage, EffectableMessage {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -31,23 +35,56 @@ class TextMessage(
     override var businessConnectionId: String? = null // TODO global configuration?
     override var messageEffectId: String? = null
     override var allowPaidBroadcast: Boolean? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
-    override suspend fun send(chatId: ChatId) = sendMessage(
-        businessConnectionId = businessConnectionId,
-        chatId = chatId,
-        messageThreadId = messageThreadId,
-        text = getMessageText(),
-        parseMode = getParseModeIfNeed(),
-        entities = messageText?.getEntities(),
-        linkPreviewOptions = linkPreviewOptions,
-        disableNotification = disableNotification,
-        protectContent = protectContent,
-        messageEffectId = messageEffectId,
-        replyParameters = replyParameters,
-        keyboardMarkup = keyboardMarkup?.toMarkup()
-    )
+    var richMessage: InputRichMessage? = null
 
-    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?) = editMessageText(
+    fun richMessage(builder: InputRichMessageBuilder.() -> Unit) {
+        richMessage = InputRichMessageBuilder().apply(builder).build()
+    }
+
+    override suspend fun send(chatId: ChatId) = if (richMessage != null) {
+        sendRichMessage(
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageThreadId = messageThreadId,
+            directMessagesTopicId = directMessagesTopicId,
+            richMessage = richMessage!!,
+            disableNotification = disableNotification,
+            protectContent = protectContent,
+            allowPaidBroadcast = allowPaidBroadcast,
+            messageEffectId = messageEffectId,
+            suggestedPostParameters = suggestedPostParameters,
+            replyParameters = replyParameters,
+            replyMarkup = keyboardMarkup?.toMarkup(),
+        )
+    } else {
+        sendMessage(
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageThreadId = messageThreadId,
+            directMessagesTopicId = directMessagesTopicId,
+            text = getMessageText(),
+            parseMode = getParseModeIfNeed(),
+            entities = messageText?.getEntities(),
+            linkPreviewOptions = linkPreviewOptions,
+            disableNotification = disableNotification,
+            protectContent = protectContent,
+            allowPaidBroadcast = allowPaidBroadcast,
+            messageEffectId = messageEffectId,
+            suggestedPostParameters = suggestedPostParameters,
+            replyParameters = replyParameters,
+            replyMarkup = keyboardMarkup?.toMarkup(),
+        )
+    }
+
+    override suspend fun edit(
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ) = editMessageText(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageId = messageId,
@@ -56,6 +93,7 @@ class TextMessage(
         parseMode = getParseModeIfNeed(),
         entities = messageText?.getEntities(),
         linkPreviewOptions = linkPreviewOptions,
+        richMessage = richMessage,
         replyMarkup = keyboardMarkup?.toMarkup()
     )
 

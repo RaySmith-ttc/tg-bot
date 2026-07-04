@@ -3,7 +3,6 @@ package ru.raysmith.tgbot.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
-import kotlin.math.pow
 
 // TODO create test that verify data with https://core.telegram.org/bots/payments/currencies.json
 
@@ -1296,7 +1295,18 @@ enum class Currency(
      * - min amount: `1448`
      * - max amount: `14484800`
      * */
-    @SerialName("ZAR") ZAR("ZAR", "South African Rand", "ZAR", "R", ",", '.', true, true, 2, 1448, 14484800)
+    @SerialName("ZAR") ZAR("ZAR", "South African Rand", "ZAR", "R", ",", '.', true, true, 2, 1448, 14484800),
+
+    /**
+     * TON coins
+     *
+     * Format:
+     * - native: `⭐`
+     * - thousands separator: `.`
+     * - symbol left: `true`
+     * - space between: `true`
+     * */
+    @SerialName("TON") TON("TON", "Telegram Stars", "⭐", "⭐", "", '.', true, true, 0, 1, Long.MAX_VALUE),
 
     ;
 

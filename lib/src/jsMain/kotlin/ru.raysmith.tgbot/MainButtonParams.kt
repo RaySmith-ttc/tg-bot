@@ -7,6 +7,14 @@ import web.cssom.Color
 @JsPlainObject
 external interface MainButtonParams {
 
+    /**
+     * button icon emoji id
+     *
+     * @since Bot API 9.5+
+     * */
+    @JsName("icon_custom_emoji_id ")
+    val iconCustomEmojiId: String
+
     /** button text */
     val text: String
 

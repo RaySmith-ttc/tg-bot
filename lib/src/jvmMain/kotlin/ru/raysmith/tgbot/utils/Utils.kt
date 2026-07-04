@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.*
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 import java.net.URLDecoder
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -14,7 +14,7 @@ import javax.crypto.spec.SecretKeySpec
  * Creates a bot context and executes a [block] within
  *
  * @param bot bot instance
- * @param withChatId Unique identifier for the target chat or username of the target channel
+ * @param withChatId Unique identifier for the target chat or username of the target bot, supergroup or channel
  * (in the format `@channelusername`). Overrides chatId from [update] if not null.
  * @param update update with which the context should be associated. If null, the update will be empty with an id of -1.
  * */

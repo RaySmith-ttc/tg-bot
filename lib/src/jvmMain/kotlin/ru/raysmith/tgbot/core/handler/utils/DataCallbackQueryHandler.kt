@@ -4,7 +4,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.base.BaseCallbackHandler
-import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.api.CallbackQuery
 
 data class DataCallbackQueryHandler(
     override val query: CallbackQuery,

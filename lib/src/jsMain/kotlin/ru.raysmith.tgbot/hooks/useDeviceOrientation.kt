@@ -11,7 +11,7 @@ import web.function.VoidFunction
 /**
  * This hook provides access to orientation data on the device.
  *
- * <img src="https://core.telegram.org/file/400780400662/2/6ziukR8E4pc.4269149/aa2ec0a86b39709a92" />
+ * @see <img src="https://core.telegram.org/file/400780400662/2/6ziukR8E4pc.4269149/aa2ec0a86b39709a92" />
  */
 fun useDeviceOrientation(): DeviceOrientationHookType {
     var isOrientationLocked by useState(webApp.isOrientationLocked)

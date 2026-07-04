@@ -8,10 +8,10 @@ import ru.raysmith.tgbot.model.bot.message.MessageWithReplyMarkup
 import ru.raysmith.tgbot.model.bot.message.TextMessage
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageInlineKeyboard
 import ru.raysmith.tgbot.model.bot.message.media.ExtendedCaptionableMediaMessage
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
-import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.message.InaccessibleMessage
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.api.keyboard.InlineKeyboardButton
+import ru.raysmith.tgbot.model.api.media.input.InputMedia
+import ru.raysmith.tgbot.model.api.message.InaccessibleMessage
+import ru.raysmith.tgbot.model.api.message.Message
 import ru.raysmith.tgbot.network.API
 import ru.raysmith.tgbot.utils.pagination.Pagination
 
@@ -37,11 +37,8 @@ interface IEditor : ChatDataHolder, API, BotHolder {
         caption: suspend MessageText.() -> Unit
     ): Message {
         return ExtendedCaptionableMediaMessage.instance(bot)
-            .apply {
-                captionWithEntities(caption)
-                this.businessConnectionId = businessConnectionId
-            }
-            .edit(chatId, messageId, inlineMessageId)
+            .apply { captionWithEntities(caption) }
+            .edit(chatId, messageId, inlineMessageId, businessConnectionId)
     }
 
     suspend fun editReplyMarkup(
@@ -52,11 +49,8 @@ interface IEditor : ChatDataHolder, API, BotHolder {
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return MessageWithReplyMarkup.instance(bot)
-            .apply {
-                inlineKeyboard(keyboard)
-                this.businessConnectionId = businessConnectionId
-            }
-            .editReplyMarkup(chatId, messageId, inlineMessageId)
+            .apply { inlineKeyboard(keyboard) }
+            .editReplyMarkup(chatId, messageId, inlineMessageId, businessConnectionId)
     }
 
     suspend fun editMedia(
@@ -68,11 +62,8 @@ interface IEditor : ChatDataHolder, API, BotHolder {
         keyboard: suspend MessageInlineKeyboard.() -> Unit
     ): Message {
         return ExtendedCaptionableMediaMessage.instance(bot)
-            .apply {
-                inlineKeyboard(keyboard)
-                this.businessConnectionId = businessConnectionId
-            }
-            .editMedia(media, chatId, messageId, inlineMessageId)
+            .apply { inlineKeyboard(keyboard) }
+            .editMedia(media, chatId, messageId, inlineMessageId, businessConnectionId)
     }
 
     @MessageDsl
@@ -88,11 +79,8 @@ interface IEditor : ChatDataHolder, API, BotHolder {
         message: suspend TextMessage.() -> Unit
     ): Message {
         return TextMessage(bot)
-            .apply {
-                message()
-                this.businessConnectionId = businessConnectionId
-            }
-            .edit(chatId, messageId, inlineMessageId)
+            .apply { message() }
+            .edit(chatId, messageId, inlineMessageId, businessConnectionId)
     }
 
     /**

@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.utils
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
-import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.api.message.ParseMode
 
 inline fun buildHTMLString(
     type: MessageTextType = MessageTextType.TEXT, botConfig: BotConfig = BotConfig.default,

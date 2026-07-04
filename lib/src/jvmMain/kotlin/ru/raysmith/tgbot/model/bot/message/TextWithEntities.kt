@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.model.bot.message
 
 import ru.raysmith.tgbot.core.Bot
-import ru.raysmith.tgbot.model.network.message.ParseMode
+import ru.raysmith.tgbot.model.api.message.ParseMode
 import ru.raysmith.tgbot.utils.withSafeLength
 
 @TextMessageDsl

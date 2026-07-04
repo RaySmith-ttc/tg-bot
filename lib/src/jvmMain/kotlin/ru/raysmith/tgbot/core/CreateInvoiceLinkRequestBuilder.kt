@@ -1,11 +1,10 @@
 package ru.raysmith.tgbot.core
 
 import io.ktor.client.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import ru.raysmith.tgbot.model.Currency
-import ru.raysmith.tgbot.model.network.payment.LabeledPrice
+import ru.raysmith.tgbot.model.api.payment.LabeledPrice
 import ru.raysmith.tgbot.network.API
 import kotlin.time.Duration
 
@@ -39,11 +38,12 @@ class CreateInvoiceLinkRequestBuilder(override val bot: Bot) : API, BotHolder {
      * [more on currencies](https://core.telegram.org/bots/payments#supported-currencies)
      * */
     var currency: Currency? = null
+
     /**
      * Price breakdown, a list of components (e.g. product price, tax, discount,
      * delivery cost, delivery tax, bonus, etc.)
      * */
-    var prices: List<LabeledPrice>? = null // TODO replace with DSL
+    var prices: List<LabeledPrice> = emptyList() // TODO replace with DSL
 
     /**
      * The maximum accepted amount for tips in the *smallest units* of the currency

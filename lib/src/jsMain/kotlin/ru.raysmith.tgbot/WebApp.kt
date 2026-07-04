@@ -171,6 +171,12 @@ external object WebApp {
     /** An object for controlling location on the device. */    
     val LocationManager: LocationManager
 
+    /** An object for storing and retrieving data from the device's local storage. */
+    val DeviceStorage : DeviceStorage
+
+    /** An object for storing and retrieving data from the device's secure storage. */
+    val SecureStorage : SecureStorage
+
     /**
      * Returns true if the user's app supports a version of the Bot API that is equal to or higher than the version
      * passed as the parameter.
@@ -404,6 +410,14 @@ external object WebApp {
     fun downloadFile(params: DownloadFileParams, callback: (granted: Boolean) -> Unit = definedExternally)
 
     /**
+     * A method that hides the on-screen keyboard, if it is currently visible. Does nothing if the keyboard is not
+     * active.
+     *
+     * @since Bot API 9.1+
+     * */
+    fun hideKeyboard()
+
+    /**
      * A method that shows a native popup described by the *params* argument of the type [PopupParams].
      * The Mini App will receive the event [EventType.popupClosed] when the popup is closed. If an optional [callback]
      * parameter was passed, the [callback] function will be called and the field id of the pressed button will be
@@ -480,6 +494,14 @@ external object WebApp {
      * @since Bot API 6.9
      * */
     fun requestContact(callback: (isUserSharedItsPhoneNumber: Boolean) -> Unit = definedExternally)
+
+    /**
+     * A method that opens a dialog allowing the user to select an existing chat or create a new one. If an optional
+     * [callback] parameter is provided, the [callback] function will be called with a boolean as the first argument,
+     * indicating whether the message was successfully sent. The [request id][reqId] passed to this method must belong
+     * to a `PreparedKeyboardButton` previously obtained via the Bot API method `savePreparedKeyboardButton`.
+     * */
+    fun requestChat(reqId: String, callback: (sent: Boolean) -> Unit = definedExternally)
 
     /**
      * A method that informs the Telegram app that the Mini App is ready to be displayed.

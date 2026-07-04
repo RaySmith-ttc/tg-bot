@@ -5,8 +5,8 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.CallbackQueryHandler
-import ru.raysmith.tgbot.model.network.CallbackQuery
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.CallbackQuery
+import ru.raysmith.tgbot.model.api.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 

@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionUpdated
+import ru.raysmith.tgbot.model.api.message.reaction.MessageReactionUpdated
 
 open class MessageReactionHandler(
     val messageReaction: MessageReactionUpdated,

@@ -4,8 +4,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.EventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 
 @LocationsDSL
 class LocationsWrapper<LFC : LocationFlowContext>(override val bot: Bot) : BotHolder {

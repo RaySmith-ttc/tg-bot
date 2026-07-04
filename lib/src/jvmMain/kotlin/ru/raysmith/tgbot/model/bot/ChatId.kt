@@ -7,9 +7,9 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import ru.raysmith.tgbot.network.serializer.ChatIdSerializer
+import ru.raysmith.tgbot.model.serializer.ChatIdSerializer
 
-@Serializable(with = ChatIdSerializer::class)
+@Serializable(ChatIdSerializer::class)
 sealed class ChatId {
 
     override fun equals(other: Any?): Boolean {
@@ -36,11 +36,11 @@ sealed class ChatId {
         }
     }
 
-    @Serializable(with = IDSerializer::class)
+    @Serializable(IDSerializer::class)
     data class ID(val value: Long) : ChatId()
 
-    /** Represents username of the user or supergroup (in any format `@username` or `username`)*/
-    @Serializable(with = UsernameSerializer::class)
+    /** Represents username of the user, target bot, supergroup or channel (in any format `@username` or `username`)*/
+    @Serializable(UsernameSerializer::class)
     data class Username(private val _value: String) : ChatId() {
         val value = _value.replaceFirstChar { if (it == '@') "@" else "@$it" }
     }

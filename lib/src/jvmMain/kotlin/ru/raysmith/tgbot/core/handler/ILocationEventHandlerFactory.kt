@@ -4,9 +4,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.base.UnknownEventHandler
 import ru.raysmith.tgbot.core.handler.location.*
-import ru.raysmith.tgbot.model.network.message.MessageType
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.message.MessageType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 

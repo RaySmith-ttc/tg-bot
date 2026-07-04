@@ -2,12 +2,12 @@ package ru.raysmith.tgbot.core
 
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.*
-import ru.raysmith.tgbot.model.bot.message.group.MediaGroupMessage
+import ru.raysmith.tgbot.model.bot.message.MediaGroupMessage
 import ru.raysmith.tgbot.model.bot.message.media.*
 import ru.raysmith.tgbot.model.bot.message.poll.PollMessage
-import ru.raysmith.tgbot.model.network.chat.ChatAction
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.response.LiveLocationResponse
+import ru.raysmith.tgbot.model.api.chat.ChatAction
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.response.LiveLocationResponse
 import ru.raysmith.tgbot.network.API
 
 // TODO [docs] methods

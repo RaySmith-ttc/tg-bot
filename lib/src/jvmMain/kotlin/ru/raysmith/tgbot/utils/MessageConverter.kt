@@ -1,13 +1,13 @@
 package ru.raysmith.tgbot.utils
 
 import ru.raysmith.tgbot.core.handler.base.MessageHandler
-import ru.raysmith.tgbot.model.network.Location
-import ru.raysmith.tgbot.model.network.Poll
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.Venue
-import ru.raysmith.tgbot.model.network.media.*
-import ru.raysmith.tgbot.model.network.message.Dice
-import ru.raysmith.tgbot.model.network.message.WebAppData
+import ru.raysmith.tgbot.model.api.Location
+import ru.raysmith.tgbot.model.api.poll.Poll
+import ru.raysmith.tgbot.model.api.Venue
+import ru.raysmith.tgbot.model.api.media.*
+import ru.raysmith.tgbot.model.api.message.Dice
+import ru.raysmith.tgbot.model.api.message.WebAppData
+import ru.raysmith.tgbot.model.bot.MediaWithFile
 
 /**
  * Applies a [onResult] to the message object after [convert] to another type and [verify] or returns null if [convert] returns null or [verify] returns false

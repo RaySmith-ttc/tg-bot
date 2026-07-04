@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.core.handler.base
 import io.ktor.client.*
 import ru.raysmith.tgbot.core.handler.ICallbackHandler
 import ru.raysmith.tgbot.model.bot.AnswerCallbackQuery
-import ru.raysmith.tgbot.model.network.CallbackQuery
+import ru.raysmith.tgbot.model.api.CallbackQuery
 import ru.raysmith.tgbot.network.API
 
 /** Base implementation of query callback handler */
