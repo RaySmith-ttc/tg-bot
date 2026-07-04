@@ -4,20 +4,26 @@ import io.ktor.client.*
 import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.model.bot.ChatId
-import ru.raysmith.tgbot.model.bot.message.ExtendedMessage
-import ru.raysmith.tgbot.model.network.media.input.InputFile
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.bot.message.BusinessMessage
+import ru.raysmith.tgbot.model.bot.message.EffectableMessage
+import ru.raysmith.tgbot.model.bot.message.ThreadMessage
+import ru.raysmith.tgbot.model.api.media.input.InputFile
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
+import ru.raysmith.tgbot.model.bot.message.SuggestablePostMessage
 
-class PhotoMessage(
-    override val bot: Bot
-) : CaptionableMediaMessage(), SpolerableContent, ExtendedMessage<Message> {
+class PhotoMessage(override val bot: Bot) : CaptionableMediaMessage(), ThreadMessage, EffectableMessage,
+    BusinessMessage, SuggestablePostMessage {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
-    override var hasSpoiler: Boolean? = null
+    var hasSpoiler: Boolean? = null
     var photo: InputFile?
         get() = media
-        set(value) { media = value }
+        set(value) {
+            media = value
+        }
 
     override val mediaName: String = "photo"
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
@@ -25,21 +31,26 @@ class PhotoMessage(
     override var messageThreadId: Int? = null
     override var messageEffectId: String? = null
     override var businessConnectionId: String? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
     override suspend fun send(chatId: ChatId) = sendPhoto(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
+        directMessagesTopicId = directMessagesTopicId,
         photo = media ?: error("$mediaName is required"),
         caption = getCaptionText(),
-        parseMode = getParseModeIfNeed(),
         captionEntities = getEntities(),
         showCaptionAboveMedia = showCaptionAboveMedia,
         hasSpoiler = hasSpoiler,
+        parseMode = getParseModeIfNeed(),
         disableNotification = disableNotification,
         protectContent = protectContent,
+        allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
+        suggestedPostParameters = suggestedPostParameters,
         replyParameters = replyParameters,
-        replyMarkup = keyboardMarkup?.toMarkup()
+        replyMarkup = keyboardMarkup?.toMarkup(),
     )
 }

@@ -1,8 +1,11 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object contains data about the current location.
  */
+@JsPlainObject
 external interface LocationData {
 
     /** Latitude in degrees. */

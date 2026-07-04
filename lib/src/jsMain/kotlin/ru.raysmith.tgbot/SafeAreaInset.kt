@@ -1,11 +1,14 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object represents the system-defined safe area insets, providing padding values to ensure content remains within
  * visible boundaries, avoiding overlap with system UI elements like notches or navigation bars.
  *
- * <img src="https://core.telegram.org/file/400780400066/1/tTFDI7OC8tE.1374724/9e496dd312c7706a38" />
+ * @see <img src="https://core.telegram.org/file/400780400066/1/tTFDI7OC8tE.1374724/9e496dd312c7706a38" />
  * */
+@JsPlainObject
 external interface SafeAreaInset {
 
     /**

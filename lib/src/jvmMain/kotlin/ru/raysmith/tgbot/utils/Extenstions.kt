@@ -4,7 +4,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.MessageText
 import ru.raysmith.tgbot.model.bot.message.MessageTextType
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 import ru.raysmith.tgbot.network.TelegramApi
 import java.util.*
 

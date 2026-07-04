@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.FileDownloadRequestedStatus.Companion.cancelled
 import ru.raysmith.tgbot.events.FileDownloadRequestedStatus.Companion.downloading
 import seskar.js.JsValue
@@ -7,11 +8,8 @@ import seskar.js.JsValue
 /**
  * @property status Status of the file download request
  * */
+@JsPlainObject
 external interface FileDownloadRequested {
-
-    /**
-     * Status of the file download request
-     * */
     val status: FileDownloadRequestedStatus
 }
 
@@ -21,7 +19,7 @@ external interface FileDownloadRequested {
  * @property downloading The file download has started
  * @property cancelled User declined this request
  * */
-external interface FileDownloadRequestedStatus {
+sealed external interface FileDownloadRequestedStatus {
     companion object {
 
         /** The file download has started */

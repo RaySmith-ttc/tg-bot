@@ -5,12 +5,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
-import ru.raysmith.tgbot.core.BotHolder
-import ru.raysmith.tgbot.model.network.keyboard.CopyTextButton
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardButton
-import ru.raysmith.tgbot.model.network.keyboard.InlineKeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.menubutton.WebAppInfo
+import ru.raysmith.tgbot.model.api.keyboard.ButtonStyle
+import ru.raysmith.tgbot.model.api.keyboard.CopyTextButton
+import ru.raysmith.tgbot.model.api.keyboard.InlineKeyboardButton
+import ru.raysmith.tgbot.model.api.keyboard.InlineKeyboardMarkup
+import ru.raysmith.tgbot.model.api.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.api.keyboard.LoginUrl
+import ru.raysmith.tgbot.model.api.keyboard.SwitchInlineQueryChosenChat
+import ru.raysmith.tgbot.model.api.menubutton.WebAppInfo
 import ru.raysmith.tgbot.utils.datepicker.DatePicker
 import ru.raysmith.tgbot.utils.pagination.Pagination
 
@@ -51,7 +53,12 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     }
 
     fun row(row: Row) = _rows.add(row)
-    fun row(text: String, callbackData: String) = _rows.add(Row().apply { button(text, callbackData) })
+    fun row(
+        text: String,
+        callbackData: String,
+        style: ButtonStyle? = null,
+    ) = _rows.add(Row().apply { button(text, callbackData, style) })
+
     suspend fun row(setRow: suspend Row.() -> Unit) = _rows.add(Row().apply { setRow() })
 
     @Serializable
@@ -63,14 +70,17 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
         override fun button(button: Button) {
             _buttons.add(button)
         }
-        fun button(text: String, callbackData: String) {
+
+        fun button(text: String, callbackData: String, style: ButtonStyle? = null) {
             _buttons.add(
                 Button().apply {
                     this.text = text
                     this.callbackData = callbackData
+                    this.style = style
                 }
             )
         }
+
         suspend fun button(setButton: suspend Button.() -> Unit) {
             _buttons.add(Button().apply { setButton() })
         }
@@ -82,21 +92,32 @@ class MessageInlineKeyboard : MessageKeyboard, Iterable<MessageInlineKeyboard.Ro
     @KeyboardDsl
     class Button : MessageKeyboardButton {
         var text: String = ""
+        var iconCustomEmojiId: String? = null
+        var style: ButtonStyle? = null
         var url: String? = null
-        var loginUrl: String? = null
+        var loginUrl: LoginUrl? = null
         var callbackData: String? = null
         var webApp: WebAppInfo? = null
         var switchInlineQuery: String? = null
         var switchInlineQueryCurrentChat: String? = null
-        var switchInlineQueryChosenChat: String? = null
+        var switchInlineQueryChosenChat: SwitchInlineQueryChosenChat? = null
         var pay: Boolean? = null
         var copyText: CopyTextButton? = null
 
-
         override fun toKeyboardButton(): InlineKeyboardButton {
             return InlineKeyboardButton(
-                text, url, callbackData, webApp, loginUrl, switchInlineQuery, switchInlineQueryCurrentChat,
-                switchInlineQueryChosenChat, copyText, pay
+                text,
+                iconCustomEmojiId,
+                style,
+                url,
+                callbackData,
+                webApp,
+                loginUrl,
+                switchInlineQuery,
+                switchInlineQueryCurrentChat,
+                switchInlineQueryChosenChat,
+                copyText,
+                pay,
             )
         }
     }

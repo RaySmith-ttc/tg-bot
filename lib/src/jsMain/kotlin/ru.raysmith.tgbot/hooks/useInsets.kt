@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -35,24 +35,25 @@ fun useInsets(): InsetsHookType {
         safeArea,
         contentSafeArea,
     ) {
-        jso {
-            this.safeArea = safeArea
-            this.contentSafeArea = contentSafeArea
-        }
+        InsetsHookType(
+            safeArea = safeArea,
+            contentSafeArea = contentSafeArea,
+        )
     }
 }
 
+@JsPlainObject
 external interface InsetsHookType {
 
     /**
      * An object representing the device's safe area insets, accounting for system UI elements like notches or
      * navigation bars.
      * */
-    var safeArea: SafeAreaInset
+    val safeArea: SafeAreaInset
 
     /**
      * An object representing the safe area for displaying content within the app, free from overlapping
      * Telegram UI elements.
      * */
-    var contentSafeArea: ContentSafeAreaInset
+    val contentSafeArea: ContentSafeAreaInset
 }

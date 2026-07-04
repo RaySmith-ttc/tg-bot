@@ -1,5 +1,7 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object describes additional sharing settings for the native story editor.
  *
@@ -8,11 +10,12 @@ package ru.raysmith.tgbot
  * @property widgetLink An object that describes a widget link to be included in the story. Note that only
  *  premium subscribers can post stories with links.
  * */
+@JsPlainObject
 external interface StoryShareParams {
-    var text: String?
+    val text: String?
 
     @JsName("widget_link")
-    var widgetLink: StoryWidgetLink?
+    val widgetLink: StoryWidgetLink?
 }
 
 /**
@@ -21,7 +24,8 @@ external interface StoryShareParams {
  * @property url The URL to be included in the story.
  * @property name The name to be displayed for the widget link, 0-48 characters.
  * */
+@JsPlainObject
 external interface StoryWidgetLink {
-    var url: String
-    var name: String?
+    val url: String
+    val name: String?
 }

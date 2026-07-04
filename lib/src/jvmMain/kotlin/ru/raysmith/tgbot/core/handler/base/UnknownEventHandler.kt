@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 
 class UnknownEventHandler(
     val update: Update,
@@ -19,6 +19,7 @@ class UnknownEventHandler(
     override var inlineMessageId = update.callbackQuery?.inlineMessageId
 
     override fun getChatId() = update.findChatId()
+    override fun getMessageThreadId(): Int? = update.findThreadId()
 
     override suspend fun handle() {
         handler()

@@ -1,8 +1,13 @@
+@file:Suppress("UnusedImport")
+
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+import ru.raysmith.tgbot.events.EventType
 import web.function.VoidFunction
 
 /** This object controls the **Settings** item in the context menu of the Mini App in the Telegram interface. */
+@JsPlainObject
 external interface SettingsButton {
 
     /** Shows whether the context menu item is visible. Set to *false* by default. */

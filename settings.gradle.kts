@@ -20,10 +20,6 @@ fun Settings.include(project: String, setup: ProjectDescriptor.() -> Unit) {
 }
 
 include("lib")
-include("webapp-app")
-include("webapp-app-application") {
-    projectDir = file("webapp-app/application")
-}
 
 rootProject.children.forEach {
     it.buildFileName = it.name + ".gradle.kts"
@@ -40,7 +36,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("kotlinWrappers") {
-            val wrappersVersion = "2025.4.12"
+            val wrappersVersion = "2026.2.8"
             from("org.jetbrains.kotlin-wrappers:kotlin-wrappers-catalog:$wrappersVersion")
         }
     }

@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.chat.ChatJoinRequest
+import ru.raysmith.tgbot.model.api.chat.ChatJoinRequest
 
 open class ChatJoinRequestHandler(
     val chatJoinRequest: ChatJoinRequest,
@@ -19,7 +19,7 @@ open class ChatJoinRequestHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = chatJoinRequest.chat.id
-    override fun getChatIdOrThrow() = chatJoinRequest.chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

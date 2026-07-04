@@ -2,6 +2,11 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property error indicates that a task or action has failed
+ * @property success indicates that a task or action has completed successfully
+ * @property warning indicates that a task or action produced a warning
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface HapticFeedbackType {
     companion object {

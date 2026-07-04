@@ -414,7 +414,7 @@
         el.target != '_blank' &&
         (el.protocol == 'http:' || el.protocol == 'https:') &&
         el.hostname == 't.me') {
-      WebApp.openTgLink(el.href);
+      WebApp.openTelegramLink(el.href);
       e.preventDefault();
     }
   }
@@ -666,6 +666,30 @@
         requestData.callback(false);
       }
       receiveWebViewEvent('shareMessageFailed', {
+        error: eventData.error
+      });
+    }
+  }
+
+  var WebAppRequestChatOpened = false;
+  function onRequestedChatSent(eventType, eventData) {
+    if (WebAppRequestChatOpened) {
+      var requestData = WebAppRequestChatOpened;
+      WebAppRequestChatOpened = false;
+      if (requestData.callback) {
+        requestData.callback(true);
+      }
+      receiveWebViewEvent('requestedChatSent');
+    }
+  }
+  function onRequestedChatFailed(eventType, eventData) {
+    if (WebAppRequestChatOpened) {
+      var requestData = WebAppRequestChatOpened;
+      WebAppRequestChatOpened = false;
+      if (requestData.callback) {
+        requestData.callback(false);
+      }
+      receiveWebViewEvent('requestedChatFailed', {
         error: eventData.error
       });
     }
@@ -1089,6 +1113,7 @@
     var isActive = true;
     var hasShineEffect = false;
     var isProgressVisible = false;
+    var iconCustomEmojiId = false;
     var buttonType = type;
     var buttonText = buttonTextDefault;
     var buttonColor = false;
@@ -1098,6 +1123,11 @@
     var bottomButton = {};
     Object.defineProperty(bottomButton, 'type', {
       get: function(){ return buttonType; },
+      enumerable: true
+    });
+    Object.defineProperty(bottomButton, 'iconCustomEmojiId', {
+      set: function(val){ bottomButton.setParams({icon_custom_emoji_id: val}); },
+      get: function(){ return iconCustomEmojiId; },
       enumerable: true
     });
     Object.defineProperty(bottomButton, 'text', {
@@ -1182,6 +1212,7 @@
           is_visible: true,
           is_active: isActive,
           is_progress_visible: isProgressVisible,
+          icon_custom_emoji_id: iconCustomEmojiId,
           text: buttonText,
           color: color,
           text_color: text_color,
@@ -1237,9 +1268,20 @@
     }
 
     function setParams(params) {
+      if (typeof params.icon_custom_emoji_id !== 'undefined') {
+        var emoji_id = params.icon_custom_emoji_id;
+        if (emoji_id === false || emoji_id === null) {
+          emoji_id = '';
+        }
+        if (emoji_id !== '' && !/^[0-9]{10,20}$/.test(emoji_id)) {
+          console.error('[Telegram.WebApp] Bottom button icon custom emoji is invalid', params.icon_custom_emoji_id);
+          throw Error('WebAppBottomButtonParamInvalid');
+        }
+        iconCustomEmojiId = emoji_id;
+      }
       if (typeof params.text !== 'undefined') {
         var text = strTrim(params.text);
-        if (!text.length) {
+        if (!text.length && !iconCustomEmojiId) {
           console.error('[Telegram.WebApp] Bottom button text is required', params.text);
           throw Error('WebAppBottomButtonParamInvalid');
         }
@@ -1503,6 +1545,131 @@
       return invokeStorageMethod('getStorageKeys', {}, callback);
     };
     return cloudStorage;
+  })();
+
+  var DeviceStorage = (function() {
+    var deviceStorage = {};
+
+    WebView.onEvent('device_storage_key_saved',  onDeviceStorageEvent);
+    WebView.onEvent('device_storage_key_received', onDeviceStorageEvent);
+    WebView.onEvent('device_storage_cleared',  onDeviceStorageEvent);
+    WebView.onEvent('device_storage_failed',  onDeviceStorageEvent);
+
+    function onDeviceStorageEvent(eventType, eventData) {
+      if (eventData.req_id && webAppCallbacks[eventData.req_id]) {
+        var requestData = webAppCallbacks[eventData.req_id];
+        delete webAppCallbacks[eventData.req_id];
+        var res = null, err = null;
+        if (eventType == 'device_storage_failed') {
+          err = eventData.error || 'UNKNOWN_ERROR';
+        } else if (eventType == 'device_storage_key_received') {
+          res = eventData.value;
+        } else {
+          res = true;
+        }
+        if (requestData.callback) {
+          requestData.callback(err, res);
+        }
+      }
+    }
+
+    function invokeStorageMethod(method, params, callback) {
+      if (!versionAtLeast('9.0')) {
+        console.error('[Telegram.WebApp] DeviceStorage is not supported in version ' + webAppVersion);
+        throw Error('WebAppMethodUnsupported');
+      }
+      var req_id = generateCallbackId(16);
+      var req_params = {req_id: req_id};
+      for (var k in params) {
+        req_params[k] = params[k];
+      }
+      webAppCallbacks[req_id] = {
+        callback: callback
+      };
+      WebView.postEvent(method, false, req_params);
+      return deviceStorage;
+    }
+
+    deviceStorage.setItem = function(key, value, callback) {
+      return invokeStorageMethod('web_app_device_storage_save_key', {key: key, value: value}, callback);
+    };
+    deviceStorage.getItem = function(key, callback) {
+      return invokeStorageMethod('web_app_device_storage_get_key', {key: key}, callback);
+    };
+    deviceStorage.removeItem = function(key, callback) {
+      return invokeStorageMethod('web_app_device_storage_save_key', {key: key, value: null}, callback);
+    };
+    deviceStorage.clear = function(callback) {
+      return invokeStorageMethod('web_app_device_storage_clear', {}, callback);
+    };
+    return deviceStorage;
+  })();
+
+  var SecureStorage = (function() {
+    var secureStorage = {};
+
+    WebView.onEvent('secure_storage_key_saved',  onSecureStorageEvent);
+    WebView.onEvent('secure_storage_key_received', onSecureStorageEvent);
+    WebView.onEvent('secure_storage_key_restored', onSecureStorageEvent);
+    WebView.onEvent('secure_storage_cleared',  onSecureStorageEvent);
+    WebView.onEvent('secure_storage_failed',  onSecureStorageEvent);
+
+    function onSecureStorageEvent(eventType, eventData) {
+      if (eventData.req_id && webAppCallbacks[eventData.req_id]) {
+        var requestData = webAppCallbacks[eventData.req_id];
+        delete webAppCallbacks[eventData.req_id];
+        var res = null, err = null, can_restore = null;
+        if (eventType == 'secure_storage_failed') {
+          err = eventData.error || 'UNKNOWN_ERROR';
+        } else if (eventType == 'secure_storage_key_received') {
+          res = eventData.value;
+          if (eventData.can_restore) {
+            can_restore = true;
+          }
+        } else if (eventType == 'secure_storage_key_restored') {
+          res = eventData.value;
+        } else {
+          res = true;
+        }
+        if (requestData.callback) {
+          requestData.callback(err, res, can_restore);
+        }
+      }
+    }
+
+    function invokeStorageMethod(method, params, callback) {
+      if (!versionAtLeast('9.0')) {
+        console.error('[Telegram.WebApp] SecureStorage is not supported in version ' + webAppVersion);
+        throw Error('WebAppMethodUnsupported');
+      }
+      var req_id = generateCallbackId(16);
+      var req_params = {req_id: req_id};
+      for (var k in params) {
+        req_params[k] = params[k];
+      }
+      webAppCallbacks[req_id] = {
+        callback: callback
+      };
+      WebView.postEvent(method, false, req_params);
+      return secureStorage;
+    }
+
+    secureStorage.setItem = function(key, value, callback) {
+      return invokeStorageMethod('web_app_secure_storage_save_key', {key: key, value: value}, callback);
+    };
+    secureStorage.getItem = function(key, callback) {
+      return invokeStorageMethod('web_app_secure_storage_get_key', {key: key}, callback);
+    };
+    secureStorage.restoreItem = function(key, callback) {
+      return invokeStorageMethod('web_app_secure_storage_restore_key', {key: key}, callback);
+    };
+    secureStorage.removeItem = function(key, callback) {
+      return invokeStorageMethod('web_app_secure_storage_save_key', {key: key, value: null}, callback);
+    };
+    secureStorage.clear = function(callback) {
+      return invokeStorageMethod('web_app_secure_storage_clear', {}, callback);
+    };
+    return secureStorage;
   })();
 
   var BiometricManager = (function() {
@@ -2391,6 +2558,9 @@
     var reqTo, fallbackTo, reqDelay = 0;
     var reqInvoke = function() {
       invokeCustomMethod('getRequestedContact', {}, function(err, res) {
+        if (res.substr(0, 1) == '"' && res.substr(-1) == '"') { // macos fix
+          res = JSON.parse(res);
+        }
         if (res && res.length) {
           clearTimeout(fallbackTo);
           callback(res);
@@ -2599,6 +2769,14 @@
   });
   Object.defineProperty(WebApp, 'CloudStorage', {
     value: CloudStorage,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'DeviceStorage', {
+    value: DeviceStorage,
+    enumerable: true
+  });
+  Object.defineProperty(WebApp, 'SecureStorage', {
+    value: SecureStorage,
     enumerable: true
   });
   Object.defineProperty(WebApp, 'BiometricManager', {
@@ -3097,6 +3275,20 @@
     };
     WebView.postEvent('web_app_send_prepared_message', false, {id: msg_id});
   };
+  WebApp.requestChat = function (req_id, callback) {
+    if (!versionAtLeast('9.6')) {
+      console.error('[Telegram.WebApp] Method requestChat is not supported in version ' + webAppVersion);
+      throw Error('WebAppMethodUnsupported');
+    }
+    if (WebAppRequestChatOpened) {
+      console.error('[Telegram.WebApp] Request chat is already opened');
+      throw Error('WebAppRequestChatOpened');
+    }
+    WebAppRequestChatOpened = {
+      callback: callback
+    };
+    WebView.postEvent('web_app_request_chat', false, {req_id: req_id});
+  };
   WebApp.setEmojiStatus = function (custom_emoji_id, params, callback) {
     params = params || {};
     if (!versionAtLeast('8.0')) {
@@ -3133,6 +3325,9 @@
   };
   WebApp.invokeCustomMethod = function (method, params, callback) {
     invokeCustomMethod(method, params, callback);
+  };
+  WebApp.hideKeyboard = function () {
+    WebView.postEvent('web_app_hide_keyboard');
   };
   WebApp.ready = function () {
     WebView.postEvent('web_app_ready');
@@ -3184,6 +3379,8 @@
   WebView.onEvent('home_screen_checked', onHomeScreenChecked);
   WebView.onEvent('prepared_message_sent', onPreparedMessageSent);
   WebView.onEvent('prepared_message_failed', onPreparedMessageFailed);
+  WebView.onEvent('requested_chat_sent', onRequestedChatSent);
+  WebView.onEvent('requested_chat_failed', onRequestedChatFailed);
   WebView.onEvent('emoji_status_set', onEmojiStatusSet);
   WebView.onEvent('emoji_status_failed', onEmojiStatusFailed);
   WebView.onEvent('emoji_status_access_requested', onEmojiStatusAccessRequested);

@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.payment.PreCheckoutQuery
+import ru.raysmith.tgbot.model.api.payment.PreCheckoutQuery
 
 open class PreCheckoutQueryHandler(
     val preCheckoutQuery: PreCheckoutQuery,
@@ -19,7 +19,7 @@ open class PreCheckoutQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = preCheckoutQuery.from.id
-    override fun getChatIdOrThrow() = preCheckoutQuery.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

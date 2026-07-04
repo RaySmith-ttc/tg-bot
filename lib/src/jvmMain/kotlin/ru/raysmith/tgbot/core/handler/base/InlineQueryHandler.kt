@@ -5,9 +5,9 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.inline.InlineQuery
-import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResult
-import ru.raysmith.tgbot.model.network.inline.result.InlineQueryResultsButton
+import ru.raysmith.tgbot.model.api.inline.InlineQuery
+import ru.raysmith.tgbot.model.api.inline.result.InlineQueryResult
+import ru.raysmith.tgbot.model.api.inline.result.InlineQueryResultsButton
 import kotlin.time.Duration
 
 open class InlineQueryHandler(
@@ -22,7 +22,7 @@ open class InlineQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineQuery.from.id
-    override fun getChatIdOrThrow() = inlineQuery.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

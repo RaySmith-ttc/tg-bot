@@ -7,14 +7,16 @@ import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.*
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
-import ru.raysmith.tgbot.model.network.media.input.InputMedia
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.media.input.InputMedia
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.message.ParseMode
+import ru.raysmith.tgbot.model.api.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
 import ru.raysmith.tgbot.utils.noimpl
 import ru.raysmith.tgbot.utils.withSafeLength
 
-abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), ExtendedMessage<Message> {
+abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), ThreadMessage, EffectableMessage {
+
     companion object {
         internal fun instance(
             bot: Bot, mediaName: String = "",
@@ -27,46 +29,77 @@ abstract class ExtendedCaptionableMediaMessage : CaptionableMediaMessage(), Exte
                 override val bot: Bot = bot
                 override var messageThreadId: Int? = null
                 override var messageEffectId: String? = null
-                override var businessConnectionId: String? = null
                 override var allowPaidBroadcast: Boolean? = null
+                override var directMessagesTopicId: Int? = null
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
                 override var replyParameters: ReplyParameters? = null
                 override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
                 override suspend fun editReplyMarkup(
-                    chatId: ChatId?, messageId: Int?, inlineMessageId: String?
+                    chatId: ChatId?,
+                    messageId: Int?,
+                    inlineMessageId: String?,
+                    businessConnectionId: String?,
                 ): Message = noimpl()
             }
         }
     }
 
-    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override suspend fun edit(
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageCaption(
-            businessConnectionId, chatId, messageId, inlineMessageId, getCaptionText() ?: "", parseMode = null,
-            _caption?.getEntities(), showCaptionAboveMedia, keyboardMarkup?.toMarkup()
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            caption = getCaptionText(),
+            parseMode = getParseModeIfNeed(),
+            captionEntities = getEntities(),
+            showCaptionAboveMedia = showCaptionAboveMedia,
+            replyMarkup = keyboardMarkup?.toMarkup(),
         )
     }
 
-    override suspend fun editMedia(media: InputMedia, chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override suspend fun editMedia(
+        media: InputMedia,
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageMedia(
-            businessConnectionId, chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            media = media,
+            replyMarkup = keyboardMarkup?.toMarkup(),
         )
     }
 
-    override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override suspend fun editReplyMarkup(
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageReplyMarkup(
             businessConnectionId = businessConnectionId,
             chatId = chatId,
             messageId = messageId,
             inlineMessageId = inlineMessageId,
-            replyMarkup = keyboardMarkup?.toMarkup()
+            replyMarkup = keyboardMarkup?.toMarkup(),
         )
     }
 }
 
-abstract class CaptionableMediaMessage :
-    MediaMessage(), IMessage<Message>, KeyboardCreator, EditableMessage, BotHolder {
+abstract class CaptionableMediaMessage : MediaMessage(), IMessage<Message>, KeyboardCreator, EditableMessage,
+    BotHolder {
 
     companion object {
         internal fun instance(
@@ -80,11 +113,13 @@ abstract class CaptionableMediaMessage :
                 override val bot: Bot = bot
                 override val client: HttpClient = bot.client
                 override val botConfig: BotConfig = bot.botConfig
-                override var replyParameters: ReplyParameters? = null
                 override var safeTextLength: Boolean = bot.botConfig.safeTextLength
 
                 override suspend fun editReplyMarkup(
-                    chatId: ChatId?, messageId: Int?, inlineMessageId: String?
+                    chatId: ChatId?,
+                    messageId: Int?,
+                    inlineMessageId: String?,
+                    businessConnectionId: String?,
                 ): Message = noimpl()
             }
         }
@@ -119,20 +154,48 @@ abstract class CaptionableMediaMessage :
 
     protected open fun getEntities() = _caption?.getEntities()
 
-    override suspend fun edit(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override suspend fun edit(
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageCaption(
-            null, chatId, messageId, inlineMessageId, getCaptionText() ?: "", parseMode = null,
-            _caption?.getEntities(), showCaptionAboveMedia, keyboardMarkup?.toMarkup()
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            caption = getCaptionText(),
+            parseMode = getParseModeIfNeed(),
+            captionEntities = getEntities(),
+            showCaptionAboveMedia = showCaptionAboveMedia,
+            replyMarkup = keyboardMarkup?.toMarkup(),
         )
     }
 
-    open suspend fun editMedia(media: InputMedia, chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    open suspend fun editMedia(
+        media: InputMedia,
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageMedia(
-            null, chatId, messageId, inlineMessageId, media, keyboardMarkup?.toMarkup()
+            businessConnectionId = businessConnectionId,
+            chatId = chatId,
+            messageId = messageId,
+            inlineMessageId = inlineMessageId,
+            media = media,
+            replyMarkup = keyboardMarkup?.toMarkup(),
         )
     }
 
-    override suspend fun editReplyMarkup(chatId: ChatId?, messageId: Int?, inlineMessageId: String?): Message {
+    override suspend fun editReplyMarkup(
+        chatId: ChatId?,
+        messageId: Int?,
+        inlineMessageId: String?,
+        businessConnectionId: String?,
+    ): Message {
         return editMessageReplyMarkup(
             businessConnectionId = null,
             chatId = chatId,

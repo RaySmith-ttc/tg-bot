@@ -5,8 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.exceptions.UnknownChatIdException
-import ru.raysmith.tgbot.model.network.PollAnswer
+import ru.raysmith.tgbot.model.api.poll.PollAnswer
 
 open class PollAnswerHandler(
     val pollAnswer: PollAnswer,
@@ -20,7 +19,7 @@ open class PollAnswerHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = pollAnswer.voterChat?.id
-    override fun getChatIdOrThrow() = pollAnswer.voterChat?.id ?: throw UnknownChatIdException()
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

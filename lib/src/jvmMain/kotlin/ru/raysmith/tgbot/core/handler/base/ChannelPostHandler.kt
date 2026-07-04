@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.api.message.Message
 
 open class ChannelPostHandler(
     val channelPost: Message,
@@ -19,7 +19,7 @@ open class ChannelPostHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = channelPost.chat.id
-    override fun getChatIdOrThrow() = channelPost.chat.id
+    override fun getMessageThreadId(): Int? = channelPost.messageThreadId
 
     override suspend fun handle() {
         handler()

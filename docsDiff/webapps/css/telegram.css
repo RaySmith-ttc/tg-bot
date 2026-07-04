@@ -649,10 +649,11 @@ a.side_blog_entry:hover .side_blog_title {
 .tl_main_side_blog .side_blog_wrap {
   position: absolute;
   margin-top: 20px;
-  right: 137px;
+  width: 260px;
+  right: 77px;
 }
 .lang_rtl .tl_main_side_blog .side_blog_wrap {
-  left: 137px;
+  left: 77px;
   right: auto;
 }
 .tl_main_bottom_blog {
@@ -3537,6 +3538,18 @@ a.tgme_head_dl_button:active,
   vertical-align: -4px;
   margin-left: 8px;
 }
+.tgme_page_title mark.label {
+  font-size: .6em;
+  background: transparent;
+  border: 1px solid #d14e4e;
+  box-shadow: 0 0 0 .5px #d14e4e;
+  color: #d14e4e;
+  border-radius: 4px;
+  padding: 2px 5px 1px;
+  margin-left: 10px;
+  vertical-align: top;
+  font-weight: 500;
+}
 .tgme_page_extra {
   font-size: 15px;
   line-height: 18px;
@@ -3698,12 +3711,51 @@ a.tgme_action_button_new:active {
   top: 0;
   bottom: 0;
   overflow: hidden;
+  pointer-events: none;
+}
+.tgme_auction_label,
+.tgme_gift_number_label {
+  position: absolute;
+  inset: auto 0;
+  bottom: 16px;
+  margin: auto;
+  width: fit-content;
+  font-size: 15px;
+  color: #fff;
+  z-index: 10000;
+  -webkit-font-smoothing: antialiased;
+  background: #ffffff25;
+  padding: 2px 6px;
+  border-radius: 1000px;
+  font-weight: 400;
+}
+.tgme_auction_label {
+  top: 175px;
+  bottom: auto;
+  background: #00000025;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3px 12px;
+}
+.tgme_auction_label:empty,
+.tgme_gift_number_label:empty {
+  display: none;
+}
+.tgme_gift_number_label a {
+  color: currentColor;
+  font-weight: 500;
 }
 .tgme_gift_model_wrap {
   position: relative;
   margin-left: 30.71428571%;
   margin-right: 30.71428571%;
   margin-top: 7.142857143%;
+}
+.tgme_gift_preview_content.auction .tgme_gift_model_wrap {
+  margin-left: 34.2857142857%;
+  margin-right: 34.2857142857%;
+  margin-top: 7.142857143%;
+  margin-bottom: 7.142857143%;
 }
 .tgme_gift_model {
   display: inline-block;
@@ -3786,11 +3838,13 @@ a.tgme_action_button_new:active {
 .tgme_gift_table_wrap .table>tbody>tr>th {
   font-weight: 500;
   background-color: var(--tme-table-head-color);
+  white-space: nowrap;
 }
 .tgme_gift_table_wrap .table>tbody>tr>th.footer {
   font-size: 13px;
   font-weight: normal;
   text-align: center;
+  white-space: normal;
 }
 .tgme_gift_table_wrap .table>tbody>tr>td {
   border-left: 1px solid var(--tme-table-border-color);
@@ -3843,6 +3897,10 @@ a.tgme_action_button_new:active {
   margin: 18px 20px 24px;
   text-align: center;
   color: var(--tme-desc-color);
+}
+.tgme_page_action ~ .tgme_gift_description {
+  margin-top: 20px;
+  margin-bottom: -12px;
 }
 
 .tgme_dl_icon:after {
@@ -4861,6 +4919,7 @@ i.tl_telegram_share_icon {
     padding: 0 10px 0 15px;
     border-width: 4px;
     border-color: #3faee8;
+    width: auto;
   }
   .side_blog_wrap {
     width: auto;

@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.EmojiStatusAccessRequestedStatus.Companion.allowed
 import ru.raysmith.tgbot.events.EmojiStatusAccessRequestedStatus.Companion.cancelled
 import seskar.js.JsValue
@@ -7,9 +8,8 @@ import seskar.js.JsValue
 /**
  * @property status Status of the emoji status access request
  * */
+@JsPlainObject
 external interface EmojiStatusAccessRequested {
-
-    /** Status of the emoji status access request */
     val status: EmojiStatusAccessRequestedStatus
 }
 

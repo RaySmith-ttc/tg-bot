@@ -1,8 +1,8 @@
 package ru.raysmith.tgbot.model.bot.message
 
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.message.MessageEntity
-import ru.raysmith.tgbot.model.network.message.MessageEntityType
+import ru.raysmith.tgbot.model.api.user.User
+import ru.raysmith.tgbot.model.api.message.MessageEntity
+import ru.raysmith.tgbot.model.api.message.MessageEntityType
 import ru.raysmith.utils.notNull
 
 class MessageEntityBuilder(val type: MessageEntityType) {

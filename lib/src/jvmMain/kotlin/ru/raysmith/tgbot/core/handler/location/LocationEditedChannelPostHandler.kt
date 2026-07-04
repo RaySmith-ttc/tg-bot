@@ -4,7 +4,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.LocationHandler
 import ru.raysmith.tgbot.core.handler.base.EditedChannelPostHandler
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 import ru.raysmith.tgbot.utils.locations.LocationFlowContext
 import ru.raysmith.tgbot.utils.locations.LocationsWrapper
 

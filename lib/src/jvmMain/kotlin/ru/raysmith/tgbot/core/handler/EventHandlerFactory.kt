@@ -1,11 +1,11 @@
 package ru.raysmith.tgbot.core.handler
 
 import org.slf4j.LoggerFactory
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 
 @HandlerDsl
-interface EventHandlerFactory {
+sealed interface EventHandlerFactory {
     companion object {
         @Deprecated("Use main logger", ReplaceWith("Bot.logger"))
         internal val logger = LoggerFactory.getLogger("event-handler-factory")

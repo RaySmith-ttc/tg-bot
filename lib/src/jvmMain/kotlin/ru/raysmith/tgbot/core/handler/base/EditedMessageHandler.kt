@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.api.message.Message
 
 open class EditedMessageHandler(
     val message: Message,
@@ -20,7 +20,7 @@ open class EditedMessageHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = message.chat.id
-    override fun getChatIdOrThrow() = message.chat.id
+    override fun getMessageThreadId(): Int? = message.asMessageOrNull()?.getMessageThreadId()
 
     override suspend fun handle() {
         handler()

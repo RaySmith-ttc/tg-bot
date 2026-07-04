@@ -10,7 +10,7 @@ package ru.raysmith.tgbot
  *  by default.
  * */
 external interface PopupParams {
-    var title: String?
-    var message: String
-    var buttons: Array<PopupButton>?
+    val title: String?
+    val message: String
+    val buttons: Array<PopupButton>?
 }

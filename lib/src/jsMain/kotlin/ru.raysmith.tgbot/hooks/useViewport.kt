@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -89,26 +89,27 @@ fun useViewport(): ViewportHookType {
         fullscreenFailed,
         isOrientationLocked,
     ) {
-        jso {
-            this.viewportHeight = viewportHeight
-            this.viewportStableHeight = viewportStableHeight
-            this.isExpanded = isExpanded
-            this.isStateStable = isStateStable
-            this.isVerticalSwipesEnabled = isVerticalSwipesEnabled
-            this.enableVerticalSwipes = enableVerticalSwipes
-            this.disableVerticalSwipes = disableVerticalSwipes
-            this.expand = expand
-            this.isFullscreen = isFullscreen
-            this.fullscreenFailed = fullscreenFailed
-            this.requestFullscreen = requestFullscreen
-            this.exitFullscreen = exitFullscreen
-            this.isOrientationLocked = isOrientationLocked
-            this.lockOrientation = lockOrientation
-            this.unlockOrientation = unlockOrientation
-        }
+        ViewportHookType(
+            viewportHeight = viewportHeight,
+            viewportStableHeight = viewportStableHeight,
+            isExpanded = isExpanded,
+            isStateStable = isStateStable,
+            isVerticalSwipesEnabled = isVerticalSwipesEnabled,
+            enableVerticalSwipes = enableVerticalSwipes,
+            disableVerticalSwipes = disableVerticalSwipes,
+            expand = expand,
+            isFullscreen = isFullscreen,
+            fullscreenFailed = fullscreenFailed,
+            requestFullscreen = requestFullscreen,
+            exitFullscreen = exitFullscreen,
+            isOrientationLocked = isOrientationLocked,
+            lockOrientation = lockOrientation,
+            unlockOrientation = unlockOrientation,
+        )
     }
 }
 
+@JsPlainObject
 external interface ViewportHookType {
 
     /**
@@ -124,7 +125,7 @@ external interface ViewportHookType {
      * window. It should not be used to pin interface elements to the bottom of the visible area. It's more appropriate
      * to use the value of the [viewportStableHeight] field for this purpose.
      * */
-    var viewportHeight: Float
+    val viewportHeight: Float
 
     /**
      * The height of the visible area of the Mini App in its last stable state. Also available in CSS as a variable
@@ -140,23 +141,23 @@ external interface ViewportHookType {
      * *Note the event [EventType.viewportChanged] with the passed parameter `[isStateStable]=true`, which will allow
      * you to track when the stable state of the height of the visible area changes.
      * */
-    var viewportStableHeight: Float
+    val viewportStableHeight: Float
 
     /**
      * *True*, if the Mini App is expanded to the maximum available height. False, if the Mini App occupies part of
      * the screen and can be expanded to the full height using the [expand] method.
      * */
-    var isExpanded: Boolean
+    val isExpanded: Boolean
 
     /** If true, the resizing of the Mini App is finished. */
-    var isStateStable: Boolean
+    val isStateStable: Boolean
 
     /**
      * *True*, if vertical swipes to close or minimize the Mini App are enabled. False, if vertical swipes to close or
      * minimize the Mini App are disabled. In any case, the user will still be able to minimize and close the
      * Mini App by swiping the Mini App's header.
      * */
-    var isVerticalSwipesEnabled: Boolean
+    val isVerticalSwipesEnabled: Boolean
 
     /**
      * A method that enables vertical swipes to close or minimize the Mini App. For user convenience, it is recommended
@@ -164,7 +165,7 @@ external interface ViewportHookType {
      *
      * @since Bot API 7.7
      * */
-    var enableVerticalSwipes: VoidFunction
+    val enableVerticalSwipes: VoidFunction
 
     /**
      * A method that disables vertical swipes to close or minimize the Mini App. This method is useful if your Mini App
@@ -172,18 +173,18 @@ external interface ViewportHookType {
      *
      * @since Bot API 7.7
      * */
-    var disableVerticalSwipes: VoidFunction
+    val disableVerticalSwipes: VoidFunction
 
     /**
      * A method that expands the Mini App to the maximum available height. To find out if the Mini App is expanded to
      * the maximum height, refer to the value of the [isExpanded] parameter
      * */
-    var expand: VoidFunction
+    val expand: VoidFunction
 
     /**
      * *True*, if the Mini App is currently being displayed in fullscreen mode.
      * */
-    var isFullscreen: Boolean
+    val isFullscreen: Boolean
 
     /**
      * Not null if a request to enter fullscreen mode fails.
@@ -192,7 +193,7 @@ external interface ViewportHookType {
      * - [FullscreenFailedType.UNSUPPORTED] – Fullscreen mode is not supported on this device or platform.
      * - [FullscreenFailedType.ALREADY_FULLSCREEN] – The Mini App is already in fullscreen mode.
      */
-    var fullscreenFailed: FullscreenFailedType?
+    val fullscreenFailed: FullscreenFailedType?
 
     /**
      * A method that requests opening the Mini App in fullscreen mode. Although the header is transparent in fullscreen
@@ -201,20 +202,20 @@ external interface ViewportHookType {
      *
      * @since Bot API 8.0
      * */
-    var requestFullscreen: VoidFunction
+    val requestFullscreen: VoidFunction
 
     /**
      * A method that requests exiting fullscreen mode.
      *
      * @since Bot API 8.0
      * */
-    var exitFullscreen: VoidFunction
+    val exitFullscreen: VoidFunction
 
     /**
      * *True*, if the Mini App’s orientation is currently locked.
      * *False*, if orientation changes freely based on the device’s rotation.
      * */
-    var isOrientationLocked : Boolean
+    val isOrientationLocked : Boolean
 
     /**
      * A method that locks the Mini App’s orientation to its current mode (either portrait or landscape). Once locked,
@@ -223,7 +224,7 @@ external interface ViewportHookType {
      *
      * @since Bot API 8.0
      * */
-    var lockOrientation: VoidFunction
+    val lockOrientation: VoidFunction
 
     /**
      * A method that unlocks the Mini App’s orientation, allowing it to follow the device's rotation freely. Use this to
@@ -231,5 +232,5 @@ external interface ViewportHookType {
      *
      * @since Bot API 8.0
      * */
-    var unlockOrientation: VoidFunction
+    val unlockOrientation: VoidFunction
 }

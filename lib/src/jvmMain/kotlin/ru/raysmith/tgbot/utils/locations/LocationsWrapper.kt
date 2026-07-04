@@ -4,8 +4,8 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.core.handler.EventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
-import ru.raysmith.tgbot.model.network.updates.Update
-import ru.raysmith.tgbot.model.network.updates.UpdateType
+import ru.raysmith.tgbot.model.api.updates.Update
+import ru.raysmith.tgbot.model.api.updates.UpdateType
 
 @LocationsDSL
 class LocationsWrapper<LFC : LocationFlowContext>(override val bot: Bot) : BotHolder {
@@ -26,8 +26,8 @@ class LocationsWrapper<LFC : LocationFlowContext>(override val bot: Bot) : BotHo
         this.updateLocation = block
     }
     
-    private var filter: context(LFC) LocationsWrapper<LFC>.(update: Update) -> Boolean = { true }
-    fun filter(block: context(LFC) LocationsWrapper<LFC>.(update: Update) -> Boolean) {
+    private var filter: LFC.(update: Update) -> Boolean = { true }
+    fun filter(block: LFC.(update: Update) -> Boolean) {
         this.filter = block
     }
     
@@ -77,7 +77,7 @@ class LocationsWrapper<LFC : LocationFlowContext>(override val bot: Bot) : BotHo
         additionalEventHandlers: MutableList<(eventHandlerFactory: EventHandlerFactory) -> Unit>
     ): LocationEventHandlerFactory<LFC> {
         val config = configCreator(update)
-        if (!filter.invoke(config, this, update)) {
+        if (!filter.invoke(config, update)) {
             Bot.logger.debug("Update #${update.updateId} skipped by locations filter")
             return LocationEventHandlerFactory(this)
         }

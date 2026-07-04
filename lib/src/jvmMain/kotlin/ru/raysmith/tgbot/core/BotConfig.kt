@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.core
 
-import ru.raysmith.tgbot.model.network.message.LinkPreviewOptions
+import ru.raysmith.tgbot.model.api.message.LinkPreviewOptions
 import ru.raysmith.tgbot.utils.BotFeature
 import ru.raysmith.tgbot.utils.getOrDefault
 import ru.raysmith.tgbot.utils.obtainToken

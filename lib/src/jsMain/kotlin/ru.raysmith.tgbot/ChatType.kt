@@ -2,6 +2,13 @@ package ru.raysmith.tgbot
 
 import seskar.js.JsValue
 
+/**
+ * @property sender
+ * @property private
+ * @property group
+ * @property supergroup
+ * @property channel
+ * */
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
 sealed external interface ChatType {
     companion object {

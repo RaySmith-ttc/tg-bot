@@ -1,10 +1,13 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object provides access to gyroscope data on the device.
  *
- * <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
+ * @see <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
  */
+@JsPlainObject
 external interface Gyroscope {
 
     /** Indicates whether gyroscope tracking is currently active. */

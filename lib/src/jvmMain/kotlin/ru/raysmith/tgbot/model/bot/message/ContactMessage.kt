@@ -7,13 +7,13 @@ import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.keyboard.KeyboardCreator
 import ru.raysmith.tgbot.model.bot.message.keyboard.MessageKeyboard
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
 
-class ContactMessage(
-    val phoneNumber: String, val firstName: String,
-    override val bot: Bot
-) : KeyboardCreator, BotHolder, ExtendedMessage<Message> {
+class ContactMessage(val phoneNumber: String, val firstName: String, override val bot: Bot) : KeyboardCreator,
+    BotHolder, IMessage<Message>, ThreadMessage, EffectableMessage, BusinessMessage, SuggestablePostMessage {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
     override var messageThreadId: Int? = null
@@ -24,6 +24,8 @@ class ContactMessage(
     override var keyboardMarkup: MessageKeyboard? = null
     override var replyParameters: ReplyParameters? = null
     override var allowPaidBroadcast: Boolean? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
     var lastName: String? = null
     var vcard: String? = null
@@ -32,6 +34,7 @@ class ContactMessage(
         businessConnectionId = businessConnectionId,
         chatId = chatId,
         messageThreadId = messageThreadId,
+        directMessagesTopicId = directMessagesTopicId,
         phoneNumber = phoneNumber,
         firstName = firstName,
         lastName = lastName,
@@ -40,6 +43,7 @@ class ContactMessage(
         protectContent = protectContent,
         allowPaidBroadcast = allowPaidBroadcast,
         messageEffectId = messageEffectId,
+        suggestedPostParameters = suggestedPostParameters,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup()
     )

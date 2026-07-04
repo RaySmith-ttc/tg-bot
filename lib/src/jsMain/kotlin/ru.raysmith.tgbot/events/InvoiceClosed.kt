@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.InvoiceClosedStatus.Companion.cancelled
 import ru.raysmith.tgbot.events.InvoiceClosedStatus.Companion.failed
 import ru.raysmith.tgbot.events.InvoiceClosedStatus.Companion.paid
@@ -10,12 +11,9 @@ import seskar.js.JsValue
  * @property url Invoice link provided
  * @property status Status
  * */
+@JsPlainObject
 external interface InvoiceClosed {
-
-    /** Invoice link provided */
     val url: String
-
-    /** Status */
     val status: InvoiceClosedStatus
 }
 
@@ -27,7 +25,7 @@ external interface InvoiceClosed {
  * @property failed User tried to pay, but the payment was failed
  * @property pending The payment is still processing. The bot will receive a service message about a
  * */
-external interface InvoiceClosedStatus {
+sealed external interface InvoiceClosedStatus {
     companion object {
 
         /** Invoice was paid successfully */

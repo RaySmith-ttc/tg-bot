@@ -1,9 +1,13 @@
+@file:Suppress("UnusedImport")
+
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.EventType
 import web.function.VoidFunction
 
 /** This object controls the main button, which is displayed at the bottom of the Mini App in the Telegram interface. */
+@JsPlainObject
 external interface BottomButton {
 
     /**
@@ -11,6 +15,13 @@ external interface BottomButton {
      * or [BottomButtonType.secondary] for the secondary button.
      * */
     val type: BottomButtonType
+
+    /**
+     * Unique identifier of the custom emoji shown before the text of the button.
+     *
+     * @since Bot API 9.5+
+     * */
+    val iconCustomEmojiId: String
 
     /**
      * Current button text. Set to [BottomButtonText.Continue] for the main button and [BottomButtonText.Cancel] for

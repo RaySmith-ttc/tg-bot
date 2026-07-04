@@ -4,7 +4,7 @@ import ru.raysmith.tgbot.core.IEditor
 import ru.raysmith.tgbot.core.ISender
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.TextMessage
-import ru.raysmith.tgbot.model.network.message.Message
+import ru.raysmith.tgbot.model.api.message.Message
 
 suspend fun <T> T.message(
     action: MessageAction,

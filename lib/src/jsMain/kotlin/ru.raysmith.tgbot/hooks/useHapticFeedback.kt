@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.HapticFeedbackStyle
 import ru.raysmith.tgbot.HapticFeedbackType
 import ru.raysmith.tgbot.webApp
@@ -21,13 +21,14 @@ fun useHapticFeedback(): HapticFeedbackHookType {
         webApp.HapticFeedback.selectionChanged()
     }
 
-    return jso {
-        this.impactOccurred = impactOccurred
-        this.notificationOccurred = notificationOccurred
-        this.selectionChanged = selectionChanged
-    }
+    return HapticFeedbackHookType(
+        impactOccurred = impactOccurred,
+        notificationOccurred = notificationOccurred,
+        selectionChanged = selectionChanged,
+    )
 }
 
+@JsPlainObject
 external interface HapticFeedbackHookType {
 
     /**
@@ -36,7 +37,7 @@ external interface HapticFeedbackHookType {
      *
      * @since Bot API 6.1
      * */
-    var impactOccurred: (style: HapticFeedbackStyle) -> Unit
+    val impactOccurred: (style: HapticFeedbackStyle) -> Unit
 
     /**
      * A method tells that a task or action has succeeded, failed, or produced a warning.
@@ -44,7 +45,7 @@ external interface HapticFeedbackHookType {
      *
      * @since Bot API 6.1
      * */
-    var notificationOccurred: (type: HapticFeedbackType) -> Unit
+    val notificationOccurred: (type: HapticFeedbackType) -> Unit
 
     /**
      * A method tells that the user has changed a selection. The Telegram app may play the appropriate haptics.
@@ -53,5 +54,5 @@ external interface HapticFeedbackHookType {
      *
      * @since Bot API 6.1
      * */
-    var selectionChanged: VoidFunction
+    val selectionChanged: VoidFunction
 }

@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.ChosenInlineResult
+import ru.raysmith.tgbot.model.api.inline.result.ChosenInlineResult
 
 open class ChosenInlineQueryHandler(
     val inlineResult: ChosenInlineResult,
@@ -19,7 +19,7 @@ open class ChosenInlineQueryHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = inlineResult.from.id
-    override fun getChatIdOrThrow() = inlineResult.from.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

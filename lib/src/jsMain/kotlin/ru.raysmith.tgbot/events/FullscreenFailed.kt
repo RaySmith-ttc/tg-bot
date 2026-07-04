@@ -1,5 +1,6 @@
 package ru.raysmith.tgbot.events
 
+import kotlinx.js.JsPlainObject
 import ru.raysmith.tgbot.events.FullscreenFailedType.Companion.ALREADY_FULLSCREEN
 import ru.raysmith.tgbot.events.FullscreenFailedType.Companion.UNSUPPORTED
 import seskar.js.JsValue
@@ -7,9 +8,8 @@ import seskar.js.JsValue
 /**
  * @property error Reason for the failure
  * */
+@JsPlainObject
 external interface FullscreenFailed {
-
-    /** Reason for the failure */
     val error: FullscreenFailedType
 }
 

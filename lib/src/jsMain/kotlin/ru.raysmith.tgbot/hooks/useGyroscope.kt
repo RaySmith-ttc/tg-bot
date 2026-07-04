@@ -1,6 +1,6 @@
 package ru.raysmith.tgbot.hooks
 
-import js.objects.jso
+import kotlinx.js.JsPlainObject
 import react.useEffectOnce
 import react.useMemo
 import react.useState
@@ -10,7 +10,7 @@ import ru.raysmith.tgbot.events.EventType
 /**
  * This hook provides access to gyroscope data on the device.
  *
- * <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
+ * @see <img src="https://core.telegram.org/file/400780400892/5/GDxCwbAAG7U.579631/7895611bc90a998a13" />
  */
 fun useGyroscope(): GyroscopeHookType {
 
@@ -49,19 +49,19 @@ fun useGyroscope(): GyroscopeHookType {
     }
 
     return useMemo(gyroscope, failed) {
-        jso {
-            this.failed = failed
-            this.isStarted = gyroscope.isStarted
-            this.x = gyroscope.x
-            this.y = gyroscope.y
-            this.z = gyroscope.z
-            this.start = start
-            this.stop = stop
-        }
+        GyroscopeHookType(
+            failed = failed,
+            isStarted = gyroscope.isStarted,
+            x = gyroscope.x,
+            y = gyroscope.y,
+            z = gyroscope.z,
+            start = start,
+            stop = stop,
+        )
     }
 }
 
-
+@JsPlainObject
 external interface GyroscopeHookType {
 
     /**
@@ -70,31 +70,31 @@ external interface GyroscopeHookType {
      * Possible values:
      * - [GyroscopeFailedType.UNSUPPORTED] – Gyroscope tracking is not supported on this device or platform
      */
-    var failed: GyroscopeFailed?
+    val failed: GyroscopeFailed?
 
     /** Indicates whether gyroscope tracking is currently active. */
-    var isStarted: Boolean
+    val isStarted: Boolean
 
     /** The current rotation rate around the X-axis, measured in rad/s. */
-    var x: Float?
+    val x: Float?
 
     /** The current rotation rate around the Y-axis, measured in rad/s. */
-    var y: Float?
+    val y: Float?
 
     /** The current rotation rate around the Z-axis, measured in rad/s. */
-    var z: Float?
+    val z: Float?
 
     /**
      * Starts tracking gyroscope data using params of type GyroscopeStartParams.
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called with a boolean indicating whether tracking was successfully started.
      */
-    var start: (params: GyroscopeStartParams, callback: ((isTrackingStarted: Boolean) -> Unit)?) -> Unit
+    val start: (params: GyroscopeStartParams, callback: ((isTrackingStarted: Boolean) -> Unit)?) -> Unit
 
     /**
      * Stops tracking gyroscope data.
      * If an optional `callback` parameter is provided,
      * the `callback` function will be called with a boolean indicating whether tracking was successfully stopped.
      */
-    var stop: (callback: (isTrackingStopped: Boolean) -> Unit) -> Unit
+    val stop: (callback: (isTrackingStopped: Boolean) -> Unit) -> Unit
 }

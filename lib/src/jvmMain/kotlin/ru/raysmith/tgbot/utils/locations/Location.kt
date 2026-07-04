@@ -3,7 +3,7 @@ package ru.raysmith.tgbot.utils.locations
 import ru.raysmith.tgbot.core.handler.ILocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationEventHandlerFactory
 import ru.raysmith.tgbot.core.handler.LocationHandler
-import ru.raysmith.tgbot.model.network.updates.Update
+import ru.raysmith.tgbot.model.api.updates.Update
 
 @LocationsDSL
 suspend fun <LFC : LocationFlowContext> createLocation(name: String, wrapper: LocationsWrapper<LFC>, setup: suspend LocationEventHandlerFactory<LFC>.(location: Location<LFC>) -> Unit): Location<LFC> {

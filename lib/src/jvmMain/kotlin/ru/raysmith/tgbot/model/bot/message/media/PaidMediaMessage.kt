@@ -6,19 +6,17 @@ import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotHolder
 import ru.raysmith.tgbot.model.bot.ChatId
 import ru.raysmith.tgbot.model.bot.message.BusinessMessage
-import ru.raysmith.tgbot.model.bot.message.MessageText
-import ru.raysmith.tgbot.model.bot.message.MessageTextType
-import ru.raysmith.tgbot.model.bot.message.group.MediaRequestWithCaption
-import ru.raysmith.tgbot.model.bot.message.group.PrivateChatsAndGroupsMediaRequestWithCaption
-import ru.raysmith.tgbot.model.network.chat.ChatAction
-import ru.raysmith.tgbot.model.network.media.input.*
-import ru.raysmith.tgbot.model.network.message.Message
-import ru.raysmith.tgbot.model.network.message.ParseMode
-import ru.raysmith.tgbot.model.network.message.ReplyParameters
+import ru.raysmith.tgbot.model.api.chat.ChatAction
+import ru.raysmith.tgbot.model.api.media.input.*
+import ru.raysmith.tgbot.model.api.message.Message
+import ru.raysmith.tgbot.model.api.suggestedpost.SuggestedPostParameters
+import ru.raysmith.tgbot.model.bot.message.SuggestablePostMessage
+import ru.raysmith.tgbot.model.bot.message.ThreadMessage
 import ru.raysmith.tgbot.network.API
-import ru.raysmith.tgbot.utils.withSafeLength
 
-class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, BotHolder, BusinessMessage<Message> {
+class PaidMediaMessage(override val bot: Bot) : CaptionableMediaMessage(), API, BotHolder, BusinessMessage,
+    ThreadMessage, SuggestablePostMessage {
+
     override val client: HttpClient = bot.client
     override val botConfig: BotConfig = bot.botConfig
 
@@ -26,8 +24,11 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
     override var sendChatAction: Boolean = bot.botConfig.sendChatActionWithMedaMessage
     override var safeTextLength: Boolean = bot.botConfig.safeTextLength
     override var businessConnectionId: String? = null
+    override var messageThreadId: Int? = null
     override var allowPaidBroadcast: Boolean? = null
     override var disableNotification: Boolean? = null
+    override var directMessagesTopicId: Int? = null
+    override var suggestedPostParameters: SuggestedPostParameters? = null
 
     private val inputMedia = mutableListOf<InputPaidMedia>()
 
@@ -42,8 +43,10 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
 
     private suspend fun sendPaidMeda(chatId: ChatId) = sendPaidMedia(
         businessConnectionId = businessConnectionId,
-        starCount = starCount,
         chatId = chatId,
+        messageThreadId = messageThreadId,
+        directMessagesTopicId = directMessagesTopicId,
+        starCount = starCount,
         media = inputMedia,
         payload = payload,
         caption = getCaptionText(),
@@ -53,46 +56,48 @@ class PaidMediaMessage(override val bot: Bot) : MediaRequestWithCaption(), API, 
         disableNotification = disableNotification,
         protectContent = protectContent,
         allowPaidBroadcast = allowPaidBroadcast,
+        suggestedPostParameters = suggestedPostParameters,
         replyParameters = replyParameters,
         keyboardMarkup = keyboardMarkup?.toMarkup(),
-        inputFiles = inputFiles
     )
-    
-    override suspend fun send(chatId: ChatId): Message {
-        if (sendChatAction && inputFiles.isNotEmpty()) {
-            val action = when {
-                inputMedia.isNotEmpty() && inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
-                inputMedia.isNotEmpty() && inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
-                inputMedia.isNotEmpty() -> ChatAction.UPLOAD_DOCUMENT
-                else -> null
-            }
 
-            if (action != null) {
-                sendChatAction(null, chatId, null, action)
+    override suspend fun send(chatId: ChatId): Message {
+        if (sendChatAction && inputMedia.isNotEmpty()) {
+            val action = when {
+                inputMedia.all { it is InputPaidMediaPhoto } -> ChatAction.UPLOAD_PHOTO
+                inputMedia.all { it is InputPaidMediaVideo } -> ChatAction.UPLOAD_VIDEO
+                else -> ChatAction.UPLOAD_DOCUMENT
             }
+            sendChatAction(businessConnectionId, chatId, messageThreadId, action)
         }
 
         return sendPaidMeda(chatId)
     }
 
-    fun photo(
-        photo: InputFile
-    ) {
-        inputMedia.add(
-            InputPaidMediaPhoto(
-                applyMedia(photo)
-            )
-        )
+    fun photo(photo: InputFile) {
+        inputMedia.add(InputPaidMediaPhoto(photo))
     }
 
     fun video(
-        video: InputFile, thumbnail: NotReusableInputFile? = null, width: Int? = null, height: Int? = null,
-        duration: Int? = null, supportsStreaming: Boolean? = null,
+        video: InputFile,
+        thumbnail: InputFile? = null,
+        cover: InputFile,
+        startTimestamp: Int? = null,
+        width: Int? = null,
+        height: Int? = null,
+        duration: Int? = null,
+        supportsStreaming: Boolean? = null,
     ) {
         inputMedia.add(
             InputPaidMediaVideo(
-                applyMedia(video), thumbnail?.let { applyMedia(it) }, width, height, duration,
-                supportsStreaming
+                media = video,
+                thumbnail = thumbnail,
+                cover = cover,
+                startTimestamp = startTimestamp,
+                width = width,
+                height = height,
+                duration = duration,
+                supportsStreaming = supportsStreaming,
             )
         )
     }

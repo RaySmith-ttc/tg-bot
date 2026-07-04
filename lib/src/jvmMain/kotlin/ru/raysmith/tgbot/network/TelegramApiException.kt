@@ -1,7 +1,7 @@
 package ru.raysmith.tgbot.network
 
 import io.ktor.client.request.*
-import ru.raysmith.tgbot.model.network.Error
+import ru.raysmith.tgbot.model.api.response.Error
 
 class TelegramApiException(val error: Error, val request: HttpRequest) : Exception(error.description) {
     override fun toString(): String {

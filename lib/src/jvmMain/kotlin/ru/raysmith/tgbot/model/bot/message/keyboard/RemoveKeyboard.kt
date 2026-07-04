@@ -3,11 +3,12 @@ package ru.raysmith.tgbot.model.bot.message.keyboard
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.raysmith.tgbot.model.network.keyboard.KeyboardMarkup
-import ru.raysmith.tgbot.model.network.keyboard.ReplyKeyboardRemove
+import ru.raysmith.tgbot.model.api.keyboard.KeyboardMarkup
+import ru.raysmith.tgbot.model.api.keyboard.ReplyKeyboardRemove
 
 @Serializable
 class RemoveKeyboard : MessageKeyboard {
+    
     @EncodeDefault
     @SerialName("class")
     override val classDiscriminator = "RemoveKeyboard"
@@ -16,5 +17,4 @@ class RemoveKeyboard : MessageKeyboard {
     override fun toMarkup(): KeyboardMarkup {
         return ReplyKeyboardRemove(selective)
     }
-
 }

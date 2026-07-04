@@ -1,11 +1,14 @@
 package ru.raysmith.tgbot
 
+import kotlinx.js.JsPlainObject
+
 /**
  * This object represents the content-defined safe area insets, providing padding values to ensure content remains
  * within visible boundaries, avoiding overlap with Telegram UI elements.
  *
- * <img src="https://core.telegram.org/file/400780400676/2/8VT7jCQvpsk.1386608/d249aa072662450345" />
+ * @see <img src="https://core.telegram.org/file/400780400676/2/8VT7jCQvpsk.1386608/d249aa072662450345" />
  * */
+@JsPlainObject
 external interface ContentSafeAreaInset {
 
     /**

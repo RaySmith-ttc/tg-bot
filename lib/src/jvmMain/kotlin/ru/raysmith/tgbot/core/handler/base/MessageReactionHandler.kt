@@ -5,7 +5,7 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.message.reaction.MessageReactionUpdated
+import ru.raysmith.tgbot.model.api.message.reaction.MessageReactionUpdated
 
 open class MessageReactionHandler(
     val messageReaction: MessageReactionUpdated,
@@ -19,7 +19,7 @@ open class MessageReactionHandler(
     override var inlineMessageId: String? = null
 
     override fun getChatId() = messageReaction.chat.id
-    override fun getChatIdOrThrow() = messageReaction.chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()

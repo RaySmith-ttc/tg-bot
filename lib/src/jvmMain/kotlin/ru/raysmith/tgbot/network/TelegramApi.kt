@@ -13,9 +13,12 @@ import io.ktor.util.*
 import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import ru.raysmith.tgbot.model.serializer.ZonedDateTimeAsUnixSerializer
 import ru.raysmith.tgbot.utils.obtainToken
+import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -72,12 +75,12 @@ object TelegramApi {
     val defaultClientInstance by lazy { defaultClient() }
 
     val json = Json {
-        isLenient = true
+//        isLenient = true
         ignoreUnknownKeys = true
         encodeDefaults = false
-        classDiscriminator = "#type"
+//        classDiscriminator = "#type"
         classDiscriminatorMode = ClassDiscriminatorMode.NONE
-        namingStrategy = JsonNamingStrategy.SnakeCase
+//        namingStrategy = JsonNamingStrategy.SnakeCase
     }
 
     fun defaultClient(
@@ -95,7 +98,7 @@ object TelegramApi {
 
         install(HttpRequestRetry) {
             retryOnException(retryOnTimeout = true)
-            retryIf(Int.MAX_VALUE) { _, response ->
+            retryIf(Int.MAX_VALUE - 1) { _, response ->  // -1 because HttpSend adds one more retry
                 response.status.value.let { it in 500..599 } ||
                 response.status == HttpStatusCode.TooManyRequests
             }
@@ -108,7 +111,7 @@ object TelegramApi {
                     this@TelegramApi.logger.debug(message)
                 }
             }
-            level = LogLevel.INFO
+            level = LogLevel.ALL
         }
 
         install(ContentNegotiation) {

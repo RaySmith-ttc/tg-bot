@@ -5,11 +5,11 @@ import ru.raysmith.tgbot.core.Bot
 import ru.raysmith.tgbot.core.BotConfig
 import ru.raysmith.tgbot.core.BotContext
 import ru.raysmith.tgbot.core.handler.BaseEventHandler
-import ru.raysmith.tgbot.model.network.User
-import ru.raysmith.tgbot.model.network.chat.Chat
-import ru.raysmith.tgbot.model.network.chat.ChatInviteLink
-import ru.raysmith.tgbot.model.network.chat.member.ChatMember
-import ru.raysmith.tgbot.model.network.chat.member.ChatMemberUpdated
+import ru.raysmith.tgbot.model.api.user.User
+import ru.raysmith.tgbot.model.api.chat.Chat
+import ru.raysmith.tgbot.model.api.chat.ChatInviteLink
+import ru.raysmith.tgbot.model.api.chat.member.ChatMember
+import ru.raysmith.tgbot.model.api.chat.member.ChatMemberUpdated
 
 open class ChatMemberHandler(
     @get:JvmName("chatOfHandler") // TODO ?
@@ -34,7 +34,7 @@ open class ChatMemberHandler(
     )
 
     override fun getChatId() = chat.id
-    override fun getChatIdOrThrow() = chat.id
+    override fun getMessageThreadId(): Int? = null // TODO always null?
 
     override suspend fun handle() {
         handler()
