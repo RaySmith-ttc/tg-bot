@@ -13,6 +13,8 @@ object Paths {
     val bottomButtons = "/bottomButtons"
     val settingsButton = "/settingsButton"
     val cloud = "/cloud"
+    val deviceStorage = "/deviceStorage"
+    val secureStorage = "/secureStorage"
     val accelerometer = "/accelerometer"
     val deviceOrientation = "/deviceOrientation"
     val gyroscope = "/gyroscope"

@@ -10,6 +10,8 @@ import ru.raysmith.tgbot.webappapp.pages.base.BaseInfoPage
 import ru.raysmith.tgbot.webappapp.pages.biometric.BiometricPage
 import ru.raysmith.tgbot.webappapp.pages.bottombutton.BottomButtonsPage
 import ru.raysmith.tgbot.webappapp.pages.cloud.CloudStoragePage
+import ru.raysmith.tgbot.webappapp.pages.devicestorage.DeviceStoragePage
+import ru.raysmith.tgbot.webappapp.pages.securestorage.SecureStoragePage
 import ru.raysmith.tgbot.webappapp.pages.gyroscope.GyroscopePage
 import ru.raysmith.tgbot.webappapp.pages.haptic.HapticFeedbackPage
 import ru.raysmith.tgbot.webappapp.pages.homescreen.HomeScreenIntegrationPage
@@ -141,6 +143,22 @@ val Router = FC<PropsWithChildren> { props ->
         )
     )
 
+    val deviceStoragePageRoute = createRoute(
+        options = RouteOptions(
+            getParentRoute = { rootRoute },
+            path = RoutePath(Paths.deviceStorage),
+            component = DeviceStoragePage
+        )
+    )
+
+    val secureStoragePageRoute = createRoute(
+        options = RouteOptions(
+            getParentRoute = { rootRoute },
+            path = RoutePath(Paths.secureStorage),
+            component = SecureStoragePage
+        )
+    )
+
     val accelerometerPageRoute = createRoute(
         options = RouteOptions(
             getParentRoute = { rootRoute },
@@ -203,6 +221,8 @@ val Router = FC<PropsWithChildren> { props ->
             bottomButtonsPageRoute,
             settingsButtonPageRoute,
             cloudStoragePageRoute,
+            deviceStoragePageRoute,
+            secureStoragePageRoute,
             accelerometerPageRoute,
             deviceOrientationPageRoute,
             gyroscopePageRoute,

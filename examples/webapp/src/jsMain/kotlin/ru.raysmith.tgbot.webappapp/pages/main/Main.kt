@@ -130,6 +130,18 @@ val MainPage = FC<Props> {
         }
 
         SubPageButton {
+            +"Device storage"
+            href = Paths.deviceStorage
+            startIcon = Storage.create()
+        }
+
+        SubPageButton {
+            +"Secure storage"
+            href = Paths.secureStorage
+            startIcon = Lock.create()
+        }
+
+        SubPageButton {
             +"Accelerometer"
             href = Paths.accelerometer
             startIcon = ViewInAr.create()
