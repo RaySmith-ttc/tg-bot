@@ -35,7 +35,7 @@ kotlin {
         useEsModules()
 
         nodejs()
-        binaries.executable()
+        binaries.library()
     }
 
     sourceSets {
