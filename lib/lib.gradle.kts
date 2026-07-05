@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.`maven-publish`
+import org.gradle.kotlin.dsl.signing
 import ru.raysmith.tgbot.gradle.HtmlDiffTask
 
 plugins {
@@ -11,7 +14,7 @@ plugins {
 }
 
 group = "ru.raysmith"
-version = "1.0.0-beta.20"
+version = "1.0.0-beta.21"
 
 java {
     toolchain {
