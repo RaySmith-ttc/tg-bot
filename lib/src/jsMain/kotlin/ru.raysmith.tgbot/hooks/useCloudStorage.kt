@@ -212,7 +212,7 @@ external interface CloudStorageHookType {
 // ---------------------------------------------------- Internal -------------------------------------------------------
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")
-private sealed external interface ActionType {
+internal sealed external interface ActionType {
     companion object {
         @JsValue("ADD") val ADD: ActionType
         @JsValue("REMOVE") val REMOVE: ActionType
@@ -222,7 +222,7 @@ private sealed external interface ActionType {
 }
 
 @JsPlainObject
-private external interface Action {
+internal external interface Action {
     val action: ActionType
     val key: String?
     val value: String?
